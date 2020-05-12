@@ -8,7 +8,9 @@ Description: flapper is an R package designed to facilitate the use of passive a
 Imports:
   dplyr, 
   pbapply,
-  glatos, geosphere
+  glatos, geosphere, 
+  fields,
+  plot.pretty, utils.add
 Suggests:
     knitr,
     rmarkdown
