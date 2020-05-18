@@ -50,7 +50,7 @@ compute_det_sim <-
     # Check that acoustics_ls is a factor
     first_non_NULL <- min(which(sapply(acoustics_ls, function(acoustics) return(!is.null(acoustics)))))
     if(!inherits(acoustics_ls[[first_non_NULL]]$id, "factor")) stop("acoustics_ls dataframe must contain id column that is a factor.")
-    # Define facotr levels (i.e. the names of individuals )
+    # Define factor levels (i.e. the names of individuals )
     id_names <- levels(acoustics_ls[[first_non_NULL]]$id)
     # id_names <- as.character(sapply(acoustics_ls, function(acoustics) return(acoustics$id[1])))
     nid <- length(id_names)
@@ -64,6 +64,10 @@ compute_det_sim <-
     if(all(!is.null(varlist), !is.null(cl))) parallel::clusterExport(cl = cl, varlist = varlist)
     lout <-
       pbapply::pblapply(acoustics_ls, cl = cl, function(acc1){
+
+        #### Testing:
+        # acc1 = acoustics_ls[[1]]; acc2 = acoustics_ls[[2]];
+        # acc1 = acoustics_ls[[2]]; acc2 = acoustics_ls[[1]];
 
         #### For each individual, loop over each other individual...
         lint <-
@@ -81,39 +85,46 @@ compute_det_sim <-
                           ") and individual (", as.character(acc2$id[1]), ").\n"))
               }
 
-              #### Match timeseries based on closest observations in time
+              #### Match timeseries based on closest observations in time using pair_ts()
               if(verbose) cat("Matching detection timeseries...\n")
               # Remove any observations from the second individual more than some limit outside of the timeseries of the first individual
-              # ... and vice versa.
-              # ... (for speed when matching)
-              acc2 <- acc2[acc2$timestamp >= (min(acc1$timestamp) - thresh_time*60) &
-                             acc2$timestamp <= (max(acc1$timestamp) + thresh_time*60), ]
-              if(nrow(acc2) == 0) return(NULL)
-              acc1 <- acc1[acc1$timestamp >= (min(acc2$timestamp) - thresh_time*60) &
-                             acc1$timestamp <= (max(acc2$timestamp) + thresh_time*60), ]
-              if(nrow(acc1) == 0) return(NULL)
+              # ... and vice versa (for speed when matching).
+              # No longer implemented, due to (a) improved speed of utils.add::match_closest() and (b) can lead to
+              # ... assymmetric pairing of timeseries.
+              # acc2 <- acc2[acc2$timestamp >= (min(acc1$timestamp) - thresh_time*60*2) &
+              #                  acc2$timestamp <= (max(acc1$timestamp) + thresh_time*60*2), ]
+              #   if(nrow(acc2) == 0) return(NULL)
+              #   acc1 <- acc1[acc1$timestamp >= (min(acc2$timestamp) - thresh_time*60*2) &
+              #                  acc1$timestamp <= (max(acc2$timestamp) + thresh_time*60*2), ]
+              #   if(nrow(acc1) == 0) return(NULL)
+              # }
+
               # Check for duplicated timestamps in each individuals dataframe, and adjust these
               # ... by a small fraction prior to matching, so that all are included. Unless there are 100,000s
               # ... of duplicate timestamps, this approach does not produce any duplicated observations.
               dup1 <- duplicated(acc1$timestamp)
               dup2 <- duplicated(acc2$timestamp)
+              adj <- (thresh_time*60)/4
               if(any(dup1)){
                 pos_dups1 <- which(dup1)
                 lpd1 <- length(pos_dups1)
-                adj_dups1 <- stats::runif(lpd1, -30, 30)
+                adj_dups1 <- stats::runif(lpd1, -adj, adj)
                 acc1$timestamp[pos_dups1] <- acc1$timestamp[pos_dups1] + adj_dups1
+                if(any(duplicated(acc1$timestamp))) warning(paste("Duplicate timestamps in, ", as.character(acc1$id[1]), "element in acoustic_ls."))
               }
               if(any(dup2)){
                 pos_dups2 <- which(dup2)
                 lpd2 <- length(pos_dups2)
-                adj_dups2 <- stats::runif(lpd2, -30, 30)
+                adj_dups2 <- stats::runif(lpd2, -adj, adj)
                 acc2$timestamp[pos_dups2] <- acc2$timestamp[pos_dups2] + adj_dups2
+                if(any(duplicated(acc2$timestamp))) warning(paste("Duplicate timestamps in, ", as.character(acc2$id[1]), "element in acoustic_ls."))
               }
               # Match timeseries, readjusting any adjusted timestamps back to their original values
+              # ... before these are added to the dataframe.
               acc1$pos_in_acc2 <- utils.add::match_closest(acc1$timestamp, acc2$timestamp)
-              acc1$timestamp_acc2 <- acc2$timestamp[acc1$pos_in_acc2]
               if(any(dup1)) acc1$timestamp[pos_dups1] <- acc1$timestamp[pos_dups1] - adj_dups1
               if(any(dup2)) acc2$timestamp[pos_dups2] <- acc2$timestamp[pos_dups2] - adj_dups2
+              acc1$timestamp_acc2 <- acc2$timestamp[acc1$pos_in_acc2]
 
               #### Exclude any timestamps more than timestamp beyond each other (could be 0 mins)
               # Implement this now, before a threshold based on distance, below, for speed.
@@ -128,13 +139,14 @@ compute_det_sim <-
               acc1$lat_receiver_acc2 <- acc2$lat_receiver[acc1$pos_in_acc2]
               acc1$long_receiver_acc2 <- acc2$long_receiver[acc1$pos_in_acc2]
               # Compute distances
-              acc1$dist_btw_rec <- round(geosphere::distGeo(acc1[, c("long_receiver", "lat_receiver")],
-                                                            acc1[, c("long_receiver_acc2", "lat_receiver_acc2")]))
+              acc1$dist_btw_rec <- geosphere::distGeo(acc1[, c("long_receiver", "lat_receiver")],
+                                                      acc1[, c("long_receiver_acc2", "lat_receiver_acc2")])
 
               #### Exclude any receivers more than some threshold distance beyond each other (could be 0 m):
               if(verbose) cat("Processing timeseries by threshold distance...\n")
               acc1 <- acc1[acc1$dist_btw_rec <= thresh_dist, ]
               if(nrow(acc1) == 0) return(NULL) else return(acc1)
+
             }
           })
 
