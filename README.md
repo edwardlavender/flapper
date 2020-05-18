@@ -5,7 +5,7 @@
 
 <!-- badges: end -->
 
-`flapper` is an `R` package which provides tools for infering patterns
+`flapper` is an `R` package which provides tools for inferring patterns
 of animal space use from passive acoustic telemetry (PAT) data. This
 package has been particularly motivated by the collection of new
 acoustic and archival data from a Critically Endangered elasmobranch,
@@ -52,11 +52,11 @@ devtools::install_github("edwardlavender/flapper")
     extension for the ‘short interval’ criterion approach implemented by
     `VUE` and `glatos` to incorporate ancillary information on animal
     swimming speeds, if applicable. This may improve the identification
-    of flase detections in clustered receiver arrays (see below).
-  - **Sentinal transmissions and detections.** `flapper` provides a
+    of false detections in clustered receiver arrays (see below).
+  - **Sentinel transmissions and detections.** `flapper` provides a
     collection of functions for assembling transmission – detection
     datasets (i..e, to model detection probability from range testing
-    experiments/sentinal tag data). The main function is
+    experiments/sentinel tag data). The main function is
     `assemble_rtdet()`, which is supported by `rtdet()` and
     `unique_rec()`.
 
@@ -86,8 +86,8 @@ space use for PAT/archival data. These include:
     `ACDC()`.
   - **The ACDC - movement pathway algorithm.** The ACDC-MP algorithm
     incorporates movement pathways into the `ACDC` process to further
-    restrict the infefred distribution of locations within which the
-    individual must have been located at each timepoint. This is
+    restrict the inferred distribution of locations within which the
+    individual must have been located at each time point. This is
     implemented with `setupMP()`, `MP()`, and `procMP()`.
 
 ## Simulations

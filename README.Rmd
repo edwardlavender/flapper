@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-`flapper` is an `R` package which provides tools for infering patterns of animal space use from passive acoustic telemetry (PAT) data. This package has been particularly motivated by the collection of new acoustic and archival data from a Critically Endangered elasmobranch, the flapper skate (_Dipturus intermedius_) off the West Coast of Scotland, where a static PAT array has been established to examine the movements of individuals within a Marine Protected Area. In this context, `flapper` has been designed as a complement to existing packages for the analyses of these data (e.g. `VTrack`, `glatos` and `fishtrack3d`), with a particular focus on the provision of tools that integrate PAT and archival (i.e. depth timeseries) data for improved estimates of animal space use, especially for demersal/benthic species. To this end, `flapper` contains functions which address the following requirements:
+`flapper` is an `R` package which provides tools for inferring patterns of animal space use from passive acoustic telemetry (PAT) data. This package has been particularly motivated by the collection of new acoustic and archival data from a Critically Endangered elasmobranch, the flapper skate (_Dipturus intermedius_) off the West Coast of Scotland, where a static PAT array has been established to examine the movements of individuals within a Marine Protected Area. In this context, `flapper` has been designed as a complement to existing packages for the analyses of these data (e.g. `VTrack`, `glatos` and `fishtrack3d`), with a particular focus on the provision of tools that integrate PAT and archival (i.e. depth timeseries) data for improved estimates of animal space use, especially for demersal/benthic species. To this end, `flapper` contains functions which address the following requirements:
 
 * **data processing**, including addressing ghost detections and assembling detection -- transmission (i.e., range testing) datasets;
 * **space use algorithms**, including a more flexible implementation of the most widely used approach for inferring space use (i.e. the centre of activity -- kernel utilisation (COA-KUD) approach) and new algorithms designed for demersal/benthic species which integrate PAT and archival data to improve estimates of space use; 
@@ -37,8 +37,8 @@ devtools::install_github("edwardlavender/flapper")
 
 ## Data processing 
 
-* **False detections.** The identification of false detections is a key component of PAT data processing. `flapper` provides an extension for the 'short interval' criterion approach implemented by `VUE` and `glatos` to incorporate ancillary information on animal swimming speeds, if applicable. This may improve the identification of flase detections in clustered receiver arrays (see below). 
-* **Sentinal transmissions and detections.** `flapper` provides a collection of functions for assembling transmission -- detection datasets (i..e, to model detection probability from range testing experiments/sentinal tag data). The main function is `assemble_rtdet()`, which is supported by `rtdet()` and `unique_rec()`.
+* **False detections.** The identification of false detections is a key component of PAT data processing. `flapper` provides an extension for the 'short interval' criterion approach implemented by `VUE` and `glatos` to incorporate ancillary information on animal swimming speeds, if applicable. This may improve the identification of false detections in clustered receiver arrays (see below). 
+* **Sentinel transmissions and detections.** `flapper` provides a collection of functions for assembling transmission -- detection datasets (i..e, to model detection probability from range testing experiments/sentinel tag data). The main function is `assemble_rtdet()`, which is supported by `rtdet()` and `unique_rec()`.
 
 ## Space use algorithms
 
@@ -50,7 +50,7 @@ Some functions implement new methods designed to provide estimates of space use 
 
 * **The depth contour (DC) algorithm.** This approach is the simplest. Under the assumption that individuals are benthic/demersal, this algorithm uses the observed depths (± some error) to define the subset of possible locations of each individual within an defined area. This is implemented via `DC()`.
 * **The acoustic centroid, depth contour (ACDC) algorithm.** The `ACDC` extends the `DC` algorithm by using passive acoustic telemetry data to inform the area within which depth contours are most likely to be found. This is implemented `setupACDC()` and `ACDC()`.
-* **The ACDC - movement pathway algorithm.** The ACDC-MP algorithm incorporates movement pathways into the `ACDC` process to further restrict the infefred distribution of locations within which the individual must have been located at each timepoint. This is implemented with `setupMP()`, `MP()`, and `procMP()`.
+* **The ACDC - movement pathway algorithm.** The ACDC-MP algorithm incorporates movement pathways into the `ACDC` process to further restrict the inferred distribution of locations within which the individual must have been located at each time point. This is implemented with `setupMP()`, `MP()`, and `procMP()`.
 
 ## Simulations
 
