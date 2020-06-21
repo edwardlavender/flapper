@@ -10,7 +10,7 @@ Imports:
   pbapply,
   glatos, geosphere, 
   fields,
-  plot.pretty, utils.add
+  plot.pretty, Tools4ETS
 Suggests:
     knitr,
     rmarkdown

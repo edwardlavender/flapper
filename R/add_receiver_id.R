@@ -40,11 +40,21 @@ add_receiver_id <-
       tz <- lubridate::tz(acoustics$timestamp)
       if(!inherits(moorings$start_date, "POSIXct")){
         warning("moorings$start_date must be a POSIXct object; attempting to coerce moorings$start_date into a POSIXct object.")
-        moorings$start_date <- as.POSIXct(moorings$start_date, tz = tz)
+        moorings$start_date <- lubridate::round_date(as.POSIXct(moorings$start_date, tz = tz), unit = "day")
+        lubridate::tz(moorings$start_date) <- tz
       }
       if(!inherits(moorings$end_date, "POSIXct")){
         warning("moorings$end_date must be a POSIXct object; attempting to coerce moorings$end_date into a POSIXct object.")
-        moorings$end_date <- as.POSIXct(moorings$end_date, tz = tz)
+        moorings$end_date <- lubridate::round_date(as.POSIXct(moorings$end_date, tz = tz), unit = "day")
+        lubridate::tz(moorings$end_date) <- tz
+      }
+      if(lubridate::tz(moorings$start_date) == ""){
+        warning("moorings$start_date lacking timezone (see lubridate::tz()). tz = lubridate::tz(acoustics$timestamp) forced.")
+        lubridate::tz(moorings$start_date) <- tz
+      }
+      if(lubridate::tz(moorings$end_date) == ""){
+        warning("moorings$timestamp lacking timezone (see lubridate::tz()). tz = lubridate::tz(acoustics$timestamp) forced.")
+        lubridate::tz(moorings$end_date) <- tz
       }
       if(class(moorings$receiver)[1] != class(acoustics$receiver)[1]){
         warning("class(moorings$receiver)[1] != class(acoustics$receiver)[1]; both coerced to character vectors.")
@@ -53,6 +63,8 @@ add_receiver_id <-
       }
 
       #### Define data.tables
+      acoustics$start_date <- acoustics$timestamp
+      acoustics$end_date <- acoustics$timestamp
       acoustics <- data.table::data.table(acoustics)
       moorings <- data.table::data.table(moorings)
       receiver <- NULL; start_date <- NULL; end_date <- NULL
@@ -71,7 +83,7 @@ add_receiver_id <-
     }
 
     #### Return the receiver IDs
-    lna <- length(is.na(acoustics$receiver_id))
+    lna <- length(which(is.na(acoustics$receiver_id)))
     if(lna > 0) warning(paste("receiver IDs returned contain,", lna, "NAs (e.g. possibly due to incorrect start/end dates)."))
     return(acoustics$receiver_id)
   }

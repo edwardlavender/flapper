@@ -3,7 +3,7 @@
 #### compute_det_sim()
 
 #' @title Compute a detection history similarity matrix
-#' @description The function computes a detection history similarity matrix. For all combinations of individuals, this shows the total number (or percentage) of detections 'nearby' in space and time, which can help elucidate possible interactions among individuals that affect space use (see Details). To compute this matrix, the function pairs detections for each individual with the detections nearest in time for each other individual. The function computes the time (minutes) between paired detection timeseries, and the distance (m) between the receiver(s) at which paired detections occurred, dropping any detection pairs that are further apart in time or space than user-defined thresholds (which depend on the mobility of the species under investigation). For each combination of individuals, the function returns total number (or percentage) of detections that are closely associated in time and space. For many combinations of individuals, especially those with long, overlapping timeseries, the function may take some time (minutes to hours) to run; therefore, testing the function on a small subset of individuals first is advisable. However, parallelisation can be used to improve computation time. Similarity matrices can be visualised with \code{\link[flapper]{plot_det_sim}}.
+#' @description The function computes a detection history similarity matrix. For all combinations of individuals, this shows the total number (or percentage) of detections 'nearby' in space and time, which can help elucidate possible interactions among individuals that affect space use (see Details). To compute this matrix, the function pairs detections for each individual with the detections nearest in time for each other individual. The function computes the time (minutes) between paired detection timeseries, and the distance (m) between the receiver(s) at which paired detections occurred, dropping any detection pairs that are further apart in time or space than user-defined thresholds (which depend on the mobility of the species under investigation). For each combination of individuals, the function returns total number (or percentage) of detections that are closely associated in time and space. For many combinations of individuals, especially those with long, overlapping timeseries, the function may take some time (minutes to hours) to run; therefore, testing the function on a small subset of individuals first is advisable. However, parallelisation can be used to improve computation time. Similarity matrices can be visualised with \code{\link[plot.pretty]{pretty_mat}}.
 #'
 #' @param acoustics_ls A list of dataframes, with one element for each individual, which contain each individual's detection timeseries. Each dataframe must include the following columns: 'id', a factor which specifies unique individuals; 'timestamp', a \code{\link[base]{DateTimeClasses}} object which specifies the time of each detection; 'long_receiver', the longitude (decimal degrees) of the receiver(s) at the individual was detected; and 'lat_receiver', the latitude (decimal degrees) of the receiver(s) at which individual was detected. Each dataframe should be ordered by 'id' and then by 'timestamp'. Careful ordering of 'id' factor levels (e.g. perhaps by population group, then by the number of detections of each individual) can aid visualisation of similarity matrices, in which the order or rows/columns corresponds directly to the order of individuals in \code{acoustics_ls}. Sequential elements in \code{acoustics_ls} should correspond to sequential factor levels for 'id', which should be the same across all dataframes.
 #' @param thresh_time A number which specifies the time, in minutes, after which detections at nearby receivers are excluded.
@@ -118,7 +118,7 @@ compute_det_sim <-
               }
               # Match timeseries, readjusting any adjusted timestamps back to their original values
               # ... before these are added to the dataframe.
-              acc1$pos_in_acc2 <- utils.add::match_closest(acc1$timestamp, acc2$timestamp)
+              acc1$pos_in_acc2 <- Tools4ETS::match_ts_nearest(acc1$timestamp, acc2$timestamp)
               if(any(dup1)) acc1$timestamp[pos_dups1] <- acc1$timestamp[pos_dups1] - adj_dups1
               if(any(dup2)) acc2$timestamp[pos_dups2] <- acc2$timestamp[pos_dups2] - adj_dups2
               acc1$timestamp_acc2 <- acc2$timestamp[acc1$pos_in_acc2]
@@ -182,79 +182,6 @@ compute_det_sim <-
     return(out)
 
   }
-
-
-#######################################
-#######################################
-#### plot_det_sim()
-
-#' @title Plot a detection similarity matrix
-#' @description This function is a wrapper for \code{\link[fields]{image.plot}} designed to streamline the visualisation of detection similarity matrices. The function returns a plot which can be customised.
-#'
-#' @param z A (detection similarity) matrix to be plotted (see \code{\link[flapper]{compute_det_sim}}). Individual IDs (for the axis tick mark labels) are extracted from the row names of this matrix, if provided. Otherwise, axis tick mark labels are given as an index.
-#' @param zlim A numeric vector of length two which specifies the z axis limits (see \code{\link[fields]{image.plot}}),
-#' @param col A colour table to use for the image (see \code{\link[fields]{image.plot}}).
-#' @param col_diag (optional) A colour which, if provided, is used to shade the diagonal of the matrix.
-#' @param grid (optional) A named list which, if provided, is passed to \code{\link[plot.pretty]{add_grid_rect_xy}} to draw grid lines around each matrix cell. Arguments \code{x} and \code{y} default to the positions of each matrix cell and do not need to be provided. To use \code{\link[plot.pretty]{add_grid_rect_xy}}'s default graphical options, simply specify \code{grid = list()}.
-#' @param cex.axis A number which specifies the axis font size (specifically, the magnification to be used for axis annotation relative to the current setting of \code{cex}, see \code{\link[graphics]{par}}).
-#' @param xlab The x axis label.
-#' @param ylab The y axis label.
-#' @param ... Additional arguments passed to \code{\link[fields]{image.plot}}. These should not include \code{x}, \code{y}, \code{xlim}, \code{ylim} or \code{axes} which are controlled internally.
-#'
-#' @return The function returns a plot of a similarity matrix.
-#'
-#' @examples
-#'
-#' @author Edward Lavender
-#' @export
-#'
-
-plot_det_sim <-
-  function(z,
-           zlim = NULL,
-           col = grDevices::colorRampPalette(c("white", "yellow", "orange", "red"))(100),
-           col_diag = NULL,
-           grid = NULL,
-           cex.axis = 1,
-           xlab = "Individual", ylab = "Individual",...
-           ){
-
-    #### Checks
-    ## Check that no arguments that are set internally have been supplied via ...
-    not_allowed <- c("x", "y", "xlim", "ylim", "axes")
-    plot.pretty::check...(c("xlim", "ylim"),...)
-
-    #### Plot image, note the need to shift limits by 0.5 down:
-    nid <- nrow(z)
-    if(is.null(rownames(z))) id_names <- 1:nid else id_names <- rownames(z)
-    fields::image.plot(1:nid, 1:nid, z,
-                       col = col,
-                       xlim = c(0.5, nid+0.5), ylim = c(0.5, nid+0.5), zlim = zlim,
-                       xlab = xlab, ylab = ylab,
-                       axes = FALSE,...)
-
-    #### Add regular grid for interpretation, if requested
-    if(!is.null(grid)){
-      if(!is.list(grid)) stop("'grid', if supplied, must be a named list.")
-      if(is.null(names(grid))) stop("'grid', if supplied, must be a named list (names are missing).")
-      grid <- utils.add::list_merge(list(x = 0.5:(nid+0.5), y = 0.5:(nid+0.5)), grid)
-      do.call(plot.pretty::add_grid_rect_xy, grid)
-    }
-
-    #### Add axes
-    at <- 0.5:(nid+0.5)
-    graphics::axis(side = 1, at = at, c(id_names, ""), pos = 0.5, cex.axis = cex.axis, las = 2)
-    graphics::axis(side = 2, at = at, c(id_names, ""), pos = 0.5, cex.axis = cex.axis, las = 2)
-    graphics::axis(side = 3, at = at, lwd.ticks = 0, labels = FALSE)
-    graphics::axis(side = 4, at = at, lwd.ticks = 0, labels = FALSE)
-
-    #### Shade diagonal for interpretion
-    if(!is.null(col_diag)){
-      zdiag <- z; zdiag[] <- NA; diag(zdiag) <- 1
-      graphics::image(1:nid, 1:nid, zdiag, add = TRUE, col = col_diag)
-    }
-
-}
 
 
 #### End of code.
