@@ -67,7 +67,7 @@ algorithms designed to infer space use from PAT data. These include:
 
   - **The centres of activity – kernel utilisation distribution
     (COA-KUD) algorithm.** This is the most widely used approach for
-    infering animal space use from PAT data. This can be implemented by
+    inferring animal space use from PAT data. This can be implemented by
     `VTrack`, but `flapper` provides a more flexible implementation
     (`coa()`) which is not so restrictive in terms of data format.
 

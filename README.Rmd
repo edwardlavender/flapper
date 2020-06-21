@@ -44,7 +44,7 @@ devtools::install_github("edwardlavender/flapper")
 
 `flapper` includes functions for the implementation of some existing algorithms designed to infer space use from PAT data. These include: 
 
-* **The centres of activity -- kernel utilisation distribution (COA-KUD) algorithm.**  This is the most widely used approach for infering animal space use from PAT data. This can be implemented by `VTrack`, but `flapper` provides a more flexible implementation (`coa()`) which is not so restrictive in terms of data format. 
+* **The centres of activity -- kernel utilisation distribution (COA-KUD) algorithm.**  This is the most widely used approach for inferring animal space use from PAT data. This can be implemented by `VTrack`, but `flapper` provides a more flexible implementation (`coa()`) which is not so restrictive in terms of data format. 
 
 Some functions implement new methods designed to provide estimates of space use for PAT/archival data. These include:
 
