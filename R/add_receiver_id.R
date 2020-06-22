@@ -9,6 +9,33 @@
 #' @return The function returns a vector of receiver IDs, as defined in the \code{moorings$receiver_id} column, which correspond to each detection in the \code{acoustics} dataframe.
 #'
 #' @examples
+#' #### Define example data
+#' # In this example, we have two receivers, but one has been re-deployed:
+#' moorings <- data.frame(receiver = c(1, 1, 2),
+#'                         receiver_id = c(1, 2, 3),
+#'                         start_date = as.POSIXct(c("2016-01-01",
+#'                                                   "2016-01-02",
+#'                                                   "2016-01-01"), tz = "UTC"),
+#'                         end_date = as.POSIXct(c("2016-01-02",
+#'                                                 "2016-01-03",
+#'                                                 "2016-01-02"), tz = "UTC")
+#'                         )
+#' # Our observational dataframe contains receivers but not unique receiver IDs:
+#' acoustics <- data.frame(receiver = c(1, 1, 2),
+#'                        timestamp = as.POSIXct(c("2016-01-01 00:30:00",
+#'                                                  "2016-01-02 00:30:00",
+#'                                                  "2016-01-01 00:30:00"), tz = "UTC")
+#'                                               )
+#'
+#' #### Example (1): Add unique receiver IDs to the observational dataframe
+#' # The first observation corresponds to receiver 1;
+#' # The second observation corresponds to the same receiver
+#' # ... but a different deployment, and has receiver_id = 2
+#' # The third observation corresponds to receiver id 3;
+#' acoustics$receiver_id <- add_receiver_id(acoustics, moorings)
+#' acoustics
+#'
+#' @seealso see \code{\link[Tools4ETS]{add_unit_id}} for a slightly more general function.
 #'
 #' @author Edward Lavender
 #' @export
