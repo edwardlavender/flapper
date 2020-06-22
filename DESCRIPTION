@@ -6,11 +6,11 @@ Author: Edward Lavender
 Maintainer: Edward Lavender <el72@st-andrews.ac.uk>
 Description: flapper is an R package designed to facilitate the use of passive acoustic telemetry (PAT) data for ecological inferences, especially those pertaining to animal space use. This includes functions for processing PAT data, new algorithms for inferring space use and simulations designed to evaluate the efficacy of existing and new algorithms for inferring space use. Package development has been motivated by the collection of PAT data for a Critically Endangered benthopelagic elasmobranch on the West Coast of Scotland. 
 Imports:
-  data.table, dplyr, lubridate,
-  pbapply,
-  glatos, geosphere, 
-  fields,
-  plot.pretty, Tools4ETS
+    magrittr, data.table, dplyr, rlang, lubridate,
+    pbapply,
+    glatos,
+    geosphere, fields,
+    plot.pretty, Tools4ETS
 Suggests:
     knitr,
     rmarkdown
