@@ -15,7 +15,7 @@ compute_det_sim(
 )
 }
 \arguments{
-\item{acoustics_ls}{A list of dataframes, with one element for each individual, which contain each individual's detection timeseries. Each dataframe must include the following columns: 'id', a factor which specifies unique individuals; 'timestamp', a \code{\link[base]{DateTimeClasses}} object which specifies the time of each detection; 'long_receiver', the longitude (decimal degrees) of the receiver(s) at the individual was detected; and 'lat_receiver', the latitude (decimal degrees) of the receiver(s) at which individual was detected. Each dataframe should be ordered by 'id' and then by 'timestamp'. Careful ordering of 'id' factor levels (e.g. perhaps by population group, then by the number of detections of each individual) can aid visualisation of similarity matrices, in which the order or rows/columns corresponds directly to the order of individuals in \code{acoustics_ls}. Sequential elements in \code{acoustics_ls} should correspond to sequential factor levels for 'id', which should be the same across all dataframes.}
+\item{acoustics_ls}{A list of dataframes, with one element for each individual, which contain each individual's detection timeseries. Each dataframe must include the following columns: 'individual_id', a factor which specifies unique individuals; 'timestamp', a \code{\link[base]{DateTimeClasses}} object which specifies the time of each detection; 'receiver_long', the longitude (decimal degrees) of the receiver(s) at the individual was detected; and 'receiver_lat', the latitude (decimal degrees) of the receiver(s) at which individual was detected. Each dataframe should be ordered by 'individual_id' and then by 'timestamp'. Careful ordering of 'individual_id' factor levels (e.g. perhaps by population group, then by the number of detections of each individual) can aid visualisation of similarity matrices, in which the order or rows/columns corresponds directly to the order of individuals in \code{acoustics_ls}. Sequential elements in \code{acoustics_ls} should correspond to sequential factor levels for 'individual_id', which should be the same across all dataframes.}
 
 \item{thresh_time}{A number which specifies the time, in minutes, after which detections at nearby receivers are excluded.}
 
@@ -25,7 +25,7 @@ compute_det_sim(
 
 \item{varlist}{(optional) A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This is required if \code{cl} is supplied and you specify some function arguments via objects, rather than directly. These objects must be located in the global environment.}
 
-\item{output}{A number which specifies the output type. If \code{output = 1}, the function returns a (usually) symmetric similarity matrix in which each number represents the number of detections nearby in space and time for each pair of individuals. Row and column names are assigned from the 'id' column in \code{acoustics_ls} dataframes. This matrix is usually symmetric, but this is not necessarily the case for data collected from tags which transmit at random intervals around a nominal delay: under this scenario, the tag for a given individual (i) may transmit multiple signals in the space of time that the tag for another individual (j) only releases a single transmission. In this case, the pairing i,j will comprise all unique transmissions for individual i, paired with the nearest observations for individual j, some of which will be duplicate observations. Therefore, this pairing will contain more 'shared observations' than the pairing j,i. However, even under random transmission, the matrix will usually be either symmetric or very nearly symmetric, with only small differences between identical pairs. If \code{output = 2}, the function returns a list with the following elements: (1) 'mat_sim', the symmetric similarity matrix (see above); 'mat_nobs', a matrix with the same dimensions as 'mat_sim' which specifies the number of observations for each individual (by row, used to calculate 'mat_pc', see later); 'mat_pc', a non-symmetric matrix in which each cell represent the percent of observations of the individual in the i'th row that are shared with the individual in the j'th column; and 'dat', a nested list, with one element for each individual which comprises a list of dataframes, one for each other individual, each one of which contains the subset of observations that are shared between the two individuals. Each dataframe contains the same columns as in the \code{acoustics_ls} dataframes with the following columns added: 'pos_in_acc2', 'timestamp_acc2', 'lat_receiver_acc2' and 'long_receiver_acc2', which represent the positions, timestamps and locations of corresponding observations in the second individual's dataframe to the first individual's dataframe, and 'difftime_abs' and 'dist_btw_receivers' which represent the duration (minutes) and distances (m) between corresponding observations. When there are no shared observations between a pair of individuals, the element simply contains \code{NULL}. Note that 'mat_pc' is computed by (mat_sim/mat_nobs)*100. The matrix is therefore non-symmetric (if individuals have differing numbers of observations); i.e., mat_pc[i, j] is the percent of individual i's observations that are shared with individual j; while mat_pc[j, i] is the percent of individual j's observations that are shared with individual i. NaN elements are possible in 'mat_pc' for levels of the factor 'id' without observations.}
+\item{output}{A number which specifies the output type. If \code{output = 1}, the function returns a (usually) symmetric similarity matrix in which each number represents the number of detections nearby in space and time for each pair of individuals. Row and column names are assigned from the 'individual_id' column in \code{acoustics_ls} dataframes. This matrix is usually symmetric, but this is not necessarily the case for data collected from tags which transmit at random intervals around a nominal delay: under this scenario, the tag for a given individual (i) may transmit multiple signals in the space of time that the tag for another individual (j) only releases a single transmission. In this case, the pairing i,j will comprise all unique transmissions for individual i, paired with the nearest observations for individual j, some of which will be duplicate observations. Therefore, this pairing will contain more 'shared observations' than the pairing j,i. However, even under random transmission, the matrix will usually be either symmetric or very nearly symmetric, with only small differences between identical pairs. If \code{output = 2}, the function returns a list with the following elements: (1) 'mat_sim', the symmetric similarity matrix (see above); 'mat_nobs', a matrix with the same dimensions as 'mat_sim' which specifies the number of observations for each individual (by row, used to calculate 'mat_pc', see later); 'mat_pc', a non-symmetric matrix in which each cell represent the percent of observations of the individual in the i'th row that are shared with the individual in the j'th column; and 'dat', a nested list, with one element for each individual which comprises a list of dataframes, one for each other individual, each one of which contains the subset of observations that are shared between the two individuals. Each dataframe contains the same columns as in the \code{acoustics_ls} dataframes with the following columns added: 'pos_in_acc2', 'timestamp_acc2', 'receiver_lat_acc2' and 'receiver_long_acc2', which represent the positions, timestamps and locations of corresponding observations in the second individual's dataframe to the first individual's dataframe, and 'difftime_abs' and 'dist_btw_receivers' which represent the duration (minutes) and distances (m) between corresponding observations. When there are no shared observations between a pair of individuals, the element simply contains \code{NULL}. Note that 'mat_pc' is computed by (mat_sim/mat_nobs)*100. The matrix is therefore non-symmetric (if individuals have differing numbers of observations); i.e., mat_pc[i, j] is the percent of individual i's observations that are shared with individual j; while mat_pc[j, i] is the percent of individual j's observations that are shared with individual i. NaN elements are possible in 'mat_pc' for levels of the factor 'individual_id' without observations.}
 
 \item{verbose}{A logical input which specifies whether or not to print messages to the console which relay function progress. This is ignored if \code{cl} is supplied.}
 }
@@ -42,6 +42,46 @@ Passive acoustic telemetry is widely used to study animal space use, and the pos
 The distances beyond which detections of different individuals nearby in time are considered to demonstrate that those individuals are not closely associated are Euclidean. This may be problematic (e.g. when receivers hug complex coastlines).}
 }
 \examples{
+#### Prepare data
+# acoustics_ls requires a dataframe with certain columns
+# individual_id should be a factor
+dat_acoustics$individual_id <- factor(dat_acoustics$individual_id)
+# ensure dataframe ordered by individual, then timestamp
+dat_acoustics <- dat_acoustics[order(dat_acoustics$individual_id, dat_acoustics$timestamp), ]
+# define list of dataframes
+acoustics_ls <- split(dat_acoustics, factor(dat_acoustics$individual_id))
+
+#### Example (1): Compute detection similarity matrix using default options
+# mat_sim contains the number of observations shared among individuals
+mat_sim <- compute_det_sim(acoustics_ls = acoustics_ls,
+                           thresh_time = 90,
+                           thresh_dist = 0)
+plot.pretty::pretty_mat(mat_sim, col_diag = "dimgrey")
+
+#### Example (2): Return list of outputs
+out_ls <- compute_det_sim(acoustics_ls = acoustics_ls,
+                          thresh_time = 90,
+                          thresh_dist = 0,
+                          output = 2)
+names(out_ls)
+# Examine number of observations for each individual
+plot.pretty::pretty_mat(out_ls$mat_nobs)
+# Examine \% shared detections between individuals
+plot.pretty::pretty_mat(out_ls$mat_pc, col_diag = "dimgrey")
+
+#### Example (3): Turn off messages with verbose = FALSE
+out_ls_non_verb <- compute_det_sim(acoustics_ls = acoustics_ls,
+                                   thresh_time = 90,
+                                   thresh_dist = 0,
+                                   verbose = FALSE)
+
+#### Example (4): Implement algorithm in parallel
+out_ls_pl <- compute_det_sim(acoustics_ls = acoustics_ls,
+                             thresh_time = 90,
+                             thresh_dist = 0,
+                             cl = parallel::makeCluster(2L),
+                             output = 2)
+names(out_ls_pl)
 
 }
 \author{
