@@ -33,7 +33,7 @@ compute_det_sim(
 The function returns a matrix or a list, depending on the input to \code{output} (see above).
 }
 \description{
-The function computes a detection history similarity matrix. For all combinations of individuals, this shows the total number (or percentage) of detections 'nearby' in space and time, which can help elucidate possible interactions among individuals that affect space use (see Details). To compute this matrix, the function pairs detections for each individual with the detections nearest in time for each other individual. The function computes the time (minutes) between paired detection timeseries, and the distance (m) between the receiver(s) at which paired detections occurred, dropping any detection pairs that are further apart in time or space than user-defined thresholds (which depend on the mobility of the species under investigation). For each combination of individuals, the function returns total number (or percentage) of detections that are closely associated in time and space. For many combinations of individuals, especially those with long, overlapping timeseries, the function may take some time (minutes to hours) to run; therefore, testing the function on a small subset of individuals first is advisable. However, parallelisation can be used to improve computation time. Similarity matrices can be visualised with \code{\link[plot.pretty]{pretty_mat}}.
+The function computes a detection history similarity matrix. For all combinations of individuals, this shows the total number (or percentage) of detections 'nearby' in space and time, which can help elucidate possible interactions among individuals that affect space use (see Details). To compute this matrix, the function pairs detections for each individual with the detections nearest in time for each other individual. The function computes the time (minutes) between paired detection timeseries, and the distance (m) between the receiver(s) at which paired detections occurred, dropping any detection pairs that are further apart in time or space than user-defined thresholds (which depend on the mobility of the species under investigation). For each combination of individuals, the function returns total number (or percentage) of detections that are closely associated in time and space. For many combinations of individuals, especially those with long, overlapping timeseries, the function may take some time (minutes to hours) to run; therefore, testing the function on a small subset of individuals first is advisable. However, parallelisation can be used to improve computation time. Similarity matrices can be visualised with \code{\link[prettyGraphics]{pretty_mat}}.
 }
 \details{
 \subsection{Background}{
@@ -56,7 +56,7 @@ acoustics_ls <- split(dat_acoustics, factor(dat_acoustics$individual_id))
 mat_sim <- compute_det_sim(acoustics_ls = acoustics_ls,
                            thresh_time = 90,
                            thresh_dist = 0)
-plot.pretty::pretty_mat(mat_sim, col_diag = "dimgrey")
+prettyGraphics::pretty_mat(mat_sim, col_diag = "dimgrey")
 
 #### Example (2): Return list of outputs
 out_ls <- compute_det_sim(acoustics_ls = acoustics_ls,
@@ -65,9 +65,9 @@ out_ls <- compute_det_sim(acoustics_ls = acoustics_ls,
                           output = 2)
 names(out_ls)
 # Examine number of observations for each individual
-plot.pretty::pretty_mat(out_ls$mat_nobs)
+prettyGraphics::pretty_mat(out_ls$mat_nobs)
 # Examine \% shared detections between individuals
-plot.pretty::pretty_mat(out_ls$mat_pc, col_diag = "dimgrey")
+prettyGraphics::pretty_mat(out_ls$mat_pc, col_diag = "dimgrey")
 
 #### Example (3): Turn off messages with verbose = FALSE
 out_ls_non_verb <- compute_det_sim(acoustics_ls = acoustics_ls,

@@ -3,7 +3,7 @@
 #### compute_det_sim()
 
 #' @title Compute a detection history similarity matrix
-#' @description The function computes a detection history similarity matrix. For all combinations of individuals, this shows the total number (or percentage) of detections 'nearby' in space and time, which can help elucidate possible interactions among individuals that affect space use (see Details). To compute this matrix, the function pairs detections for each individual with the detections nearest in time for each other individual. The function computes the time (minutes) between paired detection timeseries, and the distance (m) between the receiver(s) at which paired detections occurred, dropping any detection pairs that are further apart in time or space than user-defined thresholds (which depend on the mobility of the species under investigation). For each combination of individuals, the function returns total number (or percentage) of detections that are closely associated in time and space. For many combinations of individuals, especially those with long, overlapping timeseries, the function may take some time (minutes to hours) to run; therefore, testing the function on a small subset of individuals first is advisable. However, parallelisation can be used to improve computation time. Similarity matrices can be visualised with \code{\link[plot.pretty]{pretty_mat}}.
+#' @description The function computes a detection history similarity matrix. For all combinations of individuals, this shows the total number (or percentage) of detections 'nearby' in space and time, which can help elucidate possible interactions among individuals that affect space use (see Details). To compute this matrix, the function pairs detections for each individual with the detections nearest in time for each other individual. The function computes the time (minutes) between paired detection timeseries, and the distance (m) between the receiver(s) at which paired detections occurred, dropping any detection pairs that are further apart in time or space than user-defined thresholds (which depend on the mobility of the species under investigation). For each combination of individuals, the function returns total number (or percentage) of detections that are closely associated in time and space. For many combinations of individuals, especially those with long, overlapping timeseries, the function may take some time (minutes to hours) to run; therefore, testing the function on a small subset of individuals first is advisable. However, parallelisation can be used to improve computation time. Similarity matrices can be visualised with \code{\link[prettyGraphics]{pretty_mat}}.
 #'
 #' @param acoustics_ls A list of dataframes, with one element for each individual, which contain each individual's detection timeseries. Each dataframe must include the following columns: 'individual_id', a factor which specifies unique individuals; 'timestamp', a \code{\link[base]{DateTimeClasses}} object which specifies the time of each detection; 'receiver_long', the longitude (decimal degrees) of the receiver(s) at the individual was detected; and 'receiver_lat', the latitude (decimal degrees) of the receiver(s) at which individual was detected. Each dataframe should be ordered by 'individual_id' and then by 'timestamp'. Careful ordering of 'individual_id' factor levels (e.g. perhaps by population group, then by the number of detections of each individual) can aid visualisation of similarity matrices, in which the order or rows/columns corresponds directly to the order of individuals in \code{acoustics_ls}. Sequential elements in \code{acoustics_ls} should correspond to sequential factor levels for 'individual_id', which should be the same across all dataframes.
 #' @param thresh_time A number which specifies the time, in minutes, after which detections at nearby receivers are excluded.
@@ -36,7 +36,7 @@
 #' mat_sim <- compute_det_sim(acoustics_ls = acoustics_ls,
 #'                            thresh_time = 90,
 #'                            thresh_dist = 0)
-#' plot.pretty::pretty_mat(mat_sim, col_diag = "dimgrey")
+#' prettyGraphics::pretty_mat(mat_sim, col_diag = "dimgrey")
 #'
 #' #### Example (2): Return list of outputs
 #' out_ls <- compute_det_sim(acoustics_ls = acoustics_ls,
@@ -45,9 +45,9 @@
 #'                           output = 2)
 #' names(out_ls)
 #' # Examine number of observations for each individual
-#' plot.pretty::pretty_mat(out_ls$mat_nobs)
+#' prettyGraphics::pretty_mat(out_ls$mat_nobs)
 #' # Examine % shared detections between individuals
-#' plot.pretty::pretty_mat(out_ls$mat_pc, col_diag = "dimgrey")
+#' prettyGraphics::pretty_mat(out_ls$mat_pc, col_diag = "dimgrey")
 #'
 #' #### Example (3): Turn off messages with verbose = FALSE
 #' out_ls_non_verb <- compute_det_sim(acoustics_ls = acoustics_ls,
