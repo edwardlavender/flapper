@@ -17,7 +17,21 @@ The function checks other arguments supplied via ...; if these contain an argume
 \description{
 This function checks that arguments supplied via ... are allowed. This function was written to support other functions, specifically via the return of a helpful error message if arguments that cannot be supplied via ... have been supplied. The function is not intended for general use.
 }
+\examples{
+#### Example (1) Imagine we have a function in wich xlim and ylim cannot be supplied via ...
+# Internally, within that function, we can implement check as follows:
+pf <- function(...){
+      check...(not_allowed = c("xlim", "ylim"),...)
+      plot(1:10, 1:10, xlim = c(1, 10), ylim = c(1, 10),...)
+      }
+# This works:
+pf(col = "red")
+# This returns an error
+\dontrun{
+pf(col = "red", xlim = c(1, 15))
+}
+
+}
 \author{
 Edward Lavender
 }
-\keyword{internal}

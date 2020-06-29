@@ -47,6 +47,8 @@ devtools::install_github("edwardlavender/flapper")
 
 ## Data processing
 
+  - **Basic checks.** `quality_check()` passes acoustic data through
+    some basic quality checks prior to analysis.
   - **False detections.** The identification of false detections is a
     key component of PAT data processing. `flapper` provides an
     extension for the ‘short interval’ criterion approach implemented by

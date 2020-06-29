@@ -10,7 +10,8 @@ Imports:
     pbapply,
     glatos,
     geosphere, fields,
-    prettyGraphics, Tools4ETS
+    prettyGraphics, plotrix,
+    Tools4ETS
 Suggests:
     knitr,
     rmarkdown

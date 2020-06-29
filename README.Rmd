@@ -37,6 +37,7 @@ devtools::install_github("edwardlavender/flapper")
 
 ## Data processing 
 
+* **Basic checks.** `quality_check()` passes acoustic data through some basic quality checks prior to analysis. 
 * **False detections.** The identification of false detections is a key component of PAT data processing. `flapper` provides an extension for the 'short interval' criterion approach implemented by `VUE` and `glatos` to incorporate ancillary information on animal swimming speeds, if applicable. This may improve the identification of false detections in clustered receiver arrays (see below). 
 * **Sentinel transmissions and detections.** `flapper` provides a collection of functions for assembling transmission -- detection datasets (i..e, to model detection probability from range testing experiments/sentinel tag data). The main function is `assemble_rtdet()`, which is supported by `rtdet()` and `unique_rec()`.
 
