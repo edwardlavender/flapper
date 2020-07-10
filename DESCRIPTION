@@ -22,4 +22,4 @@ BugReports: http://github.com/edwardlavender/flapper/issues
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 7.0.1
+RoxygenNote: 7.1.1

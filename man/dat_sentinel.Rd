@@ -4,7 +4,8 @@
 \name{dat_sentinel}
 \alias{dat_sentinel}
 \title{Example sentinel tag range testing dataset}
-\format{A dataframe with 106,754 observations and 7 variables:
+\format{
+A dataframe with 106,754 observations and 7 variables:
 \describe{
   \item{timestamp}{A POSIXct object which defines the time of each observation.}
   \item{type}{A character which defines the type of observation: "transmission" or "detection". "transmission" corresponds }
@@ -13,7 +14,8 @@
   \item{source_id}{A unique identifier of the receiver which released the transmission (see \code{\link{dat_moorings}}).}
   \item{source}{The receiver which released the transmission (see \code{\link{dat_moorings}}).}
   \item{sentinel_id}{A unique identifier of the sentinel tag which released the transmission (see \code{\link{dat_moorings}}).}
-}}
+}
+}
 \source{
 Data were collected by Marine Scotland Science and Scottish Natural Heritage. Data were processed by Edward Lavender.
 }

@@ -8,8 +8,8 @@ assemble_sentinel_counts(
   sentinel,
   moorings,
   breaks = "hours",
-  as_POSIXct = function(x, tz = "UTC", ...) {     fasttime::fastPOSIXct(x, tz = tz, ...)
-    },
+  as_POSIXct = function(x, tz = "UTC", ...) {     fasttime::fastPOSIXct(x, tz = tz,
+    ...) },
   max_det_dist = 2000,
   dist_btw_receivers = NULL,
   ...

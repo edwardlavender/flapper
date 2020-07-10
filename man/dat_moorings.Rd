@@ -4,7 +4,8 @@
 \name{dat_moorings}
 \alias{dat_moorings}
 \title{Example passive acoustic telemetry receiver moorings dataset}
-\format{A dataframe with 39 observations and 8 variables:
+\format{
+A dataframe with 39 observations and 8 variables:
 \describe{
   \item{receiver_id}{A number which distinguishes each unique receiver deployment.}
   \item{receiver}{A character which defines each receiver.}
@@ -14,7 +15,8 @@
   \item{receiver_long}{A number which defines the latitude (decimal degrees) of the receiver.}
   \item{receiver_lat}{A number which defines the latitude (decimal degrees) of the receiver.}
   \item{receiver_depth}{A number which defines the approximate depth of each receiver below the surface (m).}
-}}
+}
+}
 \source{
 Data were collected by Marine Scotland Science and Scottish Natural Heritage. Data were processed by Edward Lavender.
 }

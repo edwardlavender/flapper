@@ -4,14 +4,16 @@
 \name{dat_archival}
 \alias{dat_archival}
 \title{Example archival dataset}
-\format{A dataframe with 75,000 observations and 5 variables:
+\format{
+A dataframe with 75,000 observations and 5 variables:
 \describe{
   \item{timestamp}{A POSIXct object which defines the time of each observation.}
   \item{individual_id}{A number which defines each individual (see \code{\link{dat_ids}}).}
   \item{transmitter_id}{The individual's acoustic transmitter (see \code{\link{dat_ids}}).}
   \item{archival_id}{The individual's archival tag (see \code{\link{dat_ids}}).}
   \item{depth}{A number which defines the depth (m) of the individual at each timestep}
-}}
+}
+}
 \source{
 Data were collected by Marine Scotland Science and Scottish Natural Heritage. Data were processed by Edward Lavender.
 }

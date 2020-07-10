@@ -4,7 +4,8 @@
 \name{dat_ids}
 \alias{dat_ids}
 \title{Example tagged individuals dataset}
-\format{A dataframe with 3 observations and 6 variables:
+\format{
+A dataframe with 3 observations and 6 variables:
 \describe{
   \item{individual_id}{A number which distinguishes each unique individual.}
   \item{transmitter_id}{A character which defines the acoustic transmitter code.}
@@ -12,7 +13,8 @@
   \item{tag_start_date}{A date which defines the date of tag deployment.}
   \item{tag_long}{A number which defines the longitude (decimal degrees) of tag deployment.}
   \item{tag_lat}{A number which defines the latitude (decimal degrees) of tag deployment.}
-}}
+}
+}
 \source{
 Data were collected by Marine Scotland Science and Scottish Natural Heritage. Data were processed by Edward Lavender.
 }
