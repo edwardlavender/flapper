@@ -13,8 +13,9 @@ knitr::opts_chunk$set(
 
 # flapper
 
-<!-- badges: start -->
-<!-- badges: end -->
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) 
 
 `flapper` is an `R` package which provides tools for inferring patterns of animal space use from passive acoustic telemetry (PAT) data. This package has been particularly motivated by the collection of new acoustic and archival data from a Critically Endangered elasmobranch, the flapper skate (_Dipturus intermedius_) off the West Coast of Scotland, where a static PAT array has been established to examine the movements of individuals within a Marine Protected Area. In this context, `flapper` has been designed as a complement to existing packages for the analyses of these data (e.g. `VTrack`, `glatos` and `fishtrack3d`), with a particular focus on the provision of tools that integrate PAT and archival (i.e. depth timeseries) data for improved estimates of animal space use, especially for demersal/benthic species. To this end, `flapper` contains functions which address the following requirements:
 

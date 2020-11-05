@@ -1,9 +1,9 @@
 
 # flapper
 
-<!-- badges: start -->
-
-<!-- badges: end -->
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
 `flapper` is an `R` package which provides tools for inferring patterns
 of animal space use from passive acoustic telemetry (PAT) data. This
