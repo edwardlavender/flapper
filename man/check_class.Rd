@@ -32,44 +32,7 @@ The function checks the class of the input. If the class is not the same as requ
 \description{
 This function checks that the class of an input to a parent function is appropriate. If not, the function either produces a helpful error message or returns a warning.
 }
-\examples{
-#### Example (1): Implementation using default options outside of a function
-# Imagine we have an argument, x, to a function, the input to which must be a list.
-# This input passes the check:
-check_class(arg = "x", input = list(), to_class = "list")
-\dontrun{
-# This input fails the check:
-check_class(arg = "x", input = list(), to_class = "Date")
-}
-
-#### Example (2): Implementation within a parent function
-nest_list_in_list <- function(x){
-  check_class(arg = "x", input = x, to_class = "list")
-  if(inherits(x, "list")){
-    return(list(x))
-  }
-}
-nest_list_in_list(list())
-\dontrun{
-nest_list_in_list("a")
-}
-
-#### Example (3) Return a warning rather than an error
-x <- as.POSIXct("2016-01-01")
-check_class(arg = "x", input = x, to_class = "Date",
-                  type = "warning", coerce_input = as.Date)
-
-#### Example (4) Only act on objects of a certain class; otherwise, return objects unchanged.
-# In this case the function checks x:
-check_class(arg = "x", input = x,
-                  if_class = c("POSIXct", "Date"),
-                  to_class = "Date", type = "warning", coerce_input = as.Date)
-# In this case the function does not check x
-check_class(arg = "x", input = 5,
-                  if_class = c("POSIXct", "Date"),
-                  to_class = "Date", type = "warning", coerce_input = as.Date)
-
-}
 \author{
 Edward Lavender
 }
+\keyword{internal}

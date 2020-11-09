@@ -24,24 +24,12 @@ check_names(
 \item{type}{A function which defines the failure criteria. For example, if \code{type = all}, the function will return an error unless all the names in \code{req} are contained within \code{input}. This is the default. If \code{type = any}, the function will return an error only if none of the names in \code{req} are contained within \code{input}.}
 }
 \value{
-If the input fails the check, the function returns a helpful error mesaage. Otherwise, nothing is returned.
+If the input fails the check, the function returns a helpful error message. Otherwise, nothing is returned.
 }
 \description{
 This function checks whether required names are contained within an object. If the object does not contain any/all required names (the precise criteria is controlled by the user), the function returns a helpful error message.
 }
-\examples{
-\dontrun{
-check_names(input = list(x = 1, y = 1),
-            req = c("a", "b", "c"),
-            extract_names = names,
-            type = all)
-check_names(input = data.frame(b = 1, a = 1),
-            req = c("x", "y"),
-            extract_names = colnames,
-            type = any)
-}
-
-}
 \author{
 Edward Lavender
 }
+\keyword{internal}
