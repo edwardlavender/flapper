@@ -540,6 +540,11 @@ lcp_over_surface <-
       # Check origin/destination coordinates are inputted as matrices
       check_class(input = origin, to_class = "matrix", type = "stop")
       check_class(input = destination, to_class = "matrix", type = "stop")
+      # Check raster resolution is equal in the x and y directions
+      surface_res <- raster::res(surface)
+      if(!isTRUE(all.equal(surface_res[1], surface_res[2]))){
+        stop("surface resolution must be equal in the x and y directions. Use raster::resample() to equalise resolution before implementing function.")
+      }
       # Check input options for method, goal and combination
       method <- check_value(input = method, supp = c("cppRouting", "gdistance"))
       goal <- check_value(input = goal, supp = 1:3)
@@ -643,7 +648,7 @@ lcp_over_surface <-
       ## Visualise processed raster with origin and destination added
       raster::plot(surface, xlab = "x", ylab = "y", main = "Surface (processed)")
       graphics::points(rbind(origin, destination), pch = 21, bg = "blue", col = "blue")
-      graphics::par(pp)
+      if(all(goal %in% 1)) graphics::par(pp)
     }
 
     #### Check coordinates lie within raster extent and are not NA or Inf
@@ -668,12 +673,27 @@ lcp_over_surface <-
     cat_to_console("Defining cost matrix...")
 
     #### Define parameters
+    # Basis param
     nrw <- raster::nrow(surface)
     ncl <- raster::ncol(surface)
     cells <- 1:raster::ncell(surface)
     rxy   <- raster::coordinates(surface)
     origin_cell <- raster::cellFromXY(surface, origin)
     destination_cell <- raster::cellFromXY(surface, destination)
+    # Identify any duplicate pairs
+    if(check){
+      if(combination == "pair"){
+        odcells        <- data.frame(origin_cell = origin_cell, destination_cell = destination_cell)
+        odcells$couple <- paste0(odcells$origin_cell, "-", odcells$destination_cell)
+        odcells$dup    <- duplicated(odcells$couple)
+        if(any(odcells$dup)){
+          pos <- which(odcells$dup)
+          message(paste0("Duplicated origin/destination pair(s) (i.e., those with identical cell IDs) identified: ", paste(pos, collapse = ", "), ". Removing these may improve algorithm speed."))
+        }
+      }
+    }
+
+    # Add param to out list
     out$surface_param <- list(cells = cells,
                               nrow = nrw,
                               ncol = ncl,
@@ -848,7 +868,17 @@ lcp_over_surface <-
         path_lcp_cells$cell        <- as.integer(path_lcp_cells$cell)
         path_lcp_cells$path <- paste0(path_lcp_cells$origin, "-", path_lcp_cells$destination)
         path_lcp_cells$path <- factor(path_lcp_cells$path, levels = unique(path_lcp_cells$path))
-        path_lcp_cells$path_id <- c(1:length(levels(path_lcp_cells$path)))[as.integer(path_lcp_cells$path)]
+        # Define a unique identifier for each path (that distinguishes even duplicated paths)
+        pos_start <- which(path_lcp_cells$origin == path_lcp_cells$cell)
+        if(length(pos_start) >= 2){
+          path_lcp_cells$path_id     <- NA
+          for(i in 1:(length(pos_start) - 1)){
+            path_lcp_cells$path_id[pos_start[i]:pos_start[i+1]] <- i
+          }
+          path_lcp_cells$path_id[pos_start[length(pos_start)]:nrow(path_lcp_cells)] <- i+1
+        } else{
+          path_lcp_cells$path_id <- 1
+        }
         path_lcp_cells <- path_lcp_cells[, c("path_id", "path", "origin", "destination", "cell")]
         rownames(path_lcp_cells) <- 1:nrow(path_lcp_cells)
         # Define list of coordinates for each path
@@ -867,10 +897,15 @@ lcp_over_surface <-
       #### Define a dataframe of edges with associated costs
       cat_to_console("... Defining nodes, edges and costs to make graph...")
       # from, to, cost
-      edges <- expand.grid(from = cells, to = cells)
-      edges$cost <- as.vector(tdist_mat)
-      edges <- edges[edges$from != edges$to, ]
-      edges <- edges[which(edges$cost != 0), ]
+      # edges <- expand.grid(from = cells, to = cells)
+      # edges$cost <- as.vector(tdist_mat)
+      # edges <- edges[edges$from != edges$to, ]
+      # edges <- edges[which(edges$cost != 0), ]
+
+      non_zero_indices <- Matrix::which(tdist_mat != 0, arr.ind = TRUE)
+      edges <- data.frame(from = cells[non_zero_indices[, 1]],
+                          to = cells[non_zero_indices[, 2]],
+                          cost = as.vector(tdist_mat[non_zero_indices]))
 
       #### Specify a dataframe of coordinates for each node in appropriate format
       # ... redefine origin/destination nodes in terms of cell numbers
@@ -907,6 +942,8 @@ lcp_over_surface <-
 
       #### Compute shortest pathways between origin and destination nodes
       if(goal %in% c(2, 3)){
+
+        ## Set up to compute shortest pathways
         # Define function to compute paths and add parameters to output list
         if(combination == "pair"){
           cat_to_console(paste("... Implementing",  cppRouting_algorithm, "algorithm to compute least-cost pathways(s)..."))
@@ -929,19 +966,32 @@ lcp_over_surface <-
           get_path <- cppRouting::get_multi_paths
           out$cppRouting_param$get_multi_paths_param <- get_path_param
         }
-        # Compute pathways (origin, destination and cells)
+
+        ## Compute pathways (origin, destination and cells)
         path_lcp_cells <- do.call(get_path, get_path_param)
         out$time <- rbind(out$time, data.frame(event = "path_lcp_defined", time = Sys.time()))
 
-        # Process pathways dataframe
+        ## Process pathways dataframe
+        # Define columns
         colnames(path_lcp_cells)   <- c("origin", "destination", "cell")
         path_lcp_cells$origin      <- as.integer(path_lcp_cells$origin)
         path_lcp_cells$destination <- as.integer(path_lcp_cells$destination)
         path_lcp_cells$cell        <- as.integer(path_lcp_cells$cell)
         path_lcp_cells$path <- paste0(path_lcp_cells$origin, "-", path_lcp_cells$destination)
         path_lcp_cells$path <- factor(path_lcp_cells$path, levels = unique(path_lcp_cells$path))
-        path_lcp_cells$path_id <- c(1:length(levels(path_lcp_cells$path)))[as.integer(path_lcp_cells$path)]
+        # Define a unique identifier for each path (that distinguishes even duplicated paths)
+        pos_start <- which(path_lcp_cells$destination == path_lcp_cells$cell)
+        if(length(pos_start) >= 2){
+          path_lcp_cells$path_id     <- NA
+          for(i in 1:(length(pos_start) - 1)){
+            path_lcp_cells$path_id[pos_start[i]:pos_start[i+1]] <- i
+          }
+          path_lcp_cells$path_id[pos_start[length(pos_start)]:nrow(path_lcp_cells)] <- i+1
+        } else{
+          path_lcp_cells$path_id <- 1
+        }
         path_lcp_cells <- path_lcp_cells[, c("path_id", "path", "origin", "destination", "cell")]
+        # For cppRouting, nodes are reported from the end to the start, so reverse the order
         path_lcp_cells <- lapply(split(path_lcp_cells, path_lcp_cells$path_id), function(d) d[nrow(d):1, ]) %>% dplyr::bind_rows()
         rownames(path_lcp_cells) <- 1:nrow(path_lcp_cells)
 
@@ -965,8 +1015,8 @@ lcp_over_surface <-
     #### Add least-cost pathways to output object
     if(goal %in% c(2, 3)){
       # pathways
-      names(path_lcp_SpatialLines) <- unique(path_lcp_cells$path)
-      names(path_lcp_coordinates)  <- unique(path_lcp_cells$path)
+      names(path_lcp_SpatialLines) <- unique(path_lcp_cells$path_id)
+      names(path_lcp_coordinates)  <- unique(path_lcp_cells$path_id)
       out$path_lcp <- list(cells = path_lcp_cells,
                            SpatialLines = path_lcp_SpatialLines,
                            coordinates = path_lcp_coordinates
@@ -974,6 +1024,7 @@ lcp_over_surface <-
       # Add pathways to plot, if requested
       if(plot){
         lapply(path_lcp_SpatialLines, function(l) raster::lines(l, col = "royalblue", lwd = 2))
+        graphics::par(pp)
       }
     }
 
