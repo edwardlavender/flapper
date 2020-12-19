@@ -5,7 +5,7 @@
 \alias{dat_ids}
 \title{Example tagged individuals dataset}
 \format{
-A dataframe with 3 observations and 6 variables:
+A dataframe with 33 observations and 6 variables:
 \describe{
   \item{individual_id}{A number which distinguishes each unique individual.}
   \item{transmitter_id}{A character which defines the acoustic transmitter code.}
@@ -16,12 +16,15 @@ A dataframe with 3 observations and 6 variables:
 }
 }
 \source{
-Data were collected by Marine Scotland Science and Scottish Natural Heritage. Data were processed by Edward Lavender.
+Data were collected by, and belong to, Marine Scotland Science and NatureScot. Data were processed by Edward Lavender. If you wish to use these data, please contact Marine Scotland Science and NatureScot for further information.
 }
 \usage{
 dat_ids
 }
 \description{
 A dataset containing the characteristics of a sample of flapper skate (\emph{Dipturus intermedius}) that were tagged as part of the Movement Ecology of Flapper Skate (MEFS) project. Data are arranged by \code{individual_id} (see below).
+}
+\references{
+Data collection and processing is described in Lavender (in prep). Fine-scale habitat use of the Critically Endangered flapper skate (\emph{Dipturus intermedius}). [Doctoral dissertation, University of St Andrews].
 }
 \keyword{datasets}

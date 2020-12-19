@@ -3,13 +3,13 @@
 #### update_extent()
 
 #' @title Shrink or expand an \code{\link[raster]{extent}} object
-#' @description This function updates a \code{\link[raster]{raster}}'s \code{\link[raster]{extent}} by shrinking or expanding both x and y limits.
+#' @description This function updates a \code{\link[raster]{raster}}'s \code{\link[raster]{extent}} by shrinking or expanding the x and y limits.
 #'
 #' @param x A \code{\link[raster]{raster}} or an \code{\link[raster]{extent}} object.
 #' @param x_shift A number that defines the change in the x limits. Positive numbers increase the extent (i.e., the lower limit is reduced and the upper limit is increased) while negative numbers reduce extent (i.e., the lower limit is increased and the upper limit is decreased).
 #' @param y_shift A number that defines the change in the y limits. By default, this equals \code{x_shift} (i.e., the \code{\link[raster]{extent}} is changed uniformly in all directions).
 #'
-#' @return An \code{\link[raster]{extent}} object.
+#' @return The function returns an updated \code{\link[raster]{extent}} object.
 #'
 #' @examples
 #' # Define example raster
@@ -96,7 +96,7 @@ buffer_and_crop <- function(to_buffer,
 #' @param z1 A number that defines the z-coordinate of the first point.
 #' @param z2 A number that defines the z-coordinate of the second point.
 #' @details The distance between two points in three dimensional space is given by Pythagoras' Theorem: \eqn{\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2}}.
-#' @return A number that equal to the Euclidean distance between points in three-dimensional space.
+#' @return A number that is equal to the Euclidean distance between points in three-dimensional space.
 #' @examples
 #' pythagoras_3d(1, 2, 1, 2, 1, 2)
 #' @author Edward Lavender
@@ -118,7 +118,7 @@ pythagoras_3d <- function(x1, x2, y1, y2, z1, z2){
 #' @param path A matrix or data.frame of horizontal coordinates (x, y) or a \code{\link[sp]{SpatialLines}} object which defines the path over a surface. The coordinate reference system (projection) of \code{path} should be the same as that for the \code{surface}.
 #' @param surface A \code{\link[raster]{raster}} over which the movement that generated the path occurred. The coordinate reference system (projection) of \code{path} should be the same as that for the \code{surface} and the values of the \code{surface} should also be expressed in the same units (e.g., metres).
 #' @details The total distance of a path over a three-dimensional surface is equal to the sum of the pairwise distances between each point (\eqn{i}) and its successor (\eqn{i + 1}) according to the equation: \deqn{\Sigma_{i = 1}^n [\sqrt{(x_{i+1} - x_i)^2 + (y_{i + 1} - y_i)^2 + (z_{i + 1} - z_i)^2)}]} where \eqn{x}, \eqn{y} and \eqn{z} are the x, y and z coordinates of each point in three-dimensional space. Pairwise distances are calculated via \code{\link[flapper]{pythagoras_3d}}.
-#' @return A number equal to the total distance along the path.
+#' @return The function returns a number equal to the total distance along the path.
 #' @examples
 #' #### Simulate a hypothetical landscape
 #' # Define a miniature, blank landscape with known dimensions

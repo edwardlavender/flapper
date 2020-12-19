@@ -14,10 +14,10 @@ update_extent(x, x_shift, y_shift = x_shift)
 \item{y_shift}{A number that defines the change in the y limits. By default, this equals \code{x_shift} (i.e., the \code{\link[raster]{extent}} is changed uniformly in all directions).}
 }
 \value{
-An \code{\link[raster]{extent}} object.
+The function returns an updated \code{\link[raster]{extent}} object.
 }
 \description{
-This function updates a \code{\link[raster]{raster}}'s \code{\link[raster]{extent}} by shrinking or expanding both x and y limits.
+This function updates a \code{\link[raster]{raster}}'s \code{\link[raster]{extent}} by shrinking or expanding the x and y limits.
 }
 \examples{
 # Define example raster

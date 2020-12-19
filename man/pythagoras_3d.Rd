@@ -20,7 +20,7 @@ pythagoras_3d(x1, x2, y1, y2, z1, z2)
 \item{z2}{A number that defines the z-coordinate of the second point.}
 }
 \value{
-A number that equal to the Euclidean distance between points in three-dimensional space.
+A number that is equal to the Euclidean distance between points in three-dimensional space.
 }
 \description{
 This function returns the Euclidean distance between points in three-dimensional space.

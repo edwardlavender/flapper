@@ -8,7 +8,7 @@
 A dataframe with 59,420 observations and 8 variables:
 \describe{
   \item{timestamp}{A POSIXct object which defines the time of each observation.}
-  \item{individual_id}{A unique identifier of the individual that was detected.}
+  \item{individual_id}{A unique identifier of the individual that was detected (see \code{\link{dat_ids}}).}
   \item{transmitter_id}{The acoustic transmitter that was detected (see \code{\link{dat_ids}}).}
   \item{receiver_id}{A unique identifier of the receiver at which the individual was detected (see \code{\link{dat_moorings}}).}
   \item{receiver}{The receiver at which the individual was detected (see \code{\link{dat_moorings}}).}
@@ -18,12 +18,15 @@ A dataframe with 59,420 observations and 8 variables:
 }
 }
 \source{
-Data were collected by Marine Scotland Science and Scottish Natural Heritage. Data were processed by Edward Lavender.
+Data were collected by, and belong to, Marine Scotland Science and NatureScot. Data were processed by Edward Lavender. If you wish to use these data, please contact Marine Scotland Science and NatureScot for further information.
 }
 \usage{
 dat_acoustics
 }
 \description{
-A dataset containing a sample of processed flapper skate (\emph{Dipturus intermedius}) detection timeseries. Data are arranged by \code{individual_id}, \code{timestamp} and then \code{receiver_id} (see below).
+A dataset containing a sample of processed flapper skate (\emph{Dipturus intermedius}) detection time series. Data are arranged by \code{individual_id}, \code{timestamp} and then \code{receiver_id} (see below).
+}
+\references{
+Data collection and processing is described in Lavender (in prep). Fine-scale habitat use of the Critically Endangered flapper skate (\emph{Dipturus intermedius}). [Doctoral dissertation, University of St Andrews].
 }
 \keyword{datasets}

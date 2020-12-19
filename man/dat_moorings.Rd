@@ -5,25 +5,28 @@
 \alias{dat_moorings}
 \title{Example passive acoustic telemetry receiver moorings dataset}
 \format{
-A dataframe with 39 observations and 8 variables:
+A dataframe with 40 observations and 8 variables:
 \describe{
-  \item{receiver_id}{A number which distinguishes each unique receiver deployment.}
+  \item{receiver_id}{An integer which distinguishes each unique receiver deployment.}
   \item{receiver}{A character which defines each receiver.}
   \item{sentinel_id}{A character which defines each receiver's built-in acoustic transmitter ('sentinel tag'). Some receivers did not have sentinel tags; their \code{sentinel_id} is \code{NA}.}
-  \item{receiver_start_date}{A date which defines the start date of the receiver's deployment.}
-  \item{receiver_end_date}{A date which defines the end date of the receiver's deployment.}
-  \item{receiver_long}{A number which defines the latitude (decimal degrees) of the receiver.}
-  \item{receiver_lat}{A number which defines the latitude (decimal degrees) of the receiver.}
+  \item{receiver_start_date}{A date which defines the start date of each receiver's deployment.}
+  \item{receiver_end_date}{A date which defines the end date of each receiver's deployment.}
+  \item{receiver_long}{A number which defines the latitude (decimal degrees) of each receiver.}
+  \item{receiver_lat}{A number which defines the latitude (decimal degrees) of each receiver.}
   \item{receiver_depth}{A number which defines the approximate depth of each receiver below the surface (m).}
 }
 }
 \source{
-Data were collected by Marine Scotland Science and Scottish Natural Heritage. Data were processed by Edward Lavender.
+Data were collected by, and belong to, Marine Scotland Science and NatureScot. Data were processed by Edward Lavender. If you wish to use these data, please contact Marine Scotland Science and NatureScot for further information.
 }
 \usage{
 dat_moorings
 }
 \description{
 A dataset containing a sample of passive acoustic telemetry receiver locations and associated information. Data are arranged by \code{receiver_id} (see below).
+}
+\references{
+Data collection and processing is described in Lavender (in prep). Fine-scale habitat use of the Critically Endangered flapper skate (\emph{Dipturus intermedius}). [Doctoral dissertation, University of St Andrews].
 }
 \keyword{datasets}

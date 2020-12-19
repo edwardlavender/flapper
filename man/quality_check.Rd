@@ -7,7 +7,7 @@
 quality_check(acoustics, moorings, ids)
 }
 \arguments{
-\item{acoustics}{A dataframe which comprises passive acoustic telemetry detection timeseries. This must contain the following named columns: 'timestamp', a POSIXct vector which defines the time of each detection; 'receiver_id', a unique identifier of each receiver; and 'individual_id', a unique identifier of each individual (see \code{\link[flapper]{dat_acoustics}} for an example).}
+\item{acoustics}{A dataframe which comprises passive acoustic telemetry detection time series. This must contain the following named columns: 'timestamp', a POSIXct vector which defines the time of each detection; 'receiver_id', a unique identifier of each receiver; and 'individual_id', a unique identifier of each individual (see \code{\link[flapper]{dat_acoustics}} for an example).}
 
 \item{moorings}{A dataframe which contains passive acoustic telemetry receiver metadata. This must contain the following named columns: 'receiver_id', a unique identifier for each receiver deployment; 'receiver_start_date', a POSIXct vector which defines the time of each receiver deployment; and 'receiver_end_date', a POSIXct vector which defines the end of each receiver deployment (see \code{\link[flapper]{dat_moorings}} for an example). If objects of class Date are provided for 'receiver_start_date' and 'receiver_end_date', these are coerced to POSIXct objects with a warning.}
 

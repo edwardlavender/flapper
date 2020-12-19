@@ -12,7 +12,7 @@ dist_over_surface(path, surface)
 \item{surface}{A \code{\link[raster]{raster}} over which the movement that generated the path occurred. The coordinate reference system (projection) of \code{path} should be the same as that for the \code{surface} and the values of the \code{surface} should also be expressed in the same units (e.g., metres).}
 }
 \value{
-A number equal to the total distance along the path.
+The function returns a number equal to the total distance along the path.
 }
 \description{
 This function calculates the total distance of a path, whose horizontal coordinates are known, over a three-dimensional surface. To implement this function, the \code{path} should be supplied as a matrix or data.frame of coordinates or a \code{\link[sp]{SpatialLines}} object and the \code{surface} should be supplied as a \code{\link[raster]{raster}}. The function takes the horizontal coordinates of the \code{path} and extracts the values of the surface at these points, and then calculates the total distance of the path as the sum of the paired distances between each pair of points.

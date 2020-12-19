@@ -5,10 +5,10 @@
 \alias{dat_sentinel}
 \title{Example sentinel tag range testing dataset}
 \format{
-A dataframe with 106,754 observations and 7 variables:
+A dataframe with 106,733 observations and 7 variables:
 \describe{
   \item{timestamp}{A POSIXct object which defines the time of each observation.}
-  \item{type}{A character which defines the type of observation: "transmission" or "detection". "transmission" corresponds }
+  \item{type}{A character which defines the type of observation: "transmission" or "detection".}
   \item{sink_id}{A unique identifier of the receiver which received the transmission (see \code{\link{dat_moorings}}).}
   \item{sink}{The receiver which received the transmission (see \code{\link{dat_moorings}}).}
   \item{source_id}{A unique identifier of the receiver which released the transmission (see \code{\link{dat_moorings}}).}
@@ -17,12 +17,15 @@ A dataframe with 106,754 observations and 7 variables:
 }
 }
 \source{
-Data were collected by Marine Scotland Science and Scottish Natural Heritage. Data were processed by Edward Lavender.
+Data were collected by, and belong to, Marine Scotland Science and NatureScot. Data were processed by Edward Lavender. If you wish to use these data, please contact Marine Scotland Science and NatureScot for further information.
 }
 \usage{
 dat_sentinel
 }
 \description{
-A dataset containing a sample of transmissions and detections assembled from sentinel tags. Sentinel tags are built-in acoustic transmitters which release acoustic signals at programmed intervals. The receiver unit of which each sentinel tag is a part records the timing of these transmissions. At the same time, any nearby receivers will also record transmissions from these acoustic tags. After some processing, the result is a dataframe comprising transmissions and detections, which contains information on detection probability. Data are arranged by \code{source_id}, \code{timestamp} and then \code{sink_id}.
+A dataset containing a sample of transmissions and detections assembled from sentinel tags. Sentinel tags are built-in acoustic transmitters which release acoustic signals at programmed intervals. The receiver unit of each sentinel tag records the exact timing of these transmissions. At the same time, any nearby receivers may also record transmissions from these acoustic tags. After some processing, the result is a dataframe comprising transmissions and detections, which contains information on detection probability. Data are arranged by \code{source_id}, \code{timestamp} and then \code{sink_id}.
+}
+\references{
+Data collection and processing is described in Lavender (in prep). Fine-scale habitat use of the Critically Endangered flapper skate (\emph{Dipturus intermedius}). [Doctoral dissertation, University of St Andrews].
 }
 \keyword{datasets}

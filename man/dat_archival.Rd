@@ -15,12 +15,15 @@ A dataframe with 75,000 observations and 5 variables:
 }
 }
 \source{
-Data were collected by Marine Scotland Science and Scottish Natural Heritage. Data were processed by Edward Lavender.
+Data were collected by, and belong to, Marine Scotland Science and NatureScot. Data were processed by Edward Lavender. If you wish to use these data, please contact Marine Scotland Science and NatureScot for further information.
 }
 \usage{
 dat_archival
 }
 \description{
-A dataset containing a sample of flapper skate (\emph{Dipturus intermedius}) depth (m) timeseries. Observations were sampled every 2 minutes using archival tags. Data are arranged by \code{individual_id} and then \code{timestamp}.
+A dataset containing a sample of flapper skate (\emph{Dipturus intermedius}) depth (m) time series. Observations were sampled every 2 minutes using archival tags. Data are arranged by \code{individual_id} and then \code{timestamp}.
+}
+\references{
+Data collection and processing is described in Lavender (in prep). Fine-scale habitat use of the Critically Endangered flapper skate (\emph{Dipturus intermedius}). [Doctoral dissertation, University of St Andrews].
 }
 \keyword{datasets}
