@@ -49,7 +49,7 @@ the following themes:
 <img src="vignettes/readme_context.png"/> *flapper: An `R` package
 designed to facilitate the integration of acoustic and archival datasets
 to improve estimates of space use for benthic/demersal species. Inserted
-sample depth and acoustic time series were collected as part of the
+sample depth and acoustic time-series were collected as part of the
 Movement Ecology of Flapper Skate project by Marine Scotland Science and
 NatureScot. The insert of the flapper skate is also courtesy of this
 project. The bathymetry data are sourced from the Ireland, Northern
@@ -60,27 +60,45 @@ package.*
 
 ## Installation
 
-You can install the development version of `flapper` from
-[GitHub](https://github.com/edwardlavender/flapper) as shown below:
+This package requires `R` version ≥ 4.0. You can check your current
+version with `R.version.string`. Subsequent installation steps (may)
+require the `devtools` and `pkgdown` packages, which can be installed
+with `install.packages(c("devtools", "pkgdown"))`. On Windows, package
+building requires `Rtools`. You can check whether Rtools is installed
+with `pkgbuild::has_rtools()`. If `RTools` is not installed, it is
+necessary to download and install the appropriate version of Rtools
+before proceeding by following the instructions
+[here](https://cran.r-project.org/bin/windows/Rtools/). Three packages
+([prettyGraphics](https://github.com/edwardlavender/prettyGraphics),
+[Tools4ETS](https://github.com/edwardlavender/Tools4ETS) and
+[glatos](https://gitlab.oceantrack.org/GreatLakes/glatos)) are required
+from [GitHub](https://github.com) repositories (these packages are not
+currently available from
+[CRAN](The%20Comprehensive%20R%20Archive%20Network)). These can be
+installed during the installation process (see below), but it is safer
+to install them sequentially as follows:
+
+    devtools::install_github("edwardlavender/prettyGraphics")
+    devtools::install_github("edwardlavender/Tools4ETS")
+    devtools::install_url("https://gitlab.oceantrack.org/GreatLakes/glatos/repository/master/archive.zip",
+                          build_opts = c("--no-resave-data", "--no-manual"))
+
+To install these packages with their vignettes, add `dependencies =
+TRUE` and `build_vignettes = TRUE` as arguments to the code above (see
+`?devtools::install_github` or `?devtools::install_url` for further
+information). Then, you can install the development version of `flapper`
+from [GitHub](https://github.com/edwardlavender/flapper) as shown below:
 
 ``` r
-devtools::install_github("edwardlavender/flapper", build_vignette = TRUE)
+devtools::install_github("edwardlavender/flapper", dependencies = TRUE, build_vignettes = TRUE)
 ```
 
-This requires `R` version ≥ 4.0. The installation process will also
-install the
-[prettyGraphics](https://github.com/edwardlavender/prettyGraphics),
-[Tools4ETS](https://github.com/edwardlavender/Tools4ETS) and
-[glatos](https://gitlab.oceantrack.org/GreatLakes/glatos) packages from
-[GitHub](https://github.com) repositories (these packages are not
-currently available from
-[CRAN](The%20Comprehensive%20R%20Archive%20Network)). If you experience
-issues during installation, it may help to install these packages using
-the documentation provided in these repositories before installing
-`flapper`.
-
-To access the vignettes, use `vignette("flapper_intro", package =
-"flapper")` for a general introduction to the package.
+The `dependencies = TRUE` argument will also install any suggested
+packages, which may be required by some functions and to build vignettes
+(which will be added to the package in due course). To access the
+vignettes, use `vignette("flapper_intro", package = "flapper")` for a
+general introduction to the package. *Note that vignettes have not yet
+been added to the package.*
 
 ## Example datasets
 
@@ -93,11 +111,11 @@ Scotland:
   - **dat\_moorings** is a dataset containing some sample passive
     acoustic telemetry receiver locations and associated information;
   - **dat\_acoustics** is a dataset containing some sample detection
-    time series;
-  - **dat\_archival** is a dataset containing some sample depth time
-    series;
+    time-series;
+  - **dat\_archival** is a dataset containing some sample depth
+    time-series;
   - **dat\_sentinel** is a dataset containing some sample transmission –
-    detection time series assembled from sentinel tags;
+    detection time-series assembled from sentinel tags;
 
 These example datasets were collected by Marine Scotland Science and
 NatureScot as part of the Movement Ecology of Flapper Skate project and
@@ -107,7 +125,7 @@ contact Marine Scotland Science and NatureScot for further information.
 ## Data processing tools
 
 A number of functions facilitate the assembly, processing and checking
-of passive acoustic telemetry time series.
+of passive acoustic telemetry time-series.
 
   - **Data assembly.** Some functions facilitate data assembly. For
     example, `add_receiver_id()` adds unique receiver IDs to a dataframe
@@ -232,20 +250,20 @@ the processing and analysis of PAT data. This includes the following:
 
   - **[prettyGraphics](https://github.com/edwardlavender/prettyGraphics)**
     facilitates the production of pretty, publication-quality and
-    interactive visualisations, with a particular focus on time series.
-    This makes it easy to create abacus plots, visualise time series
+    interactive visualisations, with a particular focus on time-series.
+    This makes it easy to create abacus plots, visualise time-series
     (across factor levels, at different temporal scales and in relation
     to covariates), bathymetric landscapes and movement pathways in
     three-dimensions, and detection similarity matrices.
   - **[Tools4ETS](https://github.com/edwardlavender/Tools4ETS)**
-    provides a set of general tools for ecological time series,
-    including the definition of time categories, matching time series
+    provides a set of general tools for ecological time-series,
+    including the definition of time categories, matching time-series
     (e.g., detection observations with environmental covariates),
-    flagging independent time series and simulating time series.
+    flagging independent time-series and simulating time-series.
   - **[fvcom.tbx](https://github.com/edwardlavender/fvcom.tbx)**
     provides tools for the integration of hydrodynamic model predictions
     (from the Finite Coastal Ocean Volume Model) with ecological
-    datasets (e.g., detection time series). This facilitates the
+    datasets (e.g., detection time-series). This facilitates the
     inclusion of hydrodynamic model predictions as covariates in
     movement models and the validation of hydrodynamic model predictions
     with movement datasets or data collected from static acoustic

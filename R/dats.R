@@ -53,7 +53,7 @@
 #### dat_acoustics
 
 #' @title Example passive acoustic telemetry dataset
-#' @description A dataset containing a sample of processed flapper skate (\emph{Dipturus intermedius}) detection time series. Data are arranged by \code{individual_id}, \code{timestamp} and then \code{receiver_id} (see below).
+#' @description A dataset containing a sample of processed flapper skate (\emph{Dipturus intermedius}) detection time-series. Data are arranged by \code{individual_id}, \code{timestamp} and then \code{receiver_id} (see below).
 #'
 #' @format A dataframe with 59,420 observations and 8 variables:
 #' \describe{
@@ -102,7 +102,7 @@
 #### dat_archival
 
 #' @title Example archival dataset
-#' @description A dataset containing a sample of flapper skate (\emph{Dipturus intermedius}) depth (m) time series. Observations were sampled every 2 minutes using archival tags. Data are arranged by \code{individual_id} and then \code{timestamp}.
+#' @description A dataset containing a sample of flapper skate (\emph{Dipturus intermedius}) depth (m) time-series. Observations were sampled every 2 minutes using archival tags. Data are arranged by \code{individual_id} and then \code{timestamp}.
 #'
 #' @format A dataframe with 75,000 observations and 5 variables:
 #' \describe{
