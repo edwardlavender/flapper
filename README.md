@@ -154,6 +154,9 @@ ecological investigations and space use algorithms.
     buffers a spatial object (e.g., receiver locations) and uses this
     buffered object to crop another (e.g., the local bathymetry).
     `update_extent()` shrinks or inflates an extent object.
+    `cells_from_val()` returns the cells or a raster of the cells of a
+    raster that are equal to a specified value or lie within a specified
+    range of values.
   - **Euclidean distances.** Some functions facilitate distance
     calculations. For instance, `dist_btw_receivers()` calculates
     Euclidean distances between all receiver combinations and

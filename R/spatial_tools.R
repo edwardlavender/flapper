@@ -85,6 +85,61 @@ buffer_and_crop <- function(to_buffer,
 
 ######################################
 ######################################
+#### cells_from_val()
+
+#' @title Obtain a RasterLayer or the cells of RasterLayer that are equal to or lie within a range of specified values
+#' @description This function obtains a RasterLayer or the cells of a RasterLayer that are equal to a specified value or lie within a specified range of values. To implement this function, a \code{\link[raster]{raster}} (\code{x}) and a value or range of values (\code{y}) for which a RasterLayer or the numbers of cells corresponding to those values are desired must be supplied. If a range of values is supplied, an additional argument (\code{interval}) controls whether or not cells within and equal to or simply within the specified range are returned.
+#' @param x A \code{\link[raster]{raster}} object.
+#' @param y A number or a vector with two numbers representing the lower and upper boundaries of the interval of values within which cells are identified.
+#' @param interval If y is a vector of length two, \code{interval} is an integer that controls whether or not to query cells within and equal to (\code{interval = 1L} or simply within (\code{interval = 2L}) the range specified by \code{y}.
+#' @param cells A logical variable that defines whether or not to return a vector of cell numbers (\code{TRUE}) or a RasterLayer of the cells corresponding to \code{y}.
+#' @param na.rm A logical variable that defines whether or not to ignore NAs.
+#' @param ... Additional arguments (none implemented).
+#'
+#' @examples
+#' # Define an example RasterLayer
+#' ncl <- 10
+#' nrw <- 10
+#' n   <- ncl*nrw
+#' mat <- matrix(1:n, ncol = ncl, nrow = nrw, byrow = TRUE)
+#' r <- raster::raster(mat)
+#' # Visualise example RasterLayer
+#' raster::plot(r)
+#' raster::text(r)
+#' # Obtain the number(s) of cells corresponding to a particular value
+#' cells_from_val(r, 1)
+#' # Obtain a RasterLayer of the cells corresponding to a particular value
+#' r1 <- cells_from_val(r, 1, cells = FALSE)
+#' raster::plot(r1)
+#' # Obtain the number(s) of cells within or equal to a range of values
+#' cells_from_val(r, c(1, 10))
+#' # Obtain the number(s) of cells within a range of values
+#' cells_from_val(r, c(1, 10), interval = 2L)
+#' # As above but returning a raster layer
+#' cells_from_val(r, c(1, 10), interval = 2L, cells = FALSE)
+#' @author Edward Lavender
+#' @export
+
+cells_from_val <- function(x, y, interval = 1L, cells = TRUE, na.rm = TRUE,...){
+  if(length(y) == 1){
+    cells <- raster::Which(x == y, cells = cells, na.rm = na.rm)
+  } else if(length(y) == 2){
+    interval <- check_value(input = interval, supp = 1:2, warn = TRUE, default = 1)
+    if(y[2] <= y[1]) stop("Nonsensical y range supplied: y[2] <= y[1].")
+    if(interval == 1){
+      cells <- raster::Which(x >= y[1] & x <= y[2], cells = cells, na.rm = na.rm)
+    } else if(interval == 2){
+      cells <- raster::Which(x > y[1] & x < y[2], cells = cells, na.rm = na.rm)
+    }
+  } else{
+    stop("length(y) does not equal 1 or 2.")
+  }
+  return(cells)
+}
+
+
+######################################
+######################################
 #### pythagoras_3d()
 
 #' @title Calculate the Euclidean distance between points in three-dimensional space.
