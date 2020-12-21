@@ -9,7 +9,7 @@ Imports:
     magrittr, data.table, dplyr, rlang, lubridate, pbapply,
     Matrix, raster, rgeos, geosphere, Orcs, cppRouting, gdistance, sp,
     glatos,
-    prettyGraphics, plotrix,
+    prettyGraphics, plotrix, fields,
     Tools4ETS
 Suggests:
     knitr,

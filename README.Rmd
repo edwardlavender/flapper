@@ -82,7 +82,7 @@ Some functions facilitate the implementation of existing algorithms designed to 
 
 However, the central objective of `flapper` is to implement new methods designed to provide improved estimates of space use from PAT/archival data for demersal/benthic species. These include:
 
-* **The depth contour (DC) algorithm.** This approach is the simplest. Under the assumption that individuals are benthic/demersal, this algorithm uses observed depths (± some error) to define the subset of possible locations of each individual within a defined area. This is implemented via `dc()`. _This algorithm is not currently available in the public version of this package._
+* **The depth contour (DC) algorithm.** This approach is the simplest. Under the assumption that individuals are benthic/demersal, this algorithm uses observed depths (± some error) to define the subset of possible locations of each individual within a defined area. This is implemented via `dc()`.
 * **The acoustic centroid -- depth contour (ACDC) algorithm.** The ACDC algorithm extends the DC algorithm by using PAT data to inform the area within which depth contours are most likely to be found. This is implemented via `setup_acdc()` and `acdc()`.  _This algorithm is not currently available in the public version of this package._
 * **The acoustic centroid -- depth contour -- movement pathway (MP) algorithm.** The ACDC-MP algorithm incorporates movement pathways into the ACDC process to restrict further the inferred distribution of locations within which the individual must have been located at each time point. This is implemented with `setup_acdcmp()`, `acdcmp()`, and `proc_acdcmp()`. _This algorithm is not  currently available in the public version of this package._
 

@@ -192,8 +192,7 @@ data for demersal/benthic species. These include:
     Under the assumption that individuals are benthic/demersal, this
     algorithm uses observed depths (± some error) to define the subset
     of possible locations of each individual within a defined area. This
-    is implemented via `dc()`. *This algorithm is not currently
-    available in the public version of this package.*
+    is implemented via `dc()`.
   - **The acoustic centroid – depth contour (ACDC) algorithm.** The ACDC
     algorithm extends the DC algorithm by using PAT data to inform the
     area within which depth contours are most likely to be found. This
