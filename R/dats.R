@@ -118,6 +118,37 @@
 #' @references Data collection and processing is described in Lavender (in prep). Fine-scale habitat use of the Critically Endangered flapper skate (\emph{Dipturus intermedius}). [Doctoral dissertation, University of St Andrews].
 "dat_archival"
 
+#####################################
+#####################################
+#### dat_coast
+
+#' @title The coastline around the MEFS Firth of Lorn acoustic array
+#' @description A SpatialPolygonsDataFrame delineating the coastline around a subset of acoustic receivers set up by the Movement Ecology of Flapper Skate (MEFS) project in the Firth of Lorn, off the west coast of Scotland.
+#'
+#' @format A SpatialPolygonsDataFrame (see \code{\link[sp]{SpatialPolygonsDataFrame-class}}).
+#'
+#' @source https://biogeo.ucdavis.edu/data/gadm3.6/Rsp/gadm36_GBR_0_sp.rds
+"dat_coast"
+
+
+#####################################
+#####################################
+#### dat_gebco
+
+#' @title The bathymetry around the MEFS Firth of Lorn acoustic array
+#' @description A dataset of the bathymetry (m) in an area around a subset of acoustic receivers set up by the Movement Ecology of Flapper Skate (MEFS) project in the Firth of Lorn, off the west coast of Scotland. Bathymetry data are provided by the General Bathymetric Chart of the Oceans (GEBCO).
+#'
+#' @format A \code{\link[raster]{raster}} with 36 rows, 36 columns and 1296 cells, with the following properties:
+#' \describe{
+#'   \item{dimensions}{57, 74, 4218 (nrow, ncol, ncell)}
+#'   \item{resolution}{257, 463  (x, y)}
+#'   \item{extent}{695492.1, 714510.1, 6246657, 6273048 (xmin, xmax, ymin, ymax)}
+#'   \item{crs}{+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs}
+#' }
+#'
+#' @source GEBCO Compilation Group (2019) GEBCO 2019 Grid (doi:10.5285/836f016a-33be-6ddc-e053-6c86abc0788e)
+"dat_gebco"
+
 
 #### End of code.
 #####################################
