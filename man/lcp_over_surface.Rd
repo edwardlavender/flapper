@@ -241,11 +241,11 @@ lcp_over_surface(origin = rxy[1, , drop = FALSE],
 
 #### Example (4): Find the distances between points on a real landscape
 ## We will use some example bathymetry data:
-dat_gebco <- prettyGraphics::dat_gebco
-raster::plot(dat_gebco)
-## Process bathymetry data before function implementaion
+dat_gebco_oban <- prettyGraphics::dat_gebco
+raster::plot(dat_gebco_oban)
+## Process bathymetry data before function implementation
 # (a) Define utm coordinates:
-dat_gebco_utm <- raster::projectRaster(dat_gebco, crs = proj_utm)
+dat_gebco_utm <- raster::projectRaster(dat_gebco_oban, crs = proj_utm)
 raster::res(dat_gebco_utm)
 # (b) Resample so that the resolution in the x and y directions is identical
 dat_gebco_utm_planar <- raster::raster(crs = proj_utm,
