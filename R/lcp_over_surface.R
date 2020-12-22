@@ -7,7 +7,7 @@
 #' @param buffer (optional) A named list of arguments, passed to \code{\link[rgeos]{gBuffer}} (e.g. \code{buffer = list(width = 1000)}) (m) that is used to define a buffer around a Euclidean transect connecting the \code{origin} and \code{destination}. (This option can only be implemented for a single \code{origin} and \code{destination} pair.) The \code{surface} is then cropped to the extent of this buffer before the least-cost algorithms are implemented. This may be useful for large rasters to reduce memory requirements and/or computation time.
 #' @param aggregate (optional) A named list of arguments, passed to \code{\link[raster]{aggregate}}, to aggregate raster cells before the least-cost algorithms are implemented. This may be useful for large rasters to reduce memory requirements and/or computation time.
 #' @param mask (optional) A Raster or Spatial \code{\link[raster]{mask}} that is used to prevent movement over 'impossible' areas on the \code{surface}. This must also lie on a planar surface (i.e., Universal Transverse Mercator projection). For example, for marine animals, \code{mask} might be a \code{\link[sp]{SpatialPolygonsDataFrame}} which defines the coastline. The effect of the \code{mask} depends on \code{mask_inside} (see below).
-#' @param mask_inside A logical input that defines whether or not to mask the \code{surface} inside (\code{TRUE}) or outside (\code{FALSE}) of the \code{mask}. For example, with a \code{mask} that represents the coastline, for a obligatory marine animal, it is necessary to mask values inside the coastline (i.e., on land), so \code{mask_inside = TRUE}; while for a terrestrial animal, it is necessary to mask values beyond the coastline (i.e., in the sea), so \code{mask_inside = FALSE}.
+#' @param mask_inside A logical input that defines whether or not to mask the \code{surface} inside (\code{TRUE}) or outside (\code{FALSE}) of the \code{mask} (see \code{\link[flapper]{mask_io}}).
 #' @param plot A logical input that defines whether or not to plot the inputted and processed surfaces. If \code{TRUE}, the inputted and processed plots are produced side-by-side. For the inputted surface, the \code{mask} and the region selected (via \code{crop} and/or \code{buffer}) are shown along with the \code{origin} and \code{destination}. For the processed surface, the surface and the \code{origin} and \code{destination} are shown, along with the shortest pathway(s) (if and once computed: see \code{goal}). This is useful for checking that any \code{surface} processing steps have been applied correctly and the \code{origin} and \code{destination} are positioned correctly on the \code{surface}.
 #' @param goal An integer that defines the output of the function: \code{goal = 1} computes shortest distances, \code{goal = 2} computes shortest pathways and \code{goal = 3} computes both shortest pathways and the corresponding distances. Note that \code{goal = 3} results in least-cost algorithms being implemented twice, which will be inefficient for large problems; in this case, use \code{goal = 2} to compute shortest pathways and then calculate their distance using outputs returned by the function (see Value).
 #' @param combination A character string (\code{"pair"} or \code{"matrix"}) that defines whether or not to compute shortest distances/pathways for (a) each sequential \code{origin} and \code{destination} pair of coordinates (\code{combination = "pair"}) or (b) all combinations of \code{origin} and \code{destination} coordinates (\code{combination = "matrix"}). This argument is only applicable if there is more than one \code{origin} and \code{destination}. For \code{combination = "pair"}, the number of \code{origin} and \code{destination} coordinates needs to be the same, since each \code{origin} is matched with each \code{destination}.
@@ -611,16 +611,7 @@ lcp_over_surface <-
     #### Mask raster
     if(!is.null(mask)){
       cat_to_console("Masking raster...")
-      # Re-define mask if we are masking points inside the mask:
-      if(mask_inside){
-        area <- raster::extent(surface)
-        area <- sp::Polygon(raster::coordinates(area))
-        area <- sp::SpatialPolygons(list(sp::Polygons(list(area), ID = 1)))
-        raster::crs(area) <- raster::crs(surface)
-        mask <- rgeos::gDifference(area, mask)
-      }
-      # Mask surface
-      surface <- raster::mask(x = surface, mask = mask, updatevalue = Inf)
+      surface <- mask_io(x = surface, mask = mask, mask_inside = mask_inside, updatevalue = Inf)
     }
 
     #### Visualise surface
