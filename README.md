@@ -65,7 +65,7 @@ version with `R.version.string`. Subsequent installation steps (may)
 require the `devtools` and `pkgdown` packages, which can be installed
 with `install.packages(c("devtools", "pkgdown"))`. On Windows, package
 building requires `Rtools`. You can check whether Rtools is installed
-with `pkgbuild::has_rtools()`. If `RTools` is not installed, it is
+with `pkgbuild::has_rtools()`. If `Rtools` is not installed, it is
 necessary to download and install the appropriate version of Rtools
 before proceeding by following the instructions
 [here](https://cran.r-project.org/bin/windows/Rtools/). Three packages
