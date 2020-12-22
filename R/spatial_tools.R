@@ -142,6 +142,64 @@ cells_from_val <- function(x, y, interval = 1L, cells = TRUE, na.rm = TRUE,...){
 
 ######################################
 ######################################
+#### mask_io()
+
+#' @title Implement \code{\link[raster]{mask}} using the inside or outside of the mask
+#' @description This function implements \code{\link[raster]{mask}} using the inside or the outside of the mask. The function is implemented in the same way as \code{\link[raster]{mask}} but with an additional logical argument, \code{mask_inside}. If \code{mask_inside = FALSE} (the default), values beyond the mask are masked and the function simply implements \code{\link[raster]{mask}}. In contrast, if \code{mask_inside = TRUE}, values within the mask are masked.
+#'
+#' @param x A Raster* (see \code{\link[raster]{mask}}).
+#' @param mask A mask of class \code{\link[sp]{SpatialPolygonsDataFrame-class}}.
+#' @param mask_inside A logical variable that defines whether or not to mask values in \code{x} outside (\code{FALSE}) or inside (\code{TRUE}) of the \code{mask}.
+#' @param ... Additional arguments passed to \code{\link[raster]{mask}}.
+#'
+#' @details This function was motivated by animal movement datasets from coastal environments. For example, consider the cost of movement over a surface between two points for an exclusively benthic marine animal versus an exclusively terrestrial animal. With a \code{mask} that represents the coastline, for the exclusively marine animal, it is necessary to mask values inside the coastline (i.e., on land), so \code{mask_inside = TRUE}, to prevent movement on land; while for a terrestrial animal, it is necessary to mask values beyond the coastline (i.e., in the sea), so \code{mask_inside = FALSE}, to prevent movement into the sea.
+#' @return The function returns a Raster* object in which values outside or inside of a supplied \code{\link[sp]{SpatialPolygonsDataFrame-class}} object have been masked.
+#'
+#' @examples
+#' #### Define an example raster
+#' # We will use some bathymetry data from around Oban
+#' # ... which we will mask using some coastline data. All values on land
+#' # ... are currently NA so we'll set these to 10 m for demonstration purposes.
+#' dat_gebco[is.na(dat_gebco[])] <- 10
+#' dat_gebco <- raster::crop(dat_gebco, raster::extent(dat_coast))
+#' raster::plot(dat_gebco)
+#'
+#' #### Standard implementation with mask_inside = FALSE simply implements raster::mask()
+#' m <- mask_io(dat_gebco, dat_coast)
+#' raster::plot(dat_coast)
+#' raster::plot(m, add = TRUE)
+#'
+#' #### Implementation with mask_inside = TRUE implements the mask within the coastline
+#' m <- mask_io(dat_gebco, dat_coast, mask_inside = TRUE)
+#' raster::plot(dat_coast)
+#' raster::plot(m, add = TRUE)
+#'
+#' #### Additional arguments to raster::mask() can be passed via ... as usual
+#' m <- mask_io(dat_gebco, dat_coast, mask_inside = TRUE, updatevalue = 1e5)
+#' raster::plot(dat_coast)
+#' raster::plot(m, add = TRUE)
+#'
+#' @author Edward Lavender
+#' @export
+#'
+
+mask_io <- function(x, mask, mask_inside = FALSE,...){
+  # Re-define mask if we are masking points inside the mask:
+  if(mask_inside){
+    area <- raster::extent(x)
+    area <- sp::Polygon(raster::coordinates(area))
+    area <- sp::SpatialPolygons(list(sp::Polygons(list(area), ID = 1)))
+    raster::crs(area) <- raster::crs(x)
+    mask <- rgeos::gDifference(area, mask)
+  }
+  # Mask raster
+  x_masked <- raster::mask(x = x, mask = mask,...)
+  return(x_masked)
+}
+
+
+######################################
+######################################
 #### pythagoras_3d()
 
 #' @title Calculate the Euclidean distance between points in three-dimensional space.
