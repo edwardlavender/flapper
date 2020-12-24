@@ -150,6 +150,36 @@
 "dat_gebco"
 
 
+#####################################
+#####################################
+#### dat_centroids
+
+#' @title Example acoustic centroids from \code{\link[flapper]{acdc_setup_centroids}}
+#' @description A list of acoustic centroids created by \code{\link[flapper]{acdc_setup_centroids}}. This is included principally to streamline function examples.
+#'
+#' @format A list with 57 elements, one for each receiver from 1:max(\code{\link[flapper]{dat_moorings}$receiver_id}). Each element contains a SpatialPolygonsDataFrame with the acoustic centroids for that receiver, under a detection range of 425 m, a mobility parameter of 200 m, 25 time steps and within the boundaries defined by \code{\link[flapper]{dat_coast}} and \code{\link[flapper]{dat_gebco}}.
+"dat_centroids"
+
+
+#####################################
+#####################################
+#### dat_acdc
+
+#' @title Example ACDC algorithm output
+#' @description A list of outputs created by \code{\link[flapper]{.acdc}}. This is included principally to streamline function examples.
+#'
+#' @format A named list with 4 elements:
+#' \describe{
+#'   \item{map}{A RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time-series.}
+#'   \item{record}{A list that records time-specific maps of the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations.}
+#'   \item{time}{A dataframe that defines the times of sequential stages in the algorithm's progression.}
+#'   \item{args}{A named list of user inputs that record the parameters used to generate the outputs.}
+#' }
+#'
+#' @seealso Further details are given in \code{\link[flapper]{.acdc}}.
+"dat_acdc"
+
+
 #### End of code.
 #####################################
 #####################################

@@ -135,7 +135,6 @@ check_names <- function(arg = deparse(substitute(input)), input, req, extract_na
 }
 
 
-
 ######################################
 ######################################
 #### check_tz()
@@ -161,6 +160,74 @@ check_tz <-
     return(input)
   }
 
+
+###################################
+###################################
+#### check_named_list()
+
+#' @title Check that a list is named
+#' @description This function checks that the top level of a list is named (ignoring empty lists if requested). If the list is not named, the function returns a helpful error message. Otherwise, the list is returned unchanged. This is particularly useful within functions that use \code{\link[base]{do.call}} to evaluate lists of arguments.
+#' @param arg (optional) A character string which defines the argument of a parent function.
+#' @param input A list.
+#' @param ignore_empty A logical input which defines whether or not to ignore empty lists.
+#' @return The function returns a helpful error message for unnamed lists (ignoring empty lists if requested) or the inputted list unchanged.
+
+#' @author Edward Lavender
+#' @keywords internal
+
+check_named_list <- function(arg = deparse(substitute(input)), input, ignore_empty = TRUE){
+  if(!any("list" %in% class(input))) stop(paste0("Argument '", arg, "' must be of class list."))
+  if(plotrix::listDepth(input) > 1){
+    warning("Input list of check_named_list() is of depth > 1; only the top level is checked.")
+  }
+  list_is_empty <- (length(input) == 0)
+  if(!list_is_empty | !ignore_empty){
+    if(is.null(names(input)) | any(names(input) %in% "")){
+      msg <- paste0("Argument '", arg, "' must be a named list.")
+      stop(msg)
+    }
+  }
+  return(input)
+}
+
+
+######################################
+######################################
+#### check_dir()
+
+#' @title Check a directory exists
+#' @description This function checks whether a directory exists and, if not, returns an informative error message. The inputted directory can be edited with the addition of a '/' if requested.
+#' @param arg (optional) A character string which defines the argument of a parent function.
+#' @param input A character string which defines a directory.
+#' @param check_slash A logical input that defines whether or not to check the end of a string for '/'. If \code{TRUE} and a '/' is lacking, this is added to the returned directory.
+#' @return The function checks whether or not a directory exists. If so, the function returns either the directory as inputted, or the directory with a '/' added to the end. If not, the function returns an informative error message.
+#'
+#' @author Edward Lavender
+#' @keywords internal
+#'
+
+check_dir <- function(arg = deparse(substitute(input)),
+                      input,
+                      check_slash = FALSE){
+
+  #### Check the directory exists
+  if(!dir.exists(input)){
+    stop(paste0("The directory inputted to the argument '", arg, "' ('", input, "') does not exist."), call. = FALSE)
+  }
+
+  #### Check the directory ends in a /
+  if(check_slash){
+    end_is_slash <- substr(input, nchar(input), nchar(input)) == "/"
+    if(!end_is_slash){
+
+      message(paste0("'/' added to the directory inputted to the argument '", arg, "' ('", input, "')."))
+      input <- paste0(input, "/")
+    }
+  }
+
+  #### Return input, possibly updated with / if checks passed
+  return(input)
+}
 
 
 #### End of code.

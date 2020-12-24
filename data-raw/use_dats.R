@@ -6,12 +6,22 @@
 # 1) Adds example datasets (dats) to flapper R package.
 # setwd(paste0(getwd(), "/data-raw/"))
 
+
+#####################################
+#####################################
+#### Movement data
+
 #### Load data
 dat_ids       <- readRDS("dat_ids.rds")
 dat_moorings  <- readRDS("dat_moorings.rds")
 dat_acoustics <- readRDS("dat_acoustics.rds")
 dat_sentinel  <- readRDS("dat_sentinel.rds")
 dat_archival  <- readRDS("dat_archival.rds")
+
+
+#####################################
+#####################################
+#### Spatial data
 
 #### Obtain spatial data
 ## Open Source coastline data
@@ -53,11 +63,112 @@ points(rxy_utm, cex = 2)
 axis(side = 1)
 axis(side = 2)
 
+
+#####################################
+#####################################
+#### Example function outputs
+
+#### Comments
+# In this section, some of the outputs of functions in the flapper package
+# ... are created and included as examples in the flapper package
+# ... to help illustrate examples quickly.
+library(flapper)
+
+#### dat_acdc_contours:
+# ... an example dataset of acoustic centroids required for ACDC algorithm
+# ... useful for demonstrating the acdc algorithm
+
+## Define data for setup_acdc()
+# Define coordinates of receivers as SpatialPoints with UTM CRS
+# CRS of receiver locations as recorded in dat_moorings
+proj_wgs84 <- sp::CRS("+init=epsg:4326")
+# CRS of receiver locations required
+proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
+                          "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+# Define SpatialPoints object
+xy_wgs84 <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
+xy_utm <- sp::spTransform(xy_wgs84, proj_utm)
+
+## Define a list of centroids with specified parameters
+dat_centroids <- acdc_setup(rs = dat_moorings$receiver_id,
+                            xy = xy_utm,
+                            detection_range = 425,
+                            mobility = 200,
+                            n_timesteps = 25,
+                            coastline = dat_coast,
+                            boundaries = raster::extent(dat_gebco),
+                            plot = TRUE,
+                            cl = parallel::makeCluster(11L),
+                            verbose = TRUE
+)
+# Check size (Mb) of file prior to inclusion in package
+saveRDS(dat_centroids, paste0(tempdir(), "/dat_centroids.rds"))
+file.size(paste0(tempdir(), "/dat_centroids.rds"))/1e6
+
+#### dat_acdc(): an example output from the .acdc() function
+# ... useful for demonstrating plotting functions
+
+## Prepare movement time-series
+# Add required columns to dataframes:
+dat_acoustics$timestamp_num <- as.numeric(dat_acoustics$timestamp)
+dat_archival$timestamp_num  <- as.numeric(dat_archival$timestamp)
+# Focus on an example individual
+id <- 25
+acc <- dat_acoustics[dat_acoustics$individual_id == id, ]
+arc <- dat_archival[dat_archival$individual_id == id, ]
+# Focus on the subset of data for which we have both acoustic and archival detections
+acc <- acc[acc$timestamp >= min(arc$timestamp) - 2*60 &
+             acc$timestamp <= max(arc$timestamp) + 2*60, ]
+arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
+             arc$timestamp <= max(acc$timestamp) + 2*60, ]
+# Focus on a sample of data to keep package contents small
+acc <- acc[acc$timestamp <= as.POSIXct("2016-03-19"), ]
+arc <- arc[arc$timestamp <= as.POSIXct("2016-03-19"), ]
+range(arc$timestamp)
+range(acc$timestamp)
+# Examine data in this region
+prettyGraphics::pretty_plot(arc$timestamp, arc$depth*-1, type = "l")
+prettyGraphics::pretty_line(acc$timestamp, add = TRUE)
+
+#### dat_acdc
+dat_acdc <- .acdc(acoustics = acc,
+                  archival = arc,
+                  bathy = dat_gebco,
+                  space_use = NULL,
+                  detection_range = 425,
+                  mobility = 200,
+                  depth_error = 2.5,
+                  acc_centroids = dat_centroids,
+                  plot = 50,
+                  png_param = list(),
+                  progress = 3L,
+                  verbose = TRUE,
+                  con = ""
+                  )
+
+# Check size of file prior to inclusion in package
+saveRDS(dat_acdc, paste0(tempdir(), "/dat_acdc.rds"))
+file.size(paste0(tempdir(), "/dat_acdc.rds"))/1e6
+
+
+#####################################
+#####################################
+#### Add data to pkg
+
 #### Use data
+# movement time-series
 usethis::use_data(dat_ids, overwrite = TRUE)
 usethis::use_data(dat_moorings, overwrite = TRUE)
 usethis::use_data(dat_acoustics, overwrite = TRUE)
 usethis::use_data(dat_sentinel, overwrite = TRUE)
 usethis::use_data(dat_archival, overwrite = TRUE)
+# spatial data
 usethis::use_data(dat_coast, overwrite = TRUE)
 usethis::use_data(dat_gebco, overwrite = TRUE)
+# function example data
+usethis::use_data(dat_centroids, overwrite = TRUE)
+usethis::use_data(dat_acdc, overwrite = TRUE)
+
+#### End of code.
+#####################################
+#####################################
