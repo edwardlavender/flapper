@@ -11,7 +11,7 @@ A dataframe with 75,000 observations and 5 variables:
   \item{individual_id}{A number which defines each individual (see \code{\link{dat_ids}}).}
   \item{transmitter_id}{The individual's acoustic transmitter (see \code{\link{dat_ids}}).}
   \item{archival_id}{The individual's archival tag (see \code{\link{dat_ids}}).}
-  \item{depth}{A number which defines the depth (m) of the individual at each timestep}
+  \item{depth}{A number which defines the depth (m) of the individual at each time step.}
 }
 }
 \source{

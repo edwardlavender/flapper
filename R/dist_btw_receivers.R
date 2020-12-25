@@ -1,7 +1,7 @@
-#' @title Compute euclidean distances between receivers
+#' @title Compute Euclidean distances between receivers
 #' @description This function computes linear distances (km) between all combinations of receivers.
 #'
-#' @param moorings A dataframe which defines the location of each unique receiver combination. This should contain the columns: 'receiver_id', a unique identifier of each receiver, 'receiver_lat', the latitude of that receiver in decimal degrees; and 'receiver_long', the longitude of that receiver in decimal degrees (see \code{\link[flapper]{dat_moorings}}.
+#' @param moorings A dataframe which defines the location of each unique receiver combination. This should contain the columns: 'receiver_id', a unique identifier of each receiver, 'receiver_lat', the latitude of that receiver in decimal degrees; and 'receiver_long', the longitude of that receiver in decimal degrees (see \code{\link[flapper]{dat_moorings}}).
 #' @param f (optional) A function which is used to process distances before these are returned. For example, it may be useful to round distances to nearest km with \code{f = function(x) round(x, digits = 0)}.
 #'
 #' @return The function returns a dataframe with columns 'r1', 'r2' and 'dist'. These define the IDs of each combination of receivers and the associated distance between them, in km. Note that the dataframe contains duplicate combinations of receivers (e.g., both r1 = 1 and r2 = 2 and r1 = 2 and r2 = 1).

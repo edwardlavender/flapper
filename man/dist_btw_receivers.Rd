@@ -2,12 +2,12 @@
 % Please edit documentation in R/dist_btw_receivers.R
 \name{dist_btw_receivers}
 \alias{dist_btw_receivers}
-\title{Compute euclidean distances between receivers}
+\title{Compute Euclidean distances between receivers}
 \usage{
 dist_btw_receivers(moorings, f = NULL)
 }
 \arguments{
-\item{moorings}{A dataframe which defines the location of each unique receiver combination. This should contain the columns: 'receiver_id', a unique identifier of each receiver, 'receiver_lat', the latitude of that receiver in decimal degrees; and 'receiver_long', the longitude of that receiver in decimal degrees (see \code{\link[flapper]{dat_moorings}}.}
+\item{moorings}{A dataframe which defines the location of each unique receiver combination. This should contain the columns: 'receiver_id', a unique identifier of each receiver, 'receiver_lat', the latitude of that receiver in decimal degrees; and 'receiver_long', the longitude of that receiver in decimal degrees (see \code{\link[flapper]{dat_moorings}}).}
 
 \item{f}{(optional) A function which is used to process distances before these are returned. For example, it may be useful to round distances to nearest km with \code{f = function(x) round(x, digits = 0)}.}
 }

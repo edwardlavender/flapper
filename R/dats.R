@@ -110,7 +110,7 @@
 #'   \item{individual_id}{A number which defines each individual (see \code{\link{dat_ids}}).}
 #'   \item{transmitter_id}{The individual's acoustic transmitter (see \code{\link{dat_ids}}).}
 #'   \item{archival_id}{The individual's archival tag (see \code{\link{dat_ids}}).}
-#'   \item{depth}{A number which defines the depth (m) of the individual at each timestep}
+#'   \item{depth}{A number which defines the depth (m) of the individual at each time step.}
 #' }
 #'
 #' @source Data were collected by, and belong to, Marine Scotland Science and NatureScot. Data were processed by Edward Lavender. If you wish to use these data, please contact Marine Scotland Science and NatureScot for further information.

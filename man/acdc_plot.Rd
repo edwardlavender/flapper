@@ -54,7 +54,7 @@ acdc_plot(
 
 \item{verbose}{A logical variable that defines whether or not relay messages to the console to monitor function progress.}
 
-\item{check}{A logical variable that defines whether or not to check user inputs to the function before its initation.}
+\item{check}{A logical variable that defines whether or not to check user inputs to the function before its initiation.}
 
 \item{...}{Additional arguments, passed to \code{\link[raster]{plot}}, to customise the blank background plot onto which spatial layers are added, such as \code{xlab}, \code{ylab} and \code{main}.}
 }
@@ -62,7 +62,7 @@ acdc_plot(
 The function plots the results of the ACDC algorithm at specified time steps, with one plot per time step. Plots are saved to file if \code{png_param} is supplied.
 }
 \description{
-This function is used to plot the results of the ACDC algorithm. To implement the function, a named list from \code{\link[flapper]{.acdc}} must be supplied, from which the results can be extracted and plotted. For each specified time-step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids can be added and customised and the finalised plots can be returned or saved to file.
+This function is used to plot the results of the ACDC algorithm. To implement the function, a named list from \code{\link[flapper]{.acdc}} must be supplied, from which the results can be extracted and plotted. For each specified time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids can be added and customised and the finalised plots can be returned or saved to file.
 }
 \examples{
 #### Example (1): The default options simply plot the first surface

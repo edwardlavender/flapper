@@ -58,7 +58,7 @@ acoustics_wth_errors <- add_erroneous_row(dat_acoustics,
                                           row = nrw,
                                           col = "receiver_id",
                                           val = c(100, 200, 300))
-## Add erroneous timestamps (outside receiver/individual id deployment periods )
+## Add erroneous time stamps (outside receiver/individual id deployment periods )
 acoustics_wth_errors <- add_erroneous_row(acoustics_wth_errors,
                                          row = nrw,
                                           col = "timestamp",
