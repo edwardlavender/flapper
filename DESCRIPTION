@@ -6,14 +6,16 @@ Author: Edward Lavender
 Maintainer: Edward Lavender <el72@st-andrews.ac.uk>
 Description: Algorithms which facilitate the use of passive acoustic telemetry (PAT) data for ecological inferences, especially those pertaining to animal space use. This includes functions for processing PAT data, spatial tools such as least-cost pathway calculations, new algorithms for inferring space use and simulations designed to evaluate the efficacy of existing and new algorithms for inferring space use. Package development has been motivated by the collection of PAT data for a Critically Endangered benthopelagic elasmobranch off the West Coast of Scotland. 
 Imports:
-    magrittr, data.table, dplyr, plyr, rlang, lubridate, pbapply,
+    magrittr, data.table, dplyr, plyr, rlang, lubridate, 
+    purrr, pbapply,
     Matrix, raster, rgeos, geosphere, Orcs, cppRouting, gdistance, sp,
     glatos,
-    prettyGraphics, plotrix, fields,
+    prettyGraphics, fields,
     Tools4ETS
 Suggests:
     knitr,
-    rmarkdown
+    rmarkdown, 
+    animation
 Remotes: 
     github::edwardlavender/prettyGraphics, 
     github::edwardlavender/Tools4ETS,

@@ -17,6 +17,31 @@ NULL
 
 ######################################
 ######################################
+#### check...()
+
+#' @title Check that arguments supplied via ... are allowed
+#' @description This function checks that arguments supplied via ... are allowed. This function was written to support other functions, specifically via the return of a helpful error message if arguments that cannot be supplied via ... have been supplied. The function is not intended for general use.
+#'
+#' @param not_allowed A character vector of the names of function arguments that are not allowed.
+#' @param ... Other arguments
+#'
+#' @return The function checks other arguments supplied via ...; if these contain an argument that is not allowed, the function returns an error. Otherwise, nothing is returned.
+#'
+#' @author Edward Lavender
+#' @keywords "internal"
+
+check... <- function(not_allowed,...){
+  l <- list(...)
+  if(any(names(l) %in% not_allowed)){
+    trouble <- names(l)[names(l) %in% not_allowed]
+    msg <- paste0("Additional arguments (", paste(trouble, collapse = ", "),
+                  ") have been passed to the function via ... which are implemented internally or need to be supplied via other function arguments. Implement these options via appropriate function arguments, if possible, or do not supply them.")
+    stop(msg)
+  }
+}
+
+######################################
+######################################
 #### check_value()
 
 #' @title Check the input value to a parent function argument
@@ -177,9 +202,6 @@ check_tz <-
 
 check_named_list <- function(arg = deparse(substitute(input)), input, ignore_empty = TRUE){
   if(!any("list" %in% class(input))) stop(paste0("Argument '", arg, "' must be of class list."))
-  if(plotrix::listDepth(input) > 1){
-    warning("Input list of check_named_list() is of depth > 1; only the top level is checked.")
-  }
   list_is_empty <- (length(input) == 0)
   if(!list_is_empty | !ignore_empty){
     if(is.null(names(input)) | any(names(input) %in% "")){

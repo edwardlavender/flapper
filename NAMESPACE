@@ -2,6 +2,8 @@
 
 export("%>%")
 export(.acdc)
+export(acdc_animate)
+export(acdc_plot)
 export(acdc_setup_centroids)
 export(add_receiver_id)
 export(assemble_sentinel_counts)
