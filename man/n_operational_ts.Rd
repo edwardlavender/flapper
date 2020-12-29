@@ -7,36 +7,36 @@
 n_operational_ts(data, start, stop, times = NULL, plot = TRUE, ...)
 }
 \arguments{
-\item{data}{A dataframe of observations. At a minimum, this should contain two columns that defines the start and end of each unit's operational period, defined by \code{start} and \code{stop} below.}
+\item{data}{A dataframe of observations. At a minimum, this should contain two columns that define the start and end of each unit's operational period, identified by \code{start} and \code{stop} below.}
 
-\item{start}{A character string that defines the name of the column in \code{data} that defines the start tiume of each unit's operational period.}
+\item{start}{A character string that defines the name of the column in \code{data} that defines the start time of each unit's operational period.}
 
 \item{stop}{A character string that defines the name of the column in \code{data} that defines the end time of each unit's operational period.}
 
-\item{times}{A vector of times at which to calculate the number of units operational at each time. If \code{times = NULL}, a regular sequence of dates from the first to the last date in \code{data} is used.}
+\item{times}{A vector of times for which to calculate the number of units that were operational at each time. If \code{times = NULL}, a regular sequence of dates from the first to the last date in \code{data} is used.}
 
 \item{plot}{A logical variable that defines whether or not to plot the time series of the number of operational units.}
 
-\item{...}{Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}} to customise the plot.}
+\item{...}{Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}}, to customise the plot.}
 }
 \value{
 The function returns a dataframe that, for each time step ('time'), defines the number of operational units at that time ('n'). If \code{plot = TRUE}, the function also plots a time series of the number of operational units.
 }
 \description{
-This function calculates the number of operational units through time (e.g., the number of individuals at liberty or the number of active acoustic receivers over the course of the study). To implement the function, a dataframe (\code{data}) must be supplied that defines the start and end times of each unit's operational period. Then, for each time step in a user-specified sequence of times, or an automatically generated sequence of times from the earliest start time to the latest end time in \code{data}, the function counts the number of units that were operational on each time step and returns a dataframe (and, if specified, a plot) with this information.
+This function calculates the number of operational units through time (e.g., the number of individuals at liberty or the number of active acoustic receivers over the course of a study). To implement the function, a dataframe (\code{data}) must be supplied that defines the start and end time of each unit's operational period. Then, for each time step in a user-specified sequence of times, or an automatically generated sequence of times from the earliest start time to the latest end time in \code{data}, the function counts the number of units that were operational on each time step and returns a dataframe (and, if specified, a plot) with this information.
 }
 \details{
 This is a simple metric of sampling effort. For acoustic receivers, \code{\link[flapper]{detection_area_ts}} provides another metric of sampling effort.
 }
 \examples{
-#### Example (1): Number of operational receivers over the study
+#### Example (1): Number of operational receivers over an acoustic telemetry study
 dat_n <- n_operational_ts(data = dat_moorings,
                           start = "receiver_start_date",
                           stop = "receiver_end_date")
 utils::head(dat_n)
 
-#### Example (2): Number of individuals at liberty over study
-# Define 'tag_end_date' as hypothetical end date of study
+#### Example (2): Number of individuals at liberty over a tagging study
+# Define 'tag_end_date' as hypothetical end date of a study
 # ...  and assume that all individuals remained tagged until this time
 dat_ids$tag_end_date <- as.Date("2017-06-05")
 dat_n <- n_operational_ts(data = dat_ids,
