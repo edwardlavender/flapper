@@ -754,3 +754,122 @@ detection_centroids_envir <- function(xy,
   return(ls_envir_sample)
 
 }
+
+
+######################################
+######################################
+#### detection_days()
+
+#' @title Calculate detection days
+#' @description The function calculates the total number of days (termed 'detection days') during which individuals were detected at passive acoustic telemetry receivers. To implement the function, a dataframe with passive acoustic telemetry detections of individuals at receivers must be supplied. Detection days can be calculated for all combinations of individuals/receivers in this dataframe, for all combinations of specified individuals and receivers, or for specific individual/receiver pairs. The function returns a dataframe of detection days for these individual/receiver combinations or a vector of detection days that is matched against another dataframe.
+#'
+#' @param acoustics A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: a vector of individual IDs, named 'individual_id'; a vector of receiver IDs, named 'receiver_id'; and a POSIXct vector of time stamps when detections were made, named 'timestamp'.
+#' @param individual_id (optional) A vector of individuals for which to calculate detection days.
+#' @param receiver_id (optional) A vector of receivers for which to calculate detection days.
+#' @param type If both \code{individual_id} and \code{receiver_id} are specified, then \code{type} is an integer that defines whether or not to calculate detection days for (a) each individual/receiver pair (\code{type = 1L}) or (b) all combinations of individuals/receivers.
+#' @param match_to (optional) A dataframe against which to match detection days. This must contain the 'individual_id' and 'receiver_id' column, as in \code{acoustics}. If supplied, an integer vector of detection days for individual/receiver combinations, matched against the individuals/receivers in \code{match_to}, is returned (see also Value).
+#' @param ... Additional arguments passed to \code{\link[pbapply]{pblapply}}.
+#'
+#' @return The function returns a dataframe with the detection days for all, or specified, combinations of individuals and receivers. Note that if \code{acoustics} only contains individuals/receivers that made detections, then this will only contain individuals/receivers for/at which detections were made. Alternatively, if \code{match_to} is supplied, a vector of detection days, matched against each individual/receiver observation in that dataframe, is returned.
+#'
+#' @examples
+#' #### Example (1): Detection days between all combinations
+#' # ... of detected individuals and receivers with detections
+#' dat <- detection_days(dat_acoustics)
+#'
+#' #### Example (2) Detection days between all combinations of specified
+#' #... individuals/receivers
+#' dat <- detection_days(dat_acoustics,
+#'                       individual_id = 25,
+#'                       receiver_id = c(25, 21),
+#'                       type = 2L)
+#'
+#' #### Example (3) Detection days between specified individual/receiver pairs
+#' dat <- detection_days(dat_acoustics,
+#'                       individual_id = c(25, 26),
+#'                       receiver_id = c(25, 21),
+#'                       type = 1L)
+#'
+#' #### Example (4) Match detection days to another dataframe
+#' dat_acoustics$detection_days <- detection_days(dat_acoustics,
+#'                                                match_to = dat_acoustics,
+#'                                                type = 1L)
+#'
+#' utils::head(dat_acoustics)
+#'
+#' @author Edward Lavender
+#' @export
+#'
+
+detection_days <- function(acoustics,
+                           individual_id = NULL,
+                           receiver_id = NULL,
+                           type = 1L,
+                           match_to = NULL,...){
+  #### Checks
+  # Dataframes must contains required names
+  check_names(input = acoustics, req = c("individual_id", "receiver_id", "timestamp"), extract_names = colnames, type = all)
+  if(!is.null(match_to)) check_names(input = match_to, req = c("individual_id", "receiver_id"), extract_names = colnames, type = all)
+  # Check input to type
+  type <- check_value(input = type, supp = 1:2L)
+
+  #### Define dataframe with individuals and receivers
+  ## Option (1) Both individual_id and receiver_id have been supplied
+  # ... in which case we will define a dataframe for these specific individuals based on type
+  if(!is.null(individual_id) & !is.null(receiver_id)) {
+
+    # If type == 1, then we will consider each pair of individuals and receivers
+    if(type == 1L) {
+      if(length(individual_id) != length(receiver_id)) {
+        stop("Both 'individual_id' and 'receiver_id' have been specified and type = 1L but length(individual_id) != length(receiver_id).")
+      }
+      dat <- data.frame(individual_id = individual_id, receiver_id = receiver_id)
+
+      # Otherwise, we will focus on all combinations of specified individuals and receivers
+    } else if (type == 2L) {
+      dat <- expand.grid(individual_id = individual_id, receiver_id = receiver_id)
+    }
+
+    ## Option (2) Use all combinations of individuals/receivers
+  } else {
+
+    # Filter out any unwanted individuals or receivers
+    if(!is.null(individual_id)) acoustics <- acoustics[which(acoustics$individual_id %in% individual_id), ]
+    if(!is.null(receiver_id)) acoustics <- acoustics[which(acoustics$receiver_id %in% receiver_id), ]
+    # Define dataframe
+    # This will only include receivers that recorded detections
+    dat <- expand.grid(individual_id = unique(acoustics$individual_id),
+                       receiver_id = unique(acoustics$receiver_id))
+
+  }
+
+  #### Calculate detections days
+  acoustics$date <- as.Date(acoustics$timestamp)
+  detection_days_ls <-
+    pbapply::pblapply(split(dat, 1:nrow(dat)), FUN = function(d){
+      # Subset acoustics to consider correct individual and receiver
+      aco_tmp <- acoustics[acoustics$individual_id == d$individual_id &
+                             acoustics$receiver_id == d$receiver_id, ]
+      # Count the number of detections and return
+      if(nrow(aco_tmp) > 0) n <- length(unique(aco_tmp$date)) else n <- 0
+      return(n)
+    },...)
+  dat$detection_days <- unlist(detection_days_ls)
+
+  #### Match detection days to another dataframe, if requested
+  if(!is.null(match_to)) {
+    dat$key <- paste0(dat$individual_id, "-", dat$receiver_id)
+    match_to$key  <- paste0(match_to$individual_id, "-", match_to$receiver_id)
+    match_to$detection_days <- dat$detection_days[match(match_to$key, dat$key)]
+    out <- match_to$detection_days
+    if(any(is.na(out))){
+      message(sum(is.na(out)), "NAs identified in matched vector of detection days.")
+    }
+  } else{
+    out <- dat
+  }
+
+  #### Return outputs
+  return(out)
+
+}
