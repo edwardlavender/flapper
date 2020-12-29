@@ -244,3 +244,104 @@ detection_area_sum <- function(xy,
 }
 
 
+######################################
+######################################
+#### detection_area_ts()
+
+#' @title Calculate the area sampled by receivers through time
+#' @description This function extends \code{\link[flapper]{detection_area_sum}} to calculate how the total area sampled by receivers changes through time.
+#'
+#' @param xy,detection_range,coastline,scale Arguments required to calculate the total area surveyed by receivers (at each time point) via \code{\link[flapper]{detection_area_sum}}.
+#' @param plot A logical input that defines whether or not to plot a time series of the total area sampled by receivers.
+#' @param verbose A logical input that defines whether or not to print messages to the console to relay function progress.
+#' @param cl (optional) A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. The connection to the cluster is closed within the function.
+#' @param varlist (optional) A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.
+#' @param ... Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}}, to customise the plot produced.
+#'
+#' @return The function returns a dataframe with, for each date ('date') from the time of the first receiver's deployment to the time of the last receiver's retrieval, the number of receivers operational on that date ('n') and the total area sampled ('receiver_area'). If \code{plot = TRUE}, the function also returns a plot of the area sampled by receivers through time.
+#'
+#' @examples
+#' #### Define SpatialPointsDataFrame with receiver locations and deployment dates
+#' proj_wgs84 <- sp::CRS("+init=epsg:4326")
+#' proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
+#'                           "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
+#'                         proj_wgs84)
+#' xy <- sp::spTransform(xy, proj_utm)
+#' xy <- sp::SpatialPointsDataFrame(xy, data = dat_moorings)
+#'
+#' #### Example (1): Implement function with default arguments
+#' dat <- detection_area_ts(xy)
+#'
+#' #### Example (2): Adjust detection range, include coastline and use parallel processing
+#' # For areas with complex coastline, this will reduce the speed of the algorithm
+#' # So we will also supply a cluster to improve the computation time.
+#' \dontrun{
+#' dat <- detection_area_ts(xy,
+#'                        detection_range = 500,
+#'                        coastline = dat_coast,
+#'                        cl = parallel::makeCluster(2L),
+#'                        varlist = "dat_coast"
+#'                        )
+#' }
+#'
+#' #### Example (3) Hide or customise the plot
+#' dat <- detection_area_ts(xy, plot = FALSE)
+#' dat <- detection_area_ts(xy,
+#'                        pretty_axis_args = list(axis = list(list(format = "%b-%y"),
+#'                                                            list())),
+#'                        xlab = "Time (month-year)",
+#'                        ylab = expression(paste("Area (", m^2, ")")),
+#'                        type = "l")
+#'
+#' @author Edward Lavender
+#' @export
+#'
+
+detection_area_ts <- function(xy,
+                              detection_range = 425,
+                              coastline = NULL,
+                              scale = 1/(1000^2),
+                              plot = TRUE,
+                              verbose = TRUE,
+                              cl = NULL,
+                              varlist = NULL,...){
+
+  #### Checks
+  t_onset <- Sys.time()
+  cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+  cat_to_console(paste0("flapper::detection_area_ts() called (@ ", t_onset, ")..."))
+  cat_to_console("... Implementing function checks...")
+  check_class(input = xy, to_class = "SpatialPointsDataFrame", type = "stop")
+  check_names(input = xy, req = c("receiver_start_date", "receiver_end_date"))
+  if(is.null(cl) & !is.null(varlist)) message("cl = NULL: input to 'varlist' ignored.")
+
+  #### Implement algorithm
+  cat_to_console("... Implementing algorithm...")
+  rdate_seq <- seq.Date(min(xy$receiver_start_date), max(xy$receiver_end_date), 1)
+  if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
+  rcov <- pbapply::pblapply(rdate_seq, cl = cl, function(rdate){
+    pos <- which(xy$receiver_start_date <= rdate & xy$receiver_end_date >= rdate)
+    receiver_area <- detection_area_sum(xy = xy[pos, ],
+                                        detection_range = detection_range,
+                                        coastline = coastline,
+                                        scale = scale,
+                                        plot = FALSE)
+    d <- data.frame(date = rdate, n = length(pos), receiver_area = receiver_area)
+    return(d)
+  })
+  if(!is.null(cl)) parallel::stopCluster(cl)
+  rcov <- dplyr::bind_rows(rcov)
+
+
+  #### Visualise time series
+  cat_to_console("... Visualising time series")
+  if(plot) prettyGraphics::pretty_plot(rcov$date, rcov$receiver_area,...)
+
+  #### Return outputs
+  t_end <- Sys.time()
+  duration <- difftime(t_end, t_onset, units = "mins")
+  cat_to_console(paste0("... flapper::detection_area_ts() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
+  return(rcov)
+
+}
