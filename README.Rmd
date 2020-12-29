@@ -26,7 +26,7 @@ _This package is a work-in-process. Some of the functions listed below have not 
 * **Simulation tools**, including tools for the comparison of simulated and inferred patterns of space use for existing and new algorithms;
 
 <img src="vignettes/readme_context.png"/>
-_flapper: An `R` package designed to facilitate the integration of acoustic and archival datasets to improve estimates of space use for benthic/demersal species. Inserted sample depth and acoustic time-series were collected as part of the Movement Ecology of Flapper Skate project by Marine Scotland Science and NatureScot. The insert of the flapper skate is also courtesy of this project. The bathymetry data are sourced from the Ireland, Northern Island and Scotland Hydrographic survey (Howe et al., 2015). Plots were produced using the [prettyGraphics](https://github.com/edwardlavender/prettyGraphics) package._
+_flapper: An `R` package designed to facilitate the integration of acoustic and archival datasets to improve estimates of space use for benthic/demersal species. Inserted sample depth and acoustic time series were collected as part of the Movement Ecology of Flapper Skate project by Marine Scotland Science and NatureScot. The insert of the flapper skate is also courtesy of this project. The bathymetry data are sourced from the Ireland, Northern Island and Scotland Hydrographic survey (Howe et al., 2015). Plots were produced using the [prettyGraphics](https://github.com/edwardlavender/prettyGraphics) package._
 
 ## Installation
 
@@ -52,15 +52,15 @@ The `dependencies = TRUE` argument will also install any suggested packages, whi
 
 * **dat_ids** is a dataset containing the characteristics of a sample of tagged flapper skate;
 * **dat_moorings** is a dataset containing some sample passive acoustic telemetry receiver locations and associated information;
-* **dat_acoustics** is a dataset containing some sample detection time-series;
-* **dat_archival** is a dataset containing some sample depth time-series;
-* **dat_sentinel** is a dataset containing some sample transmission -- detection time-series assembled from sentinel tags;
+* **dat_acoustics** is a dataset containing some sample detection time series;
+* **dat_archival** is a dataset containing some sample depth time series;
+* **dat_sentinel** is a dataset containing some sample transmission -- detection time series assembled from sentinel tags;
 
 These example datasets were collected by Marine Scotland Science and NatureScot as part of the Movement Ecology of Flapper Skate project and belong to these organisations. If you wish to use these data, please contact Marine Scotland Science and NatureScot for further information.
 
 ## Data processing tools 
 
-A number of functions facilitate the assembly, processing and checking of passive acoustic telemetry time-series. 
+A number of functions facilitate the assembly, processing and checking of passive acoustic telemetry time series. 
 
 * **Data assembly.** Some functions facilitate data assembly. For example, `add_receiver_id()` adds unique receiver IDs to a dataframe (which is useful if the same receiver has been deployed more than once). `assemble_sentinel_counts()` assembles counts of transmissions/detections from sentinel tags for modelling purposes (i.e., to model detection probability). 
 * **Data processing.** Some functions facilitate data processing. The identification of false detections is one key component of this process. These can be suggested by the 'short interval' criterion approach using functions in the `glatos`. In `flapper`, `false_detections_sf()` passes putative false detections through a spatial filter which incorporates ancillary information on receiver locations and animal swimming speeds to interrogate their plausibility.
@@ -103,9 +103,9 @@ Simulations are a valuable tool in ecology which can elucidate the relative perf
 
 ## Associated packages
 
-* **[prettyGraphics](https://github.com/edwardlavender/prettyGraphics)** facilitates the production of pretty, publication-quality and interactive visualisations, with a particular focus on time-series. This makes it easy to create abacus plots, visualise time-series (across factor levels, at different temporal scales and in relation to covariates), bathymetric landscapes and movement pathways in three-dimensions, and detection similarity matrices. 
-* **[Tools4ETS](https://github.com/edwardlavender/Tools4ETS)** provides a set of general tools for ecological time-series, including the definition of time categories, matching time-series (e.g., detection observations with environmental covariates), flagging independent time-series and simulating time-series. 
-* **[fvcom.tbx](https://github.com/edwardlavender/fvcom.tbx)** provides tools for the integration of hydrodynamic model predictions (from the Finite Coastal Ocean Volume Model) with ecological datasets (e.g., detection time-series). This facilitates the inclusion of hydrodynamic model predictions as covariates in movement models and the validation of hydrodynamic model predictions with movement datasets or data collected from static acoustic receivers. This package was particularly motivated by the West Scotland Coastal Ocean Modelling System (WeStCOMS). 
+* **[prettyGraphics](https://github.com/edwardlavender/prettyGraphics)** facilitates the production of pretty, publication-quality and interactive visualisations, with a particular focus on time series. This makes it easy to create abacus plots, visualise time series (across factor levels, at different temporal scales and in relation to covariates), bathymetric landscapes and movement pathways in three-dimensions, and detection similarity matrices. 
+* **[Tools4ETS](https://github.com/edwardlavender/Tools4ETS)** provides a set of general tools for ecological time series, including the definition of time categories, matching time series (e.g., detection observations with environmental covariates), flagging independent time series and simulating time series. 
+* **[fvcom.tbx](https://github.com/edwardlavender/fvcom.tbx)** provides tools for the integration of hydrodynamic model predictions (from the Finite Coastal Ocean Volume Model) with ecological datasets (e.g., detection time series). This facilitates the inclusion of hydrodynamic model predictions as covariates in movement models and the validation of hydrodynamic model predictions with movement datasets or data collected from static acoustic receivers. This package was particularly motivated by the West Scotland Coastal Ocean Modelling System (WeStCOMS). 
 
 ## References 
 

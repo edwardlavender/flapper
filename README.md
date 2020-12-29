@@ -49,7 +49,7 @@ the following themes:
 <img src="vignettes/readme_context.png"/> *flapper: An `R` package
 designed to facilitate the integration of acoustic and archival datasets
 to improve estimates of space use for benthic/demersal species. Inserted
-sample depth and acoustic time-series were collected as part of the
+sample depth and acoustic time series were collected as part of the
 Movement Ecology of Flapper Skate project by Marine Scotland Science and
 NatureScot. The insert of the flapper skate is also courtesy of this
 project. The bathymetry data are sourced from the Ireland, Northern
@@ -111,11 +111,11 @@ Scotland:
   - **dat\_moorings** is a dataset containing some sample passive
     acoustic telemetry receiver locations and associated information;
   - **dat\_acoustics** is a dataset containing some sample detection
-    time-series;
-  - **dat\_archival** is a dataset containing some sample depth
-    time-series;
+    time series;
+  - **dat\_archival** is a dataset containing some sample depth time
+    series;
   - **dat\_sentinel** is a dataset containing some sample transmission –
-    detection time-series assembled from sentinel tags;
+    detection time series assembled from sentinel tags;
 
 These example datasets were collected by Marine Scotland Science and
 NatureScot as part of the Movement Ecology of Flapper Skate project and
@@ -125,7 +125,7 @@ contact Marine Scotland Science and NatureScot for further information.
 ## Data processing tools
 
 A number of functions facilitate the assembly, processing and checking
-of passive acoustic telemetry time-series.
+of passive acoustic telemetry time series.
 
   - **Data assembly.** Some functions facilitate data assembly. For
     example, `add_receiver_id()` adds unique receiver IDs to a dataframe
@@ -253,20 +253,20 @@ the processing and analysis of PAT data. This includes the following:
 
   - **[prettyGraphics](https://github.com/edwardlavender/prettyGraphics)**
     facilitates the production of pretty, publication-quality and
-    interactive visualisations, with a particular focus on time-series.
-    This makes it easy to create abacus plots, visualise time-series
+    interactive visualisations, with a particular focus on time series.
+    This makes it easy to create abacus plots, visualise time series
     (across factor levels, at different temporal scales and in relation
     to covariates), bathymetric landscapes and movement pathways in
     three-dimensions, and detection similarity matrices.
   - **[Tools4ETS](https://github.com/edwardlavender/Tools4ETS)**
-    provides a set of general tools for ecological time-series,
-    including the definition of time categories, matching time-series
+    provides a set of general tools for ecological time series,
+    including the definition of time categories, matching time series
     (e.g., detection observations with environmental covariates),
-    flagging independent time-series and simulating time-series.
+    flagging independent time series and simulating time series.
   - **[fvcom.tbx](https://github.com/edwardlavender/fvcom.tbx)**
     provides tools for the integration of hydrodynamic model predictions
     (from the Finite Coastal Ocean Volume Model) with ecological
-    datasets (e.g., detection time-series). This facilitates the
+    datasets (e.g., detection time series). This facilitates the
     inclusion of hydrodynamic model predictions as covariates in
     movement models and the validation of hydrodynamic model predictions
     with movement datasets or data collected from static acoustic

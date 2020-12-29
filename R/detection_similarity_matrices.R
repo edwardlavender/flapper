@@ -3,9 +3,9 @@
 #### compute_det_sim()
 
 #' @title Compute a detection history similarity matrix
-#' @description The function computes a detection history similarity matrix. For all combinations of individuals, this shows the total number (or percentage) of detections 'nearby' in space and time, which can help elucidate possible interactions among individuals that affect space use (see Details). To compute this matrix, the function pairs detections for each individual with the detections nearest in time for each other individual. The function computes the time (minutes) between paired detection time-series, and the distance (m) between the receiver(s) at which paired detections occurred, dropping any detection pairs that are further apart in time or space than user-defined thresholds (which depend on the mobility of the species under investigation). For each combination of individuals, the function returns total number (or percentage) of detections that are closely associated in time and space. For very large combinations of individuals, especially those with long, overlapping time-series, the function may take some time to run; therefore, testing the function on a small subset of individuals first is advisable. Parallelisation can be used to improve computation time. Similarity matrices can be visualised with \code{\link[prettyGraphics]{pretty_mat}}.
+#' @description The function computes a detection history similarity matrix. For all combinations of individuals, this shows the total number (or percentage) of detections 'nearby' in space and time, which can help elucidate possible interactions among individuals that affect space use (see Details). To compute this matrix, the function pairs detections for each individual with the detections nearest in time for each other individual. The function computes the time (minutes) between paired detection time series, and the distance (m) between the receiver(s) at which paired detections occurred, dropping any detection pairs that are further apart in time or space than user-defined thresholds (which depend on the mobility of the species under investigation). For each combination of individuals, the function returns total number (or percentage) of detections that are closely associated in time and space. For very large combinations of individuals, especially those with long, overlapping time series, the function may take some time to run; therefore, testing the function on a small subset of individuals first is advisable. Parallelisation can be used to improve computation time. Similarity matrices can be visualised with \code{\link[prettyGraphics]{pretty_mat}}.
 #'
-#' @param acoustics_ls A list of dataframes, with one element for each individual, which contain each individual's detection time-series. Each dataframe must include the following columns: 'individual_id', a factor which specifies unique individuals; 'timestamp', a POSIXct object which specifies the time of each detection; 'receiver_long', the longitude (decimal degrees) of the receiver(s) at the individual was detected; and 'receiver_lat', the latitude (decimal degrees) of the receiver(s) at which individual was detected. Each dataframe should be ordered by 'individual_id' and then by 'timestamp'. Careful ordering of 'individual_id' factor levels (e.g. perhaps by population group, then by the number of detections of each individual) can aid visualisation of similarity matrices, in which the order or rows/columns corresponds directly to the order of individuals in \code{acoustics_ls}. Sequential elements in \code{acoustics_ls} should correspond to sequential factor levels for 'individual_id', which should be the same across all dataframes.
+#' @param acoustics_ls A list of dataframes, with one element for each individual, which contain each individual's detection time series. Each dataframe must include the following columns: 'individual_id', a factor which specifies unique individuals; 'timestamp', a POSIXct object which specifies the time of each detection; 'receiver_long', the longitude (decimal degrees) of the receiver(s) at the individual was detected; and 'receiver_lat', the latitude (decimal degrees) of the receiver(s) at which individual was detected. Each dataframe should be ordered by 'individual_id' and then by 'timestamp'. Careful ordering of 'individual_id' factor levels (e.g. perhaps by population group, then by the number of detections of each individual) can aid visualisation of similarity matrices, in which the order or rows/columns corresponds directly to the order of individuals in \code{acoustics_ls}. Sequential elements in \code{acoustics_ls} should correspond to sequential factor levels for 'individual_id', which should be the same across all dataframes.
 #' @param thresh_time A number which specifies the time, in minutes, after which detections at nearby receivers are excluded.
 #' @param thresh_dist A number which specifies the (Euclidean) distance between receivers, in metres, beyond which detections are excluded (see Details).
 #' @param cl (optional) A cluster object created by \code{\link[parallel]{makeCluster}}. This is required if you want to run the algorithm in parallel. If supplied, the connection to the cluster is stopped within the function.
@@ -99,7 +99,7 @@ compute_det_sim <-
     # Create a blank similarity matrix which we'll fill in
     mat_sim <- matrix(NA, nrow = nid, ncol = nid, dimnames = list(id_names, id_names))
 
-    #### Loop over all combinations of individuals, pair time-series and identify
+    #### Loop over all combinations of individuals, pair time series and identify
     # ... nearby observations in time and space
     if(all(!is.null(varlist), !is.null(cl))) parallel::clusterExport(cl = cl, varlist = varlist)
     lout <-
@@ -125,9 +125,9 @@ compute_det_sim <-
                           ") and individual (", as.character(acc2$individual_id[1]), ").\n"))
               }
 
-              #### Match time-series based on closest observations in time using pair_ts()
-              if(verbose) cat("Matching detection time-series...\n")
-              # Remove any observations from the second individual more than some limit outside of the time-series of the first individual
+              #### Match time series based on closest observations in time using pair_ts()
+              if(verbose) cat("Matching detection time series...\n")
+              # Remove any observations from the second individual more than some limit outside of the time series of the first individual
               # ... and vice versa (for speed when matching).
               acc2 <- acc2[acc2$timestamp >= (min(acc1$timestamp) - thresh_time*60*2) &
                              acc2$timestamp <= (max(acc1$timestamp) + thresh_time*60*2), ]
@@ -156,7 +156,7 @@ compute_det_sim <-
                 acc2$timestamp[pos_dups2] <- acc2$timestamp[pos_dups2] + adj_dups2
                 if(any(duplicated(acc2$timestamp))) warning(paste("Duplicate timestamps in, ", as.character(acc2$individual_id[1]), "element in acoustic_ls."))
               }
-              # Match time-series, readjusting any adjusted time stamps back to their original values
+              # Match time series, readjusting any adjusted time stamps back to their original values
               # ... before these are added to the dataframe.
               acc1$pos_in_acc2 <- Tools4ETS::match_ts_nearest(acc1$timestamp, acc2$timestamp)
               if(any(dup1)) acc1$timestamp[pos_dups1] <- acc1$timestamp[pos_dups1] - adj_dups1
@@ -165,7 +165,7 @@ compute_det_sim <-
 
               #### Exclude any time stamps more than time stamp beyond each other (could be 0 mins)
               # Implement this now, before a threshold based on distance, below, for speed.
-              if(verbose) cat("Processing time-series by theshold time difference...\n")
+              if(verbose) cat("Processing time series by theshold time difference...\n")
               acc1$difftime_abs <- abs(difftime(acc1$timestamp, acc1$timestamp_acc2, units = "mins"))
               acc1 <- acc1[acc1$difftime_abs <= thresh_time, ]
               if(nrow(acc1) == 0) return(NULL)
@@ -180,7 +180,7 @@ compute_det_sim <-
                                                       acc1[, c("receiver_long_acc2", "receiver_lat_acc2")])
 
               #### Exclude any receivers more than some threshold distance beyond each other (could be 0 m):
-              if(verbose) cat("Processing time-series by threshold distance...\n")
+              if(verbose) cat("Processing time series by threshold distance...\n")
               acc1 <- acc1[acc1$dist_btw_rec <= thresh_dist, ]
               if(nrow(acc1) == 0) return(NULL) else return(acc1)
 

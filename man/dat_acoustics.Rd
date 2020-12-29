@@ -24,7 +24,7 @@ Data were collected by, and belong to, Marine Scotland Science and NatureScot. D
 dat_acoustics
 }
 \description{
-A dataset containing a sample of processed flapper skate (\emph{Dipturus intermedius}) detection time-series. Data are arranged by \code{individual_id}, \code{timestamp} and then \code{receiver_id} (see below).
+A dataset containing a sample of processed flapper skate (\emph{Dipturus intermedius}) detection time series. Data are arranged by \code{individual_id}, \code{timestamp} and then \code{receiver_id} (see below).
 }
 \references{
 Data collection and processing is described in Lavender (in prep). Fine-scale habitat use of the Critically Endangered flapper skate (\emph{Dipturus intermedius}). [Doctoral dissertation, University of St Andrews].

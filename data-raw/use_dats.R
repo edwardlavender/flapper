@@ -108,7 +108,7 @@ file.size(paste0(tempdir(), "/dat_centroids.rds"))/1e6
 #### dat_acdc(): an example output from the .acdc() function
 # ... useful for demonstrating plotting functions
 
-## Prepare movement time-series
+## Prepare movement time series
 # Add required columns to dataframes:
 dat_acoustics$timestamp_num <- as.numeric(dat_acoustics$timestamp)
 dat_archival$timestamp_num  <- as.numeric(dat_archival$timestamp)
@@ -157,7 +157,7 @@ file.size(paste0(tempdir(), "/dat_acdc.rds"))/1e6
 #### Add data to pkg
 
 #### Use data
-# movement time-series
+# movement time series
 usethis::use_data(dat_ids, overwrite = TRUE)
 usethis::use_data(dat_moorings, overwrite = TRUE)
 usethis::use_data(dat_acoustics, overwrite = TRUE)

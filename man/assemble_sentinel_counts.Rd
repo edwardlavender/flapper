@@ -22,7 +22,7 @@ assemble_sentinel_counts(
 
 \item{breaks}{The time interval over which transmissions/detections are counted (e.g. \code{"hours"}). This is passed to the \code{breaks} argument of \code{\link[base]{cut.POSIXt}}.}
 
-\item{as_POSIXct}{A function which defines how to convert character time bins (returned by \code{\link[base]{cut.POSIXt}}) to POSIXct format. Usually, \code{\link[base]{as.POSIXct}} is suitable but, for large time-series, this is slow. In this case, \code{\link[fasttime]{fastPOSIXct}} can be used to improve algorithm speed, if suitable. The default function is \code{function(x, tz = "UTC",...) fasttime::fastPOSIXct(x, tz = tz,...)}.}
+\item{as_POSIXct}{A function which defines how to convert character time bins (returned by \code{\link[base]{cut.POSIXt}}) to POSIXct format. Usually, \code{\link[base]{as.POSIXct}} is suitable but, for large time series, this is slow. In this case, \code{\link[fasttime]{fastPOSIXct}} can be used to improve algorithm speed, if suitable. The default function is \code{function(x, tz = "UTC",...) fasttime::fastPOSIXct(x, tz = tz,...)}.}
 
 \item{max_det_dist}{A number which defines the distance (m) between the transmitting receiver and other receivers within with detections may plausibly be received. For each transmission, all detections at active receivers within this distance are counted; other receivers are not considered.}
 
