@@ -90,7 +90,7 @@ detection_pr <- function(distance = 1:1000,
 #'
 #' @param xy A \code{\link[sp]{SpatialPoints-class}} or \code{\link[sp]{SpatialPointsDataFrame-class}} object that defines receiver locations. The coordinate reference system should be the Universe Transverse Mercator coordinate reference system.
 #' @param detection_range A number that defines the detection range (m) of receivers.
-#' @param (optional) coastline A \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines barriers (such as the coastline) that block receivers from surveying areas within their detection range.
+#' @param coastline (optional) A \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines barriers (such as the coastline) that block receivers from surveying areas within their detection range.
 #' @param plot A logical input that defines whether or not to plot receivers, their centroids, and the buffer (if specified).
 #' @param ... Additional arguments passed to \code{\link[rgeos]{gBuffer}}, such as \code{byid} and/or \code{quadsegs}.
 #'
@@ -174,6 +174,73 @@ detection_centroids <- function(xy,
   #### Return outputs
   return(xy_buf)
 
+}
+
+
+######################################
+######################################
+#### detection_area_sum()
+
+#' @title Calculate the total area sampled by acoustic receivers
+#' @description This function calculates the total area sampled by receivers, under the assumption of a constant detection range. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The \code{\link[flapper]{detection_centroids}} is used to calculate the detection centroids around receivers, given a specified detection range (m) and any barriers to detection, such as coastline, and then the total area covered by receivers is calculated, accounting for overlapping centroids.
+#'
+#' @param xy,detection_range,coastline,plot,... Arguments required to calculate and visualise detection centroids, using \code{\link[flapper]{detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{range}), barriers to detection (\code{coastline}), and whether or not to plot the centroids (\code{plot}).
+#' @param scale A number that scales the total area (m). The default (\code{1/(1000^2)}) converts the units of \eqn{m^2} to \eqn{km^2}.
+#'
+#' @details This is a simple metric of the overall receiver sampling effort. This may be a poor metric if the assumption of a single detection range across all receivers is substantially incorrect or if there are substantial changes in the receiver array over the course of a study.
+#'
+#' @return The function returns a number that represents the total area surveyed by receivers (by default in \eqn{km^2}) and, if \code{plot = TRUE}, a plot of the area with receivers and their detection ranges.
+#'
+#' @seealso \code{\link[flapper]{detection_centroids}} defines detection centroids, across which the detection area is calculated. \code{\link[flapper]{detection_area_ts}} calculates the area sampled by receivers through time.
+#'
+#' @examples
+#' #### Define receiver locations as a SpatialPoints object with a UTM CRS
+#' proj_wgs84 <- sp::CRS("+init=epsg:4326")
+#' proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
+#'                           "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
+#'                         proj_wgs84)
+#' xy <- sp::spTransform(xy, proj_utm)
+#'
+#' #### Example (1): Calculate the total area sampled by receivers
+#' detection_area_sum(xy)
+#'
+#' #### Example (2): Account for barriers in the study area
+#' detection_area_sum(xy, coastline = dat_coast)
+#'
+#' #### Example (3): Adjust the detection range
+#' detection_area_sum(xy, detection_range = 400, coastline = dat_coast)
+#' detection_area_sum(xy, detection_range = 500, coastline = dat_coast)
+#'
+#' #### Example (4): Adjust the units
+#' detection_area_sum(xy, coastline = dat_coast, scale = 1) # m2
+#'
+#' #### Example (5): Suppress the plot
+#' detection_area_sum(xy, coastline = dat_coast, plot = FALSE)
+#'
+#' @author Edward Lavender
+#' @export
+#'
+
+detection_area_sum <- function(xy,
+                               detection_range = 425,
+                               coastline = NULL,
+                               scale = 1/(1000^2),
+                               plot = TRUE,...){
+
+  #### Checks
+  # If xy is empty, return area = 0
+  if(length(xy) == 0) return(0)
+
+  #### Define detection centroids
+  xy_buf <- detection_centroids(xy = xy,
+                                detection_range = detection_range,
+                                coastline = coastline,
+                                plot = plot,...)
+
+  #### Calculate area (m2) covered by buffers overall
+  xy_area <- rgeos::gArea(xy_buf) * scale
+  return(xy_area)
 }
 
 
