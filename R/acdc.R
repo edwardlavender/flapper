@@ -15,7 +15,7 @@
 #' @param cl (optional) A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. The connection to the cluster is closed within the function.
 #' @param verbose A logical input that defines whether or not to print messages to the console to relay function progress.
 #'
-#' @details Given detection at a particular receiver at a particular time, the detection range of the receiver and the movement speed of the animal, an acoustic centroid defines the possible locations of a detected individual at that time or a subsequent time, given only this information. More specifically, when an individual is located at a receiver, its location must be within some radius of a receiver defined by the maximum detection distance. This radius expands with the duration since detection. This function defines, for each receiver, a list of acoustic centroids that reflect the possible locations of an individual were it to have been detected from 0 to \code{n_timesteps} ago at that receiver, accounting for the coastline and within a defined area if necessary. Using the observed detection data, the ACDC and ACDCMP algorithms pull the relevant centroids out of this list, which substantially saves computation time because acoustic centroids are not computed on-the-fly. These centroids are processed within these algorithms (e.g., if an individual is detected at two different receivers, then at the halfway point between detections its location must be within the intersection of the relevant centroids for this two receivers) and combine them with other information to reconstruct where an individual could have been over time.
+#' @details Given detection at a particular receiver at a particular time, the detection range of the receiver and the movement speed of the animal, an acoustic centroid defines the possible locations of a detected individual at that time or a subsequent time, given only this information. More specifically, when an individual is located at a receiver, its location must be within some radius of a receiver defined by the maximum detection distance. This radius expands with the duration since detection. This function defines, for each receiver, a list of acoustic centroids that reflect the possible locations of an individual were it to have been detected from 0 to \code{n_timesteps} ago at that receiver, accounting for the coastline and within a defined area if necessary. Using the observed detection data, the ACDC (\code{\link[flapper]{acdc}}) and ACDCMP algorithms pull the relevant centroids out of this list, which substantially saves computation time because acoustic centroids are not computed on-the-fly. These centroids are processed within these algorithms (e.g., if an individual is detected at two different receivers, then at the halfway point between detections its location must be within the intersection of the relevant centroids for this two receivers) and combine them with other information to reconstruct where an individual could have been over time.
 #'
 #' @return The function returns a list of \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects, with one element for all numbers from 1 to the maximum receiver number (\code{rx}). Any list elements that do not correspond to receivers contain a \code{NULL} element. List elements that correspond to receivers contain a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object containing all the centroids for that receiver.
 #'
@@ -222,23 +222,24 @@ acdc_setup_centroids <- function(
 
 #' @title Back-end implementation of the ACDC algorithm
 #' @description This function is the back-end of the ACDC algorithm.
-#' @param acoustics A dataframe that contains passive acoustic telemetry detection time-series (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named 'receiver_id'; a POSIXct vector of time stamps when detections were made, named 'timestamp'; and a numeric vector of those time stamps, named 'timestamp_num'.
-#' @param archival A dataframe that contains depth time-series (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named 'depth'; a POSIXct vector of time stamps when observations were made, named 'timestamp'; and a numeric vector of those time stamps, named 'timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time-series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.
+#' @param acoustics A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named 'receiver_id'; a POSIXct vector of time stamps when detections were made, named 'timestamp'; and a numeric vector of those time stamps, named 'timestamp_num'.
+#' @param archival A dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named 'depth'; a POSIXct vector of time stamps when observations were made, named 'timestamp'; and a numeric vector of those time stamps, named 'timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.
 #' @param bathy A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).
 #' @param map (optional) A blank \code{\link[raster]{raster}}, with the same properties (i.e., dimensions, resolution, extent and coordinate reference system) as the bathymetry raster (see \code{bathy}), but in which all values are 0. If \code{NULL}, this is computed internally, but supplying a pre-defined raster can be more computationally efficient if the function is applied iteratively (e.g., over different time windows).
 #' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see also \code{\link[flapper]{acdc_setup_centroids}}).
 #' @param mobility A number that defines the distance (m) that an individual could move in the time period between archival observations (see also \code{\link[flapper]{acdc_setup_centroids}}).
 #' @param depth_error A number that defines the interval around each depth (m) observation that defines the range of depths on the bathymetry raster (see \code{bathy}) that the individual could plausibly have occupied at that time. For example, \code{depth_error = 2.5} m implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth (m) +/- 2.5 m. The appropriate value for \code{depth_error} depends on measurement error for the archival and bathymetry data, as well as the tidal range (m) across the area.
 #' @param acc_centroids A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acdc_setup_centroids}}.
-#' @param plot An integer vector that defines the time steps for which to return the necessary spatial information required to plot the plausible locations of the individual, given detection and depth time-series. \code{plot = 0} suppresses the return of this information and \code{plot = NULL} returns this information for all time steps. This spatial information can be used to plot time-specific results of the algorithm using \code{\link[flapper]{acdc_plot}}.
-#' @param plot_ts A logical input that defines whether or not to the plot detection and depth time-series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.
+#' @param plot An integer vector that defines the time steps for which to return the necessary spatial information required to plot the plausible locations of the individual, given detection and depth time series. \code{plot = 0} suppresses the return of this information and \code{plot = NULL} returns this information for all time steps. This spatial information can be used to plot time-specific results of the algorithm using \code{\link[flapper]{acdc_plot}}.
+#' @param plot_ts A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.
 #' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console; otherwise, they are written to file (see below).
 #' @param con If \code{verbose = TRUE}, \code{con} is character string that defines the full pathway to a .txt file into which messages are written to relay function progress. This is approach, rather than printing to the console, is recommended for clarity, speed and debugging.
 #' @param progress An integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the archival time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar.
 #' @param check A logical input that defines whether or not to check function inputs. This can be switched off to improve computation time when the function is applied iteratively.
+#' @param keep_args A logical input that defines whether or not to include a list of function arguments in the outputs. This can be switched off if the function is applied iteratively.
 #' @param ... Additional arguments (none implemented).
 #'
-#' @return The function returns a named list with the following elements: ‘map’, ‘record’, ‘time’ and ‘args’. The main output of the function is the ‘map’ RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time-series. The ‘record’ element records time-specific maps of the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{plot}). The ‘time’ element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time; and the ‘args’ element is a named list of user inputs that record the parameters used to generate the outputs.
+#' @return The function returns an object of class \code{\link[flapper]{.acdc-class}} with the following elements: ‘map’, ‘record’, ‘time’, ‘args’, 'chunks' and 'simplify'. The main output element is the ‘map’ RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The ‘record’ element records time-specific maps of the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{plot}). The ‘time’ element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The ‘args’ element is a named list of user inputs that record the parameters used to generate the outputs (if \code{keep_args = TRUE}, otherwise the 'args' element is \code{NULL}.
 #'
 #' @seealso \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
 #'
@@ -246,7 +247,7 @@ acdc_setup_centroids <- function(
 #' #### Step (1) Implement setup_acdc_*() steps
 #' # ... Define acoustic centroids required for ACDC algorithm (see setup_acdc_centroids())
 #'
-#' #### Step (2) Prepare movement time-series for algorithm
+#' #### Step (2) Prepare movement time series for algorithm
 #' # Add required columns to dataframes:
 #' dat_acoustics$timestamp_num <- as.numeric(dat_acoustics$timestamp)
 #' dat_archival$timestamp_num  <- as.numeric(dat_archival$timestamp)
@@ -281,7 +282,6 @@ acdc_setup_centroids <- function(
 #' out_acdc <- .acdc(acoustics = acc,
 #'                   archival = arc,
 #'                   bathy = dat_gebco,
-#'                   space_use = NULL,
 #'                   detection_range = 425,
 #'                   mobility = 200,
 #'                   depth_error = 2.5,
@@ -307,7 +307,6 @@ acdc_setup_centroids <- function(
 #'                   depth_error = 2.5,
 #'                   acc_centroids = dat_centroids,
 #'                   plot = NULL,
-#'                   png_param = list(),
 #'                   verbose = TRUE,
 #'                   con = paste0(tempdir(), "/", "acdc_log.txt")
 #'                   )
@@ -327,11 +326,12 @@ acdc_setup_centroids <- function(
     mobility,
     depth_error = 2.5,
     acc_centroids,
-    plot = 0L,
+    plot = 1L,
     plot_ts = TRUE,
     verbose = TRUE,
     con = "",
     progress = 1L,
+    keep_args = TRUE,
     check = TRUE,...
     ){
 
@@ -345,21 +345,23 @@ acdc_setup_centroids <- function(
     # ... dataframe highlighting time steps etc,
     # ... any saved spatial data
     # ... the final space use raster
-    out <- list(map = NULL, record = NULL, time = NULL, args = NULL)
-    out$args <- list(acoustics = acoustics,
-                     archival = archival,
-                     bathy = bathy,
-                     map = map,
-                     detection_range = detection_range,
-                     mobility = mobility,
-                     depth_error = depth_error,
-                     acc_centroids = acc_centroids,
-                     plot = plot,
-                     verbose = verbose,
-                     con = con,
-                     progress = progress,
-                     check = check,
-                     dots = list(...))
+    out <- list(map = NULL, record = NULL, time = NULL, args = NULL, chunks = NULL, simplify = FALSE)
+    if(keep_args) {
+      out$args <- list(acoustics = acoustics,
+                       archival = archival,
+                       bathy = bathy,
+                       map = map,
+                       detection_range = detection_range,
+                       mobility = mobility,
+                       depth_error = depth_error,
+                       acc_centroids = acc_centroids,
+                       plot = plot,
+                       verbose = verbose,
+                       con = con,
+                       progress = progress,
+                       check = check,
+                       dots = list(...))
+    }
     out$record <- list()
 
     #### Define function for printing messages to file or console
@@ -422,7 +424,7 @@ acdc_setup_centroids <- function(
       if(nrw_arc_delta != 0) message(paste(nrw_arc_delta, "archival observation(s) before the start of (processed) acoustic detections ignored."))
     }
 
-    #### Visualise time-series
+    #### Visualise time series
     if(plot_ts) {
       axis_ls <- prettyGraphics::pretty_plot(archival$timestamp, abs(archival$depth)*-1,
                                              pretty_axis_args = list(side = 3:2),
@@ -769,6 +771,7 @@ acdc_setup_centroids <- function(
     total_duration <- sum(as.numeric(out$time$serial_duration), na.rm = TRUE)
     out$time$total_duration[nrow(out$time)] <- total_duration
     cat_to_cf(paste0("... flapper::.acdc() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+    class(out) <- c(class(out), ".acdc")
     return(out)
 
   }
@@ -778,16 +781,713 @@ acdc_setup_centroids <- function(
 ######################################
 #### acdc()
 
+#' @title The acoustic-centroid depth-contour (ACDC) algorithm
+#' @description This function implements the acoustic-centroid depth-contour (ACDC) algorithm. This is an approach that integrates acoustic detections and depth observations to infer where benthic/demersal animals could have spent more or less time over the period of observations.
+#'
+#' To implement the function, a dataframe (or list) of passive acoustic telemetry detections is required (\code{acoustics}), alongside a dataframe of depth observations (\code{archival}). At each time step, the algorithm integrates information from past and future acoustic detections in the form of acoustic centroids and information from depth observations in the form of depth contours to determine the possible locations of an individual in an area (see Details).
+#'
+#' Under the default options, the approach is implemented step-wise (i.e., step-by-step across the whole time series). The result is a named list of outputs, including a record of the results for each time step, as well as a cumulative map of where the individual could have spent more or less time summed across the whole time series. Alternatively, the approach can be implemented chunk-wise, in which case the acoustic time series is split into chunks (e.g., hourly, daily, monthly segments) and the algorithm is implemented within each chunk step-by-step. The main benefits of this approach are that it can be used to reconstruct putative patterns in space use over biologically meaningful periods separately and/or the chunk-wise implementation can be parallelised, improving computation time, while retaining the capacity to combine chunk-wise results easily across the duration of the original time series. This option is implemented if (a) a list, rather than a dataframe, of acoustic detections is provided; (b) the user specifies that the time series should be split into chunks of a particular duration before the algorithm is initiated (via the \code{split} argument); and/or (c) the algorithm is implemented on a cluster via \code{cl}, in which case the acoustic time series is split (if necessary) into user-defined or automatically defined chunks prior to computation. In this case, the result is a named list of outputs, as described above, but in which the results for each chunk are returned separately. If the chunks have been implemented simply to improve computation time via parallelisation, then the maps of space use for each chunk can be combined easily to generate a single, overall map of space use.
+#'
+#' @param acoustics A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. Each dataframe should contain the following columns: an integer vector of receiver IDs, named 'receiver_id'; a POSIXct vector of time stamps when detections were made, named 'timestamp'; and a numeric vector of those time stamps, named 'timestamp_num'. If a list of dataframes is supplied, these must be refer to the detections of a single individual and be ordered by time (e.g., in hourly chunks). The algorithm will be implemented on each dataframe, termed 'chunk', either in sequence or parallel. Any empty or NULL elements will be removed automatically.
+#' @param archival A dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named 'depth'; a POSIXct vector of time stamps when observations were made, named 'timestamp'; and a numeric vector of those time stamps, named 'timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.
+#' @param bathy A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).
+#' @param map (optional) A blank \code{\link[raster]{raster}}, with the same properties (i.e., dimensions, resolution, extent and coordinate reference system) as the bathymetry raster (see \code{bathy}), but in which all values are 0. If \code{NULL}, this is computed internally, but supplying a pre-defined raster can be more computationally efficient if the function is applied iteratively (e.g., over multiple individuals).
+#' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see also \code{\link[flapper]{acdc_setup_centroids}}).
+#' @param mobility A number that defines the distance (m) that an individual could move in the time period between archival observations (see also \code{\link[flapper]{acdc_setup_centroids}}).
+#' @param depth_error A number that defines the interval around each depth (m) observation that defines the range of depths on the bathymetry raster (see \code{bathy}) that the individual could plausibly have occupied at that time. For example, \code{depth_error = 2.5} m implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth (m) +/- 2.5 m. The appropriate value for \code{depth_error} depends on measurement error for the archival and bathymetry data, as well as the tidal range (m) across the area.
+#' @param acc_centroids A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acdc_setup_centroids}}.
+#' @param plot An integer vector that defines the time steps for which to return the necessary spatial information required to plot the plausible locations of the individual, given detection and depth time series. \code{plot = 0} suppresses the return of this information and \code{plot = NULL} returns this information for all time steps. If the algorithm is applied chunk-wise, this spatial information must be returned for at least the first time step (the default) to aggregate maps across chunks (see \code{\link[flapper]{acdc_simplify}}). This information can also be used to plot time-specific results of the algorithm using \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}}.
+#' @param plot_ts A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.
+#' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console (which is only supported if the algorithm is not implemented in parallel: see below); otherwise, they are written to file (see below).
+#' @param con If \code{verbose = TRUE}, \code{con} is character string defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}), an approach that is only implemented if the function is not implemented in parallel. Otherwise, \code{con} defines the directory into which to write .txt files, into which messages are written to relay function progress. This is approach, rather than printing to the console, is recommended for clarity, speed and debugging. If the algorithm is implemented step-wise, then a single file is written to the specified directory named acdc_log.txt. If the algorithm is implemented chunk-wise, then an additional file is written for each chunk (named dot_acdc_log_1.txt, dot_acdc_log_2.txt and so on), with the details for each chunk.
+#' @param progress (optional) If the algorithm is implemented step-wise, \code{progress} is an integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the archival time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar. If the algorithm is implemented for chunks, inputs to \code{progress} are ignored and a single progress bar is shown of the progress across acoustic chunks.
+#' @param split A character string that defines the time unit used to split acoustic time series into chunks (e.g., \code{"12 hours"}). If provided, this must be supported by \code{\link[lubridate]{floor_date}}. If \code{split = NULL} and a cluster has been specified (see \code{cl}), then the acoustic time series is automatically split into chunks and the algorithm implemented for each chunk in parallel.
+#' @param cl A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the algorithm is implemented for each chunk in a list of acoustic time series as supplied by the user (if \code{acoustics} is a list) or of the time units specified via \code{split} by the user or defined automatically based on the number of nodes in the cluster if \code{split = NULL}.
+#' @param ... Additional arguments (none implemented).
+#'
+#' @details The acoustic-centroid depth-contour (ACDC) algorithm is an approach which integrates acoustic detections and depth observations to infer the possible locations of benthic or demersal animals within an area over some time interval. The locational information provided by acoustic detections is represented by acoustic centroids, which are areas around receivers that define where an individual could have been at each timepoint given the spatiotemporal pattern of detections at receivers, a model of detection probability and a movement parameter. The locational information provided by depth observations is represented by depth contours, which are areas that define where an individual could have been at each time point given its depth and the local bathymetry.
+#'
+#' In outline, the crux of the approach is the recognition that acoustic detections typically occur irregularly, while archival observations occur at regular intervals. Each detection anchors our knowledge of the location of an individual around a particular receiver (assuming that all detections are true detections). As time passes between acoustic detections, our uncertainty about the geographical location of an individual expands around the receiver at which it was detected before shrinking towards the receiver at which it was next detected. During this time, regular depth observations restrict the number of possible locations in which the individual could have been located at each time step.
+#'
+#' More specifically, when an individual is detected, it must be within some radius – say 800 m – of that receiver. This is the starting acoustic centroid. With a more-refined model of detection probability, it may be possible to predict more precisely where the individual is likely to have been within this centroid (but this approach is not yet implemented). The observed depth at this time further restricts the positions in which the individual could have been, assuming a benthic/demersal lifestyle and a non-homogenous bathymetric landscape. Moving forward in time, a number of depth records may be made before another acoustic detection. During this time, our uncertainty about where the individual could have been gets larger, because it could have moved further away from the receiver, so the acoustic centroids that define this uncertainty expand to a maximum size at the halfway point between acoustic detections, excluding areas within the detection radii of other receivers. After that, the individual must have started to move towards the receiver at which it was next detected, so these acoustic centroids start to shrink towards that receiver. If the individual was detected by different receivers, the overlap between the centroids of these two receivers at the halfway point defines the set of positions in which the individual could have been at this time. Thereafter, our uncertainty in the individual’s location is given by the overlap between the expansion of this centroid region and the contraction of the centroid around the receiver at which it was next detected. Thus, when the individual is detected again, our uncertainty about where it could have been collapses to the detection radius around the next receiver, possibly weighted by a model of detection probability around this receiver. The rate of change in centroid size depends a movement parameter that describes an average swimming speed, which will depend on some underlying estimated behavioural state (although that’s not yet implemented).
+#'
+#' The result is a map that shows where the individual could have spent more or less (or no) time over the time interval under construction. The main limitation of this approach is that reconstructs where the individual could have been, but not where it was. In reality, the individual’s current position constrains where it can go next. The ACDCMP algorithm is an extension of this approach that incorporates a movement model for this reason.
+#'
+#' @return The function returns an object of class \code{\link[flapper]{acdc-class}}. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acdc}}, if applicable, are written to file.
+#'
+#' @seealso The 'depth-contour' component of the algorithm can be implemented via \code{\link[flapper]{dc}}. For more information on the ACDC algorithm, see \code{\link[flapper]{acdc_setup_centroids}}, which defines the acoustic centroids required by this function; \code{\link[flapper]{.acdc}}, the back-end workhorse of this function; \code{\link[flapper]{acdc_simplify}} which simplifies the outputs of the \code{\link[flapper]{acdc}} function; and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}}, which visualise the results.
+#'
+#' @examples
+#' #### Step (1) Implement setup_acdc_*() steps
+#' # ... Define acoustic centroids required for ACDC algorithm (see setup_acdc_centroids())
+#'
+#' #### Step (2) Prepare movement time series for algorithm
+#' # Add required columns to dataframes:
+#' dat_acoustics$timestamp_num <- as.numeric(dat_acoustics$timestamp)
+#' dat_archival$timestamp_num  <- as.numeric(dat_archival$timestamp)
+#' # Focus on an example individual
+#' id <- 25
+#' acc <- dat_acoustics[dat_acoustics$individual_id == id, ]
+#' arc <- dat_archival[dat_archival$individual_id == id, ]
+#' # Focus on the subset of data for which we have both acoustic and archival detections
+#' acc <- acc[acc$timestamp >= min(arc$timestamp) - 2*60 &
+#'              acc$timestamp <= max(arc$timestamp) + 2*60, ]
+#' arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
+#'              arc$timestamp <= max(acc$timestamp) + 2*60, ]
+#' # We'll focus on a one day period with overlapping detection/depth time series for speed
+#' end <- as.POSIXct("2016-03-18")
+#' acc <- acc[acc$timestamp <= end, ]
+#' arc <- arc[arc$timestamp <= end, ]
+#' arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
+#'              arc$timestamp <= max(acc$timestamp) + 2*60, ]
+#'
+#' #### Example (1) Implement ACDC algorithm with default arguments
+#' # This implements the algorithm on a single core, printing messages
+#' # ... to the console to monitor function progress.
+#' out_acdc <- acdc(acoustics = acc,
+#'                  archival = arc,
+#'                  bathy = dat_gebco,
+#'                  detection_range = 425,
+#'                  mobility = 200,
+#'                  depth_error = 2.5,
+#'                  acc_centroids = dat_centroids
+#'                  )
+#' # The function returns a list with four elements
+#' # ... .acdc contains the results of the algorithm, implemented by the back-end
+#' # ... function .acdc(). The other elements provide the time series
+#' # ... for each chunk, the time of the algorithm and a list of user inputs
+#' summary(out_acdc)
+#'
+#' #### Example (2): Write messages to file to monitor function progress via 'con'
+#' out_acdc <- acdc(acoustics = acc,
+#'                  archival = arc,
+#'                  bathy = dat_gebco,
+#'                  detection_range = 425,
+#'                  mobility = 200,
+#'                  depth_error = 2.5,
+#'                  acc_centroids = dat_centroids,
+#'                  con = tempdir()
+#'                  )
+#' acdc_log <- readLines(paste0(tempdir(), "/acdc_log.txt"))
+#' utils::head(acdc_log, 10)
+#' file.remove(paste0(tempdir(), "/acdc_log.txt"))
+#'
+#' #### Example (3): Implement the algorithm and return plotting information
+#' # Specify plot = NULL to include plotting information for all time steps
+#' # ... or a vector to include this information for specific time steps
+#' out_acdc <- acdc(acoustics = acc,
+#'                  archival = arc,
+#'                  bathy = dat_gebco,
+#'                  detection_range = 425,
+#'                  mobility = 200,
+#'                  depth_error = 2.5,
+#'                  acc_centroids = dat_centroids,
+#'                  plot = NULL
+#'                  )
+#'
+#' #### Example (4): Implement the algorithm in parallel by supplying a cluster
+#' # If verbose = TRUE (the default), it is necessary to specify a directory
+#' # ... into which dot_acdc_log_*.txt files are saved (i.e., messages
+#' # ... cannot be written to the console in parallel)
+#' out_acdc <- acdc(acoustics = acc,
+#'                  archival = arc,
+#'                  bathy = dat_gebco,
+#'                  detection_range = 425,
+#'                  mobility = 200,
+#'                  depth_error = 2.5,
+#'                  acc_centroids = dat_centroids,
+#'                  con = tempdir(),
+#'                  cl = parallel::makeCluster(2L)
+#'                  )
+#' ## Check logs
+#' list.files(tempdir())
+#' # "acdc_log.txt" contains the log for the overall function
+#' acdc_log <- readLines(paste0(tempdir(), "/acdc_log.txt"))
+#' head(acdc_log, 20)
+#' # "acdc_log_1.txt", "acdc_log_2.txt" etc contain chunk-specific logs
+#' acdc_log_1 <- readLines(paste0(tempdir(), "/dot_acdc_log_1.txt"))
+#' utils::head(acdc_log_1)
+#' utils::tail(acdc_log_1)
+#' ## Examine outputs
+#' # Note that there are now four elements in .acdc, one for each chunk
+#' # Likewise, there are four elements in four elements in ts_by_chunk,
+#' # ... containing the movement time series for each chunk.
+#' summary(out_acdc)
+#' # Note that the last observation of each time series overlaps with the
+#' # ... first observation for the next chunk, to prevent loss of information
+#' lapply(out_acdc$ts_by_chunk,
+#'   function(chunk) chunk$acoustics[c(1, nrow(chunk$acoustics)), ])
+#'
+#' #### Example (5) Biologically meaningful chunks can be specified via
+#' # .. the 'split' argument or by passing a list of acoustic time series
+#' # .. already split by list of dataframes to 'acoustics'
+#' ## Using the split argument:
+#' out_acdc <- acdc(acoustics = acc,
+#'                  archival = arc,
+#'                  bathy = dat_gebco,
+#'                  detection_range = 425,
+#'                  mobility = 200,
+#'                  depth_error = 2.5,
+#'                  acc_centroids = dat_centroids,
+#'                  con = tempdir(),
+#'                  cl = parallel::makeCluster(2L),
+#'                  split = "2 hours"
+#'                  )
+#' ## Passing a list of dataframes
+#' # This option can provide more flexibility than split, which only
+#' # ... understands time categories supported by lubridate::floor_date()
+#' # ... This example could also be used using split, as described above,
+#' # ... but this is not the case for all time categories (e.g., seasons).
+#' acc$chunk <- cut(acc$timestamp, "2 hours")
+#' acc_ls <- split(acc, acc$chunk)
+#' out_acdc <- acdc(acoustics = acc_ls,
+#'                  archival = arc,
+#'                  bathy = dat_gebco,
+#'                  detection_range = 425,
+#'                  mobility = 200,
+#'                  depth_error = 2.5,
+#'                  acc_centroids = dat_centroids,
+#'                  con = tempdir(),
+#'                  cl = parallel::makeCluster(2L)
+#'                  )
+#'
+#' #### Example (5) Implement the algorithm for multiple individuals
+#' # ... To do this, it is necessary to apply the function iteratively
+#' # ... to each individual.
+#' # Pre-processing to define computation time
+#' # ... E.g., careful definition of time series
+#' # ... E.g., define 'map' argument
+#' map <- dat_gebco
+#' map <- raster::setValues(map, 0)
+#' # Define cluster
+#' cluster <- FALSE
+#' if(cluster){
+#'   cl <- parallel::makeCluster(2L)
+#'   parallel::clusterExport(cl = cl, varlist = c("acdc",
+#'                                                "dat_archival",
+#'                                                "dat_gebco",
+#'                                                "map",
+#'                                                "dat_centroids"
+#'                                                 ))
+#' } else cl<- NULL
+#' # Implement algorithm for each individual
+#' acdc_out_by_id <-
+#'   pbapply::pblapply(split(dat_acoustics, dat_acoustics$individual_id), cl = cl, function(acc){
+#'     # Define individual-specific folder in which to save function logs
+#'     dir_global <- paste0(tempdir(), "/")
+#'     dir_id     <- paste0(dir_global, acc$individual_id[1], "/")
+#'     if(!dir.exists(dir_id)) dir.create(dir_id)
+#'     # Focus on a small sample of time series for speed
+#'     acc <- acc[1:3, ]
+#'     # Isolate archival data for individual
+#'     arc <- dat_archival[dat_archival$individual_id == acc$id[1], ]
+#'     # Implement algorithm
+#'     acdc_out <- acdc(acoustics = acc,
+#'                      archival = dat_archival,
+#'                      bathy = dat_gebco,
+#'                      map = map,
+#'                      detection_range = 425,
+#'                      mobility = 200,
+#'                      depth_error = 2.5,
+#'                      acc_centroids = dat_centroids,
+#'                      plot = 1:10L,
+#'                      con = dir_id
+#'                      )
+#'     # Include logs in output
+#'     acdc_log <- lapply(list.files(dir_id, full.names = TRUE), readLines)
+#'     # Simplify the results at this stage or outside of this loop
+#'     # ... using acdc_simplify()
+#'     # Return results for specified individual
+#'     out <- list(acdc_id = acc$individual_id[1], acdc_out = acdc_out, acdc_log = acdc_log)
+#'     return(out)
+#'   })
+#' if(!is.null(cl)) parallel::stopCluster(cl)
+#' summary(acdc_out_by_id)
+#'
+#' #### Step (3) Simplify the function outputs
+#' # This step aggregates information across chunks, which is necessary to
+#' # ... plot information aggregated across all chunks (see below).
+#' # It is only necessary if the algorithm has been implemented chunk-wise
+#' # ... see acdc_simplify()
+#'
+#' #### Step (4) Examine function outputs, e.g., via plotting
+#' # See acdc_plot() and acdc_animate() to visualise the results
+#' # ... (either for a specific chunk or aggregated across all chunks
+#' # ... using acdc_simplify() as described above).
+#'
+#' @author Edward Lavender
+#' @export
+#'
+
+acdc <- function(
+  acoustics,
+  archival,
+  bathy,
+  map = NULL,
+  detection_range,
+  mobility,
+  depth_error = 2.5,
+  acc_centroids,
+  plot = 1L,
+  plot_ts = TRUE,
+  verbose = TRUE,
+  con = "",
+  progress = 1L,
+  split = NULL,
+  cl = NULL,...
+  ){
 
 
+  ######################################
+  #### Set up
+
+  #### Initiate function
+  t_onset <- Sys.time()
+  message(paste0("flapper::acdc() called (@ ", t_onset, ")..."))
+
+  #### A list to store overall outputs
+  out <- list(.acdc = NULL, ts_by_chunk = NULL, time = NULL, args = NULL)
+  out$args <- list(acoustics = acoustics,
+                   archival = archival,
+                   bathy = bathy,
+                   map = map,
+                   detection_range = detection_range,
+                   mobility = mobility,
+                   depth_error = depth_error,
+                   acc_centroids = acc_centroids,
+                   plot = plot,
+                   verbose = verbose,
+                   con = con,
+                   progress = progress,
+                   split = split,
+                   cl = cl,
+                   dots = list(...))
+
+  #### Check parallelisation options
+  if(is.null(cl)) n_cores <- 1 else n_cores <- length(cl)
+  # if(n_cores == 1 & !is.null(split)) {
+  #  message("Input to 'split' is ignored since cl = NULL.")
+  #  split <- NULL
+  # }
+  if(inherits(acoustics, "list") & !is.null(split)) message("Input to 'split' ignored since inherits(acoustics, 'list') == TRUE.")
+
+  #### Define function for printing messages to file or console
+  ## Check the connection for writing files, if applicable
+
+  if(con != ""){
+    if(!verbose) {
+      message("Input to 'con' ignored since verbose = FALSE.")
+    } else {
+      # Check directory
+      con <- check_dir(input = con, check_slash = TRUE)
+      con_dir <- con
+      # Define file
+      con <- paste0(con_dir, "acdc_log.txt")
+      if(!file.exists(con)){
+        message(paste0(con, " does not exist: attempting to write file in specified directory..."))
+        file.create(file1 = con)
+        message("... Blank file successfully written to file.")
+      }
+    }
+  } else{
+    if(n_cores > 1) stop("con = '' is not implemented in parallel (!is.null(cl)). Please supply a directory.")
+  }
+  ## Define function
+  append_messages <- ifelse(con == "", FALSE, TRUE)
+  cat_to_cf <- function(..., message = verbose, file = con, append = append_messages){
+    if(message) cat(paste(..., "\n"), file = con, append = append)
+  }
+
+  #### Checks
+  ## Formally initiate function and implement remaining checks
+  cat_to_cf(paste0("flapper::acdc() called (@ ", t_onset, ")..."))
+  out$time <- data.frame(event = "onset", time = t_onset)
+  cat_to_cf("... Checking user inputs...")
+  # Check acoustics contains required column names and correct variable types
+  if(!inherits(acoustics, "list")) acoustics_tmp <- list(acoustics) else acoustics_tmp <- acoustics
+  length_acoustics_tmp <- length(acoustics_tmp)
+  lapply(acoustics_tmp, function(acc) {
+    check_names(arg = "acoustics",
+                input = acc,
+                req = c("timestamp", "timestamp_num", "receiver_id"),
+                extract_names = colnames,
+                type = all)
+    check_class(input = acc$timestamp, to_class = "POSIXct", type = "stop")
+    check_class(input = acc$receiver_id, to_class = "integer", type = "stop")
+  })
+  # Check archival contains required column names and correct variable types
+  check_names(input = archival,
+              req = c("timestamp", "timestamp_num", "depth"),
+              extract_names = colnames,
+              type = all)
+  check_class(input = archival$timestamp, to_class = "POSIXct", type = "stop")
+  check_class(input = archival$depth, to_class = "numeric", type = "stop")
+  # Check acoustic centroids have been supplied as a list
+  check_class(input = acc_centroids, to_class = "list", type = "stop")
+  out$time <- rbind(out$time, data.frame(event = "initial_checks_passed", time = Sys.time()))
+
+  #### Pre-processing
+  if(is.null(map)) {
+    map <- bathy
+    map <- raster::setValues(map, 0)
+  }
+
+
+  ######################################
+  #### Implement splitting (if necessary)
+
+  #### Define a list of dataframes
+  # .. If the algorithm is to be implemented in parallel
+  if(inherits(acoustics, "list") | n_cores > 1 | !is.null(split)){
+
+    #### Implement splitting
+    if(length_acoustics_tmp == 1){
+
+      ## Define split if not provided
+      # If the split hasn't been specified, then the user doesn't care
+      # ... about splitting the outputs into biologically interpretable time intervals
+      # ... However, we"ll still define a split factor, to be based on computational perspectives
+      if(is.null(split)) {
+        cat_to_cf("... Splitting 'acoustics' into chunks...")
+        chunks <- seq(min(acoustics$timestamp), max(acoustics$timestamp), length.out = n_cores+1)
+        dft <- difftime(chunks[2], chunks[1])
+        dft_num <- as.numeric(dft)
+        dft_num <- floor(dft_num)
+        dft_units <- attr(dft, "units")
+        message(paste("'acoustics' dataframe split into chunks of ~", dft_num, dft_units, "across", n_cores, "core(s)."))
+        split <- paste(dft_num, dft_units)
+      }
+
+      ## Split dataframe
+      acoustics$split <- lubridate::floor_date(acoustics$timestamp, unit = split)
+      acoustics_ls <- split(acoustics, f = acoustics$split)
+    } else{
+      acoustics_ls <- acoustics
+    }
+
+    #### Process split dataframes
+    cat_to_cf("... Processing acoustics chunks...")
+
+    ## Remove NULL/length 0 elements
+    cat_to_cf("... ... Checking for NULL/empty chunks...")
+    empty_elms <- sapply(acoustics_ls, function(x) is.null(x) | nrow(x) == 0)
+    if(any(empty_elms)) {
+      msg <- paste0("acoustics_ls[c(", paste0(which(empty_elms), collapse = ","), ")] chunks are empty/NULL and will be removed...")
+      message(msg)
+      cat_to_cf(paste("... ... ...", msg))
+      acoustics_ls <- acoustics_ls[which(!empty_elms)]
+    }
+
+    ## Force overlapping time series
+    # If we naively split the dataframe into number of different windows,
+    # ... on every run, we have to stop before the last acoustic reading
+    # ... (because we can't identify the next receiver - their isn't one in the split dataframe)
+    # ...which means we're not including some information when we estimate space use.
+    # To get around this, in the list dataframes, we need to add the first line of every dataframe
+    # ... to the previous dataframe. Then, when we split the dataframe, we won't be loosing information
+    # ...because we've copied the last line.
+    cat_to_cf("... ... Overlapping chunks...")
+    acoustics_ls_wth_overlap <-
+      lapply(2:(length(acoustics_ls)), function(i){
+               # define an adjusted dataframe, binds the previous dataframe
+               # ... with the first row of the dataframe in question:
+               adj <- rbind(acoustics_ls[[i-1]], acoustics_ls[[i]][1, ])
+               return(adj)
+             })
+    # Add back the final element:
+    acoustics_ls_wth_overlap[[length(acoustics_ls)]] <- acoustics_ls[[length(acoustics_ls)]]
+    names(acoustics_ls_wth_overlap) <- names(acoustics_ls)
+
+    #### Additional checks
+    # Check the number of rows in acoustics_ls_wth_overlap. This cannot be less than two.
+    # ... If there are no rows or only one row,
+    # ... then we can't calculate where the individual was
+    # ... next detected, which will cause problems.
+    l <- length(acoustics_ls_wth_overlap)
+    lapply(1:l, function(i){
+      nrw <- nrow(acoustics_ls_wth_overlap[[i]])
+      if(nrw < 2){
+        stop(paste("acoustics_ls_wth_overlap[[", i, "]] has less than two rows. This is not allowed."))
+      }
+    })
+
+    out$time <- rbind(out$time, data.frame(event = "acoustics_chunks_defined", time = Sys.time()))
+
+  } else {
+    acoustics_ls_wth_overlap <- acoustics_tmp
+  }
+
+
+  ######################################
+  #### Visualise time series
+
+  #### Focus on the data for which we have both acoustic and archival observations
+  cat_to_cf("... Processing acoustic and archival time series...")
+  movement_ts <- lapply(1:length(acoustics_ls_wth_overlap), function(i){
+    acc <- acoustics_ls_wth_overlap[[i]]
+    nrw_acc_pre <- nrow(acc)
+    nrw_arc_pre <- nrow(archival)
+    acc <- acc[acc$timestamp >= min(archival$timestamp) - 2*60 &
+                 acc$timestamp <= max(archival$timestamp) + 2*60, ]
+    arc <- archival[archival$timestamp >= min(acc$timestamp) - 2*60, ]
+    if(i < length(acoustics_ls_wth_overlap)){
+      arc <- arc[arc$timestamp <= max(acc$timestamp) + 2*60, ]
+    }
+    nrw_acc_post <- nrow(acc)
+    nrw_arc_post <- nrow(arc)
+    nrw_acc_delta <- nrw_acc_pre - nrw_acc_post
+    nrw_arc_delta <- nrw_arc_pre - nrw_arc_post
+    if(nrw_acc_post == 0 | nrw_arc_post == 0) stop("No overlapping acoustic/archival observations to implement algorithm.")
+    if(nrw_acc_delta != 0) {
+      cat_to_cf(paste("... ...  Chunk", i, ":", nrw_acc_delta, "acoustic observation(s) beyond the ranges of archival observations ignored."))
+      message(paste("Chunk", i, ":", nrw_acc_delta, "acoustic observation(s) beyond the ranges of archival observations ignored."))
+      }
+    if(nrw_arc_delta != 0) {
+      cat_to_cf(paste("... ... Chunk", i, ":", nrw_arc_delta, "archival observation(s) beyond the ranges of (processed) acoustic detections ignored."))
+      message(paste("Chunk", i, ":", nrw_arc_delta, "archival observation(s) beyond the ranges of (processed) acoustic detections ignored."))
+    }
+    ls <- list(acoustics = acc, archival = arc)
+    return(ls)
+  })
+  out$ts_by_chunk <- movement_ts
+  out$time <- rbind(out$time, data.frame(event = "movement_time_series_processed", time = Sys.time()))
+
+  #### Visualise processed time series
+  if(plot_ts) {
+    cat_to_cf("... Plotting acoustic and archival time series (for each chunk)...")
+    if(length(movement_ts) < 25) pp <- graphics::par(mfrow = prettyGraphics::par_mf(length(movement_ts)))
+    lapply(movement_ts, function(move){
+      acoustics <- move$acoustics
+      archival  <- move$archival
+      axis_ls <- prettyGraphics::pretty_plot(archival$timestamp, abs(archival$depth)*-1,
+                                             pretty_axis_args = list(side = 3:2,
+                                                                     axis = list(list(format = "%H:%M:%S %d-%m-%y"),
+                                                                                 list()
+                                                                                 )
+                                                                     ),
+                                             xlab = "Timestamp", ylab = "Depth (m)",
+                                             type = "l",
+                                             return_list = TRUE)
+      prettyGraphics::pretty_line(acoustics$timestamp,
+                                  pretty_axis_args = list(axis_ls = axis_ls),
+                                  inherit = TRUE,
+                                  replace_axis = list(side = 1, pos = axis_ls[[2]]$lim[1]),
+                                  add = TRUE,
+                                  pch = 21, col = "royalblue", bg = "royalblue")
+    })
+    if(length(movement_ts) < 25) graphics::par(pp)
+    out$time <- rbind(out$time, data.frame(event = "time_series_plotted", time = Sys.time()))
+  }
+
+
+  ######################################
+  #### Implement ACDC algorithm
+
+  #### Checks
+  n_chunks <- length(acoustics_ls_wth_overlap)
+  # Define a list of files, one for each chunk
+  if(verbose & con != "") {
+    con_ls <- lapply(1:n_chunks, function(i) {
+      file <- paste0(con_dir, "dot_acdc_log_", i, ".txt")
+      return(file)
+    })
+  } else {
+    con_ls <- lapply(1:n_chunks, function(i) {
+      return("")
+    })
+  }
+
+  # Write blank files to directory if required
+  if(verbose & con != "" & n_chunks > 1) {
+    cat_to_cf("... Defining chunk-specific log files as dot_acdc_log_1.txt, dot_acdc_log_2.txt etc...")
+    lapply(con_ls, function(file) {
+      if(!file.exists(file)){
+        msg1 <- paste(file, "does not exist: attempting to write file in specified directory...")
+        cat_to_cf(paste("... ...", msg1))
+        message(msg1)
+        file.create(file1 = file)
+        cat_to_cf("... ... ... Blank file successfully written to file.")
+        message("... Blank file successfully written to file.")
+      }
+    })
+  }
+
+  #### Implement ACDC algorithm directly via .acdc back-end
+  if(length(acoustics_ls_wth_overlap) == 1) {
+
+    #### Implement algorithm
+    cat_to_cf("... Calling .acdc() to implement ACDC algorithm on one chunk...")
+    out$time <- rbind(out$time, data.frame(event = "calling_.acdc", time = Sys.time()))
+    .out <- .acdc(acoustics = movement_ts[[1]]$acoustics,
+                  archival = movement_ts[[1]]$archival,
+                  bathy = bathy,
+                  map = map,
+                  detection_range = detection_range,
+                  mobility = mobility,
+                  depth_error = depth_error,
+                  acc_centroids = acc_centroids,
+                  plot = plot,
+                  plot_ts = FALSE,
+                  verbose = verbose,
+                  con = con,
+                  progress = progress,
+                  check = FALSE,
+                  keep_args = FALSE)
+
+  } else {
+
+    #### Implement algorithm in parallel
+    cat_to_cf(paste("... Calling .acdc() to implement ACDC algorithm on", length(acoustics_ls_wth_overlap), "chunks, using", n_cores, "cores..."))
+    out$time <- rbind(out$time, data.frame(event = "calling_.acdc", time = Sys.time()))
+    .out <- pbapply::pblapply(1:length(acoustics_ls_wth_overlap), cl = cl, function(i){
+
+      #### Implement algorithm
+      .out <- .acdc(acoustics = movement_ts[[i]]$acoustics,
+                    archival = movement_ts[[i]]$archival,
+                    bathy = bathy,
+                    map = map,
+                    detection_range = detection_range,
+                    mobility = mobility,
+                    depth_error = depth_error,
+                    acc_centroids = acc_centroids,
+                    plot = plot,
+                    plot_ts = FALSE,
+                    verbose = verbose,
+                    con = con_ls[[i]],
+                    progress = 0L,
+                    check = FALSE,
+                    keep_args = FALSE)
+      return(.out)
+    })
+    if(!is.null(cl)) parallel::stopCluster(cl = cl)
+  }
+
+  #### Return outputs
+  out$.acdc <- .out
+  t_end <- Sys.time()
+  out$time <- rbind(out$time, data.frame(event = "algorithm_competion", time = t_end))
+  out$time$serial_duration <- Tools4ETS::serial_difference(out$time$time, units = "mins")
+  out$time$total_duration <- NA
+  total_duration <- sum(as.numeric(out$time$serial_duration), na.rm = TRUE)
+  out$time$total_duration[nrow(out$time)] <- total_duration
+  cat_to_cf(paste0("... flapper::acdc() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+  class(out) <- c(class(out), "acdc")
+  return(out)
+
+}
+
+
+######################################
+######################################
+#### acdc_simplify()
+
+#' @title Simplify the outputs of \code{\link[flapper]{acdc}}
+#' @description This function simplifies the output of \code{\link[flapper]{acdc}}, by extracting elements from the '.acdc' elements which hold the results of calls to the workhorse function \code{\link[flapper]{.acdc}}. This is especially useful if the ACDC algorithm has been applied chunk-wise, in which case the results for each acoustic chunk are returned in a list. This function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series.
+#' @param acdc A \code{\link[flapper]{acdc-class}} object returned by \code{\link[flapper]{acdc}}.
+#' @param keep_chunks A logical variable that defines whether or not to retain all chunk-specific information.
+#' @param ... Additional arguments (none implemented).
+#' @return The function returns an object of class \code{\link[flapper]{.acdc-class}}.
+#' @details If the \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the information into the format of an \code{\link[flapper]{.acdc-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps, accounting for the overlap between chunks; and (b) simplifies chunk-specific records into a single contiguous time series and with re-defined time stamps from the start to the end of the time series and then returns an \code{\link[flapper]{.acdc-class}} object.
+#' @author Edward Lavender
+#' @export
+#'
+
+acdc_simplify <- function(acdc, keep_chunks = FALSE,...) {
+
+  #### Checks
+  if(!(inherits(acdc, "acdc") | !inherits(acdc, ".acdc"))){
+    stop("Object of class 'acdc' expected.")
+  }
+  if(inherits(acdc, ".acdc")) {
+    "class(acdc) == '.acdc': 'acdc' returned unchanged."
+    return(acdc)
+  }
+
+  #### Set up
+  out <- list(map = NULL, record = NULL, time = acdc$time, args = acdc$args, chunks = NULL, simplify = TRUE)
+
+  #### Simplify extract outputs the algorithm has only been implemented for a single chunk
+  if("map" %in% names(acdc$.acdc)) {
+    out$map <- acdc$.acdc$map
+    out$record <- acdc$.acdc$record
+
+    #### Otherwise aggregate information across chunks
+  } else{
+
+    #### Compute final map from the sum of the maps for each chunk
+    # Get the first map of each chunk
+    maps_first <- lapply(acdc$.acdc, function(chunk) {
+      map_1 <- chunk$record[[1]]$spatial[[1]]$map_timestep
+      if(is.null(map_1)) {
+        stop("chunk$record[[1]]$spatial[[1]]$map_timestep is NULL. In flapper::acdc(), plot = 1L (or greater/NULL) is required to return the necessary spatial information to correct for overlapping detection time series across chunks in the summation of chunk-specific maps.")
+      }
+      return(map_1)
+    })
+    # Get the last map of each chunk
+    maps_last <- lapply(acdc$.acdc, function(chunk) chunk$map)
+    # Correct for the repeated influence of the first map due to the overlapping detection time series
+    maps <- lapply(2:length(maps_last), function(i){
+      map <- maps_last[[i]] - maps_first[[i]]
+      return(map)
+    })
+    # Sum the adjusted maps across chunks
+    out$map <- raster::brick(maps)
+    out$map <- raster::calc(out$map, sum)
+
+    #### Simplify records
+    ## Add chunk-specific records
+    out$record <- lapply(acdc$.acdc, function(chunk) chunk$record)
+    ## Delete the last element of each chunk (except the last chunk) since chunks are overlapping
+    out$record <- lapply(out$record, function(chunk) chunk[1:(length(chunk)-1)])
+    ## Define a dataframe to adjust the timestamps recorded for each chunks
+    # For chunks 2:n_chunks, we will add the timestamps reached by the previous chunk
+    # ... up to the current chunk
+    adjust_timestep <- lapply(out$record, function(chunk_record){
+      # chunk_record <- out$record[[1]]
+      dat <- chunk_record[[length(chunk_record)]]$dat
+      adjustment <- dat[nrow(dat), c("timestep_cumulative", "timestep_detection")]
+      return(adjustment)
+    })
+    adjust_timestep <- do.call(rbind, adjust_timestep)
+    adjust_timestep$timestep_cumulative <- cumsum(adjust_timestep$timestep_cumulative)
+    adjust_timestep$timestep_detection <- cumsum(adjust_timestep$timestep_detection)
+    ## Adjust timestamps and add the chunk to the dataframe for each time stamp
+    out$record <- lapply(1:length(out$record), function(i) {
+      chunk_record <- out$record[[i]]
+      if(i == 1) {
+        adjustment <- data.frame(timestep_cumulative = 0, timestep_detection = 0)
+      } else{
+        adjustment <- adjust_timestep[i-1, ]
+      }
+      chunk_record <- lapply(chunk_record, function(t){
+        t$dat$timestep_cumulative <- t$dat$timestep_cumulative + adjustment$timestep_cumulative
+        t$dat$timestep_detection <- t$dat$timestep_detection + adjustment$timestep_detection
+        t$dat$chunk <- i
+        return(t)
+      })
+      return(chunk_record)
+    })
+    ## Flatten record list across chunks
+    out$record <- purrr::flatten(out$record)
+
+  }
+
+  #### Keep chunk-specific information, if requested
+  if(keep_chunks) out$chunks <- acdc$.acdc
+
+  #### Return outputs
+  class(out) <- c(class(out), ".acdc")
+  return(out)
+
+}
 
 ######################################
 ######################################
 #### acdc_plot()
 
 #' @title Plot the results of the ACDC algorithm
-#' @description This function is used to plot the results of the ACDC algorithm. To implement the function, a named list from \code{\link[flapper]{.acdc}} must be supplied, from which the results can be extracted and plotted. For each specified time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids can be added and customised and the finalised plots can be returned or saved to file.
-#' @param acdc A named list from \code{\link[flapper]{.acdc}}.
+#' @description This function is used to plot the results of the ACDC algorithm. To implement the function, an \code{\link[flapper]{.acdc-class}} list from \code{\link[flapper]{acdc}} and \code{\link[flapper]{acdc_simplify}} (or \code{\link[flapper]{.acdc}}) must be supplied, from which the results can be extracted and plotted. For each specified time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids can be added and customised and the finalised plots can be returned or saved to file.
+#' @param acdc An \code{\link[flapper]{.acdc-class}} object.
 #' @param plot An integer vector that defines the time steps for which to make plots. If \code{plot = NULL}, the function will make a plot for all time steps for which the necessary information is available in \code{acdc}.
 #' @param add_coastline (optional) A named list of arguments, passed to \code{\link[raster]{plot}}, to add a polygon (i.e., of the coastline), to the plot. If provided, this must contain an 'x' element that contains the coastline as a spatial object (e.g., a SpatialPolygonsDataFrame: see \code{\link[flapper]{dat_coast}} for an example).
 #' @param add_receivers (optional) A named list of arguments, passed to \code{\link[graphics]{points}}, to add points (i.e., receivers) to the plot. If provided, this must contain an 'x' element that is a SpatialPoints object that specifies receiver locations (in the same coordinate reference system as other spatial data).
@@ -805,6 +1505,12 @@ acdc_setup_centroids <- function(
 #'
 #' @return The function plots the results of the ACDC algorithm at specified time steps, with one plot per time step. Plots are saved to file if \code{png_param} is supplied.
 #' @examples
+#' #### Step (1): Implement ACDC algorithm
+#' # ... see examples via acdc()
+#'
+#' #### Step (2): Simplify outputs of the ACDC algorithm
+#' dat_acdc <- acdc_simplify(dat_acdc)
+#'
 #' #### Example (1): The default options simply plot the first surface
 #' acdc_plot(acdc = dat_acdc)
 #'
@@ -902,6 +1608,14 @@ acdc_plot <- function(acdc,
   cat_to_console("flapper::acdc_plot() called...")
   if(check){
     cat_to_console("... Checking function inputs...")
+    ## Check object class
+    if(!inherits(acdc, ".acdc")){
+      if(inherits(acdc, "acdc")) {
+        stop("'acdc' must be converted from 'acdc' to '.acdc. via flapper::acdc_simpify() before implementing this function.")
+      } else{
+        stop("'acdc' must be of class '.acdc'.")
+      }
+    }
     ## Check plots to be produced
     if(any(plot <= 0L)) stop("Input to 'plot' must be > 0.")
     ## Check spatial data have been provided correctly
@@ -1016,7 +1730,6 @@ acdc_plot <- function(acdc,
     }
   }
 
-
   #### Define plotting window
   cat_to_console("... Setting plotting window...")
   pp <- do.call(graphics::par, par_param)
@@ -1116,6 +1829,7 @@ acdc_plot <- function(acdc,
 #' @examples
 #' dir_current <- getwd()
 #' setwd(tempdir())
+#' dat_acdc <- acdc_simplify(dat_acdc)
 #' acdc_animate(expr_param = list(acdc = dat_acdc,
 #'                                add_coastline = list(x = dat_coast, col = "darkgreen"),
 #'                                plot = 1:5,
@@ -1140,8 +1854,9 @@ acdc_animate <-
            interval = 0.1,
            verbose = FALSE,
            ...){
-
-    if (!requireNamespace("pbapply", quietly = TRUE)) {
+    #### Checks
+    ## animation package
+    if (!requireNamespace("animation", quietly = TRUE)) {
       stop("This function requires the 'animation' package. Please install it before continuing with install.packages('animation').")
     }
     animation::saveHTML({

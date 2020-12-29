@@ -131,20 +131,21 @@ prettyGraphics::pretty_plot(arc$timestamp, arc$depth*-1, type = "l")
 prettyGraphics::pretty_line(acc$timestamp, add = TRUE)
 
 #### dat_acdc
-dat_acdc <- .acdc(acoustics = acc,
-                  archival = arc,
-                  bathy = dat_gebco,
-                  space_use = NULL,
-                  detection_range = 425,
-                  mobility = 200,
-                  depth_error = 2.5,
-                  acc_centroids = dat_centroids,
-                  plot = 1:50,
-                  png_param = list(),
-                  progress = 3L,
-                  verbose = TRUE,
-                  con = ""
-                  )
+dat_acdc <- acdc(acoustics = acc,
+                 archival = arc,
+                 bathy = dat_gebco,
+                 space_use = NULL,
+                 detection_range = 425,
+                 mobility = 200,
+                 depth_error = 2.5,
+                 acc_centroids = dat_centroids,
+                 plot = 1:50,
+                 png_param = list(),
+                 progress = 3L,
+                 verbose = TRUE,
+                 con = "",
+                 split = "2 hours"
+)
 
 # Check size of file prior to inclusion in package
 saveRDS(dat_acdc, paste0(tempdir(), "/dat_acdc.rds"))

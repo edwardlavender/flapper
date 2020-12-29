@@ -28,7 +28,8 @@ NULL
 #' @return The function checks other arguments supplied via ...; if these contain an argument that is not allowed, the function returns an error. Otherwise, nothing is returned.
 #'
 #' @author Edward Lavender
-#' @keywords "internal"
+#' @keywords internal
+#'
 
 check... <- function(not_allowed,...){
   l <- list(...)
@@ -39,6 +40,7 @@ check... <- function(not_allowed,...){
     stop(msg)
   }
 }
+
 
 ######################################
 ######################################

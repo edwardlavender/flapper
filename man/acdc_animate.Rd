@@ -50,6 +50,7 @@ This function requires the \code{\link[animation]{animation}} package.
 \examples{
 dir_current <- getwd()
 setwd(tempdir())
+dat_acdc <- acdc_simplify(dat_acdc)
 acdc_animate(expr_param = list(acdc = dat_acdc,
                                add_coastline = list(x = dat_coast, col = "darkgreen"),
                                plot = 1:5,

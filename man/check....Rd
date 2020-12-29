@@ -20,4 +20,4 @@ This function checks that arguments supplied via ... are allowed. This function 
 \author{
 Edward Lavender
 }
-\keyword{"internal"}
+\keyword{internal}

@@ -28,7 +28,7 @@ acdc_plot(
 )
 }
 \arguments{
-\item{acdc}{A named list from \code{\link[flapper]{.acdc}}.}
+\item{acdc}{An \code{\link[flapper]{.acdc-class}} object.}
 
 \item{plot}{An integer vector that defines the time steps for which to make plots. If \code{plot = NULL}, the function will make a plot for all time steps for which the necessary information is available in \code{acdc}.}
 
@@ -62,9 +62,15 @@ acdc_plot(
 The function plots the results of the ACDC algorithm at specified time steps, with one plot per time step. Plots are saved to file if \code{png_param} is supplied.
 }
 \description{
-This function is used to plot the results of the ACDC algorithm. To implement the function, a named list from \code{\link[flapper]{.acdc}} must be supplied, from which the results can be extracted and plotted. For each specified time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids can be added and customised and the finalised plots can be returned or saved to file.
+This function is used to plot the results of the ACDC algorithm. To implement the function, an \code{\link[flapper]{.acdc-class}} list from \code{\link[flapper]{acdc}} and \code{\link[flapper]{acdc_simplify}} (or \code{\link[flapper]{.acdc}}) must be supplied, from which the results can be extracted and plotted. For each specified time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids can be added and customised and the finalised plots can be returned or saved to file.
 }
 \examples{
+#### Step (1): Implement ACDC algorithm
+# ... see examples via acdc()
+
+#### Step (2): Simplify outputs of the ACDC algorithm
+dat_acdc <- acdc_simplify(dat_acdc)
+
 #### Example (1): The default options simply plot the first surface
 acdc_plot(acdc = dat_acdc)
 

@@ -42,7 +42,7 @@ dc(
 The function returns a named list of rasters, one for each time unit, in which the value of each cell is the number of times that that cell was represented by the corresponding depth bin in the depth-time series.
 }
 \description{
-This function implements the depth-contour (DC) algorithm. Under the assumption that individuals are benthic/demersal, this algorithm relates one-dimensional depth time-series to a two-dimensional bathymetry surface to determine the extent to which different parts of an area might have been used, or effectively represent occupied depths, over time. To implement this function, a list of depth time-series, one for each time unit (e.g. month/season) need to be supplied, along with a bathymetry \code{\link[raster]{raster}}. For each time unit, the function counts the number of depth observations in each user-defined depth bin (e.g., 10 m depth bins) and then relates these counts to the local bathymetry to produce a raster in which the value of each cell is given by the number of times in which the depth bin for that cell was used. The function returns a list of rasters, one for each time unit, and a plot of these rasters, if requested.
+This function implements the depth-contour (DC) algorithm. Under the assumption that individuals are benthic/demersal, this algorithm relates one-dimensional depth time-series to a two-dimensional bathymetry surface to determine the extent to which different parts of an area might have (or have not) been used, or effectively represent occupied depths, over time. To implement this function, a list of depth time-series, one for each time unit (e.g. month/season) need to be supplied, along with a bathymetry \code{\link[raster]{raster}}. For each time unit, the function counts the number of depth observations in each user-defined depth bin (e.g., 10 m depth bins) and then relates these counts to the local bathymetry to produce a raster in which the value of each cell is given by the number of times in which the depth bin for that cell was used. The function returns a list of rasters, one for each time unit, and a plot of these rasters, if requested.
 }
 \examples{
 #### Define data for examples
@@ -124,6 +124,9 @@ dc_maps <- dc(archival_ls = archival_ls,
               add = TRUE,
               col = topo.colors(100))
 
+}
+\seealso{
+The ACDC algorithm (see \code{\link[flapper]{acdc}}) extends the depth-contour algorithm by integrating information from acoustic detections of individuals at each time step to restrict the locations in which depth contours are identified.
 }
 \author{
 Edward Lavender

@@ -13,19 +13,20 @@
   mobility,
   depth_error = 2.5,
   acc_centroids,
-  plot = 0L,
+  plot = 1L,
   plot_ts = TRUE,
   verbose = TRUE,
   con = "",
   progress = 1L,
+  keep_args = TRUE,
   check = TRUE,
   ...
 )
 }
 \arguments{
-\item{acoustics}{A dataframe that contains passive acoustic telemetry detection time-series (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named 'receiver_id'; a POSIXct vector of time stamps when detections were made, named 'timestamp'; and a numeric vector of those time stamps, named 'timestamp_num'.}
+\item{acoustics}{A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named 'receiver_id'; a POSIXct vector of time stamps when detections were made, named 'timestamp'; and a numeric vector of those time stamps, named 'timestamp_num'.}
 
-\item{archival}{A dataframe that contains depth time-series (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named 'depth'; a POSIXct vector of time stamps when observations were made, named 'timestamp'; and a numeric vector of those time stamps, named 'timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time-series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.}
+\item{archival}{A dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named 'depth'; a POSIXct vector of time stamps when observations were made, named 'timestamp'; and a numeric vector of those time stamps, named 'timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.}
 
 \item{bathy}{A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).}
 
@@ -39,9 +40,9 @@
 
 \item{acc_centroids}{A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acdc_setup_centroids}}.}
 
-\item{plot}{An integer vector that defines the time steps for which to return the necessary spatial information required to plot the plausible locations of the individual, given detection and depth time-series. \code{plot = 0} suppresses the return of this information and \code{plot = NULL} returns this information for all time steps. This spatial information can be used to plot time-specific results of the algorithm using \code{\link[flapper]{acdc_plot}}.}
+\item{plot}{An integer vector that defines the time steps for which to return the necessary spatial information required to plot the plausible locations of the individual, given detection and depth time series. \code{plot = 0} suppresses the return of this information and \code{plot = NULL} returns this information for all time steps. This spatial information can be used to plot time-specific results of the algorithm using \code{\link[flapper]{acdc_plot}}.}
 
-\item{plot_ts}{A logical input that defines whether or not to the plot detection and depth time-series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.}
+\item{plot_ts}{A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console; otherwise, they are written to file (see below).}
 
@@ -49,12 +50,14 @@
 
 \item{progress}{An integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the archival time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar.}
 
+\item{keep_args}{A logical input that defines whether or not to include a list of function arguments in the outputs. This can be switched off if the function is applied iteratively.}
+
 \item{check}{A logical input that defines whether or not to check function inputs. This can be switched off to improve computation time when the function is applied iteratively.}
 
 \item{...}{Additional arguments (none implemented).}
 }
 \value{
-The function returns a named list with the following elements: ‘map’, ‘record’, ‘time’ and ‘args’. The main output of the function is the ‘map’ RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time-series. The ‘record’ element records time-specific maps of the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{plot}). The ‘time’ element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time; and the ‘args’ element is a named list of user inputs that record the parameters used to generate the outputs.
+The function returns an object of class \code{\link[flapper]{.acdc-class}} with the following elements: ‘map’, ‘record’, ‘time’, ‘args’, 'chunks' and 'simplify'. The main output element is the ‘map’ RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The ‘record’ element records time-specific maps of the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{plot}). The ‘time’ element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The ‘args’ element is a named list of user inputs that record the parameters used to generate the outputs (if \code{keep_args = TRUE}, otherwise the 'args' element is \code{NULL}.
 }
 \description{
 This function is the back-end of the ACDC algorithm.
@@ -63,7 +66,7 @@ This function is the back-end of the ACDC algorithm.
 #### Step (1) Implement setup_acdc_*() steps
 # ... Define acoustic centroids required for ACDC algorithm (see setup_acdc_centroids())
 
-#### Step (2) Prepare movement time-series for algorithm
+#### Step (2) Prepare movement time series for algorithm
 # Add required columns to dataframes:
 dat_acoustics$timestamp_num <- as.numeric(dat_acoustics$timestamp)
 dat_archival$timestamp_num  <- as.numeric(dat_archival$timestamp)
@@ -98,7 +101,6 @@ out_acdc <- .acdc(acoustics = acc,
 out_acdc <- .acdc(acoustics = acc,
                   archival = arc,
                   bathy = dat_gebco,
-                  space_use = NULL,
                   detection_range = 425,
                   mobility = 200,
                   depth_error = 2.5,
@@ -124,7 +126,6 @@ out_acdc <- .acdc(acoustics = acc,
                   depth_error = 2.5,
                   acc_centroids = dat_centroids,
                   plot = NULL,
-                  png_param = list(),
                   verbose = TRUE,
                   con = paste0(tempdir(), "/", "acdc_log.txt")
                   )

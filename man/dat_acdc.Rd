@@ -7,8 +7,8 @@
 \format{
 A named list with 4 elements:
 \describe{
-  \item{map}{A RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time-series.}
-  \item{record}{A list that records time-specific maps of the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations.}
+  \item{.acdc}{A list of results from calls to \code{\link[flapper]{.acdc}}, with one element per chunk.}
+  \item{ts_by_chunk}{A list of time series, with one element per chunk.}
   \item{time}{A dataframe that defines the times of sequential stages in the algorithm's progression.}
   \item{args}{A named list of user inputs that record the parameters used to generate the outputs.}
 }
@@ -17,9 +17,6 @@ A named list with 4 elements:
 dat_acdc
 }
 \description{
-A list of outputs created by \code{\link[flapper]{.acdc}}. This is included principally to streamline function examples.
-}
-\seealso{
-Further details are given in \code{\link[flapper]{.acdc}}.
+An object of class \code{\link[flapper]{acdc-class}} from \code{\link[flapper]{acdc}}, created by a (2-hour) chunk-wise implementation of this function. This is included principally to streamline function examples.
 }
 \keyword{datasets}
