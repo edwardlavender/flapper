@@ -81,3 +81,99 @@ detection_pr <- function(distance = 1:1000,
 }
 
 
+######################################
+######################################
+#### detection_centroids()
+
+#' @title Define detection centroids around receivers
+#' @description This function defines the areas surveyed by receivers (termed 'detection centroids') as a spatial object, based on an estimate of the detection range (m) and any barriers to detection. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The function defines a spatial buffer around each receiver according to the estimated detection range, cuts out any barriers to detection, such as the coastline, and returns a SpatialPolygons object that defines the combined detection centroid across all receivers or receiver-specific detection centroids.
+#'
+#' @param xy A \code{\link[sp]{SpatialPoints-class}} or \code{\link[sp]{SpatialPointsDataFrame-class}} object that defines receiver locations. The coordinate reference system should be the Universe Transverse Mercator coordinate reference system.
+#' @param detection_range A number that defines the detection range (m) of receivers.
+#' @param (optional) coastline A \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines barriers (such as the coastline) that block receivers from surveying areas within their detection range.
+#' @param plot A logical input that defines whether or not to plot receivers, their centroids, and the buffer (if specified).
+#' @param ... Additional arguments passed to \code{\link[rgeos]{gBuffer}}, such as \code{byid} and/or \code{quadsegs}.
+#'
+#' @return The function returns a \code{\link[sp]{SpatialPolygons-class}} object of the detection centroids around receivers that represents the area they survey under the assumption of a constant detection range, accounting for any barriers to detection. By default, this will contain a single feature, which is suitable for the calculation of the total area surveyed by receivers (see \code{\link[flapper]{detection_area_sum}}) because it accounts for the overlap in the detection ranges of receivers. However, if \code{byid = TRUE} is passed via \code{...} to \code{\link[rgeos]{gBuffer}}, the returned object will have a feature for each pair of coordinates in (\code{xy}) (i.e., receiver). This is less appropriate for calculating the area surveyed by receivers, since areas surveyed by multiple receivers will be over-counted, but it is suitable when the centroids for particular receivers are required (e.g., to extract environmental conditions within a specific receiver's detection ranges) (see \code{\link[flapper]{detection_centroids_envir}}.
+#'
+#' @examples
+#' #### Define receiver locations as a SpatialPoints object with a UTM CRS
+#' proj_wgs84 <- sp::CRS("+init=epsg:4326")
+#' proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
+#'                           "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
+#'                         proj_wgs84)
+#' xy <- sp::spTransform(xy, proj_utm)
+#'
+#' #### Example (1): Calculate the total area sampled by receivers
+#' detection_centroids(xy)
+#'
+#' #### Example (2): Account for barriers in the study area
+#' detection_centroids(xy, coastline = dat_coast)
+#'
+#' #### Example (3): Adjust the detection range
+#' detection_centroids(xy, detection_range = 400, coastline = dat_coast)
+#' detection_centroids(xy, detection_range = 500, coastline = dat_coast)
+#'
+#' #### Example (4): Suppress the plot
+#' detection_centroids(xy, coastline = dat_coast, plot = FALSE)
+#'
+#' #### Example (5): Output characteristics are controlled via byid
+#' # A SpatialPolygons with one feature is the implicit output
+#' sp_1 <- detection_centroids(xy, coastline = dat_coast, byid = FALSE)
+#' sp_1
+#' # An SpatialPolygons with one feature for each element in xy
+#' # ... can be returned via byid = TRUE
+#' sp_2 <- detection_centroids(xy, coastline = dat_coast, byid = TRUE)
+#' sp_2
+#' # The total area of the former will be smaller, since areas covered
+#' # ... by multiple receivers are merged
+#' rgeos::gArea(sp_1); rgeos::gArea(sp_2)
+#' # But it can be more convenient to use the latter format in some cases
+#' # ... because it is easy to isolate specific centroids
+#' raster::plot(dat_coast)
+#' raster::plot(sp_1[1], add = TRUE, col = "red")  # single feature
+#' raster::plot(sp_2[1], add = TRUE, col = "blue") # isolate specific features
+#'
+#' @author Edward Lavender
+#' @export
+
+detection_centroids <- function(xy,
+                                detection_range = 425,
+                                coastline = NULL,
+                                plot = TRUE,...){
+
+  #### Checks
+  # Check xy is a SpatialPoints object or similar
+  check_class(input = xy, to_class = c("SpatialPoints", "SpatialPointsDataFrame"), type = "stop")
+
+  #### Define buffers around receivers equal to detection radius
+  xy_buf <- rgeos::gBuffer(xy, width = detection_range,...)
+
+  #### Clip around coastline (if applicable)
+  if(!is.null(coastline)) {
+    if(length(xy_buf) == 1) {
+      xy_buf <- rgeos::gDifference(xy_buf, coastline)
+    } else {
+      xy_buf <- lapply(1:length(xy_buf), function(i) rgeos::gDifference(xy_buf[i], coastline))
+      xy_buf <- do.call(raster::bind, xy_buf)
+    }
+  }
+
+  #### Plot [update to use pretty_map()]
+  if(plot){
+    if(!is.null(coastline)) {
+      raster::plot(coastline)
+      graphics::points(xy, pch = 4)
+    } else {
+      raster::plot(xy, pch = 4)
+    }
+    raster::lines(xy_buf)
+  }
+
+  #### Return outputs
+  return(xy_buf)
+
+}
+
+
