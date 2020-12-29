@@ -184,7 +184,7 @@ detection_centroids <- function(xy,
 #' @title Calculate the total area sampled by acoustic receivers
 #' @description This function calculates the total area sampled by receivers, under the assumption of a constant detection range. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The \code{\link[flapper]{detection_centroids}} is used to calculate the detection centroids around receivers, given a specified detection range (m) and any barriers to detection, such as coastline, and then the total area covered by receivers is calculated, accounting for overlapping centroids.
 #'
-#' @param xy,detection_range,coastline,plot,... Arguments required to calculate and visualise detection centroids, using \code{\link[flapper]{detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{range}), barriers to detection (\code{coastline}), and whether or not to plot the centroids (\code{plot}).
+#' @param xy,detection_range,coastline,plot,... Arguments required to calculate and visualise detection centroids via \code{\link[flapper]{detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{range}), barriers to detection (\code{coastline}), and whether or not to plot the centroids (\code{plot}).
 #' @param scale A number that scales the total area (m). The default (\code{1/(1000^2)}) converts the units of \eqn{m^2} to \eqn{km^2}.
 #'
 #' @details This is a simple metric of the overall receiver sampling effort. This may be a poor metric if the assumption of a single detection range across all receivers is substantially incorrect or if there are substantial changes in the receiver array over the course of a study.
@@ -428,3 +428,329 @@ n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,...){
 }
 
 
+######################################
+######################################
+#### id_rec_overlap()
+
+#' @title Calculate the overlap between individuals' time at liberty and receivers' operational periods
+#' @description This function calculates the duration of the overlap (in days) between individuals' time at liberty and receivers' operational periods. To implement this function, a dataframe with individual deployment periods and another with receiver deployment periods must be specified. The duration of the overlap between these intervals can be calculated for all combinations of individuals and receivers within these two dataframes, for all combinations of specified individuals and receivers, or for specific individual/receiver pairs. The function returns a dataframe of the overlap duration for these individual/receiver combinations or a vector of values that is matched against another dataframe.
+#' @param ids A dataframe that defines individual deployment periods. This must contain a column that defines individual IDs (named 'individual_id') and the time of tagging (named 'tag_start_date') and time of tag retrieval ('tag_end_date') (see \code{\link[flapper]{dat_ids}} for an example).
+#' @param moorings A dataframe that defines receiver deployment periods. This must contain a column that defines receiver IDs (named 'receiver_id') and the time of receiver deployment (named 'receiver_start_date') and retrieval (named 'receiver_end_date') (see \code{\link[flapper]{dat_moorings}} for an example).
+#' @param individual_id (optional) A vector of individuals for which to calculate overlap duration.
+#' @param receiver_id (optional) A vector of receivers for which to calculate overlap duration.
+#' @param type If both \code{individual_id} and \code{receiver_id} are specified, then \code{type} is an integer that defines whether or not to calculate overlap duration for (a) each individual/receiver pair (\code{type = 1L}) or (b) all combinations of specified individuals/receivers (\code{type = 2L}).
+#' @param match_to (optional) A dataframe against which to match the calculated overlap duration(s). This must contain an 'individual_id' and 'receiver_id' column, as in \code{ids} and \code{moorings} respectively. If supplied, an integer vector of overlap durations for individual/receiver combinations, matched against the individuals/receivers in this dataframe, is returned (see also Value).
+#' @param ... Additional arguments (none implemented).
+#'
+#' @return The function returns a dataframe with the deployment overlap duration for specific or all combinations of individuals and receivers, with the 'individual_id', 'receiver_id', 'tag_start_date', 'tag_end_date', 'receiver_start_date' and 'receiver_end_date' columns retained. The 'id_rec_overlap' column defines the temporal overlap (days). Alternatively, if \code{match_to} is supplied, a vector of overlap durations that matches each individual/receiver observation in that dataframe is returned.
+#'
+#' @examples
+#' #### Prepare data to include required columns
+#' # moorings requires 'receiver_id', 'receiver_start_date' and 'receiver_end_date'
+#' # ids requires 'individual_id', 'tag_start_date' and 'tag_end_date'
+#' # These columns are already supplied in the example datasets
+#' # ... except tag_end_date:
+#' dat_ids$tag_end_date <- as.Date("2017-06-05")
+#'
+#' #### Example (1): Temporal between all combinations
+#' # ... of individuals and receivers
+#' dat <- id_rec_overlap(dat_ids, dat_moorings)
+#'
+#' #### Example (2) Temporal overlap between all combinations of specified
+#' #... individuals/receivers
+#' dat <- id_rec_overlap(dat_ids,
+#'                       dat_moorings,
+#'                       individual_id = c(25, 26),
+#'                       receiver_id = c(3, 4),
+#'                       type = 2L)
+#'
+#' #### Example (3) Temporal overlap between specified individual/receiver pairs
+#' dat <- id_rec_overlap(dat_ids,
+#'                       dat_moorings,
+#'                       individual_id = c(25, 26),
+#'                       receiver_id = c(3, 4),
+#'                       type = 1L)
+#'
+#' #### Example (4) Match temporal overlap to another dataframe
+#' dat_acoustics$id_rec_overlap <- id_rec_overlap(dat_ids,
+#'                                                dat_moorings,
+#'                                                match_to = dat_acoustics,
+#'                                                type = 1L)
+#'
+#' @author Edward Lavender
+#' @export
+#'
+
+id_rec_overlap <- function(ids,
+                           moorings,
+                           individual_id = NULL,
+                           receiver_id = NULL,
+                           type = 1L,
+                           match_to = NULL,...){
+
+  #### Checks
+  # Dataframes must contains required names
+  check_names(input = ids, req = c("individual_id", "tag_start_date", "tag_end_date"), extract_names = colnames, type = all)
+  check_names(input = moorings, req = c("receiver_id", "receiver_start_date", "receiver_end_date"), extract_names = colnames, type = all)
+  if(!is.null(match_to)) check_names(input = match_to, req = c("individual_id", "receiver_id"), extract_names = colnames, type = all)
+  # Check input to type
+  type <- check_value(input = type, supp = 1:2L)
+
+  #### Define dataframe with individuals and receivers
+  ## Option (1) Both individual_id and receiver_id have been supplied
+  # ... in which case we will define a dataframe for these specific individuals based on type
+  if(!is.null(individual_id) & !is.null(receiver_id)) {
+
+    # If type == 1, then we will consider each pair of individuals and receivers
+    if(type == 1L) {
+      if(length(individual_id) != length(receiver_id)) {
+        stop("Both 'individual_id' and 'receiver_id' have been specified and type = 1L but length(individual_id) != length(receiver_id).")
+      }
+      dat <- data.frame(individual_id = individual_id, receiver_id = receiver_id)
+
+      # Otherwise, we will focus on all combinations of specified individuals and receivers
+    } else if (type == 2L) {
+      dat <- expand.grid(individual_id = individual_id, receiver_id = receiver_id)
+    }
+
+    ## Option (2) Use all combinations of individuals/receivers
+  } else {
+
+    # Filter out any unwanted individuals or receivers
+    if(!is.null(individual_id)) ids <- ids[which(ids$individual_id %in% individual_id), ]
+    if(!is.null(receiver_id)) moorings <- moorings[which(moorings$receiver_id %in% receiver_id), ]
+    # Define dataframe
+    # This will only include receivers that recorded detections
+    dat <- expand.grid(individual_id = unique(ids$individual_id),
+                       receiver_id = unique(moorings$receiver_id))
+
+  }
+
+  #### Define dates
+  # Define start/end dates for individuals' time at liberty
+  dat$tag_start_date      <- ids$tag_start_date[match(dat$individual_id, ids$individual_id)]
+  dat$tag_end_date        <- ids$tag_end_date[match(dat$individual_id, ids$individual_id)]
+  # Define start/end dates for receivers' deployment time
+  dat$receiver_start_date <- moorings$receiver_start_date[match(dat$receiver_id, moorings$receiver_id)]
+  dat$receiver_end_date   <- moorings$receiver_end_date[match(dat$receiver_id, moorings$receiver_id)]
+  # Define intervals
+  dat$tag_interval       <- lubridate::interval(dat$tag_start_date, dat$tag_end_date)
+  dat$receiver_interval  <- lubridate::interval(dat$receiver_start_date, dat$receiver_end_date)
+
+  #### Calculate overlap
+  # Define the overlap in days, including the first day of overlap (+1)
+  dat$id_rec_overlap <- lubridate::day(lubridate::as.period(lubridate::intersect(dat$tag_interval, dat$receiver_interval), "days")) + 1
+
+  #### Match detection days to another dataframe, if requested
+  if(!is.null(match_to)) {
+    dat$key <- paste0(dat$individual_id, "-", dat$receiver_id)
+    match_to$key  <- paste0(match_to$individual_id, "-", match_to$receiver_id)
+    match_to$id_rec_overlap <- dat$id_rec_overlap[match(match_to$key, dat$key)]
+    out <- match_to$id_rec_overlap
+    if(any(is.na(out))){
+      message(sum(is.na(out)), "NAs identified in matched vector of id_rec_overlap.")
+    }
+  } else{
+    out <- dat
+  }
+
+  #### Return outputs
+  return(out)
+
+}
+
+
+######################################
+######################################
+#### detection_centroids_envir()
+
+#' @title Sample environmental conditions around receivers
+#' @description This function is used to sample environmental conditions from within the detection centroids of receivers. To implement the function, a SpatialPoints object that defines receiver locations (\code{xy}) must be provided, along with the detection range (\code{detection_range}) of receivers. This information is used to define detection centroids, via \code{\link[flapper]{detection_centroids}}. Within each receiver's centroid, all values of an environmental variable, or a random sample of values, are extracted from a user-defined \code{\link[raster]{raster}} (\code{envir}). Under random sampling, values can be sampled according to a detection probability function (\code{sample_probs}). The function returns a list of dataframes, one for each receiver, that include the sampled values.
+
+#' @param xy,detection_range,coastline,plot,... Arguments required to calculate and visualise detection centroids via \code{\link[flapper]{detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{detection_range}), barriers to detection (\code{coastline}) and whether or not to plot the centroids (\code{plot}). Additional arguments can be passed via \code{...} but note that \code{byid} is necessarily \code{TRUE} and should not be provided.
+#' @param envir A \code{\link[raster]{raster}} that defines the values of an environmental variable across the study area. The coordinate reference system should be the Universal Transverse Mercator system.
+#' @param sample_size (optional) An integer that defines the number of samples of the environmental variable to draw from the area around each receiver (see the 'size' argument of \code{\link[base]{sample}}). If this is provided, \code{sample_size} samples are taken from this area; otherwise, all values are extracted.
+#' @param sample_replace (optional) If \code{sample_size} is specified, \code{sample_replace} is a logical input that defines whether to implement sampling with (\code{sample_replace = TRUE}, the default) or without (\code{sample_replace = FALSE}) replacement (see the 'replace' argument of \code{\link[base]{sample}}).
+#' @param sample_probs (optional) If \code{sample_size} is specified, \code{sample_probs} is a function that calculates the detection probability given the distance (m) between an cell and a receiver.
+#' @param cl A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is closed within the function.
+#' @param varlist A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.
+#' @param verbose A logical variable that defines whether or not relay messages to the console to monitor function progress.
+#'
+#' @return The function returns a list of dataframes (one for each element in \code{xy} i.e., each receiver), each of which includes the cell IDs of \code{envir} from which values were extracted ('cell'), the value of the environmental variable in that cell ('envir') and, if applicable, the distance between that cell and the receiver ('dist', m) and the detection probability in that cell ('prob').
+#'
+#' @examples
+#' #### Define receiver locations as a SpatialPoints object with a UTM CRS
+#' proj_wgs84 <- sp::CRS("+init=epsg:4326")
+#' proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
+#'                           "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
+#'                         proj_wgs84)
+#' xy <- sp::spTransform(xy, proj_utm)
+#'
+#' #### Example (1): Extract all depth values within each receiver's centroid
+#' depths_by_centroid <- detection_centroids_envir(xy = xy,
+#'                                                 detection_range = 425,
+#'                                                 coastline = dat_coast,
+#'                                                 envir = dat_gebco
+#'                                                 )
+#' # The function returns a list of dataframes, one for each receiver
+#' # ... with the cell IDs and the value of the environmental variable
+#' utils::str(depths_by_centroid)
+#' # Collapse the list and compare conditions across receivers
+#' depths_by_centroid <-
+#'   lapply(1:length(depths_by_centroid), function(i){
+#'     d <- depths_by_centroid[[i]]
+#'     d$receiver_id <- dat_moorings$receiver_id[i]
+#'     return(d)
+#'   })
+#' depths_by_centroid <- dplyr::bind_rows(depths_by_centroid)
+#' prettyGraphics::pretty_boxplot(depths_by_centroid$receiver_id,
+#'                                depths_by_centroid$envir)
+#'
+#' #### Example (2): Extract a random sample of values
+#' # (We'll keep the values small for speed)
+#' depths_by_centroid <- detection_centroids_envir(xy = xy,
+#'                                                 detection_range = 425,
+#'                                                 coastline = dat_coast,
+#'                                                 envir = dat_gebco,
+#'                                                 sample_size = 2
+#'                                                  )
+#' utils::str(depths_by_centroid)
+#'
+#' #### Example (3) Extract a random sample of values with weighted probabilities
+#' # Define detection probability function based only on distance
+#' calc_detection_pr <-
+#'   function(dist){
+#'     dpr <- detection_pr(distance = dist,
+#'                         beta_0 = 2.5,
+#'                         beta_1 = -0.01,
+#'                         inv_link = stats::plogis,
+#'                         output = 2L)
+#'     return(dpr)
+#'   }
+#' # Implement sampling with replacement according to detection probability
+#' depths_by_centroid <- detection_centroids_envir(xy = xy,
+#'                                                 detection_range = 425,
+#'                                                 coastline = dat_coast,
+#'                                                 envir = dat_gebco,
+#'                                                 sample_size = 2,
+#'                                                 sample_probs = calc_detection_pr,
+#'                                                 )
+#' # Each element of the outputted list includes the 'cell' and 'envir' column
+#' # ... as well as 'dist' and 'prob' that define the distance of that cell
+#' # ... from the location in xy and the corresponding detection probability
+#' # ... at that distance respectively
+#' utils::str(depths_by_centroid)
+#'
+#' #### Example (4) Sampling without replacement via sample_replace = FALSE
+#' depths_by_centroid <- detection_centroids_envir(xy = xy,
+#'                                                 detection_range = 425,
+#'                                                 coastline = dat_coast,
+#'                                                 envir = dat_gebco,
+#'                                                 sample_size = 2,
+#'                                                 sample_probs = calc_detection_pr,
+#'                                                 sample_replace = FALSE
+#'                                                 )
+#' utils::str(depths_by_centroid)
+#'
+#' #### Example (5) Parallelise the algorithm via cl and varlist arguments
+#' \dontrun{
+#' depths_by_centroid <- detection_centroids_envir(xy = xy,
+#'                                                 detection_range = 425,
+#'                                                 coastline = dat_coast,
+#'                                                 envir = dat_gebco,
+#'                                                 sample_size = 2,
+#'                                                 sample_probs = calc_detection_pr,
+#'                                                 sample_replace = FALSE,
+#'                                                 cl = parallel::makeCluster(2L),
+#'                                                 varlist = c("dat_gebco",
+#'                                                             "calc_detection_pr")
+#'                                                 )
+#' utils::str(depths_by_centroid)
+#' }
+#'
+#' @author Edward Lavender
+#' @export
+#'
+
+detection_centroids_envir <- function(xy,
+                                      detection_range,
+                                      coastline,
+                                      plot = FALSE,
+                                      envir,
+                                      sample_size = NULL,
+                                      sample_replace = TRUE,
+                                      sample_probs = NULL,
+                                      cl = NULL,
+                                      varlist = NULL,
+                                      verbose = TRUE,...){
+
+  #### Checks
+  t_onset <- Sys.time()
+  cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+  cat_to_console(paste0("flapper::detection_centroids_envir() called (@ ", t_onset, ")..."))
+  cat_to_console("... Implementing function checks...")
+  if(is.null(sample_size)){
+    if(!is.null(sample_probs)) message("sample_size = NULL: input to 'sample_probs' ignored.")
+    sample_probs <- NULL
+  }
+  if(is.null(cl) & !is.null(varlist)) message("cl = NULL: input to 'varlist' ignored.")
+  check...("byid",...)
+
+  #### Define detection centroids
+  cat_to_console("... Defining detection centroid(s)...")
+  xy_buf <- detection_centroids(xy = xy,
+                                detection_range = detection_range,
+                                coastline = coastline,
+                                plot = plot,
+                                byid = TRUE,...)
+  xy_buf_ls <- lapply(1:length(xy_buf), function(i) xy_buf[i])
+
+  #### Extract conditions
+  cat_to_console("... Extracting environmental conditions from detection area(s)...")
+  if(!is.null(cl) & !is.null(varlist)) {
+    parallel::clusterExport(cl = cl, varlist = varlist)
+  }
+  ls_envir <-
+    pbapply::pblapply(xy_buf_ls, cl = cl, FUN = function(centroid){
+
+      ## Extract conditions
+      # Create list of conditions sampled by each receiver
+      envir_sampled <- raster::extract(envir, centroid, cellnumbers = TRUE)
+      envir_sampled <- envir_sampled[[1]]
+      dat <- data.frame(envir_sampled)
+      colnames(dat) <- c("cell", "envir")
+
+      ## Define distances
+      if(!is.null(sample_probs)){
+        rdist <- raster::distanceFromPoints(envir, xy)
+        dist_sampled <- raster::extract(rdist, centroid, cellnumbers = TRUE)
+        dist_sampled <- dist_sampled[[1]]
+        dist_sampled <- data.frame(dist_sampled)
+        colnames(dist_sampled) <- c("cell", "dist")
+        dat$dist <- dist_sampled$dist[match(dat$cell, dist_sampled$cell)]
+      }
+
+      ## Return outputs
+      return(dat)
+
+    })
+  if(!is.null(cl)) parallel::stopCluster(cl)
+
+  #### Sample values according to their probability
+  if(!is.null(sample_size)) {
+    ls_envir_sample <- lapply(ls_envir, function(d){
+      if(!is.null(sample_probs)){
+        d$prob <- sample_probs(d$dist)
+      } else d$prob <- NULL
+      envir_sampled <- d[sample(1:nrow(d), size = sample_size, replace = sample_replace, prob = d$prob), ]
+      return(envir_sampled)
+    })
+  } else{
+    ls_envir_sample <- ls_envir
+  }
+
+  #### Return outputs
+  return(ls_envir_sample)
+
+}
