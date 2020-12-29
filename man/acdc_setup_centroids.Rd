@@ -26,7 +26,7 @@ acdc_setup_centroids(
 
 \item{mobility}{A number that defines the distance that an individual could move in the time period between archival observations.}
 
-\item{n_timesteps}{An integer that defines the the number of timesteps after a hypothetical detection for which centroids will be created, where the duration of each timestep is given by the duration between archival observations.}
+\item{n_timesteps}{An integer that defines the the number of timesteps after a hypothetical detection for which centroids will be created, where the duration of each timestep is given by the duration between archival observations (see \code{\link[flapper]{acdc_setup_n_centroids}}).}
 
 \item{coastline}{(optional) A \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines the coastline in an area. If provided, acoustic centroids are processed to remove any areas on land. Algorithm speed declines with the complexity of the coastline.}
 
