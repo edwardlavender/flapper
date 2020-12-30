@@ -22,15 +22,15 @@ sim_array(
 )
 }
 \arguments{
-\item{boundaries}{A \code{\link[raster]{extent}} object that defines the boundaries of simulated study site.}
+\item{boundaries}{An \code{\link[raster]{extent}} object that defines the boundaries of (simulated) study area.}
 
-\item{coastline}{(optional) This argument is used to incorporate the presence of barriers, such as coastline, within an array. There are three options. If \code{coastline = NULL}, no barriers are incorporated. If \code{coastline = "simple_random"}, then some coastline is simulated in the study area. Alternatively, a spatial object, such as a SpatialPolygonsDataFrame that defines the coastline in an area can be incorporated into the array design by passing this \code{coastline}.}
+\item{coastline}{(optional) This argument is used to incorporate the presence of barriers, such as coastline, in the area. There are three options. If \code{coastline = NULL}, no barriers are incorporated. If \code{coastline = "simple_random"}, then a triangular island is simulated in the study area. Alternatively, a spatial object, such as a SpatialPolygonsDataFrame, that defines the coastline in an area can be incorporated into the array design by passing this \code{coastline}.}
 
-\item{land_inside_coastline}{A logical variable that defines whether or not the land is 'inside' the polygon defined by \code{coastline} (\code{land_inside_coastline = TRUE}) or the sea is 'inside' (\code{land_inside_coastline = FALSE}).}
+\item{land_inside_coastline}{A logical variable that defines whether or not the land is 'inside' the polygon(s) defined by \code{coastline} (\code{land_inside_coastline = TRUE}) or the sea is 'inside' the polygon(s) (\code{land_inside_coastline = FALSE}).}
 
 \item{n_receivers}{An integer that defines the number of receivers in the array. This is ignored if receiver locations are specified via \code{arrangement}.}
 
-\item{arrangement, ...}{A character string or a SpatialPoints object that defines the arrangement of receivers. Supported character strings options for simulated arrays are \code{"regular"}, \code{"random"} and \code{"stratified"}, \code{"nonaligned"}, \code{"hexagonal"} and \code{"clustered"} (see \code{\link[sp]{spsample}}, which is used to simulate receiver locations). Additional arguments can be passed to this function via \code{...} for further control. Otherwise, a SpatialPoints object that defines the coordinates of receivers (in the same coordinate reference system as \code{boundaries} and, if applicable, \code{coastline}) is assumed to have been provided.}
+\item{arrangement, ...}{A character string or a SpatialPoints object that defines the arrangement of receivers. Supported character string options for simulated arrays are \code{"regular"}, \code{"random"} and \code{"stratified"}, \code{"nonaligned"}, \code{"hexagonal"} and \code{"clustered"} (see \code{\link[sp]{spsample}}, which is used to simulate receiver locations). Additional arguments can be passed to this function via \code{...} for further control. Otherwise, a SpatialPoints object that defines the coordinates of receivers (in the same coordinate reference system as \code{boundaries} and, if applicable, \code{coastline}) is assumed to have been provided.}
 
 \item{seed}{An integer that is used to set the seed to enable reproducible simulations (see \code{\link[base]{set.seed}}).}
 
@@ -40,22 +40,21 @@ sim_array(
 
 \item{add_sea}{(optional) If \code{plot = TRUE}, \code{add_sea} is a named list of arguments, passed to \code{\link[raster]{plot}}, to customise the appearance of the sea on the plot. \code{add_sea = NULL} suppresses the addition of the sea to the plot. To use the default graphical parameters, simply specify \code{add_sea = list()}.}
 
-\item{add_land}{(optional) If \code{plot = TRUE}, \code{add_land} is a named list of arguments, passed to \code{\link[raster]{plot}}, to customise the appearance of the land on the plot. \code{add_sea = NULL} suppresses the addition of the land to the plot. To use the default graphical parameters, simply specify \code{add_sea = list()}.}
+\item{add_land}{(optional) If \code{plot = TRUE}, \code{add_land} is a named list of arguments, passed to \code{\link[raster]{plot}}, to customise the appearance of the land on the plot. \code{add_land = NULL} suppresses the addition of the land to the plot. To use the default graphical parameters, simply specify \code{add_land = list()}.}
 
 \item{add_receivers}{(optional) If \code{plot = TRUE}, \code{add_receivers} is a named list of arguments, passed to \code{\link[graphics]{points}}, to customise the appearance of receivers on the plot. \code{add_receivers = NULL} suppresses the addition of the receivers to the plot. To use the default graphical parameters, simply specify \code{add_receivers = list()}.}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console to relay function progress.}
 }
 \value{
-The function returns a named list of (a) spatial objects that define the simulated array ('array') and (b) the arguments used to generate this array ('args'). The 'array' element if this list contains the following elements: 'boundaries', a \code{\link[raster]{Extent-class}} object that defines the boundaries of the area (as inputted); 'area', a \code{\link[sp]{SpatialPolygons-class}} object that defines the boundaries of the area; 'land' and 'sea' are \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects that define the land and sea respectively; and 'xy' is a \code{\link[sp]{SpatialPoints-class}} object that defines receiver locations. If \code{plot = TRUE}, the function also returns a plot.
+The function returns a named list of (a) the spatial objects that define the simulated array ('array') and (b) the arguments used to generate this array ('args'). The 'array' element is a named list contains the following elements: 'boundaries', an \code{\link[raster]{Extent-class}} object that defines the boundaries of the area (as inputted); 'area', a \code{\link[sp]{SpatialPolygons-class}} object that defines the boundaries of the area; 'land' and 'sea', \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects that define the land and sea respectively; and 'xy', a \code{\link[sp]{SpatialPoints-class}} object that defines receiver locations. If \code{plot = TRUE}, the function also returns a plot of the array.
 }
 \description{
-This function is designed to simulate different kinds of array designs for monitoring stations. The function has been particularly inspired by the need to simulate passive acoustic telemetry array designs, which comprise networks of acoustic hydrophones that listen for acoustic transmissions from tagged marine animals. To implement the function, it is necessary to define the boundaries of the area (\code{boundaries}), within which barriers to movement, such as coastline, can be simulated or included from real datasets. Within this area, a specified number of receivers (\code{n_receivers}) can be simulated under different array designs (namely, uniform, regular or random arrangements) or incorporated from real data. The function returns a list of spatial objects that define the array and, if requested, a plot of the area.
+This function is designed to simulate different kinds of array designs for monitoring stations. The function has been particularly inspired by the need to simulate passive acoustic telemetry array designs, which comprise networks of acoustic hydrophones that listen for acoustic transmissions from tagged marine animals. To implement the function, it is necessary to define the boundaries of the area (\code{boundaries}). Barriers to movement, such as coastline, within this area can be simulated or included from real datasets. The area is populated with a specified number of receivers (\code{n_receivers}) that are simulated under different array designs (namely, uniform, regular or random arrangements) or incorporated from real data. The function returns a list of spatial objects that define the array and, if requested, a plot of the area.
 }
 \examples{
 #### Example (1): Simulate an array using default parameters
-# ... And force reproducible simulations by defining seed
-seed <- 1
+# ... And force reproducible simulations by defining the seed
 array <- sim_array(boundaries = raster::extent(-10, 10, -10, 10),
                    seed = 1)
 
