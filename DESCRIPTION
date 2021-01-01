@@ -15,7 +15,8 @@ Imports:
 Suggests:
     knitr,
     rmarkdown, 
-    animation, scales
+    animation, scales, 
+    circular
 Remotes: 
     github::edwardlavender/prettyGraphics, 
     github::edwardlavender/Tools4ETS,

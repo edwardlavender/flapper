@@ -8,7 +8,7 @@ sim_array(
   boundaries = raster::extent(-10, 10, -10, 10),
   coastline = NULL,
   land_inside_coastline = TRUE,
-  n_receivers = 10,
+  n_receivers = 10L,
   arrangement = "random",
   seed = NULL,
   plot = TRUE,

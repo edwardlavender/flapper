@@ -90,7 +90,7 @@
 sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
                       coastline = NULL,
                       land_inside_coastline = TRUE,
-                      n_receivers = 10,
+                      n_receivers = 10L,
                       arrangement = "random",
                       seed = NULL,
                       plot = TRUE,
@@ -239,3 +239,271 @@ sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
 
 }
 
+
+######################################
+######################################
+#### sim_path_sa()
+
+#' @title Simulate discrete-time movement paths from step lengths and turning angles
+#' @description This function simulates movement paths from step lengths and turning angles. To implement the function, the number of time steps (\code{n}) needs to be specified and, if applicable, the area within which movement should occur. For example, in marine environments, the inclusion of the sea as a spatial layer would restrict movement within the sea. The starting location (\code{p_1}) can be provided or simulated. At each time step, user-defined functions are used to simulate step lengths and turning angles, which can depend previous values of those variables via a \code{lag} parameter, from which the next position is calculated. This implementation enables movement paths to be simulated under a variety of movement models, including random walks and correlated random walks, providing that they are conceptualised in terms of step lengths and turning angles. The function returns a list of outputs that includes the simulated pathway and, if requested, produces a plot of the simulated path.
+#'
+#' @param n An integer that defines the number of time steps in the simulation.
+#' @param area (optional) A \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines the area(s) within which movement is allowed.
+#' @param p_1 (optional) A matrix with one row and two columns that defines the starting location (x, y). If \code{p_1 = NULL}, then a random location is sampled from \code{area}, if applicable, or simulated from a uniform distribution with a minimum and maximum value of 0 and 1 respectively.
+#' @param sim_angle A function that is used to simulate turning angles. This must accept a single number that represents some previous turning angle (degrees), even if this is simply ignored (see \code{lag}, below). For example, \code{sim_angle = function() 1} will break but \code{sim_angle = function(...) 1} is fine. For convenience, a default function is included that simulates angles from a wrapped normal circular distribution with a mean and standard deviation of 1 (see \code{\link[circular]{rwrappednormal}}). Functions that actually depend on some previous angle also need to be able to generate initial angles before enough previous angles have been generated for the function to depend on those (see \code{lag}, below). All functions should return a single number that defines the turning angle in degrees.
+#' @param sim_step A function that is used to simulate step lengths. This follows the same rules as for \code{sim_angle}. For convenience, a default function is included that simulates angles from a gamma distribution with shape and scale parameters of 15 (see \code{\link[stats]{rgamma}}).
+#' @param lag If \code{sim_angle} and/or \code{sim_step} have been defined such that they depend on some previous angle/step length, then \code{lag} is an integer that defines the number of time steps between the current time step and some previous time step that affects the current turning angle and/or step length.
+#' @param plot A logical variable that defines whether or not to produce a plot of the area (if provided) and the simulated movement pathway.
+#' @param add_points,add_path (optional) Named lists of arguments that are used to customise the appearance of points (the starting location) and the pathway on the map.
+#' @param seed (optional) An integer that defines the seed (for reproducible simulations: see \code{\link[base]{set.seed}}).
+#' @param verbose A logical variable that defines whether or not to print messages to the console that relay function progress.
+#' @param ... Additional arguments. For \code{\link[flapper]{sim_path_sa}}, these are passed to \code{\link[prettyGraphics]{pretty_map}} to customise the map. For the default \code{\link[flapper]{sim_angles}} and \code{\link[flapper]{sim_steps}} functions, \code{...} is required but additional parameters are ignored.
+#'
+#' @details This function requires the \code{\link[circular]{circular}} package.
+#'
+#' @return The function returns a named list of arguments that defines the simulated pathway ('xy_mat', 'angle_mat', 'step_mat' and 'path') and a named list of arguments that were used to generate the pathway ('args'). 'xy_mat' is an n-row, two-column matrix that defines the simulated position (x, y) at each time step; 'angle_mat' and 'step_mat' are n-row, one-column matrices that define the simulated turning angle (degrees) and step length (in map units) at each time step; and 'path' is a \code{\link[sp]{SpatialLines}} representation of the movement pathway.
+#'
+#' @examples
+#' #### Example (1): Simulate movement path under default parameters
+#' # Simulate path
+#' path <- sim_path_sa()
+#' # The function returns a list of parameters that define the array and a plot
+#' summary(path)
+#'
+#' #### Example (2): Change the number of time steps
+#' path <- sim_path_sa(n = 100)
+#'
+#' #### Example (3): Change the characteristics of the study area
+#' # .. and define the starting location of the individual
+#' sea  <- invert_poly(dat_coast)
+#' path <- sim_path_sa(n = 100,
+#'                     area = sea,
+#'                     p_1 = matrix(c(706529.1, 6262293), ncol = 2),
+#'                     add_polys = list(x = sea, col = "skyblue"))
+#'
+#' #### Example (4): Change the movement model(s) to use alternative distributions/parameters
+#'
+#' ## Step lengths
+#' # Define new function to simulate step lengths
+#' sim_step_lengths <- function(...) stats::rgamma(1, shape = 10, scale = 1)
+#' # Check outputs suitable values
+#' prettyGraphics::pretty_hist(replicate(n = 1000, expr = sim_step_lengths()))
+#' # Implement simulation
+#' path <- sim_path_sa(n = 100, sim_step = sim_step_lengths)
+#' prettyGraphics::pretty_hist(as.numeric(path$step_mat))
+#'
+#' ## Turning angles
+#' # E.g., Random walk: draw turning angle from von Mises distribution
+#' sim_angles_vmd <- function(...){
+#'   angle <- circular::rvonmises(n = 1,
+#'                                mu = circular::circular(0),
+#'                                kappa = 0,
+#'                                control.circular = list(units = "degrees"))
+#'   return(as.numeric(angle))
+#' }
+#' path <- sim_path_sa(n = 100, sim_angle = sim_angles_vmd)
+#'
+#' # E.g., Correlated random walk: draw turning angle from wrapped normal distribution
+#' sim_angles_rwn <- function(...){
+#'   angle <- circular::rwrappednormal(n = 1,
+#'                                     mu = circular::circular(0),
+#'                                     rho = 0.999,
+#'                                     sd = 0,
+#'                                     control.circular = list(units = "degrees"))
+#'   return(as.numeric(angle))
+#' }
+#' path <- sim_path_sa(n = 100, sim_angle = sim_angles_rwn)
+#'
+#' #### Example (5) Change the movement models to depend on some lagged value
+#' # ... of the variable in question
+#' # Define a sim_angle function that depends on some previous angle
+#' # While the time step is less than the lag, the function needs to be
+#' # ... able to handle missing angles and return sensible values in these
+#' # ... cases e.g., via is.null structure:
+#' sim_angles_wrn_with_lag <- function(angle = NULL,...){
+#'   if(is.null(angle)) {
+#'     cat("\n... ... method (1) activated...\n") # useful check
+#'     angle_out <- circular::circular(0)
+#'   } else{
+#'     angle_out <- circular::rwrappednormal(n = 1,
+#'                                           mu = circular::circular(angle, units = "degrees"),
+#'                                           rho = 0.9,
+#'                                           sd = 0.1,
+#'                                           control.circular = list(units = "degrees"))
+#'   }
+#'   return(as.numeric(angle_out))
+#' }
+#' # Check function
+#' sim_angles_wrn_with_lag(NULL)
+#' sim_angles_wrn_with_lag(1)
+#' # Implement algorithm
+#' path <- sim_path_sa(sim_angle = sim_angles_wrn_with_lag, lag = 1)
+#' path <- sim_path_sa(sim_angle = sim_angles_wrn_with_lag, lag = 2)
+#'
+#' @author Edward Lavender
+#' @name sim_path_sa
+NULL
+
+#' @rdname sim_path_sa
+#' @export
+sim_path_sa <- function(n = 10,
+                       area = NULL,
+                       p_1 = NULL,
+                       sim_angle = sim_angles,
+                       sim_step = sim_steps,
+                       lag = 0L,
+                       plot = TRUE,
+                       add_points = list(pch = 21, bg = "darkgreen"),
+                       add_path = list(length = 0.05, col = viridis::viridis(n)),
+                       seed = NULL,
+                       verbose = TRUE,...){
+
+  #### Utils
+  t_onset <- Sys.time()
+  cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+  cat_to_console(paste0("flapper::sim_path_sa() called (@ ", t_onset, ")..."))
+  if(!requireNamespace("circular", quietly = TRUE)) stop("This function requires the 'circular' package. Please install it with `install.packages('circular')` first.")
+  if(!is.null(seed)) set.seed(seed)
+  out <- list(xy_mat = NULL, angle_mat = NULL, step_mat = NULL, time = NULL, args = NULL)
+  out$time <- data.frame(event = "onset", time = Sys.time())
+  if(!is.null(seed)) set.seed(seed)
+
+  #### Define matrices to store movement pathway param
+  cat_to_console("... Setting up simulation...")
+  # Simulated step lengths
+  step_mat <- matrix(NA, ncol = 1, nrow = n - lag)
+  # Simulated angles
+  angle_mat <- matrix(NA, ncol = 1, nrow = n - lag)
+  # Simulated locations
+  xy_mat <- matrix(NA, ncol = 2, nrow = n - lag)
+
+  #### Simulate movement
+  cat_to_console("... Simulating movement path...")
+  pb <- utils::txtProgressBar(min = 0, max = n - lag, style = 3)
+  for(t in 1:(n - lag)){
+
+    #### Simulate starting position, if required
+    if(t <= (lag + 1)){
+      ## Generate starting angles and step lengths (required if lag > 0)
+      step <- sim_step()
+      angle <- sim_angle()
+      ## Define positions
+      if(is.null(p_1)) {
+        if(!is.null(area)) {
+          p_1 <- sp::spsample(area, n = 1, type = "random")
+          p_1 <- sp::coordinates(p_1)
+        } else {
+          p_1 <- matrix(stats::runif(2, 0, 1), ncol = 2)
+        }
+      }
+      px <- p_1[1]
+      py <- p_1[2]
+
+      #### Simulate movement from previous positions
+    } else if(t > lag) {
+
+      #### Simulation within an unbounded area
+      if(is.null(area)) {
+
+        ## Simulate step lengths and turning angles using user-supplied functions
+        step <- sim_step(step_mat[t - lag])
+        angle <- sim_angle(angle_mat[t - lag])
+
+        ## Calculate new location
+        dx <- step * cos(angle) # change in x
+        dy <- step * sin(angle) # change in y
+        px <- xy_mat[t-1, 1] + dx # new x position is previous x + change in x
+        py <- xy_mat[t-1, 2] + dy # new y position is previous y + change in y
+
+      } else {
+
+        #### Simulation within a bounded area
+        # ... We will repeatedly simulate the next position until
+        # ... one that is inside the domain of interest is generated.
+
+        repeat_count <- 0
+        repeat{
+
+          ## Simulate step lengths and turning angles using user-supplied functions
+          step <- sim_step(step_mat[t - lag])
+          angle <- sim_angle(angle_mat[t - lag])
+
+          ## Calculate new location
+          dx <- step * cos(angle) # change in x
+          dy <- step * sin(angle) # change in y
+          px <- xy_mat[t-1, 1] + dx # new x position is previous x + change in x
+          py <- xy_mat[t-1, 2] + dy # new y position is previous y + change in y
+
+          ## Identify whether the point is outside the domain
+          psp <- sp::SpatialPoints(matrix(c(px, py), ncol = 2))
+          raster::crs(psp) <- raster::crs(area)
+          outside <- is.na(sp::over(psp, area))
+
+          ## If the point is not outside of the area, then break the loop
+          repeat_count <- repeat_count + 1
+          if(!outside) break
+        }
+      }
+    }
+
+    #### Update matrices
+    angle_mat[t, ] <- angle
+    step_mat[t, ]  <- step
+    xy_mat[t, ] <- c(px, py)
+    utils::setTxtProgressBar(pb, t)
+
+  }
+
+  #### Define pathway as a SpatialLines object
+  if(!is.null(area)) area_crs <- raster::crs(area) else area_crs <- NA
+  path <- Orcs::coords2Lines(xy_mat, ID = 1)
+  raster::crs(path) <- area_crs
+
+  #### Plot
+  if(plot) {
+    if(!is.null(add_points)) add_points$x <- xy_mat[1, ]
+    if(!is.null(add_path)) add_path$x <- xy_mat
+    prettyGraphics::pretty_map(x = area,
+                               add_points = add_points,
+                               add_path = add_path,...)
+  }
+
+  #### Return outputs
+  ## Define outputs
+  set.seed(NULL)
+  out <- list()
+  out$xy_mat    <- xy_mat
+  out$angle_mat <- angle_mat
+  out$step_mat  <- step_mat
+  out$path      <- path
+  out$args = list(n = n,
+                  area = area,
+                  p_1 = p_1,
+                  sim_angle = sim_angle,
+                  sim_step = sim_step,
+                  lag = lag,
+                  plot = plot, add_points = add_points, add_path = add_path,
+                  seed = seed,
+                  verbose = verbose,
+                  dots = list(...))
+  ## Return outputs
+  t_end <- Sys.time()
+  duration <- difftime(t_end, t_onset, units = "mins")
+  cat_to_console(paste0("... flapper::sim_path_sa() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
+  return(out)
+}
+
+#' @rdname sim_path_sa
+#' @export
+sim_steps <- function(...) stats::rgamma(1, shape = 15, scale = 15)
+
+#' @rdname sim_path_sa
+#' @export
+sim_angles <- function(...) {
+  angle <- circular::rwrappednormal(n = 1,
+                                    mu = circular::circular(0),
+                                    rho = NULL,
+                                    sd = 1,
+                                    control.circular = list(units = "degrees"))
+  return(as.numeric(angle))
+}
