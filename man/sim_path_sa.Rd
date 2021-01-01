@@ -38,9 +38,9 @@ sim_angles(...)
 
 \item{lag}{If \code{sim_angle} and/or \code{sim_step} have been defined such that they depend on some previous angle/step length, then \code{lag} is an integer that defines the number of time steps between the current time step and some previous time step that affects the current turning angle and/or step length.}
 
-\item{plot}{A logical variable that defines whether or not to produce a plot of the area (if provided) and the simulated movement pathway.}
+\item{plot}{A logical variable that defines whether or not to produce a plot of the area (if provided) and the simulated movement path.}
 
-\item{add_points, add_path}{(optional) Named lists of arguments that are used to customise the appearance of points (the starting location) and the pathway on the map.}
+\item{add_points, add_path}{(optional) Named lists of arguments that are used to customise the appearance of points (the starting location) and the path on the map.}
 
 \item{seed}{(optional) An integer that defines the seed (for reproducible simulations: see \code{\link[base]{set.seed}}).}
 
@@ -49,10 +49,10 @@ sim_angles(...)
 \item{...}{Additional arguments. For \code{\link[flapper]{sim_path_sa}}, these are passed to \code{\link[prettyGraphics]{pretty_map}} to customise the map. For the default \code{\link[flapper]{sim_angles}} and \code{\link[flapper]{sim_steps}} functions, \code{...} is required but additional parameters are ignored.}
 }
 \value{
-The function returns a named list of arguments that defines the simulated pathway ('xy_mat', 'angle_mat', 'step_mat' and 'path') and a named list of arguments that were used to generate the pathway ('args'). 'xy_mat' is an n-row, two-column matrix that defines the simulated position (x, y) at each time step; 'angle_mat' and 'step_mat' are n-row, one-column matrices that define the simulated turning angle (degrees) and step length (in map units) at each time step; and 'path' is a \code{\link[sp]{SpatialLines}} representation of the movement pathway.
+The function returns a named list of arguments that defines the simulated path ('xy_mat', 'angle_mat', 'step_mat' and 'path') and a named list of arguments that were used to generate the path ('args'). 'xy_mat' is an n-row, two-column matrix that defines the simulated position (x, y) at each time step; 'angle_mat' and 'step_mat' are n-row, one-column matrices that define the simulated turning angle (degrees) and step length (in map units) at each time step; and 'path' is a \code{\link[sp]{SpatialLines}} representation of the movement path.
 }
 \description{
-This function simulates movement paths from step lengths and turning angles. To implement the function, the number of time steps (\code{n}) needs to be specified and, if applicable, the area within which movement should occur. For example, in marine environments, the inclusion of the sea as a spatial layer would restrict movement within the sea. The starting location (\code{p_1}) can be provided or simulated. At each time step, user-defined functions are used to simulate step lengths and turning angles, which can depend previous values of those variables via a \code{lag} parameter, from which the next position is calculated. This implementation enables movement paths to be simulated under a variety of movement models, including random walks and correlated random walks, providing that they are conceptualised in terms of step lengths and turning angles. The function returns a list of outputs that includes the simulated pathway and, if requested, produces a plot of the simulated path.
+This function simulates movement paths from step lengths and turning angles. To implement the function, the number of time steps (\code{n}) needs to be specified and, if applicable, the area within which movement should occur. For example, in marine environments, the inclusion of the sea as a spatial layer would restrict movement within the sea. The starting location (\code{p_1}) can be provided or simulated. At each time step, user-defined functions are used to simulate step lengths and turning angles, which can depend previous values of those variables via a \code{lag} parameter, from which the next position is calculated. This implementation enables movement paths to be simulated under a variety of movement models, including random walks and correlated random walks, providing that they are conceptualised in terms of step lengths and turning angles. The function returns a list of outputs that includes the simulated path and, if requested, produces a plot of the simulated path.
 }
 \details{
 This function requires the \code{\link[circular]{circular}} package.
@@ -134,6 +134,9 @@ sim_angles_wrn_with_lag(1)
 path <- sim_path_sa(sim_angle = sim_angles_wrn_with_lag, lag = 1)
 path <- sim_path_sa(sim_angle = sim_angles_wrn_with_lag, lag = 2)
 
+}
+\seealso{
+\code{\link[flapper]{sim_path_ou_1}} simulates a movement path based on past locations according to an Ornstein-Uhlenbeck process (which is not based on step lengths and turning angles).
 }
 \author{
 Edward Lavender

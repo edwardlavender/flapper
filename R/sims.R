@@ -245,7 +245,7 @@ sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
 #### sim_path_sa()
 
 #' @title Simulate discrete-time movement paths from step lengths and turning angles
-#' @description This function simulates movement paths from step lengths and turning angles. To implement the function, the number of time steps (\code{n}) needs to be specified and, if applicable, the area within which movement should occur. For example, in marine environments, the inclusion of the sea as a spatial layer would restrict movement within the sea. The starting location (\code{p_1}) can be provided or simulated. At each time step, user-defined functions are used to simulate step lengths and turning angles, which can depend previous values of those variables via a \code{lag} parameter, from which the next position is calculated. This implementation enables movement paths to be simulated under a variety of movement models, including random walks and correlated random walks, providing that they are conceptualised in terms of step lengths and turning angles. The function returns a list of outputs that includes the simulated pathway and, if requested, produces a plot of the simulated path.
+#' @description This function simulates movement paths from step lengths and turning angles. To implement the function, the number of time steps (\code{n}) needs to be specified and, if applicable, the area within which movement should occur. For example, in marine environments, the inclusion of the sea as a spatial layer would restrict movement within the sea. The starting location (\code{p_1}) can be provided or simulated. At each time step, user-defined functions are used to simulate step lengths and turning angles, which can depend previous values of those variables via a \code{lag} parameter, from which the next position is calculated. This implementation enables movement paths to be simulated under a variety of movement models, including random walks and correlated random walks, providing that they are conceptualised in terms of step lengths and turning angles. The function returns a list of outputs that includes the simulated path and, if requested, produces a plot of the simulated path.
 #'
 #' @param n An integer that defines the number of time steps in the simulation.
 #' @param area (optional) A \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines the area(s) within which movement is allowed.
@@ -253,15 +253,17 @@ sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
 #' @param sim_angle A function that is used to simulate turning angles. This must accept a single number that represents some previous turning angle (degrees), even if this is simply ignored (see \code{lag}, below). For example, \code{sim_angle = function() 1} will break but \code{sim_angle = function(...) 1} is fine. For convenience, a default function is included that simulates angles from a wrapped normal circular distribution with a mean and standard deviation of 1 (see \code{\link[circular]{rwrappednormal}}). Functions that actually depend on some previous angle also need to be able to generate initial angles before enough previous angles have been generated for the function to depend on those (see \code{lag}, below). All functions should return a single number that defines the turning angle in degrees.
 #' @param sim_step A function that is used to simulate step lengths. This follows the same rules as for \code{sim_angle}. For convenience, a default function is included that simulates angles from a gamma distribution with shape and scale parameters of 15 (see \code{\link[stats]{rgamma}}).
 #' @param lag If \code{sim_angle} and/or \code{sim_step} have been defined such that they depend on some previous angle/step length, then \code{lag} is an integer that defines the number of time steps between the current time step and some previous time step that affects the current turning angle and/or step length.
-#' @param plot A logical variable that defines whether or not to produce a plot of the area (if provided) and the simulated movement pathway.
-#' @param add_points,add_path (optional) Named lists of arguments that are used to customise the appearance of points (the starting location) and the pathway on the map.
+#' @param plot A logical variable that defines whether or not to produce a plot of the area (if provided) and the simulated movement path.
+#' @param add_points,add_path (optional) Named lists of arguments that are used to customise the appearance of points (the starting location) and the path on the map.
 #' @param seed (optional) An integer that defines the seed (for reproducible simulations: see \code{\link[base]{set.seed}}).
 #' @param verbose A logical variable that defines whether or not to print messages to the console that relay function progress.
 #' @param ... Additional arguments. For \code{\link[flapper]{sim_path_sa}}, these are passed to \code{\link[prettyGraphics]{pretty_map}} to customise the map. For the default \code{\link[flapper]{sim_angles}} and \code{\link[flapper]{sim_steps}} functions, \code{...} is required but additional parameters are ignored.
 #'
 #' @details This function requires the \code{\link[circular]{circular}} package.
 #'
-#' @return The function returns a named list of arguments that defines the simulated pathway ('xy_mat', 'angle_mat', 'step_mat' and 'path') and a named list of arguments that were used to generate the pathway ('args'). 'xy_mat' is an n-row, two-column matrix that defines the simulated position (x, y) at each time step; 'angle_mat' and 'step_mat' are n-row, one-column matrices that define the simulated turning angle (degrees) and step length (in map units) at each time step; and 'path' is a \code{\link[sp]{SpatialLines}} representation of the movement pathway.
+#' @return The function returns a named list of arguments that defines the simulated path ('xy_mat', 'angle_mat', 'step_mat' and 'path') and a named list of arguments that were used to generate the path ('args'). 'xy_mat' is an n-row, two-column matrix that defines the simulated position (x, y) at each time step; 'angle_mat' and 'step_mat' are n-row, one-column matrices that define the simulated turning angle (degrees) and step length (in map units) at each time step; and 'path' is a \code{\link[sp]{SpatialLines}} representation of the movement path.
+#'
+#' @seealso \code{\link[flapper]{sim_path_ou_1}} simulates a movement path based on past locations according to an Ornstein-Uhlenbeck process (which is not based on step lengths and turning angles).
 #'
 #' @examples
 #' #### Example (1): Simulate movement path under default parameters
@@ -346,6 +348,7 @@ NULL
 
 #' @rdname sim_path_sa
 #' @export
+
 sim_path_sa <- function(n = 10,
                        area = NULL,
                        p_1 = NULL,
@@ -368,7 +371,7 @@ sim_path_sa <- function(n = 10,
   out$time <- data.frame(event = "onset", time = Sys.time())
   if(!is.null(seed)) set.seed(seed)
 
-  #### Define matrices to store movement pathway param
+  #### Define matrices to store movement path param
   cat_to_console("... Setting up simulation...")
   # Simulated step lengths
   step_mat <- matrix(NA, ncol = 1, nrow = n - lag)
@@ -454,13 +457,14 @@ sim_path_sa <- function(n = 10,
 
   }
 
-  #### Define pathway as a SpatialLines object
+  #### Define path as a SpatialLines object
   if(!is.null(area)) area_crs <- raster::crs(area) else area_crs <- NA
   path <- Orcs::coords2Lines(xy_mat, ID = 1)
   raster::crs(path) <- area_crs
 
   #### Plot
   if(plot) {
+    cat_to_console("... Plotting simulated path...")
     if(!is.null(add_points)) add_points$x <- xy_mat[1, ]
     if(!is.null(add_path)) add_path$x <- xy_mat
     prettyGraphics::pretty_map(x = area,
@@ -507,3 +511,123 @@ sim_angles <- function(...) {
                                     control.circular = list(units = "degrees"))
   return(as.numeric(angle))
 }
+
+
+######################################
+######################################
+#### sim_path_ou_1()
+
+#' @title Simulate discrete-time movement paths under a Ornstein-Uhlenbeck process (1)
+#' @description This function simulates movement paths under a discrete-time Ornstein-Uhlenbeck process in which the parameters of the movement model are assumed to remain constant through time.
+#'
+#' @param n An integer that defines the number of time steps in the simulation.
+#' @param r_1 (optional) A matrix with one row and two columns that defines the starting location (x, y).  If \code{r_1 = NULL}, then a random location is simulated from a uniform distribution with a minimum and maximum value of 0 and 1 respectively.
+#' @param r_h  A matrix with one row and two columns that defines the 'home range' centre location (x, y).
+#' @param k A number that defines the strength of the 'central harmonic force' that pulls an individual back towards its home range centre.
+#' @param delta_t A number that defines the number of time units between each time step.
+#' @param eps A number that defines the variance.
+#' @param plot A logical variable that defines whether or not to plot the simulated path.
+#' @param add_paths,add_points (optional) Named lists of arguments that are used to customise the appearance of points (the home range and starting location, in that order, shown as filled green and black circles by default) and the path on the map.
+#' @param verbose A logical variable that defines whether or not to print messages to the console that relay function progress.
+#' @param ... Additional arguments, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the map.
+#'
+#' @details Ornstein-Uhlenbeck processes are convenient models for animal movement around a 'home range' centre. In the model, a parameter (\code{k}) 'pulls' the location of the individual (\eqn{\vec{r}}) back towards the centre of its home range (\eqn{\vec{r}^H}) as it moves away from this centre. This function implements the discretised form of the Ornstein-Uhlenbeck model in which the parameters of the movement model remain constant through time and in which movement is not constrained by barriers described by Alós et al. (2016) (see equations (8) and (9) in particular). Under this model, the position \eqn{\vec{r}} of the animal at time \eqn{n + 1} is given by:
+#'
+#' \deqn{\vec{r}_{n + 1} = \vec{r}^H + e^{-k \Delta t} (\vec{r}_n - \vec{r}^H) + \vec{R}_n,}
+#'
+#' where \eqn{\vec{r}^H} is the location of the home range centre; \eqn{k} is the strength of the central harmonic force; \eqn{\Delta t} is the duration between time steps; and \eqn{\vec{R}_n} is a bi-dimensional normally distributed random variable with mean zero and standard deviation (\eqn{\sigma}) given by:
+#'
+#' \deqn{\sigma = \sqrt{ \frac{\epsilon (1 - e^{-2 k \Delta t}}) {2 k}}.}
+#'
+#' Note that the default plotting parameters for this function require the \code{\link[viridis]{viridis}} package for pretty visualisation.
+#'
+#' @return The function returns an n-row, two-column matrix that defines the simulated location (x, y) at each time step and, if \code{plot = TRUE}, a plot of the path.
+#'
+#' @seealso \code{\link[flapper]{sim_path_sa}} simulates a movement path based on step lengths and turning angles. This can support movement within restricted areas.
+#'
+#' @examples
+#' #### Example (1): Implement simulation with default options
+#' path <- sim_path_ou_1()
+#'
+#' #### Example (2): Change the number of time steps
+#' path <- sim_path_ou_1(n = 10000)
+#'
+#' #### Example (3): Change model parameters
+#' # esp parameter
+#' path <- sim_path_ou_1(n = 10000, eps = 10)
+#' path <- sim_path_ou_1(n = 10000, eps = 500)
+#' # central harmonic parameter
+#' path <- sim_path_ou_1(n = 1000, eps = 1, k = 1)
+#' path <- sim_path_ou_1(n = 1000, eps = 1, k = 3)
+#' path <- sim_path_ou_1(n = 1000, eps = 1, k = 500)
+#'
+#' #### Example (4): Customise the plot via add_paths, add_points and ...
+#' n <- 1000
+#' path <- sim_path_ou_1(n = n,
+#'                       add_points = list(pch = c(1, 4), lwd = 3),
+#'                       add_paths = list(col = viridis::magma(n)),
+#'                       pretty_axis_args = list(1:4)
+#'                       )
+#'
+#' @references Alós, J. et al. (2016) Bayesian State-Space Modelling of Conventional Acoustic Tracking Provides Accurate Descriptors of Home Range Behavior in a Small-Bodied Coastal Fish Species. Plos One 11, e0154089
+#'
+#' @author Edward Lavender
+#' @export
+
+sim_path_ou_1 <-
+  function(n = 1000,
+           r_1 = NULL,
+           r_h = matrix(c(0, 0), ncol = 2),
+           k = 1,
+           delta_t = 1,
+           eps = 1,
+           plot = TRUE,
+           add_paths = list(length = 0.04, col = viridis::viridis(n)),
+           add_points = list(pch = 21, cex = 2, lwd = 2, bg = c("darkgreen", "black")),
+           verbose = TRUE,...){
+
+    #### Initiate function
+    t_onset <- Sys.time()
+    cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+    cat_to_console(paste0("flapper::sim_path_ou_1() called (@ ", t_onset, ")..."))
+
+    #### Define matrices to hold results
+    cat_to_console("... Setting up simulation...")
+    xy_mat <- matrix(NA, nrow = n, ncol = 2)
+    Rn_mat <- matrix(NA, nrow = n, ncol = 2)
+
+    #### Simulate starting position
+    if(is.null(r_1)) r_1 <- matrix(stats::runif(2, 0, 1), ncol = 2)
+    xy_mat[1, ] <- r_1
+
+    #### Simulate Rn parameter (uncorrelated 'errors' that relate to extent of movement)
+    sd <- sqrt((eps * (1 - exp(-2 * k * delta_t)))/(2 * k))
+    Rn_mat[ , ] <- stats::rnorm(n*2, 0, sd)
+
+    #### Simulate process
+    cat_to_console("... Simulating movement path...")
+    # Define constant exp term for efficiency
+    exp_term <- exp(-k*delta_t)
+    # For each time step, simulate the position based on the OU process
+    for(t in 1:(n - 1)){
+      xy_mat[t+1, ] <- r_h + exp_term * (xy_mat[t, ] - r_h) + Rn_mat[t, ]
+    }
+
+    #### Visualise the simulated path
+    if(plot) {
+      cat_to_console("... Plotting simulated path...")
+      add_paths$x <- xy_mat
+      add_points$x <- matrix(rbind(r_h, xy_mat[1, ]), ncol = 2)
+      prettyGraphics::pretty_map(add_paths = add_paths,
+                                 add_points = add_points,
+                                 verbose = verbose,...)
+    }
+
+    #### Return the path
+    t_end <- Sys.time()
+    duration <- difftime(t_end, t_onset, units = "mins")
+    cat_to_console(paste0("... flapper::sim_path_ou_1() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
+    return(xy_mat)
+
+  }
+
