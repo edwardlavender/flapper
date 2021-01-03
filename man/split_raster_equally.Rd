@@ -10,7 +10,7 @@ The function taken and slightly modified from the 'greenbrown' package (see http
 split_raster_equally(r, n)
 }
 \arguments{
-\item{r}{A raster.}
+\item{r}{A \code{\link[raster]{raster}}.}
 
 \item{n}{An integer that defines the number of parts into which to split the raster.}
 }

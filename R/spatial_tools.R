@@ -298,6 +298,96 @@ split_raster_equally <- function(r, n) {
 
 ######################################
 ######################################
+#### sim_surface()
+
+#' @title Populate a raster with simulated values
+#' @description This function is designed to populate a raster with simulated values. To implement the function, a (blank) raster should be supplied. A user-defined function, or list of functions, is evaluated across this raster, or across sub-regions of this raster, to generate a new raster with simulated values.
+#'
+#' @param blank A \code{\link[raster]{raster}}.
+#' @param n An integer that defines the number of (approximately equal area) into which to split \code{blank}.
+#' @param sim_values A function or, if \code{n > 1L}, a list of functions, that, for a given number of cells, simulate new values for those cells.
+#' @param mask,mask_inside Arguments required to implement a spatial mask via \code{\link[flapper]{mask_io}}.
+#' @param plot An integer that defines whether or not to plot a histogram of simulated values (\code{1L}), a heat map of the simulated raster (\code{2L}) or both (\code{1:2L}).
+#' @param ... Additional arguments (none implemented).
+#'
+#' @return The function returns a \code{\link[raster]{raster}}, with the same properties as \code{blank}, with values generated from the \code{sim_values} function(s).
+#'
+#' @examples
+#' #### Example (1): Simulate values across the whole raster
+#' sim_surface(dat_gebco,
+#'             sim_values = function(n) stats::runif(n = n, 0, 1))
+#' sim_surface(dat_gebco,
+#'             sim_values = function(n) stats::rnorm(n = n, 0, 1))
+#'
+#' #### Example (2): Simulate values differently across different areas
+#' # .. by defining the number of areas into which to split the raster
+#' # .. and a list of function(s)
+#' sim_surface(dat_gebco,
+#'             n = 2, sim_values = list(function(n) stats::runif(n = n, 0, 1),
+#'                                      function(n) stats::runif(n = n, 10, 11))
+#'             )
+#'
+#' #### Example (3): Include a spatial mask
+#' sim_surface(dat_gebco,
+#'             n = 2, sim_values = list(function(n) stats::runif(n = n, 9, 10),
+#'                                     function(n) stats::runif(n = n, 10, 11)),
+#'             mask = dat_coast, mask_inside = TRUE
+#'             )
+#'
+#' @author Edward Lavender
+#' @export
+
+sim_surface <- function(blank,
+                        n = 1L,
+                        sim_values,
+                        mask = NULL, mask_inside = FALSE,
+                        plot = 1:2L,...){
+
+  #### Simulate values across a single raster
+  if(n == 1L) {
+    ncells <- raster::ncell(blank)
+    surface <- blank
+    raster::values(surface) <- sim_values(ncells)
+
+    #### Simulate values across pieces of a raster
+  } else {
+
+    # Split the raster equally
+    if(!inherits(sim_values, "list")) stop("If n > 1L, 'sim_values' should be a list of function(s).")
+    blank_ls <- split_raster_equally(r = blank, n = n)
+
+    # Loop over the list of blank rasters and list of functions
+    # ... to apply to each chunk
+    surface_ls <- mapply(blank_ls, sim_values, FUN = function(r, sv){
+      ncells <- raster::ncell(r)
+      raster::values(r) <- sv(ncells)
+      return(r)
+    }, SIMPLIFY = FALSE)
+
+    # Rejoin rasters
+    surface <- do.call(raster::merge, surface_ls)
+  }
+
+  #### Mask surface
+  if(!is.null(mask)) surface <- mask_io(x = surface, mask = mask, mask_inside = mask_inside, updatevalue = NA)
+
+  #### Plot surface
+  if(1L %in% plot & 2L %in% plot) pp <- graphics::par(mfrow = c(1, 2)) else pp <- graphics::par()
+  if(1L %in% plot) {
+    raster::hist(surface)
+  }
+  if(2L %in% plot) {
+    prettyGraphics::pretty_map(add_rasters = list(x = surface), verbose = FALSE)
+  }
+  graphics::par(pp)
+
+  #### Return surface
+  return(surface)
+}
+
+
+######################################
+######################################
 #### pythagoras_3d()
 
 #' @title Calculate the Euclidean distance between points in three-dimensional space.
