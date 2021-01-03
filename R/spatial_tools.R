@@ -241,6 +241,63 @@ mask_io <- function(x, mask, mask_inside = FALSE,...){
 
 ######################################
 ######################################
+#### split_raster_equally()
+
+#' @title Split a raster into equal-area parts
+#' @description This function splits a raster object into parts with approximately equal area.
+#' @param r A \code{\link[raster]{raster}}.
+#' @param n An integer that defines the number of parts into which to split the raster.
+#' @details The raster (\code{r}) should not only contain NAs.
+#' @return The function returns a list containing the split raster components.
+#'
+#' @examples
+#' l <- split_raster_equally(dat_gebco, 2)
+#' l <- split_raster_equally(dat_gebco, 3)
+#' pp <- graphics::par(mfrow = c(1, 3))
+#' lapply(l, function(r) prettyGraphics::pretty_map(add_rasters = list(x = r)))
+#' graphics::par(pp)
+#'
+#' @source The function taken and slightly modified from the 'greenbrown' package (see https://rdrr.io/rforge/greenbrown/src/R/SplitRasterEqually.R). The function is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
+#' @references Forkel M, Wutzler T (2015) greenbrown - land surface phenology and trend analysis. A package for the R software. Version 2.2, 2015-04-15, http://greenbrown.r-forge.r-project.org/.
+#' @export
+
+split_raster_equally <- function(r, n) {
+  # get total number of non NA grid cells
+  mean.r <- raster::calc(r, function(x) {
+    s <- sum(!is.na(x))
+    s[s == 0] <- NA
+    return(s)
+  })
+  ntotal <- sum(stats::na.omit(raster::values(mean.r)))
+  if (n > ncol(mean.r)/2) {
+    n <- ncol(mean.r)/2
+    warning(paste("SplitRasterEqually: n changed to", n))
+  }
+
+  # compute optimal splitting based on weighted quantile
+  xy <- raster::coordinates(mean.r)
+  df <- data.frame(lon = xy[,1], val = raster::extract(mean.r, xy))
+  df <- stats::na.omit(df)
+  x.best <- stats::quantile(df$lon, seq(0, 1, length = n + 1), na.rm = TRUE)
+
+  # split raster according to optimal splitting
+  tiles.l <- plyr::llply(as.list(1:(length(x.best)-1)), function(i) {
+    xmin <- x.best[i]
+    xmax <- x.best[i +1 ]
+    tile.r <- raster::crop(r, raster::extent(xmin,
+                                             xmax,
+                                             raster::extent(mean.r)@ymin,
+                                             raster::extent(mean.r)@ymax))
+    return(tile.r)
+  })
+
+  # Return output
+  return(tiles.l)
+}
+
+
+######################################
+######################################
 #### pythagoras_3d()
 
 #' @title Calculate the Euclidean distance between points in three-dimensional space.
