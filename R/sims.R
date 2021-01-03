@@ -631,3 +631,188 @@ sim_path_ou_1 <-
 
   }
 
+
+######################################
+######################################
+#### sim_detections()
+
+#' @title Simulate detections
+#' @description This function simulates detections at passive acoustic telemetry receivers under a detection model that depends on distance. To implement the function, the underlying movement path that gives rise to detections (or not) must be supplied (via \code{path}) along with the locations of receivers (\code{xy}) at which individuals can be detected. At each point along the movement path (i.e., time step), the function calculates the distances from that point to all of the receivers and evaluates a user-supplied detection probability function, based on distance, to determine detection probability at each receiver. The function then simulates binary detection outcomes from a binomial distribution conditional on this probability, and returns these in a matrix with one simulated outcome for each time step and receiver.
+#'
+#' @param path A two-column matrix of the coordinates of the movement path (x, y).
+#' @param xy A two-column matrix of the coordinates of receivers (x, y).
+#' @param crs A \code{\link[sp]{CRS}} object that defines the coordinate reference system (CRS) for \code{path} and \code{xy} (if applicable).
+#' @param detection_pr A function that takes in a vector of distances and returns a vector of detection probabilities.
+#' @param by_timestep A logical variable that defines whether or not \code{detection_pr} needs to be applied to each time step separately. This may be necessary if some of the parameters of the detection model are vectors (see Examples).
+#' @param plot A logical variable that defines whether or not to plot detections (and probabilities) against distances.
+#' @param jitter,add_prob,xlim,... Plot customisation options. \code{jitter} is a function that jitters \code{n} simulated outcomes (0, 1) in the vertical direction. \code{add_prob} is a named list of arguments, passed to \code{\link[graphics]{points}}, used to customise the addition of calculated probabilities to the plot. (\code{add_prob} suppresses the addition of probabilities to the plot.) \code{xlim} is a vector of x axis limits. By default, \code{xlim = c(0, 1000)} to improve resolution in the area of the plot that is of interest (under a Universal Transverse Mercator CRS, for most realistic detection probability functions, detection probability beyond 1000 will be negligible) and plotting speed. Additional arguments can be passed to \code{\link[prettyGraphics]{pretty_plot}} to customise the plot via \code{...}.
+#' @param verbose A logical variable that defines whether or not to print messages to the console to relay function progress.
+#'
+#' @details The function assumes that the individual transmits an acoustic signal which has the capacity to be detected at each time step. In reality, acoustic transmitters are often programmed with a randomly varying delay, but this is not currently implemented. The function also assumes that all receivers that are supplied are able to make detections. If the receivers at which an individual could be detected change over time, it may be necessary to apply the function iteratively or post-process the outcomes to ensure that individuals are not detected at inactive receivers.
+#'
+#' @return The function returns a named list with three matrices that define, for each path position (rows) and each receiver (columns), (a) the distance of that position from each receiver ('dist_mat'), (b) the probability of detection at that receiver ('prob_mat') and (c) the simulated outcome (0, no detection; 1, detection) ('det_mat'). If \code{plot = TRUE}, the function also returns a plot.
+#'
+#' @examples
+#' #### Step (1) Simulate an array in an area
+#' array_ls <- sim_array(boundaries = raster::extent(dat_coast),
+#'                       coastline = dat_coast,
+#'                       n_receivers = 100,
+#'                       arrangement = "regular",
+#'                       seed = 1)
+#' raster::lines(dat_coast)
+#'
+#' #### Step (2) Simulate a movement path in this area
+#' n <- 500
+#' path_ls <- sim_path_sa(n = n,
+#'                        sim_step = function(...) stats::rgamma(1, shape = 25, scale = 25),
+#'                        area = array_ls$array$sea,
+#'                        seed = 1,
+#'                        plot = FALSE
+#'                        )
+#' prettyGraphics::add_sp_path(path_ls$xy_mat, col = viridis::viridis(n), length = 0.02)
+#'
+#' #### Step (3) Simulate detections
+#' ## (A) Extract path and receiver coordinates from simulated outcomes above
+#' path <- path_ls$xy_mat
+#' xy  <- array_ls$array$xy
+#' xy <- sp::coordinates(xy)
+#' ## (B) Simulate detections under different probability functions (see below).
+#'
+#' #### Example (1) Threshold probability function
+#' # Define detection pr function
+#' calc_detection_pr <- function(dist) ifelse(dist < 425, 1, 0)
+#' # Simulate detections
+#' dets_sim <- sim_detections(path = path,
+#'                            xy = xy,
+#'                            detection_pr = calc_detection_pr)
+#' # The function returns a list of matrices that define the distances,
+#' # ... probabilities and detections for each time stamp (row) and each receiver
+#' # ... (column)
+#' utils::str(dets_sim)
+#' # Examine probabilities
+#' table(dets_sim$prob_mat)
+#'
+#' #### Example (2) Logistic probability function
+#' calc_detection_pr <- function(dist) stats::plogis(2.5 + -0.01 * dist)
+#' dets_sim <- sim_detections(path = path,
+#'                            xy = xy,
+#'                            detection_pr = calc_detection_pr)
+#'
+#' #### Example (3) Spatially varying probability function
+#' # Define spatially varying beta parameter (e.g., reflecting 2 habitat types)
+#' area <- array_ls$array$area
+#' area_r <- raster::raster(x = raster::extent(area),
+#'                          crs = raster::crs(area))
+#' area_r[] <- 0L
+#' beta_surface <- sim_surface(blank = area_r,
+#'                             n = 2L,
+#'                             sim_values = list(function(n) -0.05,
+#'                                               function(n) -0.01),
+#'                             mask = array_ls$array$sea)
+#' # Extract receiver specific beta values
+#' xy_sp <- sp::SpatialPoints(xy, proj4string = raster::crs(area_r))
+#' beta <- raster::extract(beta_surface, xy_sp)
+#' # Visualise simulated detection probability surface at some suitable distances
+#' pp <- graphics::par(mfrow = c(2, 2))
+#' lapply(c(0, 50, 100, 500), function(dist){
+#'   r <- raster::calc(beta_surface, function(x) stats::plogis(2.5 + x * dist))
+#'   raster::plot(r)
+#' })
+#' graphics::par(pp)
+#' # Define detection probability function
+#' calc_detection_pr <- function(dist) stats::plogis(2.5 + beta * dist)
+#' # Simulate detections
+#' # ... Define by_timestep = TRUE so that that distances from each receiver
+#' # ... are combined appropriately with beta values for each receiver
+#' dets_sim <- sim_detections(path = path,
+#'                            xy = xy,
+#'                            detection_pr = calc_detection_pr,
+#'                            by_timestep = TRUE)
+#'
+#' @author Edward Lavender
+#' @export
+
+
+sim_detections <- function(path,
+                           xy,
+                           crs = NA,
+                           detection_pr,
+                           by_timestep = FALSE,
+
+                           plot = TRUE,
+                           jitter = function(n) stats::rnorm(n, 0, 0.05),
+                           add_prob = list(col = "royalblue", pch = 3, cex = 0.5),
+                           xlim = c(0, 1000),
+                           verbose = TRUE,...){
+
+  #### Initiate function
+  t_onset <- Sys.time()
+  cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+  cat_to_console(paste0("flapper::sim_detections() called (@ ", t_onset, ")..."))
+
+  #### Set up
+  cat_to_console("... Setting up simulation...")
+  # Define matrices
+  n_timesteps <- nrow(path)
+  n_receivers <- nrow(xy)
+  n_obs <- n_timesteps * n_receivers
+  dist_mat <- matrix(NA, ncol = n_receivers, nrow = n_timesteps)
+  prob_mat <- dist_mat
+  det_mat <- dist_mat
+  # Define receiver locations
+  path_sp <- sp::SpatialPoints(path)
+  xy_sp   <- sp::SpatialPoints(xy)
+  raster::crs(path_sp) <- crs
+  raster::crs(xy_sp)   <- crs
+
+  #### Calculate distances
+  cat_to_console("... Calculating distances...")
+  dist_mat <- sp::spDists(path_sp, xy_sp)
+
+  #### Calculate  probabilities
+  cat_to_console("... Calculating probabilities...")
+  if(!by_timestep) {
+    prob_mat <- apply(dist_mat, 1:2, detection_pr)
+  } else {
+    for(t in 1:n_timesteps) {
+      prob_mat[t, ] <- detection_pr(dist_mat[t, ])
+    }
+  }
+
+  #### Simulate outcomes (detections)
+  cat_to_console("... Simulating detections...")
+  det_mat[] <- stats::rbinom(n = n_obs, size = 1, prob = prob_mat)
+
+  #### Visualise outcomes
+  if(plot) {
+    cat_to_console("... Plotting detections...")
+    # Define dataframe
+    dist <- as.vector(dist_mat)
+    if(!is.null(add_prob)) prob <- as.vector(prob_mat)
+    det <- det_mat + jitter(n_obs)
+    det <- as.vector(det)
+    dat <- data.frame(dist = dist, prob = prob, det = det)
+    # Select by xlim to reduce plotting time for large matrices
+    if(!is.null(xlim)) {
+      if(!is.na(xlim[1])) dat <- dat[which(dat$dist >= xlim[1]), ]
+      if(!is.na(xlim[2])) dat <- dat[which(dat$dist <= xlim[2]), ]
+    }
+    # Make plot
+    prettyGraphics::pretty_plot(dat$dist, dat$det, xlim = xlim,...)
+    # Add probabilities
+    if(!is.null(add_prob)) {
+      add_prob$x <- dat$dist
+      add_prob$y <- dat$prob
+      do.call(graphics::points, add_prob)
+    }
+  }
+
+  #### Return list
+  out <- list(dist_mat = dist_mat, prob_mat = prob_mat, det_mat = det_mat)
+  t_end <- Sys.time()
+  duration <- difftime(t_end, t_onset, units = "mins")
+  cat_to_console(paste0("... flapper::simulate_detections() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
+  return(out)
+
+}
+
