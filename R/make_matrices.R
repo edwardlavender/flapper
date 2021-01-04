@@ -117,12 +117,13 @@ make_matrix_receivers <- function(moorings,
 #### make_matrix_detections()
 
 #' @title Matricise detection time series
-#' @description This function creates a list of matrices that, for each individual (list element), defines whether or not that individual was detected (1, 0) in each time interval (matrix row) at each receiver (matrix column). To implement the function, a dataframe with acoustic detection time series must be provided via \code{acoustics}. The times for which to express whether or not each individual was detected are provided by optionally defining a \code{start} and \code{end} date (these can be taken from the range of times in \code{acoustics} if unspecified) and the interval (\code{delta_t}) between time steps. By default, matrix elements that are 'outside' individual or receiver deployment periods are defined as 0 (non detection) but can be changed to another value (e.g., NA) via \code{set_outside}. In this case, the \code{acoustics} dataframe also needs to include the deployment times for each individual and an additional dataframe must be supplied with the same information for receivers via \code{moorings}.
+#' @description This function creates a list of matrices that, for each individual (list element), defines the number of detections of that individual in each time interval (matrix row) at each receiver (matrix column). To implement the function, a dataframe with acoustic detection time series must be provided via \code{acoustics}. The time intervals over which to count detections are provided by optionally defining a \code{start} and \code{end} date (these can be taken from the range of times in \code{acoustics} if unspecified) and the interval (\code{delta_t}) between time steps. By default, matrix elements that are 'outside' individual or receiver deployment periods are defined as 0 (not detected) but can be changed to another value (e.g., NA) via \code{set_outside}. In this case, the \code{acoustics} dataframe also needs to include the deployment times for each individual and an additional dataframe must be supplied with the same information for receivers via \code{moorings}.
 #'
 #' @param acoustics A dataframe that defines passive acoustic telemetry detection time series. This should contain the following columns: a vector of individual IDs, named 'individual_id'; a (factor) vector of receiver IDs, named 'receiver_id'. If \code{set_outside} is specified, this should also contain POSIXct vectors of the start and end time of each individual's time at liberty, named 'tag_start_date' and 'tag_end_date' respectively.
 #' @param moorings (optional)  If \code{set_outside} is specified, \code{moorings} is dataframe that defines passive acoustic telemetry receiver metadata. This should contain the following columns: a vector of receiver IDs, named 'receiver_id (as in \code{acoustics}); and POSIXct vectors of the start and end times of each receiver's deployment time, named 'receiver_start_date' and 'receiver_end_date' respectively.
 #' @param start,end POSIXct objects that define the start and end time. If unspecified, these are taken from the range of detection times in \code{acoustics}.
 #' @param delta_t A number or character that defines the time interval between successive time steps. This is passed to the 'by' argument of \code{\link[base]{seq.POSIXt}}.
+#' @param simplify (optional) A function that simplifies detection matrices, such as \code{function(x) (x > 0) + 0} to convert counts into a boolean outcomes that define whether or a detection was made.
 #' @param set_outside (optional) A value (e.g., \code{NA}) that is assigned to any matrix element that is outside of an individual's or receiver's deployment period when detection was not possible.
 #' @param as_POSIXct A function that coerces supplied any supplied times that are not POSIXct objects to POSIXct objects.
 #' @param set_names A logical variable that defines whether or not to set the row and column names of the matrix to the time steps and the receiver IDs respectively.
@@ -136,6 +137,7 @@ make_matrix_receivers <- function(moorings,
 #' dat_acoustics$receiver_id <- factor(dat_acoustics$receiver_id)
 #' mat_by_id <- make_matrix_detections(dat_acoustics)
 #' summary(mat_by_id)
+#' range(mat_by_id[[1]])
 #'
 #' #### Example (2) Construct matrix across all receivers and use set_outside
 #' dat_moorings$receiver_id <- factor(dat_moorings$receiver_id)
@@ -157,6 +159,7 @@ make_matrix_detections <- function(acoustics,
                                    moorings = NULL,
                                    start = NULL, end = NULL,
                                    delta_t = "120 mins",
+                                   simplify = NULL,
                                    set_outside = NULL,
                                    as_POSIXct = as.POSIXct,
                                    set_names = TRUE,
@@ -174,8 +177,19 @@ make_matrix_detections <- function(acoustics,
   check_class(input = acoustics$timestamp, to_class = "POSIXct", type = "stop")
   acoustics$receiver_id <- check_class(input = acoustics$receiver_id, to_class = "factor",
                                        type = "warning", coerce_input = factor)
-  acoustics$timestamp <- check_tz(input = acoustics$timestamp)
-  tz <- lubridate::tz(acoustics$timestamp)
+
+  if(is.null(start)) {
+    start <- min(acoustics$timestamp, na.rm = TRUE)
+  } else {
+    start <- check_class(input = start, to_class = "POSIXct",
+                         type = "warning", coerce_input = function(x) as_POSIXct(x))
+  }
+  if(is.null(end)) {
+    end <- max(acoustics$timestamp, na.rm = TRUE)
+  } else {
+    end <- check_class(input = end, to_class = "POSIXct",
+                         type = "warning", coerce_input = function(x) as_POSIXct(x))
+  }
   if(!is.null(set_outside)) {
     check_names(input = acoustics, req = c("tag_start_date", "tag_end_date"))
     acoustics$tag_start_date <- check_class(input = acoustics$tag_start_date, to_class = "POSIXct",
@@ -194,8 +208,7 @@ make_matrix_detections <- function(acoustics,
 
   #### Define bins for which to determine detections
   cat_to_console("... Defining time bins given 'delta_t'...")
-  if(is.null(start)) start <- min(acoustics$timestamp, na.rm = TRUE)
-  if(is.null(end)) end <- max(acoustics$timestamp, na.rm = TRUE)
+
   bin <- seq.POSIXt(start, end, delta_t)
   acoustics$bin <- cut(acoustics$timestamp, bin)
   acoustics$bin <- factor(acoustics$bin, levels = levels(factor(bin)))
@@ -230,7 +243,8 @@ make_matrix_detections <- function(acoustics,
   acoustics_ls <- split(acoustics, acoustics[, by_id])
   det_ls <- pbapply::pblapply(acoustics_ls, function(d){
     # Define detection matrix (timestamps x receivers)
-    detection <- (table(d$bin, d$receiver_id) > 0) + 0
+    detection <- table(d$bin, d$receiver_id)
+    if(!is.null(simplify)) detection <- simplify(detection)
     # Process detection matrix
     if(!is.null(set_outside)) {
       # Determine any intervals outside of the individual's deployment time and force NA
@@ -255,4 +269,3 @@ make_matrix_detections <- function(acoustics,
   cat_to_console(paste0("... flapper::make_matrix_detections() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
   return(out)
 }
-

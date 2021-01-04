@@ -10,6 +10,7 @@ make_matrix_detections(
   start = NULL,
   end = NULL,
   delta_t = "120 mins",
+  simplify = NULL,
   set_outside = NULL,
   as_POSIXct = as.POSIXct,
   set_names = TRUE,
@@ -26,6 +27,8 @@ make_matrix_detections(
 
 \item{delta_t}{A number or character that defines the time interval between successive time steps. This is passed to the 'by' argument of \code{\link[base]{seq.POSIXt}}.}
 
+\item{simplify}{(optional) A function that simplifies detection matrices, such as \code{function(x) (x > 0) + 0} to convert counts into a boolean outcomes that define whether or a detection was made.}
+
 \item{set_outside}{(optional) A value (e.g., \code{NA}) that is assigned to any matrix element that is outside of an individual's or receiver's deployment period when detection was not possible.}
 
 \item{as_POSIXct}{A function that coerces supplied any supplied times that are not POSIXct objects to POSIXct objects.}
@@ -40,13 +43,14 @@ make_matrix_detections(
 A matrix, or a list of matrices (one for each individual in \code{acoustics} is there is more than one individual) with one column for each time step and one column for each receiver. Each cell defines whether (1) or not (0) the individual was detected (or, if \code{set_outside} is supplied, it could not have been detected) during that time step. All matrices are expressed across the same sequence of time steps and receivers.
 }
 \description{
-This function creates a list of matrices that, for each individual (list element), defines whether or not that individual was detected (1, 0) in each time interval (matrix row) at each receiver (matrix column). To implement the function, a dataframe with acoustic detection time series must be provided via \code{acoustics}. The times for which to express whether or not each individual was detected are provided by optionally defining a \code{start} and \code{end} date (these can be taken from the range of times in \code{acoustics} if unspecified) and the interval (\code{delta_t}) between time steps. By default, matrix elements that are 'outside' individual or receiver deployment periods are defined as 0 (non detection) but can be changed to another value (e.g., NA) via \code{set_outside}. In this case, the \code{acoustics} dataframe also needs to include the deployment times for each individual and an additional dataframe must be supplied with the same information for receivers via \code{moorings}.
+This function creates a list of matrices that, for each individual (list element), defines the number of detections of that individual in each time interval (matrix row) at each receiver (matrix column). To implement the function, a dataframe with acoustic detection time series must be provided via \code{acoustics}. The time intervals over which to count detections are provided by optionally defining a \code{start} and \code{end} date (these can be taken from the range of times in \code{acoustics} if unspecified) and the interval (\code{delta_t}) between time steps. By default, matrix elements that are 'outside' individual or receiver deployment periods are defined as 0 (not detected) but can be changed to another value (e.g., NA) via \code{set_outside}. In this case, the \code{acoustics} dataframe also needs to include the deployment times for each individual and an additional dataframe must be supplied with the same information for receivers via \code{moorings}.
 }
 \examples{
 #### Example (1) Construct matrix from detected individuals using detection time series
 dat_acoustics$receiver_id <- factor(dat_acoustics$receiver_id)
 mat_by_id <- make_matrix_detections(dat_acoustics)
 summary(mat_by_id)
+range(mat_by_id[[1]])
 
 #### Example (2) Construct matrix across all receivers and use set_outside
 dat_moorings$receiver_id <- factor(dat_moorings$receiver_id)
