@@ -1,0 +1,539 @@
+######################################
+######################################
+#### process_receiver_ids()
+
+#' @title Add unique receiver IDs to passive acoustic telemetry time series
+#' @description This function extracts the unique receiver deployment IDs (e.g., 1,...n) from a dataframe containing receiver attributes (e.g. unique receiver deployment IDs, receiver codes and locations), termed \code{moorings}, that correspond to passive acoustic telemetry (PAT) receiver codes in detection time series, termed \code{acoustics}. This is especially useful if the same receiver has been deployed multiple times (e.g. in different locations) over the course of the study. In this scenario, the receiver code in the PAT detection time series does not uniquely identify the unique receiver deployment, which means that receiver codes in PAT data and metadata cannot simply be matched: instead, both receiver code(s) and the time of detection(s) need to be included in the matching procedure. In this case, \code{\link[flapper]{process_receiver_id}} examines each receiver with detections in \code{acoustics}. If that receiver was redeployed, the function examines the time of each detection and returns the ID of the receiver that recorded that detection (given the timing of receiver deployment). If each receiver was only deployed once, this function simply matches receiver codes in \code{moorings} and receiver codes in \code{acoustics} and returns the receiver IDs (which, in this case, may be the same as the receiver codes) in \code{moorings} that correspond to each receiver code in \code{acoustics}.
+#'
+#' @param acoustics A dataframe which comprises passive acoustic telemetry detection time series. This must contain two named columns: 'timestamp', a POSIXct vector which defines the time of each detection; and 'receiver', a vector which defines the receiver at which each detection was made. The column 'receiver' should also be found in \code{moorings} (see below).
+#' @param moorings A dataframe which contains passive acoustic telemetry receiver metadata. This must contain four named columns: 'receiver', as above for \code{acoustics}; 'receiver_id', a unique identifier for each receiver deployment; 'receiver_start_date', a POSIXct vector which defines the time of each receiver deployment; and 'receiver_end_date', a POSIXct vector which defines the end of each receiver deployment. If objects of class Date are provided for 'receiver_start_date' and 'receiver_end_date', these are coerced to POSIXct objects with a warning so that the timing of receiver detections and deployment is comparable (i.e., of the same object type).
+#'
+#' @details The function implements \code{\link[data.table]{foverlaps}} to overlap the timing of detections with the timing of receiver deployments to account for receiver deployment in the assignment of receiver IDs.
+#'
+#' @return The function returns a vector of receiver IDs, as defined in the \code{moorings$receiver_id} column, which correspond to each detection in the \code{acoustics} dataframe.
+#'
+#' @examples
+#' #### Define example data
+#' # In this example, we have two receivers, but one has been re-deployed:
+#' moorings <- data.frame(receiver = c(1, 1, 2),
+#'                        receiver_id = c(1, 2, 3),
+#'                        start_date = as.POSIXct(c("2016-01-01",
+#'                                                  "2016-01-02",
+#'                                                  "2016-01-01"), tz = "UTC"),
+#'                        end_date = as.POSIXct(c("2016-01-02",
+#'                                                "2016-01-03",
+#'                                                "2016-01-02"), tz = "UTC")
+#'                        )
+#' # Our observational dataframe contains receivers but not unique receiver IDs:
+#' acoustics <- data.frame(receiver = c(1, 1, 2),
+#'                        timestamp = as.POSIXct(c("2016-01-01 00:30:00",
+#'                                                  "2016-01-02 00:30:00",
+#'                                                  "2016-01-01 00:30:00"), tz = "UTC")
+#'                                               )
+#'
+#' #### Example (1): Add unique receiver IDs to the observational dataframe
+#' # The first observation corresponds to receiver 1;
+#' # The second observation corresponds to the same receiver
+#' # ... but a different deployment, and has receiver_id = 2
+#' # The third observation corresponds to receiver id 3;
+#' acoustics$receiver_id <- process_receiver_id(acoustics, moorings)
+#' acoustics
+#'
+#' @seealso \code{\link[Tools4ETS]{add_unit_id}} is a slightly more general function.
+#'
+#' @author Edward Lavender
+#' @export
+
+process_receiver_id <-
+  function(acoustics, moorings){
+
+    #### Checks
+    # Check that moorings and acoustics contain required columns
+    if(!all(c("receiver", "receiver_id", "start_date", "end_date") %in% colnames(moorings))) stop("moorings does not contain all required column names.")
+    if(!all(c("receiver", "timestamp") %in% colnames(acoustics))) stop("acoustics does not contain all required column names.")
+
+    #### If some receivers were deployed, we need to
+    # ... account for the receiver code and the time of deployment when we add receiver IDs to the acoustics df.
+    if(any(duplicated(moorings$receiver))){
+
+      #### Check acoustics/moorings dataframes contain required information in correct format
+      if(!inherits(acoustics$timestamp, "POSIXct")) stop("acoustics$timestamp must an POSIXct object")
+      if(lubridate::tz(acoustics$timestamp) == ""){
+        warning("acoustics$timestamp lacking timezone (see lubridate::tz()). tz = 'UTC' forced.")
+        lubridate::tz(acoustics$timestamp) <- "UTC"
+      }
+      tz <- lubridate::tz(acoustics$timestamp)
+      if(!inherits(moorings$start_date, "POSIXct")){
+        warning("moorings$start_date must be a POSIXct object; attempting to coerce moorings$start_date into a POSIXct object.")
+        moorings$start_date <- lubridate::round_date(as.POSIXct(moorings$start_date, tz = tz), unit = "day")
+        lubridate::tz(moorings$start_date) <- tz
+      }
+      if(!inherits(moorings$end_date, "POSIXct")){
+        warning("moorings$end_date must be a POSIXct object; attempting to coerce moorings$end_date into a POSIXct object.")
+        moorings$end_date <- lubridate::round_date(as.POSIXct(moorings$end_date, tz = tz), unit = "day")
+        lubridate::tz(moorings$end_date) <- tz
+      }
+      if(lubridate::tz(moorings$start_date) == ""){
+        warning("moorings$start_date lacking timezone (see lubridate::tz()). tz = lubridate::tz(acoustics$timestamp) forced.")
+        lubridate::tz(moorings$start_date) <- tz
+      }
+      if(lubridate::tz(moorings$end_date) == ""){
+        warning("moorings$timestamp lacking timezone (see lubridate::tz()). tz = lubridate::tz(acoustics$timestamp) forced.")
+        lubridate::tz(moorings$end_date) <- tz
+      }
+      if(class(moorings$receiver)[1] != class(acoustics$receiver)[1]){
+        warning("class(moorings$receiver)[1] != class(acoustics$receiver)[1]; both coerced to character vectors.")
+        moorings$receiver <- as.character(moorings$receiver)
+        acoustics$receiver <- as.character(acoustics$receiver)
+      }
+
+      #### Define data.tables
+      acoustics$start_date <- acoustics$timestamp
+      acoustics$end_date <- acoustics$timestamp
+      acoustics <- data.table::data.table(acoustics)
+      moorings <- data.table::data.table(moorings)
+      receiver <- NULL; start_date <- NULL; end_date <- NULL
+      data.table::setkey(moorings, receiver, start_date, end_date)
+
+      #### Implement data.table::foverlaps()
+      order <- data.table::foverlaps(acoustics, moorings, type = "within", nomatch = NA, which = TRUE)
+
+      #### Define acoustics$receiver_id
+      acoustics$receiver_id <- moorings$receiver_id[order$yid]
+
+    #### If there are no redeployed receivers, we can simply use match()
+    # ... to obtain the receiver IDs for the acoustics dataframe.
+    } else{
+      acoustics$receiver_id <- moorings$receiver_id[match(acoustics$receiver, moorings$receiver)]
+    }
+
+    #### Return the receiver IDs
+    lna <- length(which(is.na(acoustics$receiver_id)))
+    if(lna > 0) warning(paste("receiver IDs returned contain,", lna, "NAs (e.g. possibly due to incorrect start/end dates)."))
+    return(acoustics$receiver_id)
+  }
+
+
+#########################################
+#########################################
+#### process_false_detections_sf()
+
+#' @title Pass putative false detections through a spatial filter
+#' @description The identification of false detections in acoustic telemetry data is an important aspect of processing and/or modelling these data. False detections can be identified using the short interval criterion, whereby any detection of an individual at a receiver which is not accompanied by other detections at the same receiver in a specified time window (depending on the nominal acoustic transmission delay) are flagged. This approach can be implemented using the \code{\link[glatos]{false_detections}} function in the \code{\link[glatos]{glatos}} package. Flag detections can then be examined, or passed through other filters, to examine their plausibility. This function passes false detections flagged by \code{\link[glatos]{false_detections}} through a spatial filter. The key idea is that detections at nearby receivers within the define time window can be used to suggest 'false' detections which are, in fact, plausible. To implement this approach, the user must define a dataframe comprising detections, a temporal threshold, a spatial threshold and a dataframe of distances between receivers. The function examines whether any putative false detection are accompanied by additional detections at other receivers within a user-defined Euclidean distance of that receiver. If so, these could be explained by an individual which dips in-and-out of the detection ranges of receivers (e.g. in a sparse acoustic array) and may not, in fact, be false.
+#'
+#' @param det A dataframe containing detection data. This should contain the following columns: 'detection_timestamp_utc', 'transmitter_codespace', 'transmitter_id' and 'receiver_sn', as well as 'passed_filter' (see \code{\link[glatos]{false_detections}}).
+#' @param tf A number which defines the time threshold (s) used to flag false detections (see \code{\link[glatos]{false_detections}}).
+#' @param sf A number which defines the threshold Euclidean distance between receivers beyond which, even if a false detection is accompanied by detections at other receivers, it is likely to be a true false detection, because the the individual could not have moved between receivers separated by more than this threshold over the specified time interval. \code{sf} should be defined in the same units as the distances provided in \code{dist} (see below).
+#' @param dist_btw_receivers A dataframe which defines the distances between receiver pairs. This should contain the columns: 'r1', 'r2' and 'dist', whereby 'r1' and 'r2' contain the unique receiver serial number for all combinations of receivers and 'dist' contains the distance between them. This dataframe should include duplicate combinations (e.g., both r1 = 1 and r2 = 2 and r1 = 2 and r2 = 1). This can be created with \code{\link[flapper]{dist_btw_receivers}}.
+#'
+#' @details There are limitations with the application of this spatial filter to false detections. First, the spatial threshold beyond which false detections are likely to be false is based on Euclidean distances at present. These may be problematic (e.g. when receivers hug complex coastlines). Second, for small arrays, fast-swimming organisms and/or a large nominal transmission delay (i.e., time threshold), the spatial filter is a poor filter because individuals can access the whole area over the whole time interval.
+#'
+#' @return The function returns a vector, of the same length as \code{det} with three possible values: NA, which identifies detections which have not been flagged as false detections (i.e., \code{passed_filter = 0}, see \code{\link[glatos]{false_detections}}) and are therefore not passed through the spatial filter; 1, which identifies detections which 'passed' the spatial filter (i.e., false detections which are accompanied by detections at nearby receivers within the defined spatial and temporal thresholds); or 0, which defines detections which 'failed' the spatial filter (i.e., false detections which are not accompanied by detections at nearby receivers within the defined spatial and temporal thresholds). This vector has one attribute, 'details', a dataframe with the same number of rows as \code{det} with the following columns: 'passed_filter_sf', 'n_wn_sf', 'detection_timestamp_utc_sf' and 'receiver_sn_sf'. 'passed_filter_sf' takes a value of NA, 0 or 1 depending on whether or not the detection was flagged as a false detection (if not, NA) and whether each false detection passed the spatial filter (no, 0; yes, 1). If the detection did pass the spatial filter, 'n_wn_sf' provides the number of detections at nearby receivers within \code{tf} and \code{sf}; and 'detection_timestamp_utc_sf', 'receiver_sn_sf' and 'dist_sf' define the timestamp of the detection at the nearest receiver, the receiver at which the detection was made and the distance between the two receivers respectively.
+#'
+#' @examples
+#' #### Add some false detections for demonstration purposes
+#' # Add three rows to dat_acoustics which, below, we'll make 'false detections'
+#' dat_acoustics_with_false_det <-
+#'   rbind(dat_acoustics, dat_acoustics[rep(nrow(dat_acoustics), 3), ])
+#' pos_false <- (nrow(dat_acoustics_with_false_det) - 2):nrow(dat_acoustics_with_false_det)
+#' # Add an isolated detection accompanied by a detection at a nearby receiver
+#' dat_acoustics_with_false_det$timestamp[pos_false[1:2]] <-
+#'   dat_acoustics_with_false_det$timestamp[pos_false[1:2]] + 60*60*60
+#' dat_acoustics_with_false_det$receiver_id[pos_false[2]] <- 33
+#' # Add an isolated detection not accompanied by a detection at a nearby receiver
+#' dat_acoustics_with_false_det$timestamp[pos_false[3]] <-
+#'   dat_acoustics_with_false_det$timestamp[pos_false[3]] + 60*60*60*2
+#'
+#' #### Define necessary columns to compute false detections using glatos::false_detections()
+#' dat_acoustics_with_false_det$detection_timestamp_utc <-
+#'   dat_acoustics_with_false_det$timestamp
+#' dat_acoustics_with_false_det$transmitter_codespace <-
+#'   substr(dat_acoustics_with_false_det$transmitter_id, 1, 8)
+#' dat_acoustics_with_false_det$transmitter_id <-
+#'   substr(dat_acoustics_with_false_det$transmitter_id, 10, 13)
+#' dat_acoustics_with_false_det$receiver_sn <- dat_acoustics_with_false_det$receiver_id
+#' det <- dat_acoustics_with_false_det[, c("detection_timestamp_utc",
+#'                                         "transmitter_codespace",
+#'                                         "transmitter_id",
+#'                                         "receiver_sn")]
+#'
+#' #### Compute false detections
+#' # 3 false detections returned, as expected:
+#' det <- glatos::false_detections(det, tf = 3600)
+#' tail(det$passed_filter)
+#'
+#' #### Pass false detections through a spatial filter
+#' # distances between receivers are required
+#' dist_btw_receivers_km <-
+#'   dist_btw_receivers(dat_moorings[, c("receiver_id", "receiver_long", "receiver_lat")])
+#' # Implement spatial filter.
+#' # Note the function returns a vector, unlike glatos::false_detections():
+#' det$passed_filter_sf <- process_false_detections_sf(det,
+#'                                             tf = 3600,
+#'                                             sf = 0.5,
+#'                                             dist_btw_receivers = dist_btw_receivers_km)
+#' # Only the last observation failed the spatial filter, as expected:
+#' tail(det$passed_filter_sf)
+#' # Additional information is available from the attributes dataframe:
+#' tail(attr(det$passed_filter_sf, "details"))
+#'
+#'
+#' @author Edward Lavender
+#' @export
+
+process_false_detections_sf <-
+  function(det,
+           tf,
+           sf,
+           dist_btw_receivers
+  ){
+
+    #### Initial checks
+    # Check that there are at least some detections which failed glatos' false detection filter
+    if(!any(det$passed_filter == 0)){
+      warning("No detections failed glatos' false detection filter; det returned unchanged.")
+      return(det)
+    }
+    # Sort the dataframe by transmitter then timestamp
+    # This is necessary for later.
+    rownames(det) <- 1:nrow(det)
+    det$original_order <- 1:nrow(det)
+    pos_fail_original_order <- which(det$passed_filter == 0)
+    det <- det[order(det$transmitter_id, det$detection_timestamp_utc), ]
+
+    #### Define the lower and upper time around each detection, defining a window
+    # ... within which we'll search for other detections at other receivers.
+    det$t1 <- det$detection_timestamp_utc - tf
+    det$t2 <- det$detection_timestamp_utc + tf
+
+    #### Extract the data which failed the checks.
+    pos_fail <- which(det$passed_filter == 0)
+    min_lag_fail <- det[pos_fail, ]
+
+    #### Define blank dataframe
+    dout <- data.frame(passed_filter = NA, n_wn_sf = NA, detection_timestamp_utc = as.POSIXct(NA), receiver_sn = NA, dist_btw_receivers = NA)
+    dout_ls <- lapply(pos_fail, function(i) return(dout))
+
+    #### Loop over all data pertaining to failed detections
+    dout_ls <-
+      pbapply::pbmapply(
+        min_lag_fail$t1,
+        min_lag_fail$t2,
+        min_lag_fail$transmitter_id,
+        min_lag_fail$receiver_sn,
+        dout_ls,
+        FUN = function(t1, t2, trans_id, rec_id, dout){
+
+          #### Testing
+          # testing <- FALSE
+          # if(testing){
+          #  p <- 4
+          #  pos <- pos_fail[p]
+          #  t1 = min_lag_fail$t1[p]
+          #  t2 = min_lag_fail$t2[p]
+          #  trans_id = min_lag_fail$transmitter_id[p]
+          #  rec_id = min_lag_fail$receiver_sn[p]
+          # }
+
+          #### Define a subsetted detection dataframe which contains
+          # ... all detections of a transmitted within the necessary time interval
+          # ... i.e., include possible detections at other receivers.
+          det_tmp <- det[det$transmitter_id == trans_id &
+                           det$detection_timestamp_utc >= t1 &
+                           det$detection_timestamp_utc <= t2, ]
+
+          #### If det_tmp only contains one detection (i.e., at the receiver in question)
+          # ... then no detections were made at other receivers, so we'll return a 0
+          # ... i.e., it still looks like this is a false detection.
+          if(nrow(det_tmp) == 1){
+            dout$passed_filter <- 0
+
+            #### If there are detections at multiple receivers,
+            # ... then we'll extract the distances between the receiver with the worrying detection and
+            # ... all of those other receivers. If the distance is below a user-defined threshold,
+            # ... perhaps this isn't a false detection.
+          } else{
+
+            #### Remove the detection receiver in question
+            # Otherwise this will cause issues with the calculation of distances between receivers
+            # ... and the identification of the smallest distances.
+            det_tmp <- det_tmp[det_tmp$receiver_sn != rec_id, ]
+
+            #### Extract distances between rec_id and all other receiver in det_tmp with a detection
+            # (Note calculations for all receivers, not just unique receivers, which makes the
+            # ... code below simpler e.g. reporting the number of detections within the threshold distance.)
+            dist_sbt <- dist_btw_receivers[which(dist_btw_receivers$r1 == rec_id & dist_btw_receivers$r2 %in% det_tmp$receiver_sn), ]
+            det_tmp$dist <- dist_sbt$dist[match(det_tmp$receiver_sn, dist_sbt$r2)]
+            # |dist$r1 %in% det_tmp$receiver_sn & dist$r2 == rec_id), ]
+
+            #### If any of the distances are less than a threshold, this suggests they
+            # ... may not be false after all. Hence, return a 1. Otherwise, return a 0
+            # ... i.e., it still looks like a false detection.
+            if(any(det_tmp$dist <= sf)){
+              # Define passed filter and the number of detections at other receivers within the necessary distance
+              dout$passed_filter <- 1
+              dout$n_wn_sf <- length(which(det_tmp$dist <= sf))
+              # Define the receiver, distance and detection timestamp of the (first) nearest detection in space
+              # (There may be others at slightly further receivers sooner or later in time, but, because the dataframe
+              # ... has been sorted, only the first is identified).
+              pos_min_dist <- which.min(det_tmp$dist)
+              dout$dist <- min(det_tmp$dist)
+              dout$receiver_sn <- det_tmp$receiver_sn[pos_min_dist]
+              dout$detection_timestamp_utc <- det_tmp$detection_timestamp_utc[pos_min_dist]
+
+            } else{
+              dout$passed_filter <- 0
+            }
+
+          }
+
+          # Return the updated dataframe
+          return(dout)
+
+        }, SIMPLIFY = FALSE)
+
+    #### Join the list into a single dataframe
+    dout <- dplyr::bind_rows(dout_ls)
+
+    #### Message
+    n_false_detections <- nrow(det) - sum(det$passed_filter)
+    n_false_detections_passed_spatial <- sum(dout$passed_filter)
+    n_false_detections_failed_spatial <- nrow(dout) - sum(dout$passed_filter)
+
+    message(paste0("The spatial filter retained ",
+                   n_false_detections_failed_spatial,
+                   " detections, out of ", n_false_detections, " previously identified false detections ",
+                   " (", round(n_false_detections_failed_spatial/n_false_detections * 100, 2),
+                   " %) as 'true' false detections."
+    )
+    )
+
+    #### Return a vector of whether or not each
+    # ... observation passed the spatial filter,
+    # ...with other details remaining as an attribute.
+    det$passed_filter_sf <- NA
+    det$n_wn_sf <- NA
+    det$detection_timestamp_utc_sf <- as.POSIXct(NA)
+    det$receiver_sn_sf <- NA
+    det$dist_sf <- NA
+    det$passed_filter_sf[pos_fail] <- dout$passed_filter
+    det$n_wn_sf[pos_fail] <- dout$n_wn_sf
+    det$detection_timestamp_utc_sf[pos_fail] <- dout$detection_timestamp_utc
+    det$receiver_sn_sf[pos_fail] <- dout$receiver_sn
+    det$dist_sf[pos_fail] <- dout$dist
+    det <- det[order(det$original_order), ]
+    attr(det$passed_filter_sf, "details") <- det[, c("passed_filter_sf",
+                                                     "n_wn_sf",
+                                                     "receiver_sn_sf",
+                                                     "detection_timestamp_utc_sf",
+                                                     "dist_sf")]
+    return(det$passed_filter_sf)
+
+  }
+
+
+#########################################
+#########################################
+#### process_quality_check()
+
+#' @title Basic quality checks of passive acoustic telemetry datasets
+#' @description This function passes through passive acoustic telemetry datasets through some basic quality checks (see Details). Following data processing, these provide a useful 'final check' prior to analysis.
+#' @param acoustics A dataframe which comprises passive acoustic telemetry detection time series. This must contain the following named columns: 'timestamp', a POSIXct vector which defines the time of each detection; 'receiver_id', a unique identifier of each receiver; and 'individual_id', a unique identifier of each individual (see \code{\link[flapper]{dat_acoustics}} for an example).
+#' @param moorings A dataframe which contains passive acoustic telemetry receiver metadata. This must contain the following named columns: 'receiver_id', a unique identifier for each receiver deployment; 'receiver_start_date', a POSIXct vector which defines the time of each receiver deployment; and 'receiver_end_date', a POSIXct vector which defines the end of each receiver deployment (see \code{\link[flapper]{dat_moorings}} for an example). If objects of class Date are provided for 'receiver_start_date' and 'receiver_end_date', these are coerced to POSIXct objects with a warning.
+#' @param ids A dataframe which contains the passive acoustic telemetry individual metadata. This must contain the following named columns: 'individual_id', a unique identifier for each individual; 'tag_start_date', a POSIXct vector which defines the time of each tag deployment; and 'tag_end_date', a POSIXct vector which defines the end of each tag deployment (see \code{\link[flapper]{dat_ids}} for an example). If objects of class Date are provided for 'tag_start_date' and 'tag_end_date', these are coerced to POSIXct objects with a warning.
+#' @details The function implements the following checks. (1) \code{acoustics} should only contain receivers recorded in \code{moorings}; other receivers may be included in centralised databases (e.g., from other projects) and often need to be removed. (2) Observations at receivers should occur during their deployment windows; other observations may be included in centralised databases due to receiver checks, range testing or re-deployment elsewhere. (3) \code{acoustics} is checked for any unknown tag IDs. These may be due unrecorded use of tags for receiver checking or range testing, other tagging programmes or type A false detections. (4) As for detections at receivers, all detections of tags should occur during their deployment windows. (5) False detections should be flagged. Other important checks - such as checking for receivers which were lost and later recovered, excluding observations during receiver servicing dates, excluding observations during tag recapture events and further investigation of false detections - may be required. \code{\link[flapper]{process_quality_check}} is mainly designed to be implemented after data-processing has already taken place as a basic 'final check' for common issues in passive acoustic telemetry datasets. For each check, the function returns a message or warning depending on the outcome; subsequently, the most appropriate course of action (e.g., retention versus removal of flagged observations in \code{acoustics} will depend on the context).
+#'
+#' @return For each check, the function returns a message or a warning with relevant details.
+#'
+#' @examples
+#' #### Prepare data
+#' ## All data have previously passed false detection filters (see glatos::false_detections())
+#' dat_acoustics$passed_filter <- 1
+#' ## Times should be in POSIXct format
+#' dat_moorings$receiver_start_date <-  as.POSIXct(dat_moorings$receiver_start_date)
+#' lubridate::tz(dat_moorings$receiver_start_date) <- "UTC"
+#' dat_moorings$receiver_end_date   <-  as.POSIXct(dat_moorings$receiver_end_date)
+#' lubridate::tz(dat_moorings$receiver_end_date) <- "UTC"
+#' dat_ids$tag_start_date <- as.POSIXct(dat_ids$tag_start_date)
+#' lubridate::tz(dat_ids$tag_start_date) <- "UTC"
+#' ## tag_end_date column needed in dat_ids
+#' dat_ids$tag_end_date   <- as.POSIXct("2020-01-01", tz = "UTC")
+#'
+#' #### Implement process_quality_check() on processed data as a final check for any issues
+#' process_quality_check(dat_acoustics, dat_moorings, dat_ids)
+#'
+#' #### Add erroneous data to acoustics for demonstrating process_quality_check()
+#' ## Define a convenience function to add erroneous data to
+#' # ... acoustics to demonstrate process_quality_check()
+#' add_erroneous_row <- function(acoustics, row = nrow(acoustics), col, val){
+#'   tmp_ls <- lapply(val, function(v){
+#'     tmp <- acoustics[row, ]
+#'     tmp[1, col] <- v
+#'     return(tmp)
+#'   })
+#'   tmp <- dplyr::bind_rows(tmp_ls)
+#'   acoustics <- rbind(acoustics, tmp)
+#'   return(acoustics)
+#' }
+#' ## Add erroneous receiver ids
+#' nrw <- nrow(dat_acoustics)
+#' acoustics_wth_errors <- add_erroneous_row(dat_acoustics,
+#'                                           row = nrw,
+#'                                           col = "receiver_id",
+#'                                           val = c(100, 200, 300))
+#' ## Add erroneous time stamps (outside receiver/individual id deployment periods )
+#' acoustics_wth_errors <- add_erroneous_row(acoustics_wth_errors,
+#'                                          row = nrw,
+#'                                           col = "timestamp",
+#'                                           val = as.POSIXct(c("2019-01-01", "2019-03-01"),
+#'                                                            tz = "UTC"))
+#' ## Add erroneous individual ids
+#' acoustics_wth_errors <- add_erroneous_row(acoustics_wth_errors,
+#'                                           row = nrw,
+#'                                           col = "individual_id",
+#'                                           val = c(100, 200, 300))
+#' ## Examine erroneous data:
+#' utils::tail(acoustics_wth_errors, 10)
+#'
+#' #### Implement process_quality_check()
+#' process_quality_check(acoustics_wth_errors, dat_moorings, dat_ids)
+#'
+#' @author Edward Lavender
+#' @export
+
+process_quality_check <-
+  function(acoustics,
+           moorings,
+           ids){
+
+    #### Checks
+    ## acoustics colnames
+    check_names(arg = "acoustics", input = acoustics,
+                req = c("timestamp", "receiver_id", "individual_id"),
+                extract_names = colnames, type = all)
+    ## moorings colnames
+    check_names(arg = "moorings",
+                input = moorings,
+                req = c("receiver_id", "receiver_start_date", "receiver_end_date"),
+                extract_names = names, type = all)
+    ## ids colnames
+    check_names(arg = "ids",
+                input = ids,
+                req = c("individual_id", "tag_start_date", "tag_end_date"),
+                extract_names = names, type = all)
+    ## format of times and timezones
+    times_ls <-
+      mapply(list("acoustics$timestamp",
+                  "moorings$receiver_start_date", "moorings$receiver_end_date",
+                  "ids$tag_start_date", "ids$tag_end_date"),
+             list(acoustics$timestamp,
+                  moorings$receiver_start_date, moorings$receiver_end_date,
+                  ids$tag_start_date, ids$tag_end_date),
+             FUN = function(arg, elm){
+               out <- check_class(arg = arg,
+                                  input = elm,
+                                  if_class = NULL,
+                                  to_class = "POSIXct",
+                                  type = "warning",
+                                  coerce_input = function(x) as.POSIXct(x, tz = "UTC"))
+               out <- check_tz(arg, elm)
+               return(out)
+             }, SIMPLIFY = FALSE)
+    acoustics$timestamp          <- times_ls[[1]]
+    moorings$receiver_start_date <- times_ls[[2]]
+    moorings$receiver_end_date   <- times_ls[[3]]
+    ids$tag_start_date           <- times_ls[[4]]
+    ids$tag_end_date             <- times_ls[[5]]
+
+    #### Receiver identity
+    # All receivers should have been deployed in the study in question.
+    runknown <- unique(acoustics$receiver_id)[!(unique(acoustics$receiver_id) %in% moorings$receiver_id)]
+    lrunknown <- length(runknown)
+    if(lrunknown > 0){
+      pos <- which(acoustics$receiver_id %in% runknown)
+      lpos <- length(pos)
+      warn <- paste0("Check 1 (receiver identity): failed. ",
+                     lrunknown, " receiver identities unknown (", paste(runknown, collapse = ", "), "), ",
+                     "corresponding to ", lpos, " observations in acoustics. \n")
+      warning(warn, immediate. = TRUE)
+      acoustics <- acoustics[-pos, ]
+    } else{
+      message("Check 1 (receiver identity): passed. \n")
+    }
+
+    #### Receiver loss
+    # Not currently implemented.
+
+    #### Receiver operation window
+    match_receiver <- match(acoustics$receiver_id, moorings$receiver_id)
+    acoustics$receiver_start_date  <- moorings$receiver_start_date[match_receiver]
+    acoustics$receiver_end_date    <- moorings$receiver_end_date[match_receiver]
+    acoustics$interval   <- lubridate::interval(acoustics$receiver_start_date, acoustics$receiver_end_date)
+    acoustics$not_within <- !(acoustics$timestamp %within% acoustics$interval)
+    if(length(which(acoustics$not_within)) > 0){
+      pos  <- which(acoustics$not_within)
+      lpos <- length(pos)
+      warn <- paste0("Check 3 (receiver deployment windows): failed. ",
+                     lpos, " observations in acoustics outside of receiver deployment windows. \n")
+      warning(warn, immediate. = TRUE)
+      acoustics <- acoustics[-pos, ]
+    } else{
+      message("Check 2 (receiver deployment windows): passed. \n")
+    }
+
+    #### Receiver servicing dates.
+    # Not currently implemented.
+
+    #### Tag identity
+    tunknown <- unique(acoustics$individual_id)[!(unique(acoustics$individual_id) %in% ids$individual_id)]
+    ltunknown <- length(tunknown)
+    if(ltunknown > 0){
+      pos <- which(acoustics$individual_id %in% tunknown)
+      lpos <- length(pos)
+      warn <- paste0("Check 3 (tag identity): failed. ",
+                     ltunknown, " tag identities unknown (", paste(tunknown, collapse = ", "), "), ",
+                     "corresponding to ", lpos, " observations in acoustics. \n")
+      warning(warn, immediate. = TRUE)
+      acoustics <- acoustics[-pos, ]
+    } else{
+      message("Check 3 (tag identity): passed. \n")
+    }
+
+    #### Tag loss
+    # Not currently implemented.
+
+    #### Tag operation window
+    match_tag <- match(acoustics$individual_id, ids$individual_id)
+    acoustics$tag_start_date <- ids$tag_start_date[match_tag]
+    acoustics$tag_end_date   <- ids$tag_end_date[match_tag]
+    acoustics$interval   <- lubridate::interval(acoustics$tag_start_date, acoustics$tag_end_date)
+    acoustics$not_within <- !(acoustics$timestamp %within% acoustics$interval)
+    if(length(which(acoustics$not_within)) > 0){
+      pos  <- which(acoustics$not_within)
+      lpos <- length(pos)
+      warn <- paste0("Check 3 (tag deployment windows): failed. ",
+                     lpos, " observations in acoustics outside of tag deployment windows. \n")
+      warning(warn, immediate. = TRUE)
+      acoustics <- acoustics[-pos, ]
+    } else{
+      message("Check 4 (tag deployment windows): passed. \n")
+    }
+
+    #### Tag recapture
+    # Not currently implemented.
+
+    #### False detections
+    if(!rlang::has_name(acoustics, "passed_filter")){
+      warn <- "Check 5 (false detections): 'passed_filter' column not found in acoustics. See glatos::false_detections() to analyse false detections."
+      warning(warn, immediate. = TRUE)
+    } else{
+      lpos <- length(which(acoustics$passed_filter == 0))
+      if(lpos > 1){
+        warn <- paste0("There are ", lpos, " false detections in the acoustics$passed_filter column.")
+        warning(warn, immediate. = TRUE)
+      } else{
+        message("Check 5 (false detections) passed: acoustics$passed_filter does not contain false detections. \n")
+      }
+    }
+
+  }
