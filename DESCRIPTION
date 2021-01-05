@@ -8,15 +8,14 @@ Description: Algorithms which facilitate the use of passive acoustic telemetry (
 Imports:
     methods, magrittr, data.table, dplyr, plyr, rlang, lubridate, 
     purrr, pbapply,
-    Matrix, raster, rgeos, geosphere, Orcs, cppRouting, gdistance, sp,
-    glatos,
+    Matrix, raster, rgeos, geosphere, Orcs, cppRouting, gdistance, sp, adehabitatHR,
     prettyGraphics, fields,
     Tools4ETS
 Suggests:
-    knitr,
-    rmarkdown, 
+    glatos,
     animation, scales, viridis,
-    circular
+    circular, 
+    rmarkdown, knitr
 Remotes: 
     github::edwardlavender/prettyGraphics, 
     github::edwardlavender/Tools4ETS,
