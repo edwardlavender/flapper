@@ -1,6 +1,6 @@
 ######################################
 ######################################
-#### detection_pr()
+#### get_detection_pr()
 
 #' @title A detection probability function based on distance
 #' @description This function calculates detection probability (e.g., of an acoustic detection) at specified distances from the sampling device (e.g., a passive acoustic telemetry receiver) using user-defined parameters (a model intercept, an coefficient for the effect of distance and an inverse link function). The function returns a plot of detection probability with distance and/or a vector of detection probabilities.
@@ -16,7 +16,7 @@
 #' @examples
 #' #### Example (1): Implement the function using the default parameters
 #' # The function returns a graph and a vector of detection probabilities
-#' det_pr <- detection_pr()
+#' det_pr <- get_detection_pr()
 #' utils::head(det_pr)
 #' # The vector has attributes:
 #' # ... 'X' (the model matrix),
@@ -26,12 +26,12 @@
 #'
 #' #### Example (2): Adjust model parameters
 #' # Change regression coefficients
-#' det_pr <- detection_pr(beta_0 = 2.5, beta_1 = -0.006)
+#' det_pr <- get_detection_pr(beta_0 = 2.5, beta_1 = -0.006)
 #' # Use inverse probit
-#' det_pr <- detection_pr(beta_0 = 2.5, beta_1 = -0.006, inv_link = stats::pnorm)
+#' det_pr <- get_detection_pr(beta_0 = 2.5, beta_1 = -0.006, inv_link = stats::pnorm)
 #'
 #' #### Example (3): Modify graphical properties
-#' det_pr <- detection_pr(beta_0 = 2.5,
+#' det_pr <- get_detection_pr(beta_0 = 2.5,
 #'                           beta_1 = -0.006,
 #'                           type = "l",
 #'                           xlab = "Distance (m)",
@@ -39,21 +39,21 @@
 #'
 #' #### Example (4): Modify return options
 #' # Only graph
-#' detection_pr(output = 1L)
+#' get_detection_pr(output = 1L)
 #' # Only values
-#' detection_pr(output = 2L)
+#' get_detection_pr(output = 2L)
 #' # Both graph and values (the default)
-#' detection_pr(output = 3L)
+#' get_detection_pr(output = 3L)
 #'
 #' @author Edward Lavender
 #' @export
 #'
 
-detection_pr <- function(distance = 1:1000,
-                         beta_0 = 2.5,
-                         beta_1 = -0.01,
-                         inv_link = stats::plogis,
-                         output = 3L,...){
+get_detection_pr <- function(distance = 1:1000,
+                             beta_0 = 2.5,
+                             beta_1 = -0.01,
+                             inv_link = stats::plogis,
+                             output = 3L,...){
   #### Checks
   stopifnot(length(beta_0) == 1 & length(beta_1) == 1)
   output <- check_value(input = output, supp = 1:3, warn = TRUE, default = 3L)
@@ -83,7 +83,7 @@ detection_pr <- function(distance = 1:1000,
 
 ######################################
 ######################################
-#### detection_centroids()
+#### get_detection_centroids()
 
 #' @title Define detection centroids around receivers
 #' @description This function defines the areas surveyed by receivers (termed 'detection centroids') as a spatial object, based on an estimate of the detection range (m) and any barriers to detection. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The function defines a spatial buffer around each receiver according to the estimated detection range, cuts out any barriers to detection, such as the coastline, and returns a SpatialPolygons object that defines the combined detection centroid across all receivers or receiver-specific detection centroids.
@@ -94,7 +94,7 @@ detection_pr <- function(distance = 1:1000,
 #' @param plot A logical input that defines whether or not to plot receivers, their centroids, and the buffer (if specified).
 #' @param ... Additional arguments passed to \code{\link[rgeos]{gBuffer}}, such as \code{byid} and/or \code{quadsegs}.
 #'
-#' @return The function returns a \code{\link[sp]{SpatialPolygons-class}} object of the detection centroids around receivers that represents the area they survey under the assumption of a constant detection range, accounting for any barriers to detection. By default, this will contain a single feature, which is suitable for the calculation of the total area surveyed by receivers (see \code{\link[flapper]{detection_area_sum}}) because it accounts for the overlap in the detection ranges of receivers. However, if \code{byid = TRUE} is passed via \code{...} to \code{\link[rgeos]{gBuffer}}, the returned object will have a feature for each pair of coordinates in (\code{xy}) (i.e., receiver). This is less appropriate for calculating the area surveyed by receivers, since areas surveyed by multiple receivers will be over-counted, but it is suitable when the centroids for particular receivers are required (e.g., to extract environmental conditions within a specific receiver's detection ranges) (see \code{\link[flapper]{detection_centroids_envir}}.
+#' @return The function returns a \code{\link[sp]{SpatialPolygons-class}} object of the detection centroids around receivers that represents the area they survey under the assumption of a constant detection range, accounting for any barriers to detection. By default, this will contain a single feature, which is suitable for the calculation of the total area surveyed by receivers (see \code{\link[flapper]{get_detection_area_sum}}) because it accounts for the overlap in the detection ranges of receivers. However, if \code{byid = TRUE} is passed via \code{...} to \code{\link[rgeos]{gBuffer}}, the returned object will have a feature for each pair of coordinates in (\code{xy}) (i.e., receiver). This is less appropriate for calculating the area surveyed by receivers, since areas surveyed by multiple receivers will be over-counted, but it is suitable when the centroids for particular receivers are required (e.g., to extract environmental conditions within a specific receiver's detection ranges) (see \code{\link[flapper]{get_detection_centroids_envir}}.
 #'
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
@@ -106,25 +106,25 @@ detection_pr <- function(distance = 1:1000,
 #' xy <- sp::spTransform(xy, proj_utm)
 #'
 #' #### Example (1): Calculate the total area sampled by receivers
-#' detection_centroids(xy)
+#' get_detection_centroids(xy)
 #'
 #' #### Example (2): Account for barriers in the study area
-#' detection_centroids(xy, coastline = dat_coast)
+#' get_detection_centroids(xy, coastline = dat_coast)
 #'
 #' #### Example (3): Adjust the detection range
-#' detection_centroids(xy, detection_range = 400, coastline = dat_coast)
-#' detection_centroids(xy, detection_range = 500, coastline = dat_coast)
+#' get_detection_centroids(xy, detection_range = 400, coastline = dat_coast)
+#' get_detection_centroids(xy, detection_range = 500, coastline = dat_coast)
 #'
 #' #### Example (4): Suppress the plot
-#' detection_centroids(xy, coastline = dat_coast, plot = FALSE)
+#' get_detection_centroids(xy, coastline = dat_coast, plot = FALSE)
 #'
 #' #### Example (5): Output characteristics are controlled via byid
 #' # A SpatialPolygons with one feature is the implicit output
-#' sp_1 <- detection_centroids(xy, coastline = dat_coast, byid = FALSE)
+#' sp_1 <- get_detection_centroids(xy, coastline = dat_coast, byid = FALSE)
 #' sp_1
 #' # An SpatialPolygons with one feature for each element in xy
 #' # ... can be returned via byid = TRUE
-#' sp_2 <- detection_centroids(xy, coastline = dat_coast, byid = TRUE)
+#' sp_2 <- get_detection_centroids(xy, coastline = dat_coast, byid = TRUE)
 #' sp_2
 #' # The total area of the former will be smaller, since areas covered
 #' # ... by multiple receivers are merged
@@ -138,7 +138,7 @@ detection_pr <- function(distance = 1:1000,
 #' @author Edward Lavender
 #' @export
 
-detection_centroids <- function(xy,
+get_detection_centroids <- function(xy,
                                 detection_range = 425,
                                 coastline = NULL,
                                 plot = TRUE,...){
@@ -179,19 +179,19 @@ detection_centroids <- function(xy,
 
 ######################################
 ######################################
-#### detection_area_sum()
+#### get_detection_area_sum()
 
 #' @title Calculate the total area sampled by acoustic receivers
-#' @description This function calculates the total area sampled by receivers, under the assumption of a constant detection range. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The \code{\link[flapper]{detection_centroids}} is used to calculate the detection centroids around receivers, given a specified detection range (m) and any barriers to detection, such as coastline, and then the total area covered by receivers is calculated, accounting for overlapping centroids.
+#' @description This function calculates the total area sampled by receivers, under the assumption of a constant detection range. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The \code{\link[flapper]{get_detection_centroids}} is used to calculate the detection centroids around receivers, given a specified detection range (m) and any barriers to detection, such as coastline, and then the total area covered by receivers is calculated, accounting for overlapping centroids.
 #'
-#' @param xy,detection_range,coastline,plot,... Arguments required to calculate and visualise detection centroids via \code{\link[flapper]{detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{range}), barriers to detection (\code{coastline}), and whether or not to plot the centroids (\code{plot}).
+#' @param xy,detection_range,coastline,plot,... Arguments required to calculate and visualise detection centroids via \code{\link[flapper]{get_detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{range}), barriers to detection (\code{coastline}), and whether or not to plot the centroids (\code{plot}).
 #' @param scale A number that scales the total area (m). The default (\code{1/(1000^2)}) converts the units of \eqn{m^2} to \eqn{km^2}.
 #'
 #' @details This is a simple metric of the overall receiver sampling effort. This may be a poor metric if the assumption of a single detection range across all receivers is substantially incorrect or if there are substantial changes in the receiver array over the course of a study.
 #'
 #' @return The function returns a number that represents the total area surveyed by receivers (by default in \eqn{km^2}) and, if \code{plot = TRUE}, a plot of the area with receivers and their detection ranges.
 #'
-#' @seealso \code{\link[flapper]{detection_centroids}} defines detection centroids, across which the detection area is calculated. \code{\link[flapper]{detection_area_ts}} calculates the area sampled by receivers through time.
+#' @seealso \code{\link[flapper]{get_detection_centroids}} defines detection centroids, across which the detection area is calculated. \code{\link[flapper]{get_detection_area_ts}} calculates the area sampled by receivers through time.
 #'
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
@@ -203,40 +203,40 @@ detection_centroids <- function(xy,
 #' xy <- sp::spTransform(xy, proj_utm)
 #'
 #' #### Example (1): Calculate the total area sampled by receivers
-#' detection_area_sum(xy)
+#' get_detection_area_sum(xy)
 #'
 #' #### Example (2): Account for barriers in the study area
-#' detection_area_sum(xy, coastline = dat_coast)
+#' get_detection_area_sum(xy, coastline = dat_coast)
 #'
 #' #### Example (3): Adjust the detection range
-#' detection_area_sum(xy, detection_range = 400, coastline = dat_coast)
-#' detection_area_sum(xy, detection_range = 500, coastline = dat_coast)
+#' get_detection_area_sum(xy, detection_range = 400, coastline = dat_coast)
+#' get_detection_area_sum(xy, detection_range = 500, coastline = dat_coast)
 #'
 #' #### Example (4): Adjust the units
-#' detection_area_sum(xy, coastline = dat_coast, scale = 1) # m2
+#' get_detection_area_sum(xy, coastline = dat_coast, scale = 1) # m2
 #'
 #' #### Example (5): Suppress the plot
-#' detection_area_sum(xy, coastline = dat_coast, plot = FALSE)
+#' get_detection_area_sum(xy, coastline = dat_coast, plot = FALSE)
 #'
 #' @author Edward Lavender
 #' @export
 #'
 
-detection_area_sum <- function(xy,
-                               detection_range = 425,
-                               coastline = NULL,
-                               scale = 1/(1000^2),
-                               plot = TRUE,...){
+get_detection_area_sum <- function(xy,
+                                   detection_range = 425,
+                                   coastline = NULL,
+                                   scale = 1/(1000^2),
+                                   plot = TRUE,...){
 
   #### Checks
   # If xy is empty, return area = 0
   if(length(xy) == 0) return(0)
 
   #### Define detection centroids
-  xy_buf <- detection_centroids(xy = xy,
-                                detection_range = detection_range,
-                                coastline = coastline,
-                                plot = plot,...)
+  xy_buf <- get_detection_centroids(xy = xy,
+                                    detection_range = detection_range,
+                                    coastline = coastline,
+                                    plot = plot,...)
 
   #### Calculate area (m2) covered by buffers overall
   xy_area <- rgeos::gArea(xy_buf) * scale
@@ -246,12 +246,12 @@ detection_area_sum <- function(xy,
 
 ######################################
 ######################################
-#### detection_area_ts()
+#### get_detection_area_ts()
 
 #' @title Calculate the area sampled by receivers through time
-#' @description This function extends \code{\link[flapper]{detection_area_sum}} to calculate how the total area sampled by receivers changes through time.
+#' @description This function extends \code{\link[flapper]{get_detection_area_sum}} to calculate how the total area sampled by receivers changes through time.
 #'
-#' @param xy,detection_range,coastline,scale Arguments required to calculate the total area surveyed by receivers (at each time point) via \code{\link[flapper]{detection_area_sum}}.
+#' @param xy,detection_range,coastline,scale Arguments required to calculate the total area surveyed by receivers (at each time point) via \code{\link[flapper]{get_detection_area_sum}}.
 #' @param plot A logical input that defines whether or not to plot a time series of the total area sampled by receivers.
 #' @param verbose A logical input that defines whether or not to print messages to the console to relay function progress.
 #' @param cl (optional) A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. The connection to the cluster is closed within the function.
@@ -271,13 +271,13 @@ detection_area_sum <- function(xy,
 #' xy <- sp::SpatialPointsDataFrame(xy, data = dat_moorings)
 #'
 #' #### Example (1): Implement function with default arguments
-#' dat <- detection_area_ts(xy)
+#' dat <- get_detection_area_ts(xy)
 #'
 #' #### Example (2): Adjust detection range, include coastline and use parallel processing
 #' # For areas with complex coastline, this will reduce the speed of the algorithm
 #' # So we will also supply a cluster to improve the computation time.
 #' \dontrun{
-#' dat <- detection_area_ts(xy,
+#' dat <- get_detection_area_ts(xy,
 #'                        detection_range = 500,
 #'                        coastline = dat_coast,
 #'                        cl = parallel::makeCluster(2L),
@@ -286,8 +286,8 @@ detection_area_sum <- function(xy,
 #' }
 #'
 #' #### Example (3) Hide or customise the plot
-#' dat <- detection_area_ts(xy, plot = FALSE)
-#' dat <- detection_area_ts(xy,
+#' dat <- get_detection_area_ts(xy, plot = FALSE)
+#' dat <- get_detection_area_ts(xy,
 #'                        pretty_axis_args = list(axis = list(list(format = "%b-%y"),
 #'                                                            list())),
 #'                        xlab = "Time (month-year)",
@@ -298,7 +298,7 @@ detection_area_sum <- function(xy,
 #' @export
 #'
 
-detection_area_ts <- function(xy,
+get_detection_area_ts <- function(xy,
                               detection_range = 425,
                               coastline = NULL,
                               scale = 1/(1000^2),
@@ -310,7 +310,7 @@ detection_area_ts <- function(xy,
   #### Checks
   t_onset <- Sys.time()
   cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
-  cat_to_console(paste0("flapper::detection_area_ts() called (@ ", t_onset, ")..."))
+  cat_to_console(paste0("flapper::get_detection_area_ts() called (@ ", t_onset, ")..."))
   cat_to_console("... Implementing function checks...")
   check_class(input = xy, to_class = "SpatialPointsDataFrame", type = "stop")
   check_names(input = xy, req = c("receiver_start_date", "receiver_end_date"))
@@ -322,7 +322,7 @@ detection_area_ts <- function(xy,
   if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
   rcov <- pbapply::pblapply(rdate_seq, cl = cl, function(rdate){
     pos <- which(xy$receiver_start_date <= rdate & xy$receiver_end_date >= rdate)
-    receiver_area <- detection_area_sum(xy = xy[pos, ],
+    receiver_area <- get_detection_area_sum(xy = xy[pos, ],
                                         detection_range = detection_range,
                                         coastline = coastline,
                                         scale = scale,
@@ -341,7 +341,7 @@ detection_area_ts <- function(xy,
   #### Return outputs
   t_end <- Sys.time()
   duration <- difftime(t_end, t_onset, units = "mins")
-  cat_to_console(paste0("... flapper::detection_area_ts() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
+  cat_to_console(paste0("... flapper::get_detection_area_ts() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
   return(rcov)
 
 }
@@ -349,7 +349,7 @@ detection_area_ts <- function(xy,
 
 ######################################
 ######################################
-#### n_operational_ts()
+#### get_n_operational_ts()
 
 #' @title Calculate the number of operational units through time
 #' @importFrom lubridate `%within%`
@@ -363,13 +363,13 @@ detection_area_ts <- function(xy,
 #' @param plot A logical variable that defines whether or not to plot the time series of the number of operational units.
 #' @param ... Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}}, to customise the plot.
 #'
-#' @details This is a simple metric of sampling effort. For acoustic receivers, \code{\link[flapper]{detection_area_ts}} provides another metric of sampling effort.
+#' @details This is a simple metric of sampling effort. For acoustic receivers, \code{\link[flapper]{get_detection_area_ts}} provides another metric of sampling effort.
 #'
 #' @return The function returns a dataframe that, for each time step ('time'), defines the number of operational units at that time ('n'). If \code{plot = TRUE}, the function also plots a time series of the number of operational units.
 #'
 #' @examples
 #' #### Example (1): Number of operational receivers over an acoustic telemetry study
-#' dat_n <- n_operational_ts(data = dat_moorings,
+#' dat_n <- get_n_operational_ts(data = dat_moorings,
 #'                           start = "receiver_start_date",
 #'                           stop = "receiver_end_date")
 #' utils::head(dat_n)
@@ -378,12 +378,12 @@ detection_area_ts <- function(xy,
 #' # Define 'tag_end_date' as hypothetical end date of a study
 #' # ...  and assume that all individuals remained tagged until this time
 #' dat_ids$tag_end_date <- as.Date("2017-06-05")
-#' dat_n <- n_operational_ts(data = dat_ids,
+#' dat_n <- get_n_operational_ts(data = dat_ids,
 #'                           start = "tag_start_date",
 #'                           stop = "tag_end_date")
 #'
 #' #### Example (3): Specify the time period under consideration
-#' dat_n <- n_operational_ts(data = dat_ids,
+#' dat_n <- get_n_operational_ts(data = dat_ids,
 #'                           start = "tag_start_date",
 #'                           stop = "tag_end_date",
 #'                           times = seq(min(dat_moorings$receiver_start_date),
@@ -391,11 +391,11 @@ detection_area_ts <- function(xy,
 #'                           )
 #'
 #' #### Example (4): Suppress or customise the plot
-#' dat_n <- n_operational_ts(data = dat_ids,
+#' dat_n <- get_n_operational_ts(data = dat_ids,
 #'                           start = "tag_start_date",
 #'                           stop = "tag_end_date",
 #'                           plot = FALSE)
-#' dat_n <- n_operational_ts(data = dat_ids,
+#' dat_n <- get_n_operational_ts(data = dat_ids,
 #'                           start = "tag_start_date",
 #'                           stop = "tag_end_date",
 #'                           xlab = "Time", ylab = "N (individuals)",
@@ -405,7 +405,7 @@ detection_area_ts <- function(xy,
 #' @export
 #'
 
-n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,...){
+get_n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,...){
 
   #### Define a sequence of times that span the range of the data, if required.
   if(is.null(times)){
@@ -430,7 +430,7 @@ n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,...){
 
 ######################################
 ######################################
-#### id_rec_overlap()
+#### get_id_rec_overlap()
 
 #' @title Calculate the overlap between individuals' time at liberty and receivers' operational periods
 #' @description This function calculates the duration of the overlap (in days) between individuals' time at liberty and receivers' operational periods. To implement this function, a dataframe with individual deployment periods and another with receiver deployment periods must be specified. The duration of the overlap between these intervals can be calculated for all combinations of individuals and receivers within these two dataframes, for all combinations of specified individuals and receivers, or for specific individual/receiver pairs. The function returns a dataframe of the overlap duration for these individual/receiver combinations or a vector of values that is matched against another dataframe.
@@ -442,7 +442,7 @@ n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,...){
 #' @param match_to (optional) A dataframe against which to match the calculated overlap duration(s). This must contain an 'individual_id' and 'receiver_id' column, as in \code{ids} and \code{moorings} respectively. If supplied, an integer vector of overlap durations for individual/receiver combinations, matched against the individuals/receivers in this dataframe, is returned (see also Value).
 #' @param ... Additional arguments (none implemented).
 #'
-#' @return The function returns a dataframe with the deployment overlap duration for specific or all combinations of individuals and receivers, with the 'individual_id', 'receiver_id', 'tag_start_date', 'tag_end_date', 'receiver_start_date' and 'receiver_end_date' columns retained. The 'id_rec_overlap' column defines the temporal overlap (days). Alternatively, if \code{match_to} is supplied, a vector of overlap durations that matches each individual/receiver observation in that dataframe is returned.
+#' @return The function returns a dataframe with the deployment overlap duration for specific or all combinations of individuals and receivers, with the 'individual_id', 'receiver_id', 'tag_start_date', 'tag_end_date', 'receiver_start_date' and 'receiver_end_date' columns retained. The 'get_id_rec_overlap' column defines the temporal overlap (days). Alternatively, if \code{match_to} is supplied, a vector of overlap durations that matches each individual/receiver observation in that dataframe is returned.
 #'
 #' @examples
 #' #### Prepare data to include required columns
@@ -454,25 +454,25 @@ n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,...){
 #'
 #' #### Example (1): Temporal between all combinations
 #' # ... of individuals and receivers
-#' dat <- id_rec_overlap(dat_ids, dat_moorings)
+#' dat <- get_id_rec_overlap(dat_ids, dat_moorings)
 #'
 #' #### Example (2) Temporal overlap between all combinations of specified
 #' #... individuals/receivers
-#' dat <- id_rec_overlap(dat_ids,
+#' dat <- get_id_rec_overlap(dat_ids,
 #'                       dat_moorings,
 #'                       individual_id = c(25, 26),
 #'                       receiver_id = c(3, 4),
 #'                       type = 2L)
 #'
 #' #### Example (3) Temporal overlap between specified individual/receiver pairs
-#' dat <- id_rec_overlap(dat_ids,
+#' dat <- get_id_rec_overlap(dat_ids,
 #'                       dat_moorings,
 #'                       individual_id = c(25, 26),
 #'                       receiver_id = c(3, 4),
 #'                       type = 1L)
 #'
 #' #### Example (4) Match temporal overlap to another dataframe
-#' dat_acoustics$id_rec_overlap <- id_rec_overlap(dat_ids,
+#' dat_acoustics$get_id_rec_overlap <- get_id_rec_overlap(dat_ids,
 #'                                                dat_moorings,
 #'                                                match_to = dat_acoustics,
 #'                                                type = 1L)
@@ -481,7 +481,7 @@ n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,...){
 #' @export
 #'
 
-id_rec_overlap <- function(ids,
+get_id_rec_overlap <- function(ids,
                            moorings,
                            individual_id = NULL,
                            receiver_id = NULL,
@@ -562,12 +562,12 @@ id_rec_overlap <- function(ids,
 
 ######################################
 ######################################
-#### detection_centroids_envir()
+#### get_detection_centroids_envir()
 
 #' @title Sample environmental conditions around receivers
-#' @description This function is used to sample environmental conditions from within the detection centroids of receivers. To implement the function, a SpatialPoints object that defines receiver locations (\code{xy}) must be provided, along with the detection range (\code{detection_range}) of receivers. This information is used to define detection centroids, via \code{\link[flapper]{detection_centroids}}. Within each receiver's centroid, all values of an environmental variable, or a random sample of values, are extracted from a user-defined \code{\link[raster]{raster}} (\code{envir}). Under random sampling, values can be sampled according to a detection probability function (\code{sample_probs}). The function returns a list of dataframes, one for each receiver, that include the sampled values.
+#' @description This function is used to sample environmental conditions from within the detection centroids of receivers. To implement the function, a SpatialPoints object that defines receiver locations (\code{xy}) must be provided, along with the detection range (\code{detection_range}) of receivers. This information is used to define detection centroids, via \code{\link[flapper]{get_detection_centroids}}. Within each receiver's centroid, all values of an environmental variable, or a random sample of values, are extracted from a user-defined \code{\link[raster]{raster}} (\code{envir}). Under random sampling, values can be sampled according to a detection probability function (\code{sample_probs}). The function returns a list of dataframes, one for each receiver, that include the sampled values.
 
-#' @param xy,detection_range,coastline,plot,... Arguments required to calculate and visualise detection centroids via \code{\link[flapper]{detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{detection_range}), barriers to detection (\code{coastline}) and whether or not to plot the centroids (\code{plot}). Additional arguments can be passed via \code{...} but note that \code{byid} is necessarily \code{TRUE} and should not be provided.
+#' @param xy,detection_range,coastline,plot,... Arguments required to calculate and visualise detection centroids via \code{\link[flapper]{get_detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{detection_range}), barriers to detection (\code{coastline}) and whether or not to plot the centroids (\code{plot}). Additional arguments can be passed via \code{...} but note that \code{byid} is necessarily \code{TRUE} and should not be provided.
 #' @param envir A \code{\link[raster]{raster}} that defines the values of an environmental variable across the study area. The coordinate reference system should be the Universal Transverse Mercator system.
 #' @param sample_size (optional) An integer that defines the number of samples of the environmental variable to draw from the area around each receiver (see the 'size' argument of \code{\link[base]{sample}}). If this is provided, \code{sample_size} samples are taken from this area; otherwise, all values are extracted.
 #' @param sample_replace (optional) If \code{sample_size} is specified, \code{sample_replace} is a logical input that defines whether to implement sampling with (\code{sample_replace = TRUE}, the default) or without (\code{sample_replace = FALSE}) replacement (see the 'replace' argument of \code{\link[base]{sample}}).
@@ -588,7 +588,7 @@ id_rec_overlap <- function(ids,
 #' xy <- sp::spTransform(xy, proj_utm)
 #'
 #' #### Example (1): Extract all depth values within each receiver's centroid
-#' depths_by_centroid <- detection_centroids_envir(xy = xy,
+#' depths_by_centroid <- get_detection_centroids_envir(xy = xy,
 #'                                                 detection_range = 425,
 #'                                                 coastline = dat_coast,
 #'                                                 envir = dat_gebco
@@ -609,7 +609,7 @@ id_rec_overlap <- function(ids,
 #'
 #' #### Example (2): Extract a random sample of values
 #' # (We'll keep the values small for speed)
-#' depths_by_centroid <- detection_centroids_envir(xy = xy,
+#' depths_by_centroid <- get_detection_centroids_envir(xy = xy,
 #'                                                 detection_range = 425,
 #'                                                 coastline = dat_coast,
 #'                                                 envir = dat_gebco,
@@ -621,7 +621,7 @@ id_rec_overlap <- function(ids,
 #' # Define detection probability function based only on distance
 #' calc_detection_pr <-
 #'   function(dist){
-#'     dpr <- detection_pr(distance = dist,
+#'     dpr <- get_detection_pr(distance = dist,
 #'                         beta_0 = 2.5,
 #'                         beta_1 = -0.01,
 #'                         inv_link = stats::plogis,
@@ -629,7 +629,7 @@ id_rec_overlap <- function(ids,
 #'     return(dpr)
 #'   }
 #' # Implement sampling with replacement according to detection probability
-#' depths_by_centroid <- detection_centroids_envir(xy = xy,
+#' depths_by_centroid <- get_detection_centroids_envir(xy = xy,
 #'                                                 detection_range = 425,
 #'                                                 coastline = dat_coast,
 #'                                                 envir = dat_gebco,
@@ -643,7 +643,7 @@ id_rec_overlap <- function(ids,
 #' utils::str(depths_by_centroid)
 #'
 #' #### Example (4) Sampling without replacement via sample_replace = FALSE
-#' depths_by_centroid <- detection_centroids_envir(xy = xy,
+#' depths_by_centroid <- get_detection_centroids_envir(xy = xy,
 #'                                                 detection_range = 425,
 #'                                                 coastline = dat_coast,
 #'                                                 envir = dat_gebco,
@@ -655,7 +655,7 @@ id_rec_overlap <- function(ids,
 #'
 #' #### Example (5) Parallelise the algorithm via cl and varlist arguments
 #' \dontrun{
-#' depths_by_centroid <- detection_centroids_envir(xy = xy,
+#' depths_by_centroid <- get_detection_centroids_envir(xy = xy,
 #'                                                 detection_range = 425,
 #'                                                 coastline = dat_coast,
 #'                                                 envir = dat_gebco,
@@ -673,7 +673,7 @@ id_rec_overlap <- function(ids,
 #' @export
 #'
 
-detection_centroids_envir <- function(xy,
+get_detection_centroids_envir <- function(xy,
                                       detection_range,
                                       coastline,
                                       plot = FALSE,
@@ -688,7 +688,7 @@ detection_centroids_envir <- function(xy,
   #### Checks
   t_onset <- Sys.time()
   cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
-  cat_to_console(paste0("flapper::detection_centroids_envir() called (@ ", t_onset, ")..."))
+  cat_to_console(paste0("flapper::get_detection_centroids_envir() called (@ ", t_onset, ")..."))
   cat_to_console("... Implementing function checks...")
   if(is.null(sample_size)){
     if(!is.null(sample_probs)) message("sample_size = NULL: input to 'sample_probs' ignored.")
@@ -699,7 +699,7 @@ detection_centroids_envir <- function(xy,
 
   #### Define detection centroids
   cat_to_console("... Defining detection centroid(s)...")
-  xy_buf <- detection_centroids(xy = xy,
+  xy_buf <- get_detection_centroids(xy = xy,
                                 detection_range = detection_range,
                                 coastline = coastline,
                                 plot = plot,
@@ -758,7 +758,7 @@ detection_centroids_envir <- function(xy,
 
 ######################################
 ######################################
-#### detection_days()
+#### get_detection_days()
 
 #' @title Calculate detection days
 #' @description The function calculates the total number of days (termed 'detection days') during which individuals were detected at passive acoustic telemetry receivers. To implement the function, a dataframe with passive acoustic telemetry detections of individuals at receivers must be supplied. Detection days can be calculated for all combinations of individuals/receivers in this dataframe, for all combinations of specified individuals and receivers, or for specific individual/receiver pairs. The function returns a dataframe of detection days for these individual/receiver combinations or a vector of detection days that is matched against another dataframe.
@@ -775,23 +775,23 @@ detection_centroids_envir <- function(xy,
 #' @examples
 #' #### Example (1): Detection days between all combinations
 #' # ... of detected individuals and receivers with detections
-#' dat <- detection_days(dat_acoustics)
+#' dat <- get_detection_days(dat_acoustics)
 #'
 #' #### Example (2) Detection days between all combinations of specified
 #' #... individuals/receivers
-#' dat <- detection_days(dat_acoustics,
+#' dat <- get_detection_days(dat_acoustics,
 #'                       individual_id = 25,
 #'                       receiver_id = c(25, 21),
 #'                       type = 2L)
 #'
 #' #### Example (3) Detection days between specified individual/receiver pairs
-#' dat <- detection_days(dat_acoustics,
+#' dat <- get_detection_days(dat_acoustics,
 #'                       individual_id = c(25, 26),
 #'                       receiver_id = c(25, 21),
 #'                       type = 1L)
 #'
 #' #### Example (4) Match detection days to another dataframe
-#' dat_acoustics$detection_days <- detection_days(dat_acoustics,
+#' dat_acoustics$detection_days <- get_detection_days(dat_acoustics,
 #'                                                match_to = dat_acoustics,
 #'                                                type = 1L)
 #'
@@ -801,7 +801,7 @@ detection_centroids_envir <- function(xy,
 #' @export
 #'
 
-detection_days <- function(acoustics,
+get_detection_days <- function(acoustics,
                            individual_id = NULL,
                            receiver_id = NULL,
                            type = 1L,
