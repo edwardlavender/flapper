@@ -8,7 +8,7 @@ sim_detections(
   path,
   xy,
   crs = NA,
-  detection_pr,
+  calc_detection_pr,
   by_timestep = FALSE,
   delta_t = NULL,
   plot = TRUE,
@@ -26,9 +26,9 @@ sim_detections(
 
 \item{crs}{A \code{\link[sp]{CRS}} object that defines the coordinate reference system (CRS) for \code{path} and \code{xy} (if applicable).}
 
-\item{detection_pr}{A function that takes in a vector of distances and returns a vector of detection probabilities.}
+\item{calc_detection_pr}{A function that takes in a vector of distances and returns a vector of detection probabilities.}
 
-\item{by_timestep}{A logical variable that defines whether or not \code{detection_pr} needs to be applied to each time step separately. This may be necessary if some of the parameters of the detection model are vectors (see Examples).}
+\item{by_timestep}{A logical variable that defines whether or not \code{calc_detection_pr} needs to be applied to each time step separately. This may be necessary if some of the parameters of the detection model are vectors (see Examples).}
 
 \item{delta_t}{(optional) An integer that defines the number of time steps over which to aggregate detections. If provided, detections are summed over each \code{delta_t} interval and returned along with averaged distances and probabilities (see Value).}
 
@@ -79,7 +79,7 @@ calc_detection_pr <- function(dist) ifelse(dist < 425, 1, 0)
 # Simulate detections
 dets_sim <- sim_detections(path = path,
                            xy = xy,
-                           detection_pr = calc_detection_pr)
+                           calc_detection_pr = calc_detection_pr)
 # The function returns a list of matrices that define the distances,
 # ... probabilities and detections for each time stamp (row) and each receiver
 # ... (column)
@@ -89,7 +89,7 @@ table(dets_sim$prob_mat)
 # We can also aggregate detections via delta_t
 dets_sim <- sim_detections(path = path,
                            xy = xy,
-                           detection_pr = calc_detection_pr,
+                           calc_detection_pr = calc_detection_pr,
                            delta_t = 10)
 # In this case, the function returns a list with 'agg' and 'raw' elements
 # ... The 'agg' elements contain aggregated matrices and the 'raw' elements
@@ -102,7 +102,7 @@ table(dets_sim$agg$det_mat)
 calc_detection_pr <- function(dist) stats::plogis(2.5 + -0.01 * dist)
 dets_sim <- sim_detections(path = path,
                            xy = xy,
-                           detection_pr = calc_detection_pr)
+                           calc_detection_pr = calc_detection_pr)
 
 #### Example (3) Spatially varying probability function
 # Define spatially varying beta parameter (e.g., reflecting 2 habitat types)
@@ -132,7 +132,7 @@ calc_detection_pr <- function(dist) stats::plogis(2.5 + beta * dist)
 # ... are combined appropriately with beta values for each receiver
 dets_sim <- sim_detections(path = path,
                            xy = xy,
-                           detection_pr = calc_detection_pr,
+                           calc_detection_pr = calc_detection_pr,
                            by_timestep = TRUE)
 
 }

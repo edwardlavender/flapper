@@ -679,8 +679,8 @@ summarise_along_walk <- function(vec, every, summarise = sum, na.rm = FALSE,...)
 #' @param path A two-column matrix of the coordinates of the movement path (x, y).
 #' @param xy A two-column matrix of the coordinates of receivers (x, y).
 #' @param crs A \code{\link[sp]{CRS}} object that defines the coordinate reference system (CRS) for \code{path} and \code{xy} (if applicable).
-#' @param detection_pr A function that takes in a vector of distances and returns a vector of detection probabilities.
-#' @param by_timestep A logical variable that defines whether or not \code{detection_pr} needs to be applied to each time step separately. This may be necessary if some of the parameters of the detection model are vectors (see Examples).
+#' @param calc_detection_pr A function that takes in a vector of distances and returns a vector of detection probabilities.
+#' @param by_timestep A logical variable that defines whether or not \code{calc_detection_pr} needs to be applied to each time step separately. This may be necessary if some of the parameters of the detection model are vectors (see Examples).
 #' @param delta_t (optional) An integer that defines the number of time steps over which to aggregate detections. If provided, detections are summed over each \code{delta_t} interval and returned along with averaged distances and probabilities (see Value).
 #' @param plot A logical variable that defines whether or not to plot detections (and probabilities) against distances.
 #' @param jitter,add_prob,xlim,... Plot customisation options. \code{jitter} is a function that jitters \code{n} simulated outcomes (0, 1) in the vertical direction. \code{add_prob} is a named list of arguments, passed to \code{\link[graphics]{points}}, used to customise the addition of calculated probabilities to the plot. (\code{add_prob} suppresses the addition of probabilities to the plot.) \code{xlim} is a vector of x axis limits. By default, \code{xlim = c(0, 1000)} to improve resolution in the area of the plot that is of interest (under a Universal Transverse Mercator CRS, for most realistic detection probability functions, detection probability beyond 1000 will be negligible) and plotting speed. Additional arguments can be passed to \code{\link[prettyGraphics]{pretty_plot}} to customise the plot via \code{...}.
@@ -722,7 +722,7 @@ summarise_along_walk <- function(vec, every, summarise = sum, na.rm = FALSE,...)
 #' # Simulate detections
 #' dets_sim <- sim_detections(path = path,
 #'                            xy = xy,
-#'                            detection_pr = calc_detection_pr)
+#'                            calc_detection_pr = calc_detection_pr)
 #' # The function returns a list of matrices that define the distances,
 #' # ... probabilities and detections for each time stamp (row) and each receiver
 #' # ... (column)
@@ -732,7 +732,7 @@ summarise_along_walk <- function(vec, every, summarise = sum, na.rm = FALSE,...)
 #' # We can also aggregate detections via delta_t
 #' dets_sim <- sim_detections(path = path,
 #'                            xy = xy,
-#'                            detection_pr = calc_detection_pr,
+#'                            calc_detection_pr = calc_detection_pr,
 #'                            delta_t = 10)
 #' # In this case, the function returns a list with 'agg' and 'raw' elements
 #' # ... The 'agg' elements contain aggregated matrices and the 'raw' elements
@@ -745,7 +745,7 @@ summarise_along_walk <- function(vec, every, summarise = sum, na.rm = FALSE,...)
 #' calc_detection_pr <- function(dist) stats::plogis(2.5 + -0.01 * dist)
 #' dets_sim <- sim_detections(path = path,
 #'                            xy = xy,
-#'                            detection_pr = calc_detection_pr)
+#'                            calc_detection_pr = calc_detection_pr)
 #'
 #' #### Example (3) Spatially varying probability function
 #' # Define spatially varying beta parameter (e.g., reflecting 2 habitat types)
@@ -775,17 +775,16 @@ summarise_along_walk <- function(vec, every, summarise = sum, na.rm = FALSE,...)
 #' # ... are combined appropriately with beta values for each receiver
 #' dets_sim <- sim_detections(path = path,
 #'                            xy = xy,
-#'                            detection_pr = calc_detection_pr,
+#'                            calc_detection_pr = calc_detection_pr,
 #'                            by_timestep = TRUE)
 #'
 #' @author Edward Lavender
 #' @export
 
-
 sim_detections <- function(path,
                            xy,
                            crs = NA,
-                           detection_pr,
+                           calc_detection_pr,
                            by_timestep = FALSE,
                            delta_t = NULL,
                            plot = TRUE,
@@ -821,10 +820,10 @@ sim_detections <- function(path,
   #### Calculate  probabilities
   cat_to_console("... Calculating probabilities...")
   if(!by_timestep) {
-    prob_mat <- apply(dist_mat, 1:2, detection_pr)
+    prob_mat <- apply(dist_mat, 1:2, calc_detection_pr)
   } else {
     for(t in 1:n_timesteps) {
-      prob_mat[t, ] <- detection_pr(dist_mat[t, ])
+      prob_mat[t, ] <- calc_detection_pr(dist_mat[t, ])
     }
   }
 

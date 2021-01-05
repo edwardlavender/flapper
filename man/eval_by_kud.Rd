@@ -96,7 +96,7 @@ prettyGraphics::add_sp_path(path_ls$xy_mat, col = viridis::viridis(n), length = 
 # ... (In reality, we would need to consider this choice carefully).
 det_ls <- sim_detections(path = path_ls$xy_mat,
                          xy = sp::coordinates(array$xy),
-                         detection_pr = function(dist) ifelse(dist < 700, 1, 0),
+                         calc_detection_pr = function(dist) ifelse(dist < 700, 1, 0),
                          delta_t = 10)
 
 str(det_ls)
