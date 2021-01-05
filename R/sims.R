@@ -632,6 +632,43 @@ sim_path_ou_1 <-
   }
 
 
+#####################################################
+#####################################################
+#### summarise_along_walk()
+
+#' @title Summarise every n numbers in a vector
+#' @description This function summarises every n numbers in a vector.
+#' @param vec A numeric vector.
+#' @param every An integer that defines the step length of the walk over the vector.
+#' @param summarise A function that summarises the numbers in each step.
+#' @param na.rm A logical value that defines whether or not to remove NAs.
+#' @param ... Additional arguments passed to \code{summarise}.
+#'
+#' @return The function returns a numeric vector.
+#'
+#' @examples
+#' \dontrun{
+#' x <- c(rep(1, 10), rep(2, 10))
+#' summarise_along_walk(x, every = 10)
+#' x <- c(mean(10, 5), mean(100, 5))
+#' summarise_along_walk(x, every = 10, summarise = mean)
+#' x <- c(x, NA)
+#' summarise_along_walk(x, every = 10, summarise = mean, na.rm = TRUE)
+#' }
+#'
+#' @source This function is a slight modification of the code provided here: https://stackoverflow.com/questions/43635846/calculating-mean-for-every-n-values-from-a-vector.
+#'
+#' @keywords internal
+
+summarise_along_walk <- function(vec, every, summarise = sum, na.rm = FALSE,...) {
+  n <- length(vec)
+  x <- .colSums(vec, every, n %/% every, na.rm = na.rm)
+  r <- n %% every
+  if (r) x <- c(x, summarise(vec[(n - r + 1):n], na.rm = na.rm,...))
+  return(x)
+}
+
+
 ######################################
 ######################################
 #### sim_detections()
@@ -644,13 +681,14 @@ sim_path_ou_1 <-
 #' @param crs A \code{\link[sp]{CRS}} object that defines the coordinate reference system (CRS) for \code{path} and \code{xy} (if applicable).
 #' @param detection_pr A function that takes in a vector of distances and returns a vector of detection probabilities.
 #' @param by_timestep A logical variable that defines whether or not \code{detection_pr} needs to be applied to each time step separately. This may be necessary if some of the parameters of the detection model are vectors (see Examples).
+#' @param delta_t (optional) An integer that defines the number of time steps over which to aggregate detections. If provided, detections are summed over each \code{delta_t} interval and returned along with averaged distances and probabilities (see Value).
 #' @param plot A logical variable that defines whether or not to plot detections (and probabilities) against distances.
 #' @param jitter,add_prob,xlim,... Plot customisation options. \code{jitter} is a function that jitters \code{n} simulated outcomes (0, 1) in the vertical direction. \code{add_prob} is a named list of arguments, passed to \code{\link[graphics]{points}}, used to customise the addition of calculated probabilities to the plot. (\code{add_prob} suppresses the addition of probabilities to the plot.) \code{xlim} is a vector of x axis limits. By default, \code{xlim = c(0, 1000)} to improve resolution in the area of the plot that is of interest (under a Universal Transverse Mercator CRS, for most realistic detection probability functions, detection probability beyond 1000 will be negligible) and plotting speed. Additional arguments can be passed to \code{\link[prettyGraphics]{pretty_plot}} to customise the plot via \code{...}.
 #' @param verbose A logical variable that defines whether or not to print messages to the console to relay function progress.
 #'
 #' @details The function assumes that the individual transmits an acoustic signal which has the capacity to be detected at each time step. In reality, acoustic transmitters are often programmed with a randomly varying delay, but this is not currently implemented. The function also assumes that all receivers that are supplied are able to make detections. If the receivers at which an individual could be detected change over time, it may be necessary to apply the function iteratively or post-process the outcomes to ensure that individuals are not detected at inactive receivers.
 #'
-#' @return The function returns a named list with three matrices that define, for each path position (rows) and each receiver (columns), (a) the distance of that position from each receiver ('dist_mat'), (b) the probability of detection at that receiver ('prob_mat') and (c) the simulated outcome (0, no detection; 1, detection) ('det_mat'). If \code{plot = TRUE}, the function also returns a plot.
+#' @return If \code{delta_t = NULL}, then function returns a named list with three matrices that define, for each path position (rows) and each receiver (columns), (a) the distance of that position from each receiver ('dist_mat'), (b) the probability of detection at that receiver ('prob_mat') and (c) the simulated outcome (0, no detection; 1, detection) ('det_mat'). If \code{delta_t} is specified, then the function returns a list with a 'raw' and an 'agg' element. The raw elements contains the matrices described above; the 'agg' element contains the aggregated versions of these matrices, with detections summed over each \code{delta_t} interval and distances and probabilities averaged (using the arithmetic mean) over each interval. If \code{plot = TRUE}, the function also returns a plot of the (raw) detections (0, 1) and, if specified, the corresponding probabilities.
 #'
 #' @examples
 #' #### Step (1) Simulate an array in an area
@@ -691,6 +729,17 @@ sim_path_ou_1 <-
 #' utils::str(dets_sim)
 #' # Examine probabilities
 #' table(dets_sim$prob_mat)
+#' # We can also aggregate detections via delta_t
+#' dets_sim <- sim_detections(path = path,
+#'                            xy = xy,
+#'                            detection_pr = calc_detection_pr,
+#'                            delta_t = 10)
+#' # In this case, the function returns a list with 'agg' and 'raw' elements
+#' # ... The 'agg' elements contain aggregated matrices and the 'raw' elements
+#' # ... contain the matrices described above.
+#' utils::str(dets_sim)
+#' table(dets_sim$raw$det_mat)
+#' table(dets_sim$agg$det_mat)
 #'
 #' #### Example (2) Logistic probability function
 #' calc_detection_pr <- function(dist) stats::plogis(2.5 + -0.01 * dist)
@@ -738,7 +787,7 @@ sim_detections <- function(path,
                            crs = NA,
                            detection_pr,
                            by_timestep = FALSE,
-
+                           delta_t = NULL,
                            plot = TRUE,
                            jitter = function(n) stats::rnorm(n, 0, 0.05),
                            add_prob = list(col = "royalblue", pch = 3, cex = 0.5),
@@ -807,8 +856,35 @@ sim_detections <- function(path,
     }
   }
 
+  #### Aggregate detections over delta t
+  if(!is.null(delta_t)) {
+    cat_to_console("... summarising detections over delta t...")
+    # Save full matrices
+    dist_mat_raw <- dist_mat
+    prob_mat_raw <- prob_mat
+    det_mat_raw  <- det_mat
+    # Aggregate matrices
+    agg_mat_ls <- lapply(1:ncol(det_mat), function(j){
+      dist <- summarise_along_walk(dist_mat[, j], every = delta_t, summarise = mean, na.rm = TRUE) # mean
+      prob <- summarise_along_walk(prob_mat[, j], every = delta_t, summarise = mean, na.rm = TRUE) # mean
+      det <- summarise_along_walk(det_mat[, j], every = delta_t, summarise = sum, na.rm = TRUE)    # sum
+      list_m <- list(dist = dist, prob = prob, det = det)
+      return(list_m)
+    })
+    dist_mat <- do.call(cbind, lapply(agg_mat_ls, function(elm) elm$dist))
+    prob_mat <- do.call(cbind, lapply(agg_mat_ls, function(elm) elm$prob))
+    det_mat  <- do.call(cbind, lapply(agg_mat_ls, function(elm) elm$det))
+  }
+
   #### Return list
   out <- list(dist_mat = dist_mat, prob_mat = prob_mat, det_mat = det_mat)
+  if(!is.null(delta_t)) {
+    out <- list(agg = out)
+    out$raw = list()
+    out$raw$dist_mat_raw <- dist_mat_raw
+    out$raw$prob_mat_raw <- prob_mat_raw
+    out$raw$det_mat_raw  <- det_mat_raw
+  }
   t_end <- Sys.time()
   duration <- difftime(t_end, t_onset, units = "mins")
   cat_to_console(paste0("... flapper::simulate_detections() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))

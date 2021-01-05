@@ -10,6 +10,7 @@ sim_detections(
   crs = NA,
   detection_pr,
   by_timestep = FALSE,
+  delta_t = NULL,
   plot = TRUE,
   jitter = function(n) stats::rnorm(n, 0, 0.05),
   add_prob = list(col = "royalblue", pch = 3, cex = 0.5),
@@ -29,6 +30,8 @@ sim_detections(
 
 \item{by_timestep}{A logical variable that defines whether or not \code{detection_pr} needs to be applied to each time step separately. This may be necessary if some of the parameters of the detection model are vectors (see Examples).}
 
+\item{delta_t}{(optional) An integer that defines the number of time steps over which to aggregate detections. If provided, detections are summed over each \code{delta_t} interval and returned along with averaged distances and probabilities (see Value).}
+
 \item{plot}{A logical variable that defines whether or not to plot detections (and probabilities) against distances.}
 
 \item{jitter, add_prob, xlim, ...}{Plot customisation options. \code{jitter} is a function that jitters \code{n} simulated outcomes (0, 1) in the vertical direction. \code{add_prob} is a named list of arguments, passed to \code{\link[graphics]{points}}, used to customise the addition of calculated probabilities to the plot. (\code{add_prob} suppresses the addition of probabilities to the plot.) \code{xlim} is a vector of x axis limits. By default, \code{xlim = c(0, 1000)} to improve resolution in the area of the plot that is of interest (under a Universal Transverse Mercator CRS, for most realistic detection probability functions, detection probability beyond 1000 will be negligible) and plotting speed. Additional arguments can be passed to \code{\link[prettyGraphics]{pretty_plot}} to customise the plot via \code{...}.}
@@ -36,7 +39,7 @@ sim_detections(
 \item{verbose}{A logical variable that defines whether or not to print messages to the console to relay function progress.}
 }
 \value{
-The function returns a named list with three matrices that define, for each path position (rows) and each receiver (columns), (a) the distance of that position from each receiver ('dist_mat'), (b) the probability of detection at that receiver ('prob_mat') and (c) the simulated outcome (0, no detection; 1, detection) ('det_mat'). If \code{plot = TRUE}, the function also returns a plot.
+If \code{delta_t = NULL}, then function returns a named list with three matrices that define, for each path position (rows) and each receiver (columns), (a) the distance of that position from each receiver ('dist_mat'), (b) the probability of detection at that receiver ('prob_mat') and (c) the simulated outcome (0, no detection; 1, detection) ('det_mat'). If \code{delta_t} is specified, then the function returns a list with a 'raw' and an 'agg' element. The raw elements contains the matrices described above; the 'agg' element contains the aggregated versions of these matrices, with detections summed over each \code{delta_t} interval and distances and probabilities averaged (using the arithmetic mean) over each interval. If \code{plot = TRUE}, the function also returns a plot of the (raw) detections (0, 1) and, if specified, the corresponding probabilities.
 }
 \description{
 This function simulates detections at passive acoustic telemetry receivers under a detection model that depends on distance. To implement the function, the underlying movement path that gives rise to detections (or not) must be supplied (via \code{path}) along with the locations of receivers (\code{xy}) at which individuals can be detected. At each point along the movement path (i.e., time step), the function calculates the distances from that point to all of the receivers and evaluates a user-supplied detection probability function, based on distance, to determine detection probability at each receiver. The function then simulates binary detection outcomes from a binomial distribution conditional on this probability, and returns these in a matrix with one simulated outcome for each time step and receiver.
@@ -83,6 +86,17 @@ dets_sim <- sim_detections(path = path,
 utils::str(dets_sim)
 # Examine probabilities
 table(dets_sim$prob_mat)
+# We can also aggregate detections via delta_t
+dets_sim <- sim_detections(path = path,
+                           xy = xy,
+                           detection_pr = calc_detection_pr,
+                           delta_t = 10)
+# In this case, the function returns a list with 'agg' and 'raw' elements
+# ... The 'agg' elements contain aggregated matrices and the 'raw' elements
+# ... contain the matrices described above.
+utils::str(dets_sim)
+table(dets_sim$raw$det_mat)
+table(dets_sim$agg$det_mat)
 
 #### Example (2) Logistic probability function
 calc_detection_pr <- function(dist) stats::plogis(2.5 + -0.01 * dist)
