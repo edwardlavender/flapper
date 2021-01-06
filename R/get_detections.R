@@ -409,7 +409,7 @@ get_n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,..
 
   #### Define a sequence of times that span the range of the data, if required.
   if(is.null(times)){
-    times <- seq(as.Date(min(data[, start]), na.rm = TRUE), as.Date(max(data[, stop]), na.rm = TRUE), by = "days")
+    times <- seq(min(data[, start], na.rm = TRUE), max(data[, stop], na.rm = TRUE), by = "days")
   }
 
   #### Count the number of operational units at each time step
