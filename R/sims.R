@@ -11,11 +11,9 @@
 #' @param n_receivers An integer that defines the number of receivers in the array. This is ignored if receiver locations are specified via \code{arrangement}.
 #' @param arrangement,... A character string or a SpatialPoints object that defines the arrangement of receivers. Supported character string options for simulated arrays are \code{"regular"}, \code{"random"} and \code{"stratified"}, \code{"nonaligned"}, \code{"hexagonal"} and \code{"clustered"} (see \code{\link[sp]{spsample}}, which is used to simulate receiver locations). Additional arguments can be passed to this function via \code{...} for further control. Otherwise, a SpatialPoints object that defines the coordinates of receivers (in the same coordinate reference system as \code{boundaries} and, if applicable, \code{coastline}) is assumed to have been provided.
 #' @param seed An integer that is used to set the seed to enable reproducible simulations (see \code{\link[base]{set.seed}}).
-#' @param plot A logical variable that defines whether or not plot the array.
+#' @param plot A logical variable that defines whether or not plot the array (via \code{\link[prettyGraphics]{pretty_map}}).
 #' @param xlim,ylim (optional) Axis limits for the plot. These can be specified in any way supported by \code{\link[prettyGraphics]{pretty_axis}}.
-#' @param add_sea (optional) If \code{plot = TRUE}, \code{add_sea} is a named list of arguments, passed to \code{\link[raster]{plot}}, to customise the appearance of the sea on the plot. \code{add_sea = NULL} suppresses the addition of the sea to the plot. To use the default graphical parameters, simply specify \code{add_sea = list()}.
-#' @param add_land (optional) If \code{plot = TRUE}, \code{add_land} is a named list of arguments, passed to \code{\link[raster]{plot}}, to customise the appearance of the land on the plot. \code{add_land = NULL} suppresses the addition of the land to the plot. To use the default graphical parameters, simply specify \code{add_land = list()}.
-#' @param add_receivers (optional) If \code{plot = TRUE}, \code{add_receivers} is a named list of arguments, passed to \code{\link[graphics]{points}}, to customise the appearance of receivers on the plot. \code{add_receivers = NULL} suppresses the addition of the receivers to the plot. To use the default graphical parameters, simply specify \code{add_receivers = list()}.
+#' @param add_sea,add_land,add_receivers (optional) Named lists of arguments, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the sea, land and/or receivers on the plot. \code{add_* = NULL} suppresses the addition of the layer to the plot. To use the default graphical parameters, simply specify \code{add_* = list()}.
 #' @param verbose A logical variable that defines whether or not to print messages to the console to relay function progress.
 #'
 #' @return The function returns a named list of (a) the spatial objects that define the simulated array ('array') and (b) the arguments used to generate this array ('args'). The 'array' element is a named list contains the following elements: 'boundaries', an \code{\link[raster]{Extent-class}} object that defines the boundaries of the area (as inputted); 'area', a \code{\link[sp]{SpatialPolygons-class}} object that defines the boundaries of the area; 'land' and 'sea', \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects that define the land and sea respectively; and 'xy', a \code{\link[sp]{SpatialPoints-class}} object that defines receiver locations. If \code{plot = TRUE}, the function also returns a plot of the array.
@@ -170,44 +168,15 @@ sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
   #### Plot array
   if(plot){
     cat_to_console("... Plotting array...")
-    # Get pretty axes
-    x <- lapply(list(area, land, sea, rxy), function(x) if(!is.null(x)) raster::extent(x)[1:2])
-    x <- unlist(x)
-    y <- lapply(list(area, land, sea, rxy), function(x) if(!is.null(x)) raster::extent(x)[3:4])
-    y <- unlist(y)
-    pretty_axis_args <- list(side = 1:4,
-                             axis = list(list(),
-                                         list(),
-                                         list(labels = FALSE),
-                                         list(labels = FALSE)),
-                             control_sci_notation = list(magnitude = 16L, digits = 0)
-                             )
-    axis_param <- prettyGraphics::implement_pretty_axis_args(x = list(x, y),
-                                                             pretty_axis_args = pretty_axis_args,
-                                                             xlim = xlim,
-                                                             ylim = ylim)
-    # Draw background plot
-    raster::plot(area,
-                 xlim = axis_param[[1]]$lim, ylim = axis_param[[2]]$lim,
-                 axes = FALSE, border = NA)
-    # Add spatial layers
-    if(!is.null(add_land)){
-      add_land$x <- land
-      add_land$add <- TRUE
-      do.call(raster::plot, add_land)
-    }
-    if(!is.null(add_sea)){
-      add_sea$x <- sea
-      add_sea$add <- TRUE
-      do.call(raster::plot, add_sea)
-    }
-    if(!is.null(add_receivers)){
-      add_receivers$x <- rxy
-      do.call(graphics::points, add_receivers)
-    }
-    # Add pretty axes
-    prettyGraphics::pretty_axis(axis_ls = axis_param, add = TRUE)
-
+    # Define spatial layers
+    if(!is.null(add_land)) add_land$x <- land
+    if(!is.null(add_sea)) add_sea$x <- sea
+    if(!is.null(add_receivers)) add_receivers$x <- rxy
+    # Make map
+    prettyGraphics::pretty_map(x = area,
+                               xlim = xlim, ylim = ylim,
+                               add_polys = list(add_land, add_sea),
+                               add_points = add_receivers)
   }
 
   #### Return outputs

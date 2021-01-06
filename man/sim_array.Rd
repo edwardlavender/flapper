@@ -34,15 +34,11 @@ sim_array(
 
 \item{seed}{An integer that is used to set the seed to enable reproducible simulations (see \code{\link[base]{set.seed}}).}
 
-\item{plot}{A logical variable that defines whether or not plot the array.}
+\item{plot}{A logical variable that defines whether or not plot the array (via \code{\link[prettyGraphics]{pretty_map}}).}
 
 \item{xlim, ylim}{(optional) Axis limits for the plot. These can be specified in any way supported by \code{\link[prettyGraphics]{pretty_axis}}.}
 
-\item{add_sea}{(optional) If \code{plot = TRUE}, \code{add_sea} is a named list of arguments, passed to \code{\link[raster]{plot}}, to customise the appearance of the sea on the plot. \code{add_sea = NULL} suppresses the addition of the sea to the plot. To use the default graphical parameters, simply specify \code{add_sea = list()}.}
-
-\item{add_land}{(optional) If \code{plot = TRUE}, \code{add_land} is a named list of arguments, passed to \code{\link[raster]{plot}}, to customise the appearance of the land on the plot. \code{add_land = NULL} suppresses the addition of the land to the plot. To use the default graphical parameters, simply specify \code{add_land = list()}.}
-
-\item{add_receivers}{(optional) If \code{plot = TRUE}, \code{add_receivers} is a named list of arguments, passed to \code{\link[graphics]{points}}, to customise the appearance of receivers on the plot. \code{add_receivers = NULL} suppresses the addition of the receivers to the plot. To use the default graphical parameters, simply specify \code{add_receivers = list()}.}
+\item{add_sea, add_land, add_receivers}{(optional) Named lists of arguments, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the sea, land and/or receivers on the plot. \code{add_* = NULL} suppresses the addition of the layer to the plot. To use the default graphical parameters, simply specify \code{add_* = list()}.}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console to relay function progress.}
 }
