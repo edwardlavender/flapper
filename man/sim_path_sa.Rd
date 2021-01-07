@@ -138,7 +138,7 @@ path <- sim_path_sa(sim_angle = sim_angles_wrn_with_lag, lag = 2)
 
 }
 \seealso{
-\code{\link[flapper]{sim_path_ou_1}} simulates a movement path based on past locations according to an Ornstein-Uhlenbeck process (which is not based on step lengths and turning angles).
+For movement simulations, see \code{\link[flapper]{sim_path_*}} for the full list of functions currently implemented in \code{\link[flapper]{flapper}}. For example, \code{\link[flapper]{sim_path_ou_1}} simulates a movement path based on past locations according to an Ornstein-Uhlenbeck process (which is not based on step lengths and turning angles). More broadly, \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement.
 }
 \author{
 Edward Lavender

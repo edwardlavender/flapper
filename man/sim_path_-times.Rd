@@ -10,3 +10,6 @@
   \item{\link{sim_path_ou_1}} -- simulate discrete-time movement paths under a Ornstein-Uhlenbeck process with time-fixed parameters
 }
 }
+\seealso{
+\code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement.
+}

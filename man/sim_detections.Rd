@@ -136,6 +136,9 @@ dets_sim <- sim_detections(path = path,
                            by_timestep = TRUE)
 
 }
+\seealso{
+\code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement. To convert the detection matrix to dataframe, see \code{\link[flapper]{make_df_detections}}.
+}
 \author{
 Edward Lavender
 }

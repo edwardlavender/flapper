@@ -222,6 +222,7 @@ sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
 #'   \item{\link{sim_path_sa}} - simulate discrete-time movement paths from step lengths and turning angles
 #'   \item{\link{sim_path_ou_1}} -- simulate discrete-time movement paths under a Ornstein-Uhlenbeck process with time-fixed parameters
 #' }
+#' @seealso \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement.
 #' @name sim_path_*
 NULL
 
@@ -251,7 +252,7 @@ NULL
 #'
 #' @return The function returns a named list of arguments that defines the simulated path ('xy_mat', 'angle_mat', 'step_mat' and 'path') and a named list of arguments that were used to generate the path ('args'). 'xy_mat' is an n-row, two-column matrix that defines the simulated position (x, y) at each time step; 'angle_mat' and 'step_mat' are n-row, one-column matrices that define the simulated turning angle (degrees) and step length (in map units) at each time step; and 'path' is a \code{\link[sp]{SpatialLines}} representation of the movement path.
 #'
-#' @seealso \code{\link[flapper]{sim_path_ou_1}} simulates a movement path based on past locations according to an Ornstein-Uhlenbeck process (which is not based on step lengths and turning angles).
+#' @seealso For movement simulations, see \code{\link[flapper]{sim_path_*}} for the full list of functions currently implemented in \code{\link[flapper]{flapper}}. For example, \code{\link[flapper]{sim_path_ou_1}} simulates a movement path based on past locations according to an Ornstein-Uhlenbeck process (which is not based on step lengths and turning angles). More broadly, \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement.
 #'
 #' @examples
 #' #### Example (1): Simulate movement path under default parameters
@@ -531,7 +532,7 @@ sim_angles <- function(...) {
 #'
 #' @return The function returns an n-row, two-column matrix that defines the simulated location (x, y) at each time step and, if \code{plot = TRUE}, a plot of the path.
 #'
-#' @seealso \code{\link[flapper]{sim_path_sa}} simulates a movement path based on step lengths and turning angles. This can support movement within restricted areas.
+#' @seealso For movement simulations, see \code{\link[flapper]{sim_path_*}} for the full list of functions currently implemented in \code{\link[flapper]{flapper}}. For example, \code{\link[flapper]{sim_path_sa}} simulates a movement path based on step lengths and turning angles. This can support movement within restricted areas. More broadly, \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement.
 #'
 #' @examples
 #' #### Example (1): Implement simulation with default options
@@ -766,6 +767,7 @@ summarise_along_walk <- function(vec, every, summarise = sum, na.rm = FALSE,...)
 #'                            calc_detection_pr = calc_detection_pr,
 #'                            by_timestep = TRUE)
 #'
+#' @seealso \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement. To convert the detection matrix to dataframe, see \code{\link[flapper]{make_df_detections}}.
 #' @author Edward Lavender
 #' @export
 

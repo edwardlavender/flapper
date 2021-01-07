@@ -85,7 +85,7 @@ path <- sim_path_ou_1(n = n,
 Alós, J. et al. (2016) Bayesian State-Space Modelling of Conventional Acoustic Tracking Provides Accurate Descriptors of Home Range Behavior in a Small-Bodied Coastal Fish Species. Plos One 11, e0154089
 }
 \seealso{
-\code{\link[flapper]{sim_path_sa}} simulates a movement path based on step lengths and turning angles. This can support movement within restricted areas.
+For movement simulations, see \code{\link[flapper]{sim_path_*}} for the full list of functions currently implemented in \code{\link[flapper]{flapper}}. For example, \code{\link[flapper]{sim_path_sa}} simulates a movement path based on step lengths and turning angles. This can support movement within restricted areas. More broadly, \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement.
 }
 \author{
 Edward Lavender
