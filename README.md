@@ -185,12 +185,12 @@ of passive acoustic telemetry time series:
           - `make_matrix_ids()` matricises individual deployment time
             series;
           - `make_matrix_receivers()` matricises receiver deployment
-            time series ;
+            time series;
           - `make_matrix_detections()` matricises detection time series;
       - `make_df_*()` functions (i.e., `make_df_detections()`) reverse
         this process;
   - **Data processing.**
-      - `process_receiver_ids()` adds unique receiver IDs to a dataframe
+      - `process_receiver_id()` adds unique receiver IDs to a dataframe
         (which is useful if the same receiver has been deployed more
         than once);
       - `process_false_detections_sf()` passes putative false detections

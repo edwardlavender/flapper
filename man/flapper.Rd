@@ -9,22 +9,113 @@ flapper is an R package designed to facilitate the use of passive acoustic telem
 }
 \section{Data processing}{
 
-A set of functions is used for processing PAT data, including exploring false detections, assembling detection -- transmission (i.e., range testing) datasets and implementing quality checks.
+Some functions facilitate the assembly, processing and checking of passive acoustic telemetry time series:
+\itemize{
+  \item Data assembly
+   \itemize{
+     \item \link{assemble_sentinel_counts} assembles counts of transmissions/detections from sentinel tags for modelling purposes (i.e., to model detection probability);
+     \item \link{make_matrix_ids} matricises individual deployment time series;
+     \item \link{make_matrix_receivers} matricises receiver deployment time series;
+     \item \link{make_matrix_detections} matricises detection time series;
+     \item \link{make_df_detections} reverses this process;
+  }
+  \item Data processing
+  \itemize{
+    \item \link{process_receiver_id} adds unique receiver IDs to a dataframe (which is useful if the same receiver has been deployed more than once);
+    \item \link{process_false_detections_sf} passes putative false detections through a spatial filter which incorporates ancillary information on receiver locations and animal swimming speeds to interrogate their plausibility;
+    \item \link{process_quality_check} passes acoustic data through some basic quality checks prior to analysis;
+   }
+}
 }
 
 \section{Spatial tools}{
 
-A set of functions is used to implement standard spatial operations, distance calculations and the (rapid) computation of least-cost pathways over a surface between origin and destination coordinates.
+Some functions facilitate spatial operations, which support ecological investigations and space use algorithms:
+\itemize{
+  \item \link{buffer_and_crop} buffers a spatial object (e.g., receiver locations) and uses this buffered object to crop another (e.g., the local bathymetry);
+  \item \link{cells_from_val} returns the cells (or a raster of the cells) of a raster that are equal to a specified value or lie within a specified range of values;
+  \item \link{invert_poly} inverts a polygon (e.g, to define the ‘sea’ from a polygon of the ‘land’);
+  \item \link{mask_io} masks values in a raster that lie inside or outside of a spatial mask (e.g., to mask the ‘land’ from the ‘sea’);
+  \item \link{sim_surface} populates a raster with simulated values;
+  \item \link{split_raster_equally} splits a raster into equal pieces (using code from the [greenbrown](http://greenbrown.r-forge.r-project.org) package);
+  \item \link{update_extent} shrinks or inflates an extent object;
+}
+}
+
+\section{Distance calculations}{
+
+Some functions facilitate distance calculations, including the calculation of distances between receivers, along 3-dimensional movement paths, and of the shortest paths over a surface:
+\itemize{
+  \item \link{dist_btw_receivers} calculates the Euclidean distances between all combinations of receivers;
+  \item \link{dist_btw_points_3d} calculates the Euclidean distances between points in three-dimensional space;
+  \item \link{dist_over_surface} calculates the Euclidean distance along a path over a three-dimensional surface;
+  \item \link{dist_over_surface} calculates shortest pathways and/or the distances of the shortest pathways over a surface between origin and destination coordinates;
+}
+}
+
+\section{Detection statistics}{
+
+Some functions facilitate the calculation of detection statistics, including those related to sampling effort and to detections of individuals:
+\itemize{
+  \item \link{get_detection_pr} calculates detection probability given a model for detection probability with distance;
+  \item \link{get_detection_centroids} defines detection centroids (areas within the maximum detection range) around receivers;
+  \item \link{get_detection_centroids_envir} extracts environmental conditions from within receiver detection ranges, accounting for detection probability;
+  \item \link{get_detection_area_sum} calculates the total area surveyed by receivers;
+  \item \link{get_detection_area_ts} defines a time series of the area surveyed by receivers;
+  \item \link{get_n_operational_ts} defines a time series of the number of operational units (e.g., individuals at liberty or active receivers)
+  \item \link{get_id_rec_overlap} calculates the overlap between the deployment periods of tagged individuals and receivers;
+  \item \link{make_matrix_cooccurence} computes a detection history similarity matrix across individuals;
+}
 }
 
 \section{Space use algorithms}{
 
-A set of functions is used to implement existing and new algorithms for inferring patterns of space use from PAT and/or archival data.
+The main thrust of flapper is the implementation of existing and new algorithms designed to infer space use from PAT and archival data:
+\itemize{
+  \item The centres of activity (COA) algorithm
+  \itemize{
+    \item \link{coa_setup_delta_t} informs decisions as to an appropriate time interval over which to calculate COAs;
+    \item \link{make_matrix_detections} summarises matrices over time intervals (see above);
+    \item \link{coa} implements the arithmetic version of the mean-position algorithm to calculate COAs;
+    \item \link{kud_around_coastline} facilitates the estimation of home ranges (e.g., from estimated COAs) in areas of complex coastline;
+  }
+  \item The depth contour (DC) algorithm
+  \itemize{
+    \item \link{dc} implements the DC algorithm;
+  }
+  \item The acoustic-centroid depth-contour (ACDC) algorithm
+  \itemize{
+    \item \link{acdc_setup_n_centroids} suggests the number of acoustic centroids for the algorithm;
+    \item \link{acdc_setup_centroids} defines the acoustic centroids for the algorithm;
+    \item \link{acdc} implements the algorithm, via the back-end function \link{.acdc};
+    \item \link{acdc_simplify} simplifies the results of the algorithm;
+    \item \link{acdc_plot} plots the results of the algorithm;
+    \item \link{acdc_animate} creates html animations of the algorithm;
+  }
+  \item The ACDC particle filtering and movement pathway (ACDCPF and ACDCMP) algorithms
+  \itemize{
+    \item These algorithms will be added to the package in the near future.
+  }
+}
 }
 
 \section{Simulations}{
 
-A set of functions is used to simulate PAT arrays, movement and detections to evaluate data processing and space use algorithms.
+A set of \code{sim_*()} functions provide an integrated workflow for the simulation of receiver arrays, movement paths and detections under different array designs, movement models and detection models for the evaluation of data processing decisions and the relative merits of alternative space use algorithms under different conditions:
+\itemize{
+  \item \link{sim_array} simulates alternative array designs;
+  \item \link{sim_path_*} functions simulate discrete-time movement paths, including:
+  \itemize{
+    \item \link{sim_path_sa}, supported by \link{sim_steps} and \link{sim_angles}, simulates movement paths (possibly in restricted areas) from step lengths and turning angles;
+    \item \link{sim_path_ou_1} simulates movement paths under Ornstein-Uhlenbeck processes;
+  }
+  \item \link{sim_detections} simulates detections at receivers arising from movement paths under a diversity of detection probability models;
+}
+
+Another set of functions facilitate the evaluation of the performance of alternative algorithms for inferring patterns of space use under different array designs, movement and detections models:
+\itemize{
+  \item \link{eval_by_kud} compares patterns of space use inferred from simulated and estimated movement paths using kernel utilisation distributions;
+}
 }
 
 \seealso{
