@@ -16,6 +16,8 @@
 #' @param add_sea,add_land,add_receivers (optional) Named lists of arguments, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the sea, land and/or receivers on the plot. \code{add_* = NULL} suppresses the addition of the layer to the plot. To use the default graphical parameters, simply specify \code{add_* = list()}.
 #' @param verbose A logical variable that defines whether or not to print messages to the console to relay function progress.
 #'
+#' @details Note that this function does not currently support temporally varying array designs.
+#'
 #' @return The function returns a named list of (a) the spatial objects that define the simulated array ('array') and (b) the arguments used to generate this array ('args'). The 'array' element is a named list contains the following elements: 'boundaries', an \code{\link[raster]{Extent-class}} object that defines the boundaries of the area (as inputted); 'area', a \code{\link[sp]{SpatialPolygons-class}} object that defines the boundaries of the area; 'land' and 'sea', \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects that define the land and sea respectively; and 'xy', a \code{\link[sp]{SpatialPoints-class}} object that defines receiver locations. If \code{plot = TRUE}, the function also returns a plot of the array.
 #'
 #' @examples
@@ -81,6 +83,7 @@
 #'                    add_land = list()
 #'                    )
 #'
+#' @seealso \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement.
 #' @author Edward Lavender
 #' @export
 #'
@@ -207,6 +210,20 @@ sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
   return(out)
 
 }
+
+
+######################################
+######################################
+#### sim_path_*() documentation
+
+#' @title Functions for the simulation of movement paths
+#' @description \link{flapper} includes a number of functions for the simulation of movement paths (\code{sim_path_*()}), listed here for convenience:
+#' \itemize{
+#'   \item{\link{sim_path_sa}} - simulate discrete-time movement paths from step lengths and turning angles
+#'   \item{\link{sim_path_ou_1}} -- simulate discrete-time movement paths under a Ornstein-Uhlenbeck process with time-fixed parameters
+#' }
+#' @name sim_path_*
+NULL
 
 
 ######################################

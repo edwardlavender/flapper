@@ -48,6 +48,9 @@ The function returns a named list of (a) the spatial objects that define the sim
 \description{
 This function is designed to simulate different kinds of array designs for monitoring stations. The function has been particularly inspired by the need to simulate passive acoustic telemetry array designs, which comprise networks of acoustic hydrophones that listen for acoustic transmissions from tagged marine animals. To implement the function, it is necessary to define the boundaries of the area (\code{boundaries}). Barriers to movement, such as coastline, within this area can be simulated or included from real datasets. The area is populated with a specified number of receivers (\code{n_receivers}) that are simulated under different array designs (namely, uniform, regular or random arrangements) or incorporated from real data. The function returns a list of spatial objects that define the array and, if requested, a plot of the area.
 }
+\details{
+Note that this function does not currently support temporally varying array designs.
+}
 \examples{
 #### Example (1): Simulate an array using default parameters
 # ... And force reproducible simulations by defining the seed
@@ -111,6 +114,9 @@ array <- sim_array(boundaries = raster::extent(dat_coast),
                    add_land = list()
                    )
 
+}
+\seealso{
+\code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement.
 }
 \author{
 Edward Lavender
