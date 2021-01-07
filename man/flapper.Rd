@@ -37,7 +37,7 @@ Some functions facilitate spatial operations, which support ecological investiga
   \item \link{invert_poly} inverts a polygon (e.g, to define the ‘sea’ from a polygon of the ‘land’);
   \item \link{mask_io} masks values in a raster that lie inside or outside of a spatial mask (e.g., to mask the ‘land’ from the ‘sea’);
   \item \link{sim_surface} populates a raster with simulated values;
-  \item \link{split_raster_equally} splits a raster into equal pieces (using code from the [greenbrown](http://greenbrown.r-forge.r-project.org) package);
+  \item \link{split_raster_equally} splits a raster into equal pieces (using code from the greenbrown (http://greenbrown.r-forge.r-project.org) package);
   \item \link{update_extent} shrinks or inflates an extent object;
 }
 }

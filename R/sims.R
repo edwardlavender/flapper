@@ -219,8 +219,8 @@ sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
 #' @title Functions for the simulation of movement paths
 #' @description \link{flapper} includes a number of functions for the simulation of movement paths (\code{sim_path_*()}), listed here for convenience:
 #' \itemize{
-#'   \item{\link{sim_path_sa}} - simulate discrete-time movement paths from step lengths and turning angles
-#'   \item{\link{sim_path_ou_1}} -- simulate discrete-time movement paths under a Ornstein-Uhlenbeck process with time-fixed parameters
+#'   \item{\link{sim_path_sa}} simulates discrete-time movement paths from step lengths and turning angles
+#'   \item{\link{sim_path_ou_1}} simulates discrete-time movement paths under a Ornstein-Uhlenbeck process with time-fixed parameters
 #' }
 #' @seealso \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement.
 #' @name sim_path_*
