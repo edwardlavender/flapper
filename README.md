@@ -310,6 +310,8 @@ algorithm by using PAT data to inform the area within which depth
 contours are most likely to be found. This algorithm is supported by a
 number of functions:
 
+  - `acdc_setup_mobility()` examines the assumption of a constant
+    ‘mobility’ parameter;
   - `acdc_setup_n_centroids()` suggests the number of acoustic centroids
     for the algorithm;
   - `acdc_setup_centroids()` defines the acoustic centroids for the

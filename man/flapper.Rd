@@ -85,6 +85,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
   }
   \item The acoustic-centroid depth-contour (ACDC) algorithm
   \itemize{
+    \item \link{acdc_setup_mobility} examines the assumption of a constant 'mobility' parameter;
     \item \link{acdc_setup_n_centroids} suggests the number of acoustic centroids for the algorithm;
     \item \link{acdc_setup_centroids} defines the acoustic centroids for the algorithm;
     \item \link{acdc} implements the algorithm, via the back-end function \link{.acdc};
