@@ -118,10 +118,11 @@ not currently available from [CRAN](https://cran.r-project.org)). These
 can be installed during the installation process (see below), but it is
 safer to install them sequentially as follows:
 
-    devtools::install_github("edwardlavender/prettyGraphics")
-    devtools::install_github("edwardlavender/Tools4ETS")
-    devtools::install_url("https://gitlab.oceantrack.org/GreatLakes/glatos/repository/master/archive.zip",
-                          build_opts = c("--no-resave-data", "--no-manual"))
+    devtools::install_github("edwardlavender/prettyGraphics") # required
+    devtools::install_github("edwardlavender/Tools4ETS")      # currently required
+    devtools::install_url(                                    # suggested
+      "https://gitlab.oceantrack.org/GreatLakes/glatos/repository/master/archive.zip",
+       build_opts = c("--no-resave-data", "--no-manual")) 
 
 To install these packages with their vignettes, add `dependencies =
 TRUE` and `build_vignettes = TRUE` as arguments to the code above (see

@@ -45,10 +45,11 @@ This package requires `R` version ≥ 4.0. You can check your current version wi
 
 Three packages ([prettyGraphics](https://github.com/edwardlavender/prettyGraphics), [Tools4ETS](https://github.com/edwardlavender/Tools4ETS) and [glatos](https://gitlab.oceantrack.org/GreatLakes/glatos)) required or suggested from [GitHub](https://github.com) repositories (since they are not currently available from [CRAN](https://cran.r-project.org)). These can be installed during the installation process (see below), but it is safer to install them sequentially as follows: 
 ```
-devtools::install_github("edwardlavender/prettyGraphics")
-devtools::install_github("edwardlavender/Tools4ETS")
-devtools::install_url("https://gitlab.oceantrack.org/GreatLakes/glatos/repository/master/archive.zip",
-                      build_opts = c("--no-resave-data", "--no-manual"))
+devtools::install_github("edwardlavender/prettyGraphics") # required
+devtools::install_github("edwardlavender/Tools4ETS")      # currently required
+devtools::install_url(                                    # suggested
+  "https://gitlab.oceantrack.org/GreatLakes/glatos/repository/master/archive.zip",
+   build_opts = c("--no-resave-data", "--no-manual")) 
 ```
 
 To install these packages with their vignettes, add `dependencies = TRUE` and `build_vignettes = TRUE` as arguments to the code above (see `?devtools::install_github` or `?devtools::install_url` for further information). Then, you can install the development version of `flapper` from [GitHub](https://github.com/edwardlavender/flapper) as shown below: 
