@@ -40,7 +40,7 @@
 #'   \item \link{dist_btw_receivers} calculates the Euclidean distances between all combinations of receivers;
 #'   \item \link{dist_btw_points_3d} calculates the Euclidean distances between points in three-dimensional space;
 #'   \item \link{dist_over_surface} calculates the Euclidean distance along a path over a three-dimensional surface;
-#'   \item \link{dist_over_surface} calculates shortest pathways and/or the distances of the shortest pathways over a surface between origin and destination coordinates;
+#'   \item \link{lcp_over_surface} calculates shortest pathways and/or the distances of the shortest pathways over a surface between origin and destination coordinates;
 #' }
 #'
 #' @section Detection statistics:
