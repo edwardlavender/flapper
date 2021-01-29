@@ -26,10 +26,10 @@ improved inference of patterns of space use, especially for
 benthic/demersal species. To this end, `flapper` contains functions in
 the following themes:
 
-  - **Data processing tools**, including data assembly (e.g., of
-    range-testing datasets), checking false detections and implementing
+  - **Data processing tools**, including data assembly (e.g.,
+    range-testing datasets), the evaluation of false detections and
     quality checks;
-  - **Spatial tools**, including common spatial operations for
+  - **Spatial tools**, including common spatial operations for the
     manipulation of spatial data, such as polygon inversion;
   - **Distance calculations**, including the calculation of distances
     between receivers, along 3-dimensional movement paths, and of the
@@ -72,30 +72,30 @@ discrete detections at receivers, especially:
     algorithms from the
     [cppRouting](https://github.com/vlarmet/cppRouting) package. This
     makes it easy to use biologically meaningful distances (that account
-    for the bathymetric depth over which a benthic animal must move, if
-    applicable, and barriers to movement) in movement models.
+    for the bathymetric surface over which a benthic animal must move,
+    if applicable, and barriers to movement) in movement models.
   - **`coa()`.** This function implements the arithmetic version of the
     mean-position algorithm to estimate centres of activity (COAs) from
-    discrete detections at receivers, given only a detection matrix and
-    the locations of receivers.
+    discrete detections at receivers, given a detection matrix and the
+    locations of receivers.
   - **`dc()`.** This function implements the ‘depth-contour’ (DC)
     algorithm to examine patterns of space use of benthic/demersal
     animals. This relates one-dimensional depth time series to a
     two-dimensional bathymetry surface to determine the extent to which
     different parts of an area might have (or have not) been used, or
     effectively represent occupied depths, over time.
-  - **`acdc()`.** This function implements the ‘acoustic-centroids
+  - **`acdc()`.** This function implements the ‘acoustic-centroid
     depth-contour’ (ACDC) algorithm to examine patterns of space use.
     This is a new approach that integrates the locational information
     provided by acoustic detections and concurrent depth observations to
     infer where benthic/demersal animals could have spent more or less
     time over the period of observations.
   - **`acdcpf()`** and **`acdcmp()`** are extensions of the ACDC
-    algorithm that will be added in the package in the near future.
+    algorithm that will be added to the package in the near future.
   - **`sim_*()`.** These functions provide flexible routines for the
-    simulation of receiver arrays, movement paths and detections to
-    evaluate alternative algorithms for inferences about patterns of
-    space use under different conditions.
+    simulation of receiver arrays, movement paths and detections and can
+    be used to evaluate alternative algorithms for inferences about
+    patterns of space use under different conditions.
 
 ## Installation
 
@@ -112,11 +112,11 @@ before proceeding by following the instructions
 Three packages
 ([prettyGraphics](https://github.com/edwardlavender/prettyGraphics),
 [Tools4ETS](https://github.com/edwardlavender/Tools4ETS) and
-[glatos](https://gitlab.oceantrack.org/GreatLakes/glatos)) required or
-suggested from [GitHub](https://github.com) repositories (since they are
-not currently available from [CRAN](https://cran.r-project.org)). These
-can be installed during the installation process (see below), but it is
-safer to install them sequentially as follows:
+[glatos](https://gitlab.oceantrack.org/GreatLakes/glatos)) are required
+or suggested from [GitHub](https://github.com) repositories (since they
+are not currently available from [CRAN](https://cran.r-project.org)).
+These can be installed during the installation process (see below), but
+it is safer to install them sequentially as follows:
 
     devtools::install_github("edwardlavender/prettyGraphics") # required
     devtools::install_github("edwardlavender/Tools4ETS")      # currently required
@@ -135,10 +135,10 @@ devtools::install_github("edwardlavender/flapper", dependencies = TRUE, build_vi
 ```
 
 The `dependencies = TRUE` argument will also install any suggested
-packages, which may be required by some functions and to build vignettes
-(which will be added to the package in due course). To access the
-vignettes, use `vignette("flapper_intro", package = "flapper")` for a
-general introduction to the package. *Note that vignettes have not yet
+packages, which are required by some functions/examples and to build
+vignettes (which will be added to the package in due course). To access
+the vignettes, use `vignette("flapper_intro", package = "flapper")` for
+a general introduction to the package. *Note that vignettes have not yet
 been added to the package.*
 
 ## Example datasets
@@ -149,12 +149,11 @@ and matrices) rather than package-specific object classes. For
 simplicity, `flapper` makes some assumptions about variable names that
 follow a consistent and logical structure (e.g., individual IDs are
 given as `individual_id` and receiver IDs are given as `receiver_id`)
-but, apart from these assumptions, this structure means the functions in
-the package are accessible and straightforward to use.
+but, notwithstanding this framework, this structure means that the
+functions in the package are accessible and straightforward to use.
 
-`flapper` functions are illustrated using simulated data and the
-following sample data collected from flapper skate off the west coast of
-Scotland:
+Functions are illustrated using simulated data and the following sample
+data collected from flapper skate off the west coast of Scotland:
 
   - `dat_ids` is a dataset containing the characteristics of a sample of
     tagged flapper skate;
@@ -192,18 +191,17 @@ of passive acoustic telemetry time series:
         this process;
   - **Data processing.**
       - `process_receiver_id()` adds unique receiver IDs to a dataframe
-        (which is useful if the same receiver has been deployed more
-        than once);
+        (i.e., if the same receiver has been deployed more than once);
       - `process_false_detections_sf()` passes putative false detections
-        through a spatial filter which incorporates ancillary
-        information on receiver locations and animal swimming speeds to
-        interrogate their plausibility;
+        through a spatial filter which incorporates information on
+        receiver locations and animal swimming speeds to interrogate
+        their plausibility;
       - `process_quality_check()` passes acoustic data through some
         basic quality checks prior to analysis;
 
 ## Spatial tools
 
-A number of functions facilitate spatial operations, which support
+A number of functions facilitate spatial operations that support
 ecological investigations and space use algorithms:
 
   - `buffer_and_crop()` buffers a spatial object (e.g., receiver
@@ -231,8 +229,8 @@ distances:
     all combinations of receivers;
   - `dist_btw_points_3d()` calculates the Euclidean distances between
     points in three-dimensional space;
-  - `dist_over_surface()` calculates the Euclidean distance along a path
-    over a three-dimensional surface;
+  - `dist_over_surface()` calculates the total Euclidean distance along
+    a path over a three-dimensional surface;
 
 Often, Euclidean distances may not be a suitable representation of
 distance. This is especially the case for coastal benthic/demersal
@@ -268,10 +266,10 @@ of individuals:
 
 ## Space use algorithms
 
-The main thrust of `flapper` is the implementation of existing and new
-algorithms designed to infer space use from PAT data and their
-evaluation under different circumstances (e.g., array designs, movement
-and detection models).
+The main thrust of `flapper` is the implementation of algorithms
+designed to infer space use from PAT data and their evaluation under
+different circumstances (e.g., array designs, movement models and
+detection models).
 
 ### The centres of activity (COA) algorithm
 
@@ -286,7 +284,7 @@ following functions:
 
   - `coa_setup_delta_t()` informs decisions as to an appropriate time
     interval over which to calculate COAs;
-  - `make_matrix_detections()` summarises matrices over time intervals
+  - `make_matrix_detections()` summarises detections over time intervals
     (see above);
   - `coa()` implements the arithmetic version of the mean-position
     algorithm to calculate COAs;
@@ -339,7 +337,7 @@ relative performance of alternative methods for ecological inferences
 patterns of space use) and the extent to which new data sources
 influence ecological inferences under different circumstances (e.g. the
 extent to which sparse or regular PAT detections improve estimates of
-space use). To this end, `flapper` provided joined-up routines for the
+space use). To this end, `flapper` provides joined-up routines for the
 evaluation of approaches for the estimation of patterns of space use
 under different conditions; namely:
 
@@ -355,7 +353,7 @@ under different conditions; namely:
     movement paths under a diversity of detection probability models;
 
 To evaluate the performance of alternative algorithms for inferring
-patterns of space use under different array designs, movement and
+patterns of space use under different array designs, movement models and
 detections models, `eval_by_kud()` compares patterns of space use
 inferred from simulated and estimated movement paths using kernel
 utilisation distributions.
@@ -371,12 +369,13 @@ utilisation distributions.
     three-dimensions, and detection similarity matrices.
   - **[Tools4ETS](https://github.com/edwardlavender/Tools4ETS)**
     provides a set of general tools for ecological time series,
-    including the definition of time categories, matching time series
-    (e.g., detection observations with environmental covariates),
-    flagging independent time series and simulating time series.
+    including for the definition of time categories, matching time
+    series (e.g., detection observations with temporally varying
+    environmental covariates), flagging independent time series and
+    simulations.
   - **[fvcom.tbx](https://github.com/edwardlavender/fvcom.tbx)**
     provides tools for the integration of hydrodynamic model predictions
-    (from the Finite Coastal Ocean Volume Model) with ecological
+    (from the Finite Volume Coastal Ocean Model) with ecological
     datasets (e.g., detection time series). This facilitates the
     inclusion of hydrodynamic model predictions as covariates in
     movement models and the validation of hydrodynamic model predictions
