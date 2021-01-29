@@ -133,7 +133,7 @@ out_acdc <- .acdc(acoustics = acc,
 
 }
 \seealso{
-\code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function, aided by \code{\link[flapper]{acdc_setup_centroids}}. \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant 'mobility' parameter. \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
+\code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function, aided by \code{\link[flapper]{acdc_setup_centroids}}. \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant 'mobility' parameter. \code{\link[flapper]{acdc}} is the front-end of the algorithm. \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
 }
 \author{
 Edward Lavender
