@@ -2,21 +2,23 @@
 ######################################
 #### acdc_setup_mobility()
 
-#' @title Examine the constant mobility assumption of the ACDC algorithm
-#' @description In the simplest and fastest (and only version currently implemented in \code{\link[flapper]{flapper}}) of the ACDC algorithm, the rate at which acoustic centroids expand and contract is described by a single 'mobility' parameter that defines the horizontal distance that an individual can move in the time period between archival observations. In some situations, this approximation may be relatively poor, particularly for animals that change dramatically in depth and for which changes in depth are likely to curtail the extent of horizontal movement*. To this end, this function investigates the extent to which the horizontal distance an animal could travel changes through time if the the mobility parameter is conceptualised as the diagonal distance between sequential depth observations.
+#' @title Examine the constant 'mobility' assumption of the ACDC algorithm
+#' @description In the simplest and fastest (and only) version of the ACDC algorithm currently implemented by \code{\link[flapper]{flapper}}, the rate at which acoustic centroids expand and contract depends on a single 'mobility' parameter that describes how the uncertainty in an individual's location changes through time according to the passive acoustic telemetry data. These changes essentially reflect the maximum horizontal distance that an individual can move in the time period between archival observations. However, in some situations, a fixed parameter for horizontal movement may not be well supported by archival data, particularly for animals that change dramatically in depth and for which changes in depth are likely to curtail the extent of horizontal movement*. Thus, this function investigates the extent to which the horizontal distance an animal could travel changes through time if the mobility parameter is instead conceptualised as the diagonal distance between sequential depth observations.
 #'
 #' @param depth A vector of depth observations, whose units match the \code{mobility} parameter, to be incorporated into the ACDC algorithm. (Note that the ACDC algorithm may drop depth observations internally depending on their alignment with the acoustic time series and so, ideally, pre-processed time series should be passed to \code{depth} to ensure inferences correspond directly to the time series modelled by \code{\link[flapper]{acdc}}.) Depth observations should be regularly spaced in time (i.e., represent a time series for a single individual, without gaps).
-#' @param mobility A number, in the same units as \code{depth}, that defines the horizontal distance that an individual could move in the time period between archival observations.
+#' @param mobility A number, in the same units as \code{depth}, that defines the maximum horizontal distance that an individual could move in the time period between archival observations (see \code{\link[flapper]{acdc_setup_centroids}}).
 #' @param plot A logical variable that defines whether or not to plot the distribution of horizontal distances that the individual could travel, given its depth time series and \code{mobility}, as a histogram.
 #' @param add_mobility (optional) If \code{plot = TRUE}, \code{add_mobility} is a named list of arguments, passed to \code{\link[graphics]{abline}}, to add the \code{mobility} parameter as a vertical line to the histogram as a reference point. \code{add_mobility = NULL} suppresses this line.
 #' @param add_rug (optional) If \code{plot = TRUE}, \code{add_rug} is a named list of arguments, passed to \code{\link[graphics]{rug}}, to add the estimated distances to the histogram as a rug. \code{add_rug = NULL} suppresses this rug.
 #' @param xlab,... Additional arguments, passed to \code{\link[prettyGraphics]{pretty_hist}}, to customise the histogram.
 #'
-#' @details The function uses a Pythagorean approximation to estimate the horizontal \eqn{distance} that an individual could travel in each time step (\eqn{t}), given the maximum distance that the individual could move (\eqn{mobility}) and sequential changes in \eqn{depth}, according to the equation:
+#' @details The function uses a Pythagorean approximation to estimate the \eqn{distance} that an individual could travel in each time step (\eqn{t}), given the maximum horizontal distance that the individual could move (\eqn{mobility}) and sequential changes in \eqn{depth}, according to the equation:
 #'
 #' \deqn{distance_{t + 1} = \sqrt{mobility^2 + (depth_{t + 1} - depth_{t})^2},}
 #'
-#' where \eqn{depth_{t + 1}} for the final (\eqn{n^{th}}) observation is defined as \eqn{depth_{t = n}} and thus \eqn{distance_{t = n} = mobility}. *If the horizontal distances that an individual could travel are not very variable, then the benefits of a single mobility parameter are likely to outweigh the costs. On the other hand, substantial variation in the horizontal distances that an individual could travel may suggest that pre-processed acoustic centroids are inappropriate; in this situation, the correct centroids could be computed on-the-fly within the ACDC algorithm, but this is not currently implemented.
+#' where \eqn{depth_{t + 1}} for the final (\eqn{n^{th}}) observation is defined as \eqn{depth_{t = n}} and thus \eqn{distance_{t = n} = mobility}.
+#'
+#' *If the horizontal distances that an individual could travel are not very variable, then the benefits of a single mobility parameter are likely to outweigh the costs. On the other hand, substantial variation in the horizontal distances that an individual could travel may suggest that pre-processed acoustic centroids are inappropriate; in this situation, the correct centroids could be computed on-the-fly within the ACDC algorithm, but this is not currently implemented. However, the ACDCPF/ACDCMP algorithms can account for this by the incorporation of movement models within/between acoustic centroids. (Indeed, even if the horizontal mobility remains approximately constant, the integration of a movement model via ACDCPF/MP can still be beneficial.)
 #'
 #' @return The function returns a numeric vector of distances and, if \code{plot = TRUE}, a histogram of those distances.
 #'
@@ -47,13 +49,18 @@
 #' graphics::par(pp)
 #'
 #' #### Results
-#' # For these sample time series, even though the animals' change depth
+#' # For these sample time series, even though the animals change depth
 #' # ... (quite substantially) though time, the sequential changes in depth
 #' # ... are small and the influence on the horizontal distances that they
 #' # ... are assumed to be able to travel in the time gap between archival
 #' # ... observations is so small that a constant mobility parameter
 #' # ... is reasonable without further information (e.g., models of the underlying
-#' # ... behavioural state of the animal).
+#' # ... behavioural state of the animal). However, it is still likely to be
+#' # ... beneficial to include a movement model to join locations within/
+#' # ... between acoustic centroids for some applications via the ACDCPF/MP
+#' # ... algorithms.
+#'
+#' @seealso \code{\link[flapper]{acdc_setup_mobility}}, \code{\link[flapper]{acdc_setup_n_centroids}} and \code{\link[flapper]{acdc_setup_centroids}} are used to set up the ACDC algorithm as implemented by \code{\link[flapper]{acdc}}.
 #'
 #' @author Edward Lavender
 #' @export
