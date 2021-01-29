@@ -1588,12 +1588,13 @@ acdc <- function(
 #### acdc_simplify()
 
 #' @title Simplify the outputs of \code{\link[flapper]{acdc}}
-#' @description This function simplifies the output of \code{\link[flapper]{acdc}}, by extracting elements from the '.acdc' elements which hold the results of calls to the workhorse function \code{\link[flapper]{.acdc}}. This is especially useful if the ACDC algorithm has been applied chunk-wise, in which case the results for each acoustic chunk are returned in a list. This function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series.
-#' @param acdc A \code{\link[flapper]{acdc-class}} object returned by \code{\link[flapper]{acdc}}.
+#' @description This function simplifies the output of \code{\link[flapper]{acdc}}, by processing information from the '.acdc' elements of a \code{\link[flapper]{acdc-class}} object that hold the results of calls to the workhorse function \code{\link[flapper]{.acdc}}. This is especially useful if the ACDC algorithm has been applied chunk-wise, in which case the results for each acoustic chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series.
+#' @param acdc An \code{\link[flapper]{acdc-class}} object returned by \code{\link[flapper]{acdc}}.
 #' @param keep_chunks A logical variable that defines whether or not to retain all chunk-specific information.
 #' @param ... Additional arguments (none implemented).
 #' @return The function returns an object of class \code{\link[flapper]{.acdc-class}}.
-#' @details If the \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the information into the format of an \code{\link[flapper]{.acdc-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps, accounting for the overlap between chunks; and (b) simplifies chunk-specific records into a single contiguous time series and with re-defined time stamps from the start to the end of the time series and then returns an \code{\link[flapper]{.acdc-class}} object.
+#' @details If the \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an \code{\link[flapper]{.acdc-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps, accounting for the overlap between chunks; (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series to (c) return a \code{\link[flapper]{.acdc-class}} object.
+#' @seealso The ACDC algorithm is implemented by \code{\link[flapper]{acdc}}, via the back-end function \code{\link[flapper]{.acdc}}. After simplification, \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} can be implemented to visualise time-specific results.
 #' @author Edward Lavender
 #' @export
 #'
