@@ -1,5 +1,5 @@
 ---
-title: "flapper"
+title: "Vignette: an introduction to the `flapper` package"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{flapper}
@@ -14,6 +14,12 @@ knitr::opts_chunk$set(
 )
 ```
 
+# Introduction 
+
+An introductory vignette will be added to the package in due course. 
+
+# Set up 
+
 ```{r setup}
-# library(flapper)
+library(flapper)
 ```
