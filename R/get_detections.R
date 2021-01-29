@@ -94,7 +94,7 @@ get_detection_pr <- function(distance = 1:1000,
 #' @param plot A logical input that defines whether or not to plot receivers, their centroids, and the buffer (if specified).
 #' @param ... Additional arguments passed to \code{\link[rgeos]{gBuffer}}, such as \code{byid} and/or \code{quadsegs}.
 #'
-#' @return The function returns a \code{\link[sp]{SpatialPolygons-class}} object of the detection centroids around receivers that represents the area they survey under the assumption of a constant detection range, accounting for any barriers to detection. By default, this will contain a single feature, which is suitable for the calculation of the total area surveyed by receivers (see \code{\link[flapper]{get_detection_area_sum}}) because it accounts for the overlap in the detection ranges of receivers. However, if \code{byid = TRUE} is passed via \code{...} to \code{\link[rgeos]{gBuffer}}, the returned object will have a feature for each pair of coordinates in (\code{xy}) (i.e., receiver). This is less appropriate for calculating the area surveyed by receivers, since areas surveyed by multiple receivers will be over-counted, but it is suitable when the centroids for particular receivers are required (e.g., to extract environmental conditions within a specific receiver's detection ranges) (see \code{\link[flapper]{get_detection_centroids_envir}}.
+#' @return The function returns a \code{\link[sp]{SpatialPolygons-class}} object of the detection centroids around receivers that represents the area they survey under the assumption of a constant detection range, accounting for any barriers to detection. By default, this will contain a single feature, which is suitable for the calculation of the total area surveyed by receivers (see \code{\link[flapper]{get_detection_area_sum}}) because it accounts for the overlap in the detection ranges of receivers. However, if \code{byid = TRUE} is passed via \code{...} to \code{\link[rgeos]{gBuffer}}, the returned object will have a feature for each pair of coordinates in \code{xy} (i.e., receiver). This is less appropriate for calculating the area surveyed by receivers, since areas surveyed by multiple receivers will be over-counted, but it is suitable when the centroids for particular receivers are required (e.g., to extract environmental conditions within a specific receiver's detection ranges) (see \code{\link[flapper]{get_detection_centroids_envir}}).
 #'
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
@@ -105,7 +105,7 @@ get_detection_pr <- function(distance = 1:1000,
 #'                         proj_wgs84)
 #' xy <- sp::spTransform(xy, proj_utm)
 #'
-#' #### Example (1): Calculate the total area sampled by receivers
+#' #### Example (1): Get the simplest centroids around receivers
 #' get_detection_centroids(xy)
 #'
 #' #### Example (2): Account for barriers in the study area
