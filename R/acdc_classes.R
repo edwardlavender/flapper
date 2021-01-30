@@ -3,7 +3,7 @@
 #### .acdc-class
 
 #' @title ".acdc" class
-#' @description An S3 class object that defines the object returned by the \code{\link[flapper]{acdc}} algorithm, after simplification via \code{\link[flapper]{acdc_simplify}}, or directly from the back-end \code{\link[flapper]{.acdc}} function.
+#' @description An S3 class that defines the object returned by the \code{\link[flapper]{acdc}} algorithm, after simplification via \code{\link[flapper]{acdc_simplify}}, or directly from the back-end \code{\link[flapper]{.acdc}} function.
 
 #' @return \subsection{A named list}{An ".acdc" class object is a named list with the following elements: ‘map’, ‘record’, ‘time’, ‘args’, 'chunks' and 'simplify'. The main output element is the ‘map’ RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The ‘record’ element records time-specific maps of the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by the \code{plot} argument). The ‘time’ element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The ‘args’ element is a named list of user inputs that record the parameters used to generate the outputs (if \code{keep_args = TRUE}, otherwise the 'args' element is \code{NULL}). The 'chunks' element is a list with chunk-specific information that is generated if the \code{\link[flapper]{acdc}} algorithm is implemented chunk-wise and then simplified via \code{\link[flapper]{acdc_simplify}} with the \code{keep_chunks = TRUE} argument. The \code{simplify} element is a logical value that defines whether or not the object was created from \code{\link[flapper]{acdc}} and \code{\link[flapper]{acdc_simplify}} or \code{\link[flapper]{.acdc}}. Below, more detail about the ‘map’ and ‘record’ elements is provided.}
 #'
@@ -29,15 +29,15 @@ NULL
 #' @title "acdc" class
 #' @description An S3 class that defines the object returned by the \code{\link[flapper]{acdc}} algorithm.
 #'
-#' @return An \code{\link[flapper]{acdc-class}} is a named list that contains the output of a call to \code{\link[flapper]{acdc}}. This contains the following elements: ‘.acdc’, ‘ts_by_chunk’, ‘time’ and ‘args’.
+#' @return An \code{\link[flapper]{acdc-class}} object is a named list that contains the output of a call to \code{\link[flapper]{acdc}}. This contains the following elements: ‘.acdc’, ‘ts_by_chunk’, ‘time’ and ‘args’.
 #'
-#' The main output is the ‘.acdc’ element. This contains a list of arguments returned by the call(s) to the \code{\link[flapper]{.acdc}} function, which is the workhorse that actually implements the algorithm. If the algorithm is implemented step-wise, this contains a \code{\link[flapper]{.acdc-class}} object as returned by \code{\link[flapper]{.acdc}}. If the algorithm is implemented chunk-wise, this is a list, with one element for each chunk, which contains an \code{\link[flapper]{.acdc-class}} object with results of the call to \code{\link[flapper]{.acdc}} for each chunk. The results across chunks can be aggregated using \code{\link[flapper]{acdc_simplify}}.
+#' The main output is the ‘.acdc’ element. This contains a list of arguments returned by the call(s) to the \code{\link[flapper]{.acdc}} function, which is the workhorse that actually implements the algorithm. If the algorithm is implemented step-wise, this contains a single \code{\link[flapper]{.acdc-class}} object as returned by \code{\link[flapper]{.acdc}}. If the algorithm is implemented chunk-wise, this is a list, with one element for each chunk, each element containing a \code{\link[flapper]{.acdc-class}} object with results of the call to \code{\link[flapper]{.acdc}} for that chunk. The results across chunks can be aggregated using \code{\link[flapper]{acdc_simplify}}.
 #'
 #' The 'ts_by_chunk' element is a list, with one element for each chunk, that contains the acoustic and archival time series that were used in that chunk. If there is more than one chunk, the last observation of each acoustic chunk is the same as the first acoustic observation for the next chunk. This results from splitting chunks at acoustic observations, which enables the results of chunks that are computed independently to be simply aggregated without the loss of any information.
 #'
 #' The ‘time’ element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time.
 #'
-#' The ‘args’ element is a named list of user inputs that record the parameters used to generate the outputs.
+#' The ‘args’ element is a named list of user inputs that records the parameters used to generate the outputs.
 #'
 #' @author Edward Lavender
 #' @docType package
