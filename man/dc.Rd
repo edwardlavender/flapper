@@ -20,7 +20,7 @@ dc(
 )
 }
 \arguments{
-\item{archival_ls}{A list of data.frames, with one element for each time unit (e.g., month), which contain depth time series to be related to the local bathymetry. Each data.frame should contain a column of depths ('depth') and a column that defines the time unit ('time_unit'). Depth should be recorded using absolute values in the same units as the bathymetry (see below).}
+\item{archival_ls}{A list of dataframes, with one element for each time unit (e.g., month), which contain depth time series to be related to the local bathymetry. Each dataframe should contain a column of depths ('depth') and a column that defines the time unit ('time_unit'). Depth should be recorded using absolute values in the same units as the bathymetry (see below).}
 
 \item{bathy}{A \code{\link[raster]{raster}} of the bathymetry in an area within which the animal is likely to have been located over the study. Bathymetry values should be recorded as absolute values and in the same units as for depths (see \code{archival_ls}).}
 
@@ -39,7 +39,7 @@ dc(
 \item{verbose}{A logical input that defines whether or not to relay messages to the console to monitor function progress.}
 }
 \value{
-The function returns a named list of rasters, one for each time unit, in which the value of each cell is the number of times that that cell was represented by the corresponding depth bin in the depth-time series.
+The function returns a named list of rasters, one for each time unit, in which the value of each cell is the number of times that that cell was represented by the corresponding depth bin in the depth time series.
 }
 \description{
 This function implements the depth-contour (DC) algorithm. Under the assumption that individuals are benthic/demersal, this algorithm relates one-dimensional depth time series to a two-dimensional bathymetry surface to determine the extent to which different parts of an area might have (or have not) been used, or effectively represent occupied depths, over time. To implement this function, a list of depth time series, one for each time unit (e.g. month/season) need to be supplied, along with a bathymetry \code{\link[raster]{raster}}. For each time unit, the function counts the number of depth observations in each user-defined depth bin (e.g., 10 m depth bins) and then relates these counts to the local bathymetry to produce a raster in which the value of each cell is given by the number of times in which the depth bin for that cell was used. The function returns a list of rasters, one for each time unit, and a plot of these rasters, if requested.
