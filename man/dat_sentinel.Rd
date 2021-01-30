@@ -23,7 +23,7 @@ Data were collected by, and belong to, Marine Scotland Science and NatureScot. D
 dat_sentinel
 }
 \description{
-A dataset containing a sample of transmissions and detections assembled from sentinel tags. Sentinel tags are built-in acoustic transmitters which release acoustic signals at programmed intervals. The receiver unit of each sentinel tag records the exact timing of these transmissions. At the same time, any nearby receivers may also record transmissions from these acoustic tags. After some processing, the result is a dataframe comprising transmissions and detections, which contains information on detection probability. Data are arranged by \code{source_id}, \code{timestamp} and then \code{sink_id}.
+A dataset containing a sample of transmissions and detections assembled from sentinel tags. Sentinel tags are built-in acoustic transmitters which release acoustic signals at programmed intervals. The receiver unit of each sentinel tag records the exact timing of these transmissions. At the same time, any nearby receivers may also record these transmissions as detections. After some processing, the result is a dataframe comprising transmissions and detections, which contains information on detection probability. Data are arranged by \code{source_id}, \code{timestamp} and then \code{sink_id}.
 }
 \references{
 Data collection and processing is described in Lavender (in prep). Fine-scale habitat use of the Critically Endangered flapper skate (\emph{Dipturus intermedius}). [Doctoral dissertation, University of St Andrews].

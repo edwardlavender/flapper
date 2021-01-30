@@ -8,7 +8,7 @@
 A SpatialPolygonsDataFrame (see \code{\link[sp]{SpatialPolygonsDataFrame-class}}).
 }
 \source{
-https://biogeo.ucdavis.edu/data/gadm3.6/Rsp/gadm36_GBR_0_sp.rds
+Data were processed from https://biogeo.ucdavis.edu/data/gadm3.6/Rsp/gadm36_GBR_0_sp.rds.
 }
 \usage{
 dat_coast

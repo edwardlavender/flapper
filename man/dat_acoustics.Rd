@@ -3,7 +3,7 @@
 \docType{data}
 \name{dat_acoustics}
 \alias{dat_acoustics}
-\title{Example passive acoustic telemetry dataset}
+\title{Example passive acoustic telemetry detections dataset}
 \format{
 A dataframe with 59,420 observations and 8 variables:
 \describe{

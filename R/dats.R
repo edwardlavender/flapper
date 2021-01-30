@@ -37,7 +37,7 @@
 #'   \item{sentinel_id}{A character which defines each receiver's built-in acoustic transmitter ('sentinel tag'). Some receivers did not have sentinel tags; their \code{sentinel_id} is \code{NA}.}
 #'   \item{receiver_start_date}{A date which defines the start date of each receiver's deployment.}
 #'   \item{receiver_end_date}{A date which defines the end date of each receiver's deployment.}
-#'   \item{receiver_long}{A number which defines the latitude (decimal degrees) of each receiver.}
+#'   \item{receiver_long}{A number which defines the longitude (decimal degrees) of each receiver.}
 #'   \item{receiver_lat}{A number which defines the latitude (decimal degrees) of each receiver.}
 #'   \item{receiver_depth}{A number which defines the approximate depth of each receiver below the surface (m).}
 #' }
@@ -52,7 +52,7 @@
 #####################################
 #### dat_acoustics
 
-#' @title Example passive acoustic telemetry dataset
+#' @title Example passive acoustic telemetry detections dataset
 #' @description A dataset containing a sample of processed flapper skate (\emph{Dipturus intermedius}) detection time series. Data are arranged by \code{individual_id}, \code{timestamp} and then \code{receiver_id} (see below).
 #'
 #' @format A dataframe with 59,420 observations and 8 variables:
@@ -78,7 +78,7 @@
 #### dat_sentinel
 
 #' @title Example sentinel tag range testing dataset
-#' @description A dataset containing a sample of transmissions and detections assembled from sentinel tags. Sentinel tags are built-in acoustic transmitters which release acoustic signals at programmed intervals. The receiver unit of each sentinel tag records the exact timing of these transmissions. At the same time, any nearby receivers may also record transmissions from these acoustic tags. After some processing, the result is a dataframe comprising transmissions and detections, which contains information on detection probability. Data are arranged by \code{source_id}, \code{timestamp} and then \code{sink_id}.
+#' @description A dataset containing a sample of transmissions and detections assembled from sentinel tags. Sentinel tags are built-in acoustic transmitters which release acoustic signals at programmed intervals. The receiver unit of each sentinel tag records the exact timing of these transmissions. At the same time, any nearby receivers may also record these transmissions as detections. After some processing, the result is a dataframe comprising transmissions and detections, which contains information on detection probability. Data are arranged by \code{source_id}, \code{timestamp} and then \code{sink_id}.
 #'
 #' @format A dataframe with 106,733 observations and 7 variables:
 #' \describe{
@@ -127,7 +127,7 @@
 #'
 #' @format A SpatialPolygonsDataFrame (see \code{\link[sp]{SpatialPolygonsDataFrame-class}}).
 #'
-#' @source https://biogeo.ucdavis.edu/data/gadm3.6/Rsp/gadm36_GBR_0_sp.rds
+#' @source Data were processed from https://biogeo.ucdavis.edu/data/gadm3.6/Rsp/gadm36_GBR_0_sp.rds.
 "dat_coast"
 
 
@@ -176,6 +176,7 @@
 #'   \item{args}{A named list of user inputs that record the parameters used to generate the outputs.}
 #' }
 #'
+#' @seealso See \code{\link[flapper]{acdc-class}} for further information on this S3 class.
 "dat_acdc"
 
 

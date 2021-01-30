@@ -19,4 +19,7 @@ dat_acdc
 \description{
 An object of class \code{\link[flapper]{acdc-class}} from \code{\link[flapper]{acdc}}, created by a (2-hour) chunk-wise implementation of this function. This is included principally to streamline function examples.
 }
+\seealso{
+See \code{\link[flapper]{acdc-class}} for further information on this S3 class.
+}
 \keyword{datasets}
