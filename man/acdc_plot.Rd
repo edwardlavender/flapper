@@ -2,7 +2,7 @@
 % Please edit documentation in R/acdc.R
 \name{acdc_plot}
 \alias{acdc_plot}
-\title{Plot the results of the ACDC algorithm}
+\title{Plot time-specific maps from the ACDC algorithm}
 \usage{
 acdc_plot(
   acdc,
@@ -44,9 +44,9 @@ acdc_plot(
 
 \item{crop_spatial}{A logical variable that defines whether or not to crop spatial data to lie within the axis limits.}
 
-\item{xlim, ylim, fix_zlim, pretty_axis_args}{Axis control arguments. \code{xlim} and \code{ylim} control the axis limits, following the rules of the 'lim' argument in \code{\link[prettyGraphics]{pretty_axis}}. \code{fix_zlim} is a logical input that defines whether or not to fix z axis limits across all plots (to facilitate comparisons), or a vector of two numbers that define a custom range for the z axis which is fixed across all plots. \code{fix_zlim = FALSE} produces plots in which the z axis is allowed to vary flexibly between time units. Other axis options supported by \code{\link[prettyGraphics]{pretty_axis}} are implemented by passing a named list of arguments to this function via \code{pretty_axis_args}.}
+\item{xlim, ylim, fix_zlim, pretty_axis_args}{Axis control arguments. \code{xlim} and \code{ylim} control the axis limits, following the rules of the \code{lim} argument in \code{\link[prettyGraphics]{pretty_axis}}. \code{fix_zlim} is a logical input that defines whether or not to fix z axis limits across all plots (to facilitate comparisons), or a vector of two numbers that define a custom range for the z axis which is fixed across all plots. \code{fix_zlim = FALSE} produces plots in which the z axis is allowed to vary flexibly between time units. Other axis options supported by \code{\link[prettyGraphics]{pretty_axis}} are implemented by passing a named list of arguments to this function via \code{pretty_axis_args}.}
 
-\item{par_param}{(optional) A named list of arguments, passed to \code{\link[graphics]{par}} to control the plotting window. This is executed before plotting is initiated and therefore affects all plots.}
+\item{par_param}{(optional) A named list of arguments, passed to \code{\link[graphics]{par}}, to control the plotting window. This is executed before plotting is initiated and therefore affects all plots.}
 
 \item{png_param}{(optional) A named list of arguments, passed to \code{\link[grDevices]{png}}, to save plots to file. If supplied, the plot for each time step is saved separately. The 'filename' argument should be the directory in which plots are saved. Plots are then saved as "1.png", "2.png" and so on.}
 
@@ -62,7 +62,7 @@ acdc_plot(
 The function plots the results of the ACDC algorithm at specified time steps, with one plot per time step. Plots are saved to file if \code{png_param} is supplied.
 }
 \description{
-This function is used to plot the results of the ACDC algorithm. To implement the function, an \code{\link[flapper]{.acdc-class}} list from \code{\link[flapper]{acdc}} and \code{\link[flapper]{acdc_simplify}} (or \code{\link[flapper]{.acdc}}) must be supplied, from which the results can be extracted and plotted. For each specified time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids can be added and customised and the finalised plots can be returned or saved to file.
+This function is used to plot time-specific maps from the ACDC algorithm. To implement the function, a \code{\link[flapper]{.acdc-class}} list from \code{\link[flapper]{acdc}} and \code{\link[flapper]{acdc_simplify}} (or \code{\link[flapper]{.acdc}}) must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids can be added and customised and the finalised plots can be returned or saved to file.
 }
 \examples{
 #### Step (1): Implement ACDC algorithm
@@ -137,6 +137,21 @@ acdc_plot(acdc = dat_acdc,
           png_param = list(filename = tempdir())
           )
 list.files(tempdir())
+
+#### Example (7) To plot the overall map, you can also just use a
+# ... a raster plotting function like prettyGraphics::pretty_map()
+ext <- update_extent(raster::extent(dat_coast), -1000)
+prettyGraphics::pretty_map(x = ext,
+                           add_rasters = list(x = dat_acdc$map),
+                           add_points = list(x = rsp, pch = "*", col = "red"),
+                           add_polys = list(x = dat_coast, col = "lightgreen"),
+                           crop_spatial = TRUE,
+                           xlab = "Easting", ylab = "Northing"
+                           )
+
+}
+\seealso{
+This function is typically used following calls to \code{\link[flapper]{acdc}} and \code{\link[flapper]{acdc_simplify}}.
 }
 \author{
 Edward Lavender

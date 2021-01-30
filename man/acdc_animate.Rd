@@ -39,7 +39,7 @@ acdc_animate(
 \item{...}{Additional arguments passed to \code{\link[animation]{ani.options}}.}
 }
 \value{
-The function produces an animation in .html format in the working directory (or a sub-directory of this). A folder 'images' is also produced which contains the images for each time step. A 'css' and 'js' folder are also produced by \code{\link[animation]{saveHTML}} which creates the animation.
+The function produces an animation in .html format in the working directory (or a sub-directory of this). A folder named 'images' is also produced which contains the images for each time step. The 'css' and 'js' folders are also produced by \code{\link[animation]{saveHTML}} which creates the animation.
 }
 \description{
 This function is a simple wrapper for \code{\link[flapper]{acdc_plot}} and \code{\link[animation]{saveHTML}} which creates an animation of the ACDC algorithm over time. To implement this function, a named list of arguments for \code{\link[flapper]{acdc_plot}}, which creates the plots, must be supplied. This is embedded within \code{\link[animation]{saveHTML}}, which creates a folder in the working directory named 'images' that contains a .png file for each time step and an animation as a .html file.
@@ -55,7 +55,7 @@ acdc_animate(expr_param = list(acdc = dat_acdc,
                                add_coastline = list(x = dat_coast, col = "darkgreen"),
                                plot = 1:5,
                                fix_zlim = FALSE)
-)
+                               )
 setwd(dir_current)
 }
 \author{
