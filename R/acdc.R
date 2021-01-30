@@ -1471,7 +1471,7 @@ acdc <- function(
                                                                                  list()
                                                                                  )
                                                                      ),
-                                             xlab = "Timestamp", ylab = "Depth (m)",
+                                             xlab = "Time stamp", ylab = "Depth (m)",
                                              type = "l",
                                              return_list = TRUE)
       prettyGraphics::pretty_line(acoustics$timestamp,
@@ -1646,8 +1646,8 @@ acdc_simplify <- function(acdc, keep_chunks = FALSE,...) {
     out$record <- lapply(acdc$.acdc, function(chunk) chunk$record)
     ## Delete the last element of each chunk (except the last chunk) since chunks are overlapping
     out$record <- lapply(out$record, function(chunk) chunk[1:(length(chunk)-1)])
-    ## Define a dataframe to adjust the timestamps recorded for each chunks
-    # For chunks 2:n_chunks, we will add the timestamps reached by the previous chunk
+    ## Define a dataframe to adjust the time stamps recorded for each chunks
+    # For chunks 2:n_chunks, we will add the time stamps reached by the previous chunk
     # ... up to the current chunk
     adjust_timestep <- lapply(out$record, function(chunk_record){
       # chunk_record <- out$record[[1]]
@@ -1658,7 +1658,7 @@ acdc_simplify <- function(acdc, keep_chunks = FALSE,...) {
     adjust_timestep <- do.call(rbind, adjust_timestep)
     adjust_timestep$timestep_cumulative <- cumsum(adjust_timestep$timestep_cumulative)
     adjust_timestep$timestep_detection <- cumsum(adjust_timestep$timestep_detection)
-    ## Adjust timestamps and add the chunk to the dataframe for each time stamp
+    ## Adjust time stamps and add the chunk to the dataframe for each time stamp
     out$record <- lapply(1:length(out$record), function(i) {
       chunk_record <- out$record[[i]]
       if(i == 1) {

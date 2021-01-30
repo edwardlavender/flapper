@@ -148,7 +148,7 @@ coa_setup_delta_t <- function(acoustics,
     if(is.null(moorings)) stop("'moorings' is required for implementation 2L.")
     check_names(input = moorings, req = c("receiver_start_date", "receiver_end_date"),
                 extract_names = colnames, type = all)
-    # Ensure acoustics timestamps and moorings deployment periods are in the same format
+    # Ensure acoustics time stamps and moorings deployment periods are in the same format
     if(!inherits(moorings$receiver_start_date, "POSIXct")) {
       moorings$receiver_start_date <- as.POSIXct(moorings$receiver_start_date, tz = tz)
     }
@@ -367,7 +367,7 @@ coa_setup_delta_t <- function(acoustics,
 #' coa_mat <- coa(mat = detection_matrix_by_id[[1]], xy = xy)
 #' utils::str(coa_mat)
 #'
-#' #### Example (2): Change the output format and coerce timestamps to POSIXct format
+#' #### Example (2): Change the output format and coerce time stamps to POSIXct format
 #' coa_dat <- coa(mat = detection_matrix_by_id[[1]], xy = xy, output = "data.frame")
 #' utils::str(coa_dat)
 #'

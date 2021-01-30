@@ -77,7 +77,7 @@ xy <- sp::coordinates(xy)
 coa_mat <- coa(mat = detection_matrix_by_id[[1]], xy = xy)
 utils::str(coa_mat)
 
-#### Example (2): Change the output format and coerce timestamps to POSIXct format
+#### Example (2): Change the output format and coerce time stamps to POSIXct format
 coa_dat <- coa(mat = detection_matrix_by_id[[1]], xy = xy, output = "data.frame")
 utils::str(coa_dat)
 

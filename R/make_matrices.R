@@ -409,9 +409,9 @@ make_matrix_cooccurence <-
                              acc1$timestamp <= (max(acc2$timestamp) + thresh_time*60*2), ]
               if(nrow(acc1) == 0) return(NULL)
 
-              # Check for duplicated timestamps in each individuals dataframe, and adjust these
+              # Check for duplicated time stamps in each individual's dataframe, and adjust these
               # ... by a small fraction prior to matching, so that all are included. Unless there are 100,000s
-              # ... of duplicate timestamps, this approach does not produce any duplicated observations.
+              # ... of duplicate time stamps, this approach does not produce any duplicated observations.
               dup1 <- duplicated(acc1$timestamp)
               dup2 <- duplicated(acc2$timestamp)
               adj <- (thresh_time*60)/4
@@ -420,14 +420,14 @@ make_matrix_cooccurence <-
                 lpd1 <- length(pos_dups1)
                 adj_dups1 <- stats::runif(lpd1, -adj, adj)
                 acc1$timestamp[pos_dups1] <- acc1$timestamp[pos_dups1] + adj_dups1
-                if(any(duplicated(acc1$timestamp))) warning(paste("Duplicate timestamps in, ", as.character(acc1$individual_id[1]), "element in acoustic_ls."))
+                if(any(duplicated(acc1$timestamp))) warning(paste("Duplicate time stamps in, ", as.character(acc1$individual_id[1]), "element in acoustic_ls."))
               }
               if(any(dup2)){
                 pos_dups2 <- which(dup2)
                 lpd2 <- length(pos_dups2)
                 adj_dups2 <- stats::runif(lpd2, -adj, adj)
                 acc2$timestamp[pos_dups2] <- acc2$timestamp[pos_dups2] + adj_dups2
-                if(any(duplicated(acc2$timestamp))) warning(paste("Duplicate timestamps in, ", as.character(acc2$individual_id[1]), "element in acoustic_ls."))
+                if(any(duplicated(acc2$timestamp))) warning(paste("Duplicate time stamps in, ", as.character(acc2$individual_id[1]), "element in acoustic_ls."))
               }
               # Match time series, readjusting any adjusted time stamps back to their original values
               # ... before these are added to the dataframe.
