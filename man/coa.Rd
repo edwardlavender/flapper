@@ -17,11 +17,11 @@ coa(
 \arguments{
 \item{mat}{A detection matrix, with one row for each time step and one column for each receiver, in which each cell defines the number of detections at each time step/receiver (for a particular individual) (see \code{\link[flapper]{make_matrix_detections}}). It is advisable that the rows and columns of this matrix are labelled by time stamp and receiver respectively, especially if there are any rows without detections (see \code{output} below).}
 
-\item{xy}{A matrix that defines receiver locations (x, y). This should contain one row for each receiver (column) in \code{mat} (in the same order as in \code{mat}) and two columns for the coordinates. Planar coordinates (i.e., Universal Transverse Mercator) projection are required for the averaging process.}
+\item{xy}{A matrix that defines receiver locations (x, y). This should contain one row for each receiver (column) in \code{mat} (in the same order as in \code{mat}) and two columns for the coordinates. Planar coordinates (i.e., in Universal Transverse Mercator projection) are required for the averaging process.}
 
 \item{cl}{A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the connection to the cluster is closed within the function.}
 
-\item{na_omit, as_POSIXct}{Processing options. \code{na_omit} is a logical variable that defines whether or not to omit NAs (i.e., rows in \code{mat} for which no detections were made and thus for which COAs cannot be calculated) from returned coordinates. If \code{output = "data.frame"} (see below), \code{as_POSIXct} is a function to convert timestamps, taken from the row names of \code{mat}, to a POSIXct vector. \code{as_POSIXct = NULL} suppresses this conversion.}
+\item{na_omit, as_POSIXct}{Processing options. \code{na_omit} is a logical variable that defines whether or not to omit NAs (i.e., rows in \code{mat} for which no detections were made and thus for which COAs cannot be calculated) from returned coordinates. If \code{output = "data.frame"} (see below), \code{as_POSIXct} is a function to convert time stamps, taken from the row names of \code{mat}, to a POSIXct vector. \code{as_POSIXct = NULL} suppresses this conversion.}
 
 \item{output}{A character that defines the output format. Currently supported options are: \code{"matrix"}, which returns a matrix of the coordinates of COAs; and \code{"data.frame"}, which returns a dataframe with timestamps (taken from the row names of \code{mat}) and COA coordinates.}
 
@@ -31,7 +31,7 @@ coa(
 The function returns a matrix or a dataframe, depending on the \code{output} argument, that represents a time series of COAs. If \code{na_omit = TRUE}, the time series may have 'gaps' over which COAs could not be calculated due to the absence of detections.
 }
 \description{
-This function implements the arithmetic mean-position algorithm to calculate an individual's centres of activity (COAs) though time from detections at passive acoustic telemetry receivers, as described by Simpfendorfer et al (2002). Under this approach, each COA is calculated as the arithmetic mean of the locations of receivers at which an individual was detected over a specified time interval, weighted by the frequency of detections at each of those receivers. To implement the function, a detection matrix that defines the number of detections of an individual along sequence of time steps at each receiver (e.g., from \code{\link[flapper]{make_matrix_detections}}) needs to be supplied, along a matrix of receiver locations using a planar coordinate system. For each time interval, the function calculates the centre of activity and returns a matrix or dataframe with this information.
+This function implements the arithmetic mean-position algorithm to calculate an individual's centres of activity (COAs) though time from detections at passive acoustic telemetry receivers, as described by Simpfendorfer et al (2002). Under this approach, each COA is calculated as the arithmetic mean of the locations of receivers at which an individual was detected over a specified time interval, weighted by the frequency of detections at each of those receivers. To implement the function, a detection matrix that defines the number of detections of an individual along sequence of time steps at each receiver (e.g., from \code{\link[flapper]{make_matrix_detections}}) needs to be supplied, along a matrix of receiver locations in a planar coordinate system. For each time interval, the function calculates the centre of activity and returns a matrix or dataframe with this information.
 }
 \details{
 Centres of activity (COA) are a widely used metric for the reconstruction of patterns of space use from passive acoustic telemetry detections. Several methods have been developed to calculate COAs, but the mean-position algorithm is the commonest. Under this approach, COAs are estimated as an average of the locations of receivers at which an individual is detected over a specified time interval, weighted by the frequency of detections at each of those receivers. Within \code{\link[flapper]{flapper}}, COAs are calculated in three stages by first exploring possible time intervals over which to calculate COAs with \code{\link[flapper]{coa_setup_delta_t}}; then summarising detections over those intervals with \code{\link[flapper]{make_matrix_detections}}; and finally passing the resultant detection matrix to the \code{\link[flapper]{coa}} function to calculate COAs. This implements the arithmetic version of the mean-position algorithm, calculating the arithmetic mean of the receiver locations, weighted by the frequency of detections at each receiver.
@@ -42,7 +42,7 @@ To generate estimates of space use, COAs are usually taken as point estimates fr
 #### Define data for the calculation of COAs
 
 ## (1) Define the period over which to calculate COAs
-# ... by focusing on the range of time over which IDs were at liberty.
+# ... by focusing on the time over which IDs were at liberty.
 dat_ids$tag_start_date <- as.POSIXct(dat_ids$tag_start_date)
 dat_ids$tag_end_date   <- as.POSIXct("2017-06-02")
 
@@ -57,7 +57,7 @@ dat_acoustics$receiver_id <- factor(dat_acoustics$receiver_id,
 ## (3) Define the detection matrix
 # ... Here we simply create a detection matrix across all IDs and using
 # ... a convenient (but unjustified) delta_t value. In reality, we would need
-# ... to consider the time series over which it is appropriate to calculate
+# ... to consider the time series for which to calculate
 # ... COAs and the appropriate delta t value(s) more carefully.
 detection_matrix_by_id <- make_matrix_detections(dat_acoustics,
                                                  delta_t = "days",
@@ -77,7 +77,7 @@ xy <- sp::coordinates(xy)
 coa_mat <- coa(mat = detection_matrix_by_id[[1]], xy = xy)
 utils::str(coa_mat)
 
-#### Example (2): Change the output format and coerce timestamps to output format
+#### Example (2): Change the output format and coerce timestamps to POSIXct format
 coa_dat <- coa(mat = detection_matrix_by_id[[1]], xy = xy, output = "data.frame")
 utils::str(coa_dat)
 
