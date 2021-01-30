@@ -36,17 +36,17 @@ coa_setup_delta_t(
 
 \item{xlim, ylim}{X and y axis limits. If \code{method = 1:2L}, a single vector will affect both plots identically, whereas a list with one element for each method will affect plots differently.}
 
-\item{add_additional}{(optional) A stand-alone function, to be executed after a plot has been made to customise the result.}
+\item{add_additional}{(optional) A stand-alone function, to be executed after a plot has been made, to customise the result.}
 
-\item{type, ...}{Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}} that affect all plots.}
+\item{type, ...}{Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}}, that affect all plots.}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console to relay function progress.}
 }
 \value{
-The function returns a named list and a plot for each \code{method}. The list contains a 'data' element that is a named list of dataframes for each method ('m1', 'm2') and implementation ('i1', 'i2'). For 'm1_i1', the dataframe contains the number of receivers with detections ('n_receiver_with_detections') and the percent of the time series for which that number of receivers made detections ('pc_of_ts'). For 'm1_i2', the percentage of receivers with detections ('pc_receiver_with_detections') is given instead. For 'm2_i1', the number of detections ('n_detections') is given; for 'm2_i2', it is the number of detections per receiver ('n_detections_per_receiver'). The list also contains an 'arg' element with input to \code{acoustics} and \code{delta_t} for reference.
+The function returns a named list and a plot for each \code{method}. The list contains a 'data' element that is a named list of dataframes for each method ('m1', 'm2') and implementation ('i1', 'i2'). For 'm1_i1', the dataframe contains the number of receivers with detections ('n_receiver_with_detections') and the percent of the time series for which that number of receivers made detections ('pc_of_ts'). For 'm1_i2', the percentage of receivers with detections ('pc_receiver_with_detections') is given instead. For 'm2_i1', the number of detections ('n_detections') is given; for 'm2_i2', it is the number of detections per receiver ('n_detections_per_receiver'). The list also contains an 'args' element that records the inputs to \code{acoustics} and \code{delta_t} for reference.
 }
 \description{
-This function implements the two approaches introduced by Simpfendorfer et al. (2002) to suggest suitable time interval(s) over which to estimate centres of activity (COAs). Both approaches rely on prior specification of a candidate time interval (\code{delta_t}) and provide a qualitative assessment of its suitability. The iteration of this scheme over multiple intervals provides a measure of their relative suitability.
+This function implements the two approaches introduced by Simpfendorfer et al. (2002) to suggest suitable time interval(s) over which to estimate centres of activity (COAs). Both approaches rely on prior specification of a candidate time interval (\code{delta_t}) and provide a qualitative assessment of its suitability. The manual iteration of this scheme over multiple intervals provides a measure of their relative suitability.
 
 The first method (\code{method = 1L}) is based on the premise that estimated COAs are more accurate when they are estimated from detections at more receivers and thus examines the frequency distribution (over the whole time series) of the number of receivers at which detections were made within a given time interval (e.g., one hour). The second method (\code{method = 2L}) is based on the premise that estimated COAs are more accurate when they are estimated from a larger number of detections and thus examines the frequency distribution (over the whole time series) of the number of detections in a given time interval. In a comparison of multiple candidate intervals, the most appropriate interval is the one which optimises a trade off between sufficiently meeting these criteria while remaining sufficiently small in duration such that COAs remain a meaningful representation of the individual's location or short-term centre of activity.
 
