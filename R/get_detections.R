@@ -3,15 +3,15 @@
 #### get_detection_pr()
 
 #' @title A detection probability function based on distance
-#' @description This function calculates detection probability (e.g., of an acoustic detection) at specified distances from the sampling device (e.g., a passive acoustic telemetry receiver) using user-defined parameters (a model intercept, an coefficient for the effect of distance and an inverse link function). The function returns a plot of detection probability with distance and/or a vector of detection probabilities.
+#' @description This function calculates detection probability (e.g., of an acoustic detection) at specified distances from the sampling device (e.g., a passive acoustic telemetry receiver) using user-defined parameters (i.e., a model intercept, a coefficient for the effect of distance and an inverse link function). The function returns a plot of detection probability with distance and/or a vector of detection probabilities.
 #'
 #' @param distance A numeric vector of distances at which to calculate detection probability.
 #' @param beta_0,beta_1 Single numbers that define the model coefficients (i.e., the intercept and gradient on the scale of the link function).
 #' @param inv_link A function that defines the inverse link function.The default function is the logistic (inverse logit) function.
 #' @param output An integer (\code{1L}, \code{2L} or \code{3L}) that defines the output type. \code{1L} returns a plot of detection probability against distance; \code{2L} returns a numeric vector of detection probabilities; and \code{3L} returns both of the above.
-#' @param ... Additional arguments passed to \code{\link[prettyGraphics]{pretty_plot}} to customise the plot. These are only implemented if \code{output = 1L} or \code{output = 3L}.
+#' @param ... Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}}, to customise the plot. These are only implemented if \code{output = 1L} or \code{output = 3L}.
 #'
-#' @return The function calculates detection probability at each specified distance and returns a plot, a vector of detection probabilities, or both, depending on the value of the \code{output} argument. If a vector of detection probabilities is returned, this contains the following attributes: X', the model matrix; 'beta', the regression coefficients; and 'inv_link', the inverse link function.
+#' @return The function calculates detection probability at each specified distance and returns a plot, a vector of detection probabilities, or both, depending on the value of the \code{output} argument. If a vector of detection probabilities is returned, this contains the following attributes: 'X', the model matrix; 'beta', the regression coefficients; and 'inv_link', the inverse link function.
 #'
 #' @examples
 #' #### Example (1): Implement the function using the default parameters
@@ -19,7 +19,7 @@
 #' det_pr <- get_detection_pr()
 #' utils::head(det_pr)
 #' # The vector has attributes:
-#' # ... 'X' (the model matrix),
+#' # ... 'X' (the model matrix)
 #' # ... 'beta' (the regression coefficient)
 #' # ... 'inv_link' (the inverse link function)
 #' utils::str(det_pr)
@@ -27,15 +27,15 @@
 #' #### Example (2): Adjust model parameters
 #' # Change regression coefficients
 #' det_pr <- get_detection_pr(beta_0 = 2.5, beta_1 = -0.006)
-#' # Use inverse probit
+#' # Use inverse probit link function
 #' det_pr <- get_detection_pr(beta_0 = 2.5, beta_1 = -0.006, inv_link = stats::pnorm)
 #'
 #' #### Example (3): Modify graphical properties
 #' det_pr <- get_detection_pr(beta_0 = 2.5,
-#'                           beta_1 = -0.006,
-#'                           type = "l",
-#'                           xlab = "Distance (m)",
-#'                           ylab = "Detection Probability")
+#'                            beta_1 = -0.006,
+#'                            type = "l",
+#'                            xlab = "Distance (m)",
+#'                            ylab = "Detection Probability")
 #'
 #' #### Example (4): Modify return options
 #' # Only graph
@@ -94,7 +94,7 @@ get_detection_pr <- function(distance = 1:1000,
 #' @param plot A logical input that defines whether or not to plot receivers, their centroids, and the buffer (if specified).
 #' @param ... Additional arguments passed to \code{\link[rgeos]{gBuffer}}, such as \code{byid} and/or \code{quadsegs}.
 #'
-#' @return The function returns a \code{\link[sp]{SpatialPolygons-class}} object of the detection centroids around receivers that represents the area they survey under the assumption of a constant detection range, accounting for any barriers to detection. By default, this will contain a single feature, which is suitable for the calculation of the total area surveyed by receivers (see \code{\link[flapper]{get_detection_area_sum}}) because it accounts for the overlap in the detection ranges of receivers. However, if \code{byid = TRUE} is passed via \code{...} to \code{\link[rgeos]{gBuffer}}, the returned object will have a feature for each pair of coordinates in \code{xy} (i.e., receiver). This is less appropriate for calculating the area surveyed by receivers, since areas surveyed by multiple receivers will be over-counted, but it is suitable when the centroids for particular receivers are required (e.g., to extract environmental conditions within a specific receiver's detection ranges) (see \code{\link[flapper]{get_detection_centroids_envir}}).
+#' @return The function returns a \code{\link[sp]{SpatialPolygons-class}} object of the detection centroids around receivers that represents the area they survey under the assumption of a constant detection range, accounting for any barriers to detection. By default, this will contain a single feature, which is suitable for the calculation of the total area surveyed by receivers (see \code{\link[flapper]{get_detection_area_sum}}) because it accounts for the overlap in the detection ranges of receivers. However, if \code{byid = TRUE} is passed via \code{...} to \code{\link[rgeos]{gBuffer}}, the returned object will have a feature for each pair of coordinates in \code{xy} (i.e., receiver). This is less appropriate for calculating the area surveyed by receivers, since areas surveyed by multiple receivers will be over-counted, but it is suitable when the centroids for particular receivers are required (e.g., to extract environmental conditions within a specific receiver's detection range) (see \code{\link[flapper]{get_detection_centroids_envir}}).
 #'
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
@@ -119,10 +119,10 @@ get_detection_pr <- function(distance = 1:1000,
 #' get_detection_centroids(xy, coastline = dat_coast, plot = FALSE)
 #'
 #' #### Example (5): Output characteristics are controlled via byid
-#' # A SpatialPolygons with one feature is the implicit output
+#' # A SpatialPolygons object with one feature is the implicit output
 #' sp_1 <- get_detection_centroids(xy, coastline = dat_coast, byid = FALSE)
 #' sp_1
-#' # An SpatialPolygons with one feature for each element in xy
+#' # A SpatialPolygons object with one feature for each element in xy
 #' # ... can be returned via byid = TRUE
 #' sp_2 <- get_detection_centroids(xy, coastline = dat_coast, byid = TRUE)
 #' sp_2
@@ -130,7 +130,7 @@ get_detection_pr <- function(distance = 1:1000,
 #' # ... by multiple receivers are merged
 #' rgeos::gArea(sp_1); rgeos::gArea(sp_2)
 #' # But it can be more convenient to use the latter format in some cases
-#' # ... because it is easy to isolate specific centroids
+#' # ... because it is easy to isolate specific centroids:
 #' raster::plot(dat_coast)
 #' raster::plot(sp_1[1], add = TRUE, col = "red")  # single feature
 #' raster::plot(sp_2[1], add = TRUE, col = "blue") # isolate specific features

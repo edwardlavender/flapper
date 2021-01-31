@@ -22,13 +22,13 @@ get_detection_pr(
 
 \item{output}{An integer (\code{1L}, \code{2L} or \code{3L}) that defines the output type. \code{1L} returns a plot of detection probability against distance; \code{2L} returns a numeric vector of detection probabilities; and \code{3L} returns both of the above.}
 
-\item{...}{Additional arguments passed to \code{\link[prettyGraphics]{pretty_plot}} to customise the plot. These are only implemented if \code{output = 1L} or \code{output = 3L}.}
+\item{...}{Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}}, to customise the plot. These are only implemented if \code{output = 1L} or \code{output = 3L}.}
 }
 \value{
-The function calculates detection probability at each specified distance and returns a plot, a vector of detection probabilities, or both, depending on the value of the \code{output} argument. If a vector of detection probabilities is returned, this contains the following attributes: X', the model matrix; 'beta', the regression coefficients; and 'inv_link', the inverse link function.
+The function calculates detection probability at each specified distance and returns a plot, a vector of detection probabilities, or both, depending on the value of the \code{output} argument. If a vector of detection probabilities is returned, this contains the following attributes: 'X', the model matrix; 'beta', the regression coefficients; and 'inv_link', the inverse link function.
 }
 \description{
-This function calculates detection probability (e.g., of an acoustic detection) at specified distances from the sampling device (e.g., a passive acoustic telemetry receiver) using user-defined parameters (a model intercept, an coefficient for the effect of distance and an inverse link function). The function returns a plot of detection probability with distance and/or a vector of detection probabilities.
+This function calculates detection probability (e.g., of an acoustic detection) at specified distances from the sampling device (e.g., a passive acoustic telemetry receiver) using user-defined parameters (i.e., a model intercept, a coefficient for the effect of distance and an inverse link function). The function returns a plot of detection probability with distance and/or a vector of detection probabilities.
 }
 \examples{
 #### Example (1): Implement the function using the default parameters
@@ -36,7 +36,7 @@ This function calculates detection probability (e.g., of an acoustic detection) 
 det_pr <- get_detection_pr()
 utils::head(det_pr)
 # The vector has attributes:
-# ... 'X' (the model matrix),
+# ... 'X' (the model matrix)
 # ... 'beta' (the regression coefficient)
 # ... 'inv_link' (the inverse link function)
 utils::str(det_pr)
@@ -44,15 +44,15 @@ utils::str(det_pr)
 #### Example (2): Adjust model parameters
 # Change regression coefficients
 det_pr <- get_detection_pr(beta_0 = 2.5, beta_1 = -0.006)
-# Use inverse probit
+# Use inverse probit link function
 det_pr <- get_detection_pr(beta_0 = 2.5, beta_1 = -0.006, inv_link = stats::pnorm)
 
 #### Example (3): Modify graphical properties
 det_pr <- get_detection_pr(beta_0 = 2.5,
-                          beta_1 = -0.006,
-                          type = "l",
-                          xlab = "Distance (m)",
-                          ylab = "Detection Probability")
+                           beta_1 = -0.006,
+                           type = "l",
+                           xlab = "Distance (m)",
+                           ylab = "Detection Probability")
 
 #### Example (4): Modify return options
 # Only graph

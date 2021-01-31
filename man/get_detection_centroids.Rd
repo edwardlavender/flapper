@@ -24,7 +24,7 @@ get_detection_centroids(
 \item{...}{Additional arguments passed to \code{\link[rgeos]{gBuffer}}, such as \code{byid} and/or \code{quadsegs}.}
 }
 \value{
-The function returns a \code{\link[sp]{SpatialPolygons-class}} object of the detection centroids around receivers that represents the area they survey under the assumption of a constant detection range, accounting for any barriers to detection. By default, this will contain a single feature, which is suitable for the calculation of the total area surveyed by receivers (see \code{\link[flapper]{get_detection_area_sum}}) because it accounts for the overlap in the detection ranges of receivers. However, if \code{byid = TRUE} is passed via \code{...} to \code{\link[rgeos]{gBuffer}}, the returned object will have a feature for each pair of coordinates in \code{xy} (i.e., receiver). This is less appropriate for calculating the area surveyed by receivers, since areas surveyed by multiple receivers will be over-counted, but it is suitable when the centroids for particular receivers are required (e.g., to extract environmental conditions within a specific receiver's detection ranges) (see \code{\link[flapper]{get_detection_centroids_envir}}).
+The function returns a \code{\link[sp]{SpatialPolygons-class}} object of the detection centroids around receivers that represents the area they survey under the assumption of a constant detection range, accounting for any barriers to detection. By default, this will contain a single feature, which is suitable for the calculation of the total area surveyed by receivers (see \code{\link[flapper]{get_detection_area_sum}}) because it accounts for the overlap in the detection ranges of receivers. However, if \code{byid = TRUE} is passed via \code{...} to \code{\link[rgeos]{gBuffer}}, the returned object will have a feature for each pair of coordinates in \code{xy} (i.e., receiver). This is less appropriate for calculating the area surveyed by receivers, since areas surveyed by multiple receivers will be over-counted, but it is suitable when the centroids for particular receivers are required (e.g., to extract environmental conditions within a specific receiver's detection range) (see \code{\link[flapper]{get_detection_centroids_envir}}).
 }
 \description{
 This function defines the areas surveyed by receivers (termed 'detection centroids') as a spatial object, based on an estimate of the detection range (m) and any barriers to detection. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The function defines a spatial buffer around each receiver according to the estimated detection range, cuts out any barriers to detection, such as the coastline, and returns a SpatialPolygons object that defines the combined detection centroid across all receivers or receiver-specific detection centroids.
@@ -52,10 +52,10 @@ get_detection_centroids(xy, detection_range = 500, coastline = dat_coast)
 get_detection_centroids(xy, coastline = dat_coast, plot = FALSE)
 
 #### Example (5): Output characteristics are controlled via byid
-# A SpatialPolygons with one feature is the implicit output
+# A SpatialPolygons object with one feature is the implicit output
 sp_1 <- get_detection_centroids(xy, coastline = dat_coast, byid = FALSE)
 sp_1
-# An SpatialPolygons with one feature for each element in xy
+# A SpatialPolygons object with one feature for each element in xy
 # ... can be returned via byid = TRUE
 sp_2 <- get_detection_centroids(xy, coastline = dat_coast, byid = TRUE)
 sp_2
@@ -63,7 +63,7 @@ sp_2
 # ... by multiple receivers are merged
 rgeos::gArea(sp_1); rgeos::gArea(sp_2)
 # But it can be more convenient to use the latter format in some cases
-# ... because it is easy to isolate specific centroids
+# ... because it is easy to isolate specific centroids:
 raster::plot(dat_coast)
 raster::plot(sp_1[1], add = TRUE, col = "red")  # single feature
 raster::plot(sp_2[1], add = TRUE, col = "blue") # isolate specific features
