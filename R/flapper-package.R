@@ -1,7 +1,7 @@
 #' @title flapper: An R Package to Explore Animal Space Use Within Passive Acoustic Telemetry Arrays
 #' @author Edward Lavender
 #'
-#' @description flapper is an R package designed to facilitate the use of passive acoustic telemetry (PAT) data for ecological inferences, especially those pertaining to animal space use. This includes functions for processing PAT data, spatial tools, new algorithms for inferring space use and simulations designed to evaluate the efficacy of existing and new algorithms for inferring space use. Package development has been motivated by the collection of PAT data for a Critically Endangered benthopelagic elasmobranch off the West Coast of Scotland.
+#' @description flapper is an R package designed to facilitate the use of passive acoustic telemetry (PAT) data for ecological inferences, especially those pertaining to animal space use. This includes functions for processing PAT data, spatial tools, new algorithms for inferring space use and simulations designed to evaluate the efficacy of existing and new algorithms for inferring space use. Package development has been motivated by the collection of PAT data for a Critically Endangered benthopelagic elasmobranch (the flapper skate, \emph{Dipturus intermedius}) off the west coast of Scotland.
 #'
 #' @section Data processing:
 #' Some functions facilitate the assembly, processing and checking of passive acoustic telemetry time series:
@@ -16,14 +16,14 @@
 #'   }
 #'   \item Data processing
 #'   \itemize{
-#'     \item \link{process_receiver_id} adds unique receiver IDs to a dataframe (which is useful if the same receiver has been deployed more than once);
+#'     \item \link{process_receiver_id} adds unique receiver IDs to a dataframe (e.g., if the same receiver has been deployed more than once);
 #'     \item \link{process_false_detections_sf} passes putative false detections through a spatial filter which incorporates ancillary information on receiver locations and animal swimming speeds to interrogate their plausibility;
 #'     \item \link{process_quality_check} passes acoustic data through some basic quality checks prior to analysis;
 #'    }
 #' }
 #'
 #' @section Spatial tools:
-#' Some functions facilitate spatial operations, which support ecological investigations and space use algorithms:
+#' Some functions facilitate spatial operations that support ecological investigations and space use algorithms:
 #' \itemize{
 #'   \item \link{buffer_and_crop} buffers a spatial object (e.g., receiver locations) and uses this buffered object to crop another (e.g., the local bathymetry);
 #'   \item \link{cells_from_val} returns the cells (or a raster of the cells) of a raster that are equal to a specified value or lie within a specified range of values;
@@ -40,7 +40,7 @@
 #'   \item \link{dist_btw_receivers} calculates the Euclidean distances between all combinations of receivers;
 #'   \item \link{dist_btw_points_3d} calculates the Euclidean distances between points in three-dimensional space;
 #'   \item \link{dist_over_surface} calculates the Euclidean distance along a path over a three-dimensional surface;
-#'   \item \link{lcp_over_surface} calculates shortest pathways and/or the distances of the shortest pathways over a surface between origin and destination coordinates;
+#'   \item \link{lcp_over_surface} calculates the shortest path and/or the distances of the shortest paths over a surface between origin and destination coordinates;
 #' }
 #'
 #' @section Detection statistics:
@@ -51,7 +51,7 @@
 #'   \item \link{get_detection_centroids_envir} extracts environmental conditions from within receiver detection ranges, accounting for detection probability;
 #'   \item \link{get_detection_area_sum} calculates the total area surveyed by receivers;
 #'   \item \link{get_detection_area_ts} defines a time series of the area surveyed by receivers;
-#'   \item \link{get_n_operational_ts} defines a time series of the number of operational units (e.g., individuals at liberty or active receivers)
+#'   \item \link{get_n_operational_ts} defines a time series of the number of operational units (e.g., individuals at liberty or active receivers);
 #'   \item \link{get_id_rec_overlap} calculates the overlap between the deployment periods of tagged individuals and receivers;
 #'   \item \link{make_matrix_cooccurence} computes a detection history similarity matrix across individuals;
 #' }
@@ -98,7 +98,7 @@
 #'   \item \link{sim_detections} simulates detections at receivers arising from movement paths under a diversity of detection probability models;
 #' }
 #'
-#' Another set of functions facilitate the evaluation of the performance of alternative algorithms for inferring patterns of space use under different array designs, movement and detections models:
+#' Another set of functions facilitate the evaluation of the performance of alternative algorithms for inferring patterns of space use under different array designs, movement models and detections models:
 #' \itemize{
 #'   \item \link{eval_by_kud} compares patterns of space use inferred from simulated and estimated movement paths using kernel utilisation distributions;
 #' }
