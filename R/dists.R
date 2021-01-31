@@ -3,9 +3,9 @@
 #### dist_btw_receivers()
 
 #' @title Compute Euclidean distances between receivers
-#' @description This function computes linear distances (km) between all combinations of receivers.
+#' @description This function computes Euclidean distances (km) between all combinations of receivers.
 #'
-#' @param moorings A dataframe which defines the location of each unique receiver combination. This should contain the columns: 'receiver_id', a unique identifier of each receiver, 'receiver_lat', the latitude of that receiver in decimal degrees; and 'receiver_long', the longitude of that receiver in decimal degrees (see \code{\link[flapper]{dat_moorings}}).
+#' @param moorings A dataframe which defines each unique receiver deployment. This should contain the columns: 'receiver_id', a unique identifier of each receiver, 'receiver_lat', the latitude of that receiver in decimal degrees; and 'receiver_long', the longitude of that receiver in decimal degrees (see \code{\link[flapper]{dat_moorings}}).
 #' @param f (optional) A function which is used to process distances before these are returned. For example, it may be useful to round distances to nearest km with \code{f = function(x) round(x, digits = 0)}.
 #'
 #' @return The function returns a dataframe with columns 'r1', 'r2' and 'dist'. These define the IDs of each combination of receivers and the associated distance between them, in km. Note that the dataframe contains duplicate combinations of receivers (e.g., both r1 = 1 and r2 = 2 and r1 = 2 and r2 = 1).
@@ -99,10 +99,10 @@ dist_btw_points_3d <- function(x1, x2, y1, y2, z1, z2){
 #### dist_over_surface()
 
 #' @title Calculate the total distance of a path over a three-dimensional surface
-#' @description This function calculates the total distance of a path, whose horizontal coordinates are known, over a three-dimensional surface. To implement this function, the \code{path} should be supplied as a matrix or data.frame of coordinates or a \code{\link[sp]{SpatialLines}} object and the \code{surface} should be supplied as a \code{\link[raster]{raster}}. The function takes the horizontal coordinates of the \code{path} and extracts the values of the surface at these points, and then calculates the total distance of the path as the sum of the paired distances between each pair of points.
-#' @param path A matrix or data.frame of horizontal coordinates (x, y) or a \code{\link[sp]{SpatialLines}} object which defines the path over a surface. The coordinate reference system (projection) of \code{path} should be the same as that for the \code{surface}.
+#' @description This function calculates the total distance of a path, whose horizontal coordinates are known, over a three-dimensional surface. To implement the function, the \code{path} should be supplied as a matrix or dataframe of coordinates or a \code{\link[sp]{SpatialLines}} object and the \code{surface} should be supplied as a \code{\link[raster]{raster}}. The function takes the horizontal coordinates of the \code{path} and extracts the values of the surface at these points, and then calculates the total distance of the path as the sum of the paired distances between each pair of points.
+#' @param path A matrix or dataframe of horizontal coordinates (x, y) or a \code{\link[sp]{SpatialLines}} object which defines the path over a surface. The coordinate reference system (projection) of \code{path} should be the same as that for the \code{surface}.
 #' @param surface A \code{\link[raster]{raster}} over which the movement that generated the path occurred. The coordinate reference system (projection) of \code{path} should be the same as that for the \code{surface} and the values of the \code{surface} should also be expressed in the same units (e.g., metres).
-#' @details The total distance of a path over a three-dimensional surface is equal to the sum of the pairwise distances between each point (\eqn{i}) and its successor (\eqn{i + 1}) according to the equation: \deqn{\Sigma_{i = 1}^n [\sqrt{(x_{i+1} - x_i)^2 + (y_{i + 1} - y_i)^2 + (z_{i + 1} - z_i)^2)}]} where \eqn{x}, \eqn{y} and \eqn{z} are the x, y and z coordinates of each point in three-dimensional space. Pairwise distances are calculated via \code{\link[flapper]{dist_btw_points_3d}}.
+#' @details The total distance of a path over a three-dimensional surface is equal to the sum of the pairwise distances between each point (\eqn{i}) and its successor (\eqn{i + 1}) according to the equation: \deqn{\Sigma_{i = 1}^n \sqrt{(x_{i+1} - x_i)^2 + (y_{i + 1} - y_i)^2 + (z_{i + 1} - z_i)^2)}} where \eqn{x}, \eqn{y} and \eqn{z} are the x, y and z coordinates of each point in three-dimensional space and \eqn{n} is the total number of points minus 1. Pairwise distances are calculated via \code{\link[flapper]{dist_btw_points_3d}}. Note that for realistic distances, some interpolation (e.g., via least-cost paths) between points may be required to generate localisations at sufficiently high resolution to effectively capture the shape of the landscape.
 #' @return The function returns a number equal to the total distance along the path.
 #' @examples
 #' #### Simulate a hypothetical landscape
@@ -121,30 +121,30 @@ dist_btw_points_3d <- function(x1, x2, y1, y2, z1, z2){
 #' raster::plot(r)
 #' raster::text(r)
 #'
-#' #### Example (1) Total distance between two example adjacent points
+#' #### Example (1): Total distance between two example adjacent points
 #' path_cells <- c(1, 2)
 #' path_matrix <- sp::coordinates(r)[path_cells, ]
 #' dist_over_surface(path_matrix, r)
 #' sqrt(5^2 + (10-5)^2)
 #'
-#' #### Example (2) Total distance between two example diagonal points
+#' #### Example (2): Total distance between two example diagonal points
 #' path_cells <- c(1, 5)
 #' path_matrix <- sp::coordinates(r)[path_cells, ]
 #' dist_over_surface(path_matrix, r)
 #' sqrt(sqrt(5^2 + 5^2)^2 + (5 - 1)^2)
 #'
-#' #### Example (3) Total distance along a longer path
+#' #### Example (3): Total distance along a longer path
 #' path_cells <- c(1, 2, 3)
 #' path_matrix <- sp::coordinates(r)[path_cells, ]
 #' dist_over_surface(path_matrix, r)
 #' sqrt(5^2 + (10-5)^2) + sqrt(5^2 + (10-3)^2)
 #'
-#' #### Example (4) Total distance along an even longer path
+#' #### Example (4): Total distance along an even longer path
 #' path_cells <- c(1, 2, 3, 6, 8)
 #' path_matrix <- sp::coordinates(r)[path_cells, ]
 #' dist_over_surface(path_matrix, r)
 #'
-#' #### Example (5) A SpatialLines object can be used for the path
+#' #### Example (5): A SpatialLines object can be used for the path
 #' path_line <- Orcs::coords2Lines(path_matrix, ID = 1, proj4string = proj_utm)
 #' raster::lines(path_line)
 #' dist_over_surface(path_line, r)
@@ -183,8 +183,8 @@ dist_over_surface <- function(path, surface){
 ######################################
 #### lcp_over_surface()
 
-#' @title Calculate shortest pathway(s) and/or distance(s) over a surface between origin and destination coordinates
-#' @description This function computes the shortest pathway(s) and/or distance(s) over a \code{surface} between \code{origin} and \code{destination} coordinates. To implement this function, \code{origin} and \code{destination} coordinates need to be specified as matrices and the surface over which movement occurs should be supplied as a \code{\link[raster]{raster}}. Since determining shortest pathways can be computationally and memory-intensive, the \code{surface} can be reduced in size and/or resolution before these are computed, by (a) cropping the surface within user-defined extents; (b) focusing on a buffer zone along a Euclidean transect connecting \code{origin} and \code{destination} coordinates; (c) aggregating the surface to reduce the resolution; and/or (d) masking out areas over which movement is impossible (e.g., land for marine animals). Then, the function computes distances between connected cells, given (a) the planar distances between connected cells and (b) their difference in elevation. These distances are taken as a measure of 'cost'. For each pair of \code{origin} and \code{destination} coordinates, or for all combinations of coordinates, these distances are used to compute the least-cost pathway (i.e., the shortest pathway) and/or the distance of this pathway, using functions in the \code{\link[cppRouting]{cppRouting}} or \code{\link[gdistance]{gdistance}} package. The function returns the shortest pathway(s) and/or their distance(s) (m) along with a plot and a list of objects involved in the calculations.
+#' @title Calculate shortest path(s) and/or distance(s) over a surface between origin and destination coordinates
+#' @description This function computes the shortest path(s) and/or distance(s) over a \code{surface} between \code{origin} and \code{destination} coordinates. To implement this function, \code{origin} and \code{destination} coordinates need to be specified as matrices and the surface over which movement occurs should be supplied as a \code{\link[raster]{raster}}. Since determining shortest paths can be computationally and memory-intensive, the \code{surface} can be reduced in size and/or resolution before these are computed, by (a) cropping the surface within user-defined extents; (b) focusing on a buffer zone along a Euclidean transect connecting \code{origin} and \code{destination} coordinates; (c) aggregating the surface to reduce the resolution; and/or (d) masking out areas over which movement is impossible (e.g., land for marine animals). Then, the function computes distances between connected cells, given (a) the planar distances between connected cells and (b) their difference in elevation. These distances are taken as a measure of 'cost'. For each pair of \code{origin} and \code{destination} coordinates, or for all combinations of coordinates, these distances are used to compute the least-cost (i.e., shortest) path and/or the distance of this path, using functions in the \code{\link[cppRouting]{cppRouting}} or \code{\link[gdistance]{gdistance}} package. The function returns the shortest path(s) and/or their distance(s) (m) along with a plot and a list of objects involved in the calculations.
 #' @param origin A matrix which defines the coordinates (x, y) of the starting location(s). Coordinates should lie on a plane (i.e., Universal Transverse Mercator projection).
 #' @param destination A matrix which defines the coordinates (x, y) of the finishing location(s). Coordinates should lie on a plane (i.e., Universal Transverse Mercator projection).
 #' @param surface A \code{\link[raster]{raster}} over which the object (e.g., individual) must move from \code{origin} to \code{destination}. The \code{surface} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in x, y and z directions (m). The \code{surface}'s \code{\link[raster]{resolution}} is taken to define the distance between horizontally and vertically connected cells and must be the same in both x and y directions (for \code{surface}'s with unequal horizontal resolution, \code{\link[raster]{resample}} can be used to equalise resolution: see Examples). Any cells with NA values (e.g., due to missing data) are treated as 'impossible' to move though by the algorithm. In this case, the \code{surface} might need to be pre-processed so that NAs are replaced/removed before implementing the function, depending on their source.
@@ -193,48 +193,48 @@ dist_over_surface <- function(path, surface){
 #' @param aggregate (optional) A named list of arguments, passed to \code{\link[raster]{aggregate}}, to aggregate raster cells before the least-cost algorithms are implemented. This may be useful for large rasters to reduce memory requirements and/or computation time.
 #' @param mask (optional) A Raster or Spatial \code{\link[raster]{mask}} that is used to prevent movement over 'impossible' areas on the \code{surface}. This must also lie on a planar surface (i.e., Universal Transverse Mercator projection). For example, for marine animals, \code{mask} might be a \code{\link[sp]{SpatialPolygonsDataFrame}} which defines the coastline. The effect of the \code{mask} depends on \code{mask_inside} (see below).
 #' @param mask_inside A logical input that defines whether or not to mask the \code{surface} inside (\code{TRUE}) or outside (\code{FALSE}) of the \code{mask} (see \code{\link[flapper]{mask_io}}).
-#' @param plot A logical input that defines whether or not to plot the inputted and processed surfaces. If \code{TRUE}, the inputted and processed plots are produced side-by-side. For the inputted surface, the \code{mask} and the region selected (via \code{crop} and/or \code{buffer}) are shown along with the \code{origin} and \code{destination}. For the processed surface, the surface and the \code{origin} and \code{destination} are shown, along with the shortest pathway(s) (if and once computed: see \code{goal}). This is useful for checking that any \code{surface} processing steps have been applied correctly and the \code{origin} and \code{destination} are positioned correctly on the \code{surface}.
-#' @param goal An integer that defines the output of the function: \code{goal = 1} computes shortest distances, \code{goal = 2} computes shortest pathways and \code{goal = 3} computes both shortest pathways and the corresponding distances. Note that \code{goal = 3} results in least-cost algorithms being implemented twice, which will be inefficient for large problems; in this case, use \code{goal = 2} to compute shortest pathways and then calculate their distance using outputs returned by the function (see Value).
-#' @param combination A character string (\code{"pair"} or \code{"matrix"}) that defines whether or not to compute shortest distances/pathways for (a) each sequential \code{origin} and \code{destination} pair of coordinates (\code{combination = "pair"}) or (b) all combinations of \code{origin} and \code{destination} coordinates (\code{combination = "matrix"}). This argument is only applicable if there is more than one \code{origin} and \code{destination}. For \code{combination = "pair"}, the number of \code{origin} and \code{destination} coordinates needs to be the same, since each \code{origin} is matched with each \code{destination}.
-#' @param method A character string (\code{"cppRouting"} or \code{"gdistance"}) that defines the method used to compute the shortest distances between the \code{origin} and the \code{destination}. \code{"cppRouting"} is the default \code{method}. Under this option, functions in the \code{\link[cppRouting]{cppRouting}} package are used to compute the shortest pathways (\code{\link[cppRouting]{get_path_pair}} or \code{\link[cppRouting]{get_multi_paths}} for each pair of coordinates or for all combinations of coordinates, respectively) and/or distances (\code{\link[cppRouting]{get_distance_pair}} or \code{\link[cppRouting]{get_distance_matrix}}). This package implements functions written in C++ massively outperforms the other \code{method = "gdistance"} for large problems. Otherwise, if \code{method = "gdistance"}, functions in the \code{\link[gdistance]{gdistance}} are called iteratively to compute shortest pathways (via \code{\link[gdistance]{shortestPath}}) or distances (via \code{\link[gdistance]{costDistance}}).
-#' @param cppRouting_algorithm A character string that defines the algorithm used to compute shortest pathways or distances. This is only applicable if \code{method = "cppRouting"}: \code{method = "gdistance"} implements Dijkstra's algorithm only. For shortest pathways or their distances between pairs of coordinates, the options are \code{"Dijkstra"}, \code{"bi"}, \code{"A*"} or \code{"NBA"} for the uni-directional Dijkstra, bi-directional Dijkstra, A star unidirectional search or new bi-directional A star algorithms respectively (see \code{\link[cppRouting]{get_path_pair}} or \code{\link[cppRouting]{get_distance_pair}}). For shortest pathways between all combinations of coordinates, \code{cppRouting_algorithm} is ignored and the Dijkstra algorithm is implemented recursively. For shortest distances between all combinations of coordinates, the options are \code{"phast"} or \code{"mch"} (see \code{\link[cppRouting]{get_distance_matrix}}).
-#' @param use_all_cores,cl,varlist Parallelisation arguments for \code{method = "cppRouting"} (\code{use_all_cores}) or \code{method = "gdistance"} (\code{cl} and \code{varlist}) respectively. If \code{method = "cppRouting"}, parallelisation is implemented via \code{use_all_cores} for computing shortest distances only (not computing shortest pathways). \code{use_all_cores} is a logical input that defines whether or not to use all cores for computing shortest distance(s).  If \code{method = "gdistance"}, parallelisation is implemented via \code{cl} and \code{varlist} for both shortest pathways and distances function calls. \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is stopped within the function. \code{varlist} is a character vector of containing the names of exported objects. This may be required if \code{cl} is supplied. This is passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. Exported objects must be located in the global environment.
+#' @param plot A logical input that defines whether or not to plot the inputted and processed surfaces. If \code{TRUE}, the inputted and processed plots are produced side-by-side. For the inputted surface, the \code{mask} and the region selected (via \code{crop} and/or \code{buffer}) are shown along with the \code{origin} and \code{destination}. For the processed surface, the surface and the \code{origin} and \code{destination} are shown, along with the shortest path(s) (if and once computed: see \code{goal}). This is useful for checking that any \code{surface} processing steps have been applied correctly and the \code{origin} and \code{destination} are positioned correctly on the \code{surface}.
+#' @param goal An integer that defines the output of the function: \code{goal = 1} computes shortest distances, \code{goal = 2} computes shortest paths and \code{goal = 3} computes both shortest paths and the corresponding distances. Note that \code{goal = 3} results in least-cost algorithms being implemented twice, which will be inefficient for large problems; in this case, use \code{goal = 2} to compute shortest paths and then calculate their distance using outputs returned by the function (see Value).
+#' @param combination A character string (\code{"pair"} or \code{"matrix"}) that defines whether or not to compute shortest distances/paths for (a) each sequential \code{origin} and \code{destination} pair of coordinates (\code{combination = "pair"}) or (b) all combinations of \code{origin} and \code{destination} coordinates (\code{combination = "matrix"}). This argument is only applicable if there is more than one \code{origin} and \code{destination}. For \code{combination = "pair"}, the number of \code{origin} and \code{destination} coordinates needs to be the same, since each \code{origin} is matched with each \code{destination}.
+#' @param method A character string (\code{"cppRouting"} or \code{"gdistance"}) that defines the method used to compute the shortest distances between the \code{origin} and the \code{destination}. \code{"cppRouting"} is the default \code{method}. Under this option, functions in the \code{\link[cppRouting]{cppRouting}} package are used to compute the shortest paths (\code{\link[cppRouting]{get_path_pair}} or \code{\link[cppRouting]{get_multi_paths}} for each pair of coordinates or for all combinations of coordinates, respectively) and/or distances (\code{\link[cppRouting]{get_distance_pair}} or \code{\link[cppRouting]{get_distance_matrix}}). This package implements functions written in C++ and massively outperforms the other \code{method = "gdistance"} for large problems. Otherwise, if \code{method = "gdistance"}, functions in the \code{\link[gdistance]{gdistance}} are called iteratively to compute shortest paths (via \code{\link[gdistance]{shortestPath}}) or distances (via \code{\link[gdistance]{costDistance}}).
+#' @param cppRouting_algorithm A character string that defines the algorithm used to compute shortest paths or distances. This is only applicable if \code{method = "cppRouting"}: \code{method = "gdistance"} implements Dijkstra's algorithm only. For shortest paths or their distances between pairs of coordinates, the options are \code{"Dijkstra"}, \code{"bi"}, \code{"A*"} or \code{"NBA"} for the uni-directional Dijkstra, bi-directional Dijkstra, A star unidirectional search or new bi-directional A star algorithms respectively (see \code{\link[cppRouting]{get_path_pair}} or \code{\link[cppRouting]{get_distance_pair}}). For shortest paths between all combinations of coordinates, \code{cppRouting_algorithm} is ignored and the Dijkstra algorithm is implemented recursively. For shortest distances between all combinations of coordinates, the options are \code{"phast"} or \code{"mch"} (see \code{\link[cppRouting]{get_distance_matrix}}).
+#' @param use_all_cores,cl,varlist Parallelisation arguments for \code{method = "cppRouting"} (\code{use_all_cores}) or \code{method = "gdistance"} (\code{cl} and \code{varlist}) respectively. If \code{method = "cppRouting"}, parallelisation is implemented via \code{use_all_cores} for computing shortest distances only (not computing shortest paths). \code{use_all_cores} is a logical input that defines whether or not to use all cores for computing shortest distance(s). If \code{method = "gdistance"}, parallelisation is implemented via \code{cl} and \code{varlist} for both shortest paths and distances function calls. \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is stopped within the function. \code{varlist} is a character vector of containing the names of exported objects. This may be required if \code{cl} is supplied. This is passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. Exported objects must be located in the global environment.
 #' @param check A logical input that defines whether or not to check function inputs. If \code{TRUE}, internal checks are implemented to check user-inputs and whether or not inputted coordinates are in appropriate places on the processed \code{surface} (for instance, to ensure inputted coordinates do not lie over masked areas). This helps to prevent intractable error messages. If \code{FALSE}, these checks are not implemented, so function progress may be faster initially (especially for large \code{origin}/\code{destination} coordinate matrices).
 #' @param verbose A logical input that defines whether or not to print messages to the console to monitor function progress. This is especially useful with a large \code{surface} since the algorithms are computationally intensive.
 #' @param ... Additional arguments (none implemented).
 #'
 #' @details
 #' \subsection{Methods}{
-#' This function was motivated by the need to determine the shortest pathways and their distances between points for benthic animals, which must move over the seabed to navigate from A to B. For these animals, especially in areas with heterogeneous bathymetric landscapes and/or coastline, the shortest pathway that an individual must travel to move from A and B may differ substantially from the Euclidean pathway that is often used as a proxy for distance in biological studies. However, this function can still be used in situations where the surface over which an individual must move is irrelevant (e.g., for a pelagic animal), by supplying a flat surface; then shortest pathways/distances simply depend on the planar distances between locations and any barriers (e.g., the coastline). (However, this process will be somewhat inefficient.)
+#' This function was motivated by the need to determine the shortest paths and their distances between points for benthic animals, which must move over the seabed to navigate from A to B. For these animals, especially in areas with heterogeneous bathymetric landscapes and/or coastline, the shortest path that an individual must travel to move from A and B may differ substantially from the Euclidean path that is often used as a proxy for distance in biological studies. However, this function can still be used in situations where the surface over which an individual must move is irrelevant (e.g., for a pelagic animal), by supplying a flat surface; then shortest paths/distances simply depend on the planar distances between locations and any barriers (e.g., the coastline). (However, this process will be somewhat inefficient.)
 #'
-#' The function conceptualises a object moving across a landscape as a queen on a chessboard which can move, in eight directions around its current position, across this surface. Given the potentially large number of possible pathways between an \code{origin} and \code{destination}, the surface may be reduced in extent or size before the game begins. To determine shortest pathway/distance over the surface between each \code{origin} and \code{destination} pair/combination, the function first considers the distance that an object must travel between pairs of connected cells. This depends on the planar distances between cells and their differences in elevation. Planar distances (\eqn{d_p}, m) depend on the movement type: under a rook's movement (i.e., horizontally or vertically), the distance (\eqn{d_{p,r}}) between connected cells is extracted from the raster's resolution (which is assumed to be identical in the x and y directions); under a bishop's movement (i.e., diagonally), the distance between connected cells \eqn{d_{p,b}} is given by Pythagoras' Theorem: \eqn{d_{p,b} = \sqrt{(d_{p, r}^2 + d_{p, r}^2)}}. Vertical distances (\eqn{d_v}, m) are simply the differences in height between cells. The total distance (\eqn{d_t}) between any two connected cells is a combination of these distances given by Pythagoras' Theorem: \eqn{d_t = \sqrt{(d_p^2 + d_v^2)}}. These distances are taken to define the 'cost' of movement between connected cells. Thus, 'costs' are symmetric (i.e., the cost of moving from A to B equals the cost of moving from B to A).
+#' The function conceptualises an object moving across a landscape as a queen on a chessboard which can move, in eight directions around its current position, across this surface. Given the potentially large number of possible paths between an \code{origin} and \code{destination}, the surface may be reduced in extent or size before the game begins. To determine shortest path/distance over the surface between each \code{origin} and \code{destination} pair/combination, the function first considers the distance that an object must travel between pairs of connected cells. This depends on the planar distances between cells and their differences in elevation. Planar distances (\eqn{d_p}, m) depend on the movement type: under a rook's movement (i.e., horizontally or vertically), the distance (\eqn{d_{p,r}}) between connected cells is extracted from the raster's resolution (which is assumed to be identical in the x and y directions); under a bishop's movement (i.e., diagonally), the distance between connected cells \eqn{d_{p,b}} is given by Pythagoras' Theorem: \eqn{d_{p,b} = \sqrt{(d_{p, r}^2 + d_{p, r}^2)}}. Vertical distances (\eqn{d_v}, m) are simply the differences in height between cells. The total distance (\eqn{d_t}) between any two connected cells is a combination of these distances given by Pythagoras' Theorem: \eqn{d_t = \sqrt{(d_p^2 + d_v^2)}}. These distances are taken to define the 'cost' of movement between connected cells. Thus, 'costs' are symmetric (i.e., the cost of moving from A to B equals the cost of moving from B to A).
 #'
-#' This cost surface is then used to compute the shortest pathway and/or distance of the shortest path between each \code{origin} and \code{destination} pair/combination using functions in the \code{\link[cppRouting]{cppRouting}} or \code{\link[gdistance]{gdistance}} package. The functions implemented depend on the \code{goal} (i.e., whether the aim is to compute shortest pathways, shortest distances or both) and, if there is more than one \code{origin}/\code{destination}, the \code{combination} type (i.e., whether to compute shortest pathways/distances for each sequential pair of coordinates or all possible combinations of coordinates).
+#' This cost surface is then used to compute the shortest path and/or distance of the shortest path between each \code{origin} and \code{destination} pair/combination using functions in the \code{\link[cppRouting]{cppRouting}} or \code{\link[gdistance]{gdistance}} package. The functions implemented depend on the \code{goal} (i.e., whether the aim is to compute shortest paths, shortest distances or both) and, if there is more than one \code{origin}/\code{destination}, the \code{combination} type (i.e., whether to compute shortest paths/distances for each sequential pair of coordinates or all possible combinations of coordinates).
 #' }
 #'
 #' \subsection{Warnings}{
-#' The function returns a warning produced by \code{\link[gdistance]{transition}} which is implemented to facilitate the definition of the cost surface, before shortest pathways/distances are computed by either method: 'In .TfromR(x, transitionFunction, directions, symm) : transition function gives negative values'. This warning arises because the height differences between connecting cells can be negative. It can be safely ignored.
+#' The function returns a warning produced by \code{\link[gdistance]{transition}} which is implemented to facilitate the definition of the cost surface, before shortest paths/distances are computed by either method: 'In .TfromR(x, transitionFunction, directions, symm) : transition function gives negative values'. This warning arises because the height differences between connecting cells can be negative. It can be safely ignored.
 #' }
 #'
 #' @return
-#' \subsection{A named list}{The function returns a named list. The most important element(s) of this list are 'path_lcp' and/or 'dist_lcp', the shortest pathway(s) and/or distance(s) (m) between \code{origin} and \code{destination} coordinate pairs/combinations. 'path_lcp' is returned if \code{goal = 2} or \code{goal = 3} and 'dist_lcp' is returned if \code{goal = 1} or \code{goal = 3}. 'path_lcp' contains (a) a dataframe with the cells comprising each path ('cells'), (b) a named list containing a \code{\link[sp]{SpatialLines}} object for each path ('SpatialLines') and (c) a named list of matrices of the coordinates of each path ('coordinates'). 'dist_lcp' is a (a) numeric vector or (b) matrix with the distances (m) between each pair or combination of coordinates respectively. If 'dist_lcp' is computed, dist_euclid', the Euclidean distances (m) between the \code{origin} and \code{destination}, is also returned for comparison.
+#' \subsection{A named list}{The function returns a named list. The most important element(s) of this list are 'path_lcp' and/or 'dist_lcp', the shortest path(s) and/or distance(s) (m) between \code{origin} and \code{destination} coordinate pairs/combinations. 'path_lcp' is returned if \code{goal = 2} or \code{goal = 3} and 'dist_lcp' is returned if \code{goal = 1} or \code{goal = 3}. 'path_lcp' contains (a) a dataframe with the cells comprising each path ('cells'), (b) a named list containing a \code{\link[sp]{SpatialLines}} object for each path ('SpatialLines') and (c) a named list of matrices of the coordinates of each path ('coordinates'). 'dist_lcp' is a (a) numeric vector or (b) matrix with the distances (m) between each pair or combination of coordinates respectively. If 'dist_lcp' is computed, 'dist_euclid', the Euclidean distances (m) between the \code{origin} and \code{destination}, is also returned for comparison.
 #' }
 #'
-#' \subsection{Common elements}{Other elements of the list record important outputs at sequential stages of the algorithm's progression. These include the following elements: 'args', a named list of user inputs; 'time', a dataframe that defines the times of sequential stages in the algorithm's progression; ; 'surface', the surface over which shortest distances are computed (this may differ from the inputted surface if any of the processing options, such as \code{crop}, have been implemented); 'surface_param', a named list that defines the cell IDs, the number of rows, the number of columns, the coordinates of the implemented surface and the cell IDs of the \code{origin} and \code{destination} nodes; 'cost', a named list of arguments that defines the distances (m) between connected cells under a rook's or bishop's movement ('dist_rook' and 'dist_bishop'), the planar and vertical distances between connected cells ('dist_planar' and 'dist_vertical') and the total distance between connected cells ('dist_total'); and 'cppRouting_param' or 'gdistance_param', a named list of arguments used to compute shortest pathways/distances via \code{\link[cppRouting]{cppRouting}} or \code{\link[gdistance]{gdistance}} (see below).
+#' \subsection{Common elements}{Other elements of the list record important outputs at sequential stages of the algorithm's progression. These include the following elements: 'args', a named list of user inputs; 'time', a dataframe that defines the times of sequential stages in the algorithm's progression; 'surface', the surface over which shortest distances are computed (this may differ from the inputted surface if any of the processing options, such as \code{crop}, have been implemented); 'surface_param', a named list that defines the cell IDs, the number of rows, the number of columns, the coordinates of the implemented surface and the cell IDs of the \code{origin} and \code{destination} nodes; 'cost', a named list of arguments that defines the distances (m) between connected cells under a rook's or bishop's movement ('dist_rook' and 'dist_bishop'), the planar and vertical distances between connected cells ('dist_planar' and 'dist_vertical') and the total distance between connected cells ('dist_total'); and 'cppRouting_param' or 'gdistance_param', a named list of arguments used to compute shortest paths/distances via \code{\link[cppRouting]{cppRouting}} or \code{\link[gdistance]{gdistance}} (see below).
 #' }
 #'
-#' \subsection{Method-specific elements}{If \code{method = "cppRouting"}, the 'cppRouting_param' list contains a named list of arguments passed to \code{\link[cppRouting]{makegraph}} ('makegraph_param') as well as \code{\link[cppRouting]{get_path_pair}} ('get_path_pair_param') or \code{\link[cppRouting]{get_multi_paths}} ('get_multi_paths_param') and/or \code{\link[cppRouting]{get_distance_pair}} ('get_distance_pair_param') or \code{\link[cppRouting]{get_distance_matrix}} ('get_distance_matrix_param'), depending on whether or not shortest pathways and/or distances have been computed (see \code{goal}) and whether or not shortest pathways/distances have been computed for each pair of coordinates or all combinations of coordinates. If \code{method = "gdistance"}, this list contains a named list of arguments passed iteratively, for each pair/combination of coordinates, to \code{\link[gdistance]{shortestPath}} ('shortestPath_param') or \code{\link[gdistance]{costDistance}} ('costDistance_param'). This includes an object of class TransitionLayer (see \code{\link[gdistance]{Transition-classes}}), in which the \code{transitionMatrix} slot contains a (sparse) matrix that defines the ease of moving between connected cells (the reciprocal of the 'dist_total' matrix).
+#' \subsection{Method-specific elements}{If \code{method = "cppRouting"}, the 'cppRouting_param' list contains a named list of arguments passed to \code{\link[cppRouting]{makegraph}} ('makegraph_param') as well as \code{\link[cppRouting]{get_path_pair}} ('get_path_pair_param') or \code{\link[cppRouting]{get_multi_paths}} ('get_multi_paths_param') and/or \code{\link[cppRouting]{get_distance_pair}} ('get_distance_pair_param') or \code{\link[cppRouting]{get_distance_matrix}} ('get_distance_matrix_param'), depending on whether or not shortest paths and/or distances have been computed (see \code{goal}) and whether or not shortest paths/distances have been computed for each pair of coordinates or all combinations of coordinates. If \code{method = "gdistance"}, this list contains a named list of arguments passed iteratively, for each pair/combination of coordinates, to \code{\link[gdistance]{shortestPath}} ('shortestPath_param') or \code{\link[gdistance]{costDistance}} ('costDistance_param'). This includes an object of class TransitionLayer (see \code{\link[gdistance]{Transition-classes}}), in which the \code{transitionMatrix} slot contains a (sparse) matrix that defines the ease of moving between connected cells (the reciprocal of the 'dist_total' matrix).
 #' }
 #'
-#' \subsection{Plot}{If \code{plot = TRUE}, a plot is also produced of the inputted and processed surfaces that are used in the calculations, along with the shortest pathway(s) (if and once computed).
+#' \subsection{Plot}{If \code{plot = TRUE}, a plot is also produced of the inputted and processed surfaces that are used in the calculations, along with the shortest path(s) (if and once computed).
 #' }
 #'
 #' @examples
 #' #### Example types
 #' # Shortest distances between a single origin and a single destination
-#' # Shortest pathways between a single origin and a single destination
-#' # Shortest distances/pathways between origin/destination pairs
-#' # Shortest distances/pathways between all origin/destination combinations
+#' # Shortest paths between a single origin and a single destination
+#' # Shortest distances/paths between origin/destination pairs
+#' # Shortest distances/paths between all origin/destination combinations
 #'
 #' #### Simulate a hypothetical landscape
 #' # Define a miniature, blank landscape with appropriate dimensions
@@ -363,7 +363,7 @@ dist_over_surface <- function(path, surface){
 #' # Or, using the numbers computed in the dist_total object:
 #' out1$cost$dist_total[1, 2] + out1$cost$dist_total[2, 6]
 #' ## Compare to effect of making a value in the landscape extremely large
-#' # In the same way, we can force the shortest pathway away from particular areas
+#' # In the same way, we can force the shortest path away from particular areas
 #' # ... by making the height of the landscape in those areas very large or Inf:
 #' rtmp[5] <- 1e20
 #' raster::plot(rtmp); raster::text(rtmp)
@@ -434,7 +434,7 @@ dist_over_surface <- function(path, surface){
 #'                                buffer = list(width = 1000))
 #' out_gebco1$dist_lcp
 #'
-#' #### Example (5C):  Reduce the complexity of the landscape via aggregation
+#' #### Example (5C): Reduce the complexity of the landscape via aggregation
 #' out_gebco1 <- lcp_over_surface(origin = origin,
 #'                                destination = destination,
 #'                                surface = dat_gebco_utm_planar,
@@ -495,9 +495,9 @@ dist_over_surface <- function(path, surface){
 #'
 #'
 #' ############################################################################
-#' #### Shortest pathways between a single origin and a single destination
+#' #### Shortest paths between a single origin and a single destination
 #'
-#' #### Example (8) Shortest pathways (goal = 2) only using default method
+#' #### Example (8) Shortest paths (goal = 2) only using default method
 #' # Implement function
 #' out1 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
 #'                          destination = rxy[6, , drop = FALSE],
@@ -512,16 +512,16 @@ dist_over_surface <- function(path, surface){
 #' # ... by cppRouting::get_path_pair(), the arguments of which are retained in
 #' # ... this list:
 #' out1$cppRouting_param$get_path_pair_param
-#' # Note the pathway is also added to the plot produced, if plot = TRUE.
+#' # Note the path is also added to the plot produced, if plot = TRUE.
 #'
-#' #### Example (9) Shortest distances and pathways (goal = 3) using default method
+#' #### Example (9) Shortest distances and paths (goal = 3) using default method
 #' out1 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
 #'                          destination = rxy[6, , drop = FALSE],
 #'                          surface = r,
 #'                          goal = 3)
 #' out1$dist_lcp; out1$path_lcp
 #'
-#' #### Example (10) Shortest distances and pathways (goal = 3) via gdistance
+#' #### Example (10) Shortest distances and paths (goal = 3) via gdistance
 #' out1 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
 #'                          destination = rxy[6, , drop = FALSE],
 #'                          surface = r,
@@ -538,7 +538,7 @@ dist_over_surface <- function(path, surface){
 #' # ... use_all_cores or cl arguments. For cppRouting, parallelisation
 #' # ... is only implemented for distance calculations (so not if goal = 2),
 #' # ... while parallelisation is implemented for both distance and shortest
-#' # ... pathways for method = "gdistance"
+#' # ... paths for method = "gdistance"
 #' out1 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
 #'                          destination = rxy[6, , drop = FALSE],
 #'                          surface = r,
@@ -559,9 +559,9 @@ dist_over_surface <- function(path, surface){
 #'
 #'
 #' ############################################################################
-#' #### Shortest distances/pathways between origin/destination pairs
+#' #### Shortest distances/paths between origin/destination pairs
 #'
-#' #### Example (12): Shortest distances/pathways computed in sequence:
+#' #### Example (12): Shortest distances/paths computed in sequence:
 #' # cppRouting method
 #' out1 <- lcp_over_surface(origin = rxy[1:2, , drop = FALSE],
 #'                          destination = rxy[5:6, , drop = FALSE],
@@ -576,7 +576,7 @@ dist_over_surface <- function(path, surface){
 #' out1$dist_lcp; out1$path_lcp
 #' out2$dist_lcp; out2$path_lcp
 #'
-#' #### Example (13): Shortest distances/pathways computed in parallel:
+#' #### Example (13): Shortest distances/paths computed in parallel:
 #' # cppRouting method for goal 3
 #' out1 <- lcp_over_surface(origin = rxy[1:2, , drop = FALSE],
 #'                          destination = rxy[5:6, , drop = FALSE],
@@ -600,7 +600,7 @@ dist_over_surface <- function(path, surface){
 #'
 #'
 #' ############################################################################
-#' #### Shortest distances/pathways between all origin/destination combinations
+#' #### Shortest distances/paths between all origin/destination combinations
 #'
 #' #### Example (14) Compute all combinations via combination = "matrix"
 #' # cppRouting goal 3
@@ -927,7 +927,7 @@ lcp_over_surface <-
       out$dist_euclid <- dist_euclid
     }
 
-    #### LCP distances/pathways
+    #### LCP distances/paths
     if(method == "gdistance"){
       cat_to_console("Using method = 'gdistance'...")
 
@@ -988,9 +988,9 @@ lcp_over_surface <-
         out$time <- rbind(out$time, data.frame(event = "lcp_dist_defined", time = Sys.time()))
       }
 
-      #### Calculate least-cost pathways between points
+      #### Calculate least-cost paths between points
       if(goal %in% c(2, 3)){
-        cat_to_console("... Implementing Dijkstra's algorithm to compute least-cost pathway(s)...")
+        cat_to_console("... Implementing Dijkstra's algorithm to compute least-cost path(s)...")
         shortestPath_param <- list(x = tr, fromCoords = origin, toCoords = destination)
         out$gdistance_param$shortestPath_param <- shortestPath_param
 
@@ -1021,7 +1021,7 @@ lcp_over_surface <-
           parallel::clusterExport(cl = cl, varlist = varlist)
         }
 
-        ## Loop over each pair of coordinates and compute least-cost pathways
+        ## Loop over each pair of coordinates and compute least-cost paths
         path_lcp_SpatialLines <- pbapply::pblapply(coords_by_pair, cl = cl, FUN = function(xy){
           param <- list(x = tr, origin = xy[, 1:2, drop = FALSE], goal = xy[, 3:4, drop = FALSE], output = "SpatialLines")
           path_lcp <- do.call(gdistance::shortestPath, param)
@@ -1029,7 +1029,7 @@ lcp_over_surface <-
         })
         if(!is.null(cl)) parallel::stopCluster(cl = cl)
 
-        ## Process least-cost pathways
+        ## Process least-cost paths
         # Define dataframe with paths and cells
         path_lcp_cells <- mapply(path_lcp_SpatialLines, coords_by_pair, FUN = function(l, dcoords){
           xy <- raster::geom(l)[, c("x", "y")]
@@ -1116,13 +1116,13 @@ lcp_over_surface <-
         out$time <- rbind(out$time, data.frame(event = "dist_lcp_defined", time = Sys.time()))
       }
 
-      #### Compute shortest pathways between origin and destination nodes
+      #### Compute shortest paths between origin and destination nodes
       if(goal %in% c(2, 3)){
 
-        ## Set up to compute shortest pathways
+        ## Set up to compute shortest paths
         # Define function to compute paths and add parameters to output list
         if(combination == "pair"){
-          cat_to_console(paste("... Implementing",  cppRouting_algorithm, "algorithm to compute least-cost pathways(s)..."))
+          cat_to_console(paste("... Implementing",  cppRouting_algorithm, "algorithm to compute least-cost paths(s)..."))
           get_path_param <- list(Graph = graph,
                                  from = origin_cell,
                                  to = destination_cell,
@@ -1133,7 +1133,7 @@ lcp_over_surface <-
           get_path <- cppRouting::get_path_pair
           out$cppRouting_param$get_path_pair_param <- get_path_param
         } else if(combination == "matrix"){
-          cat_to_console("... Implementing Dijkstra's algorithm recursively to compute least-cost pathways(s)...")
+          cat_to_console("... Implementing Dijkstra's algorithm recursively to compute least-cost paths(s)...")
           get_path_param <- list(Graph = graph,
                                  from = origin_cell,
                                  to = destination_cell,
@@ -1143,11 +1143,11 @@ lcp_over_surface <-
           out$cppRouting_param$get_multi_paths_param <- get_path_param
         }
 
-        ## Compute pathways (origin, destination and cells)
+        ## Compute paths (origin, destination and cells)
         path_lcp_cells <- do.call(get_path, get_path_param)
         out$time <- rbind(out$time, data.frame(event = "path_lcp_defined", time = Sys.time()))
 
-        ## Process pathways dataframe
+        ## Process paths dataframe
         # Define columns
         colnames(path_lcp_cells)   <- c("origin", "destination", "cell")
         path_lcp_cells$origin      <- as.integer(path_lcp_cells$origin)
@@ -1171,7 +1171,7 @@ lcp_over_surface <-
         path_lcp_cells <- lapply(split(path_lcp_cells, path_lcp_cells$path_id), function(d) d[nrow(d):1, ]) %>% dplyr::bind_rows()
         rownames(path_lcp_cells) <- 1:nrow(path_lcp_cells)
 
-        # Define pathway coordinates and SpatialLines
+        # Define path coordinates and SpatialLines
         path_lcp_spatial <- lapply(split(path_lcp_cells, path_lcp_cells$path_id), function(d){
           xy  <- raster::xyFromCell(surface, cell = d$cell)
           spl <- Orcs::coords2Lines(xy, ID = d$path_id[1], proj4string = raster::crs(surface))
@@ -1188,16 +1188,16 @@ lcp_over_surface <-
       out$dist_lcp <- dist_lcp
     }
 
-    #### Add least-cost pathways to output object
+    #### Add least-cost paths to output object
     if(goal %in% c(2, 3)){
-      # pathways
+      # paths
       names(path_lcp_SpatialLines) <- unique(path_lcp_cells$path_id)
       names(path_lcp_coordinates)  <- unique(path_lcp_cells$path_id)
       out$path_lcp <- list(cells = path_lcp_cells,
                            SpatialLines = path_lcp_SpatialLines,
                            coordinates = path_lcp_coordinates
       )
-      # Add pathways to plot, if requested
+      # Add paths to plot, if requested
       if(plot){
         lapply(path_lcp_SpatialLines, function(l) raster::lines(l, col = "royalblue", lwd = 2))
         graphics::par(pp)

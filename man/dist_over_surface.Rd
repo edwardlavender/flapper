@@ -7,7 +7,7 @@
 dist_over_surface(path, surface)
 }
 \arguments{
-\item{path}{A matrix or data.frame of horizontal coordinates (x, y) or a \code{\link[sp]{SpatialLines}} object which defines the path over a surface. The coordinate reference system (projection) of \code{path} should be the same as that for the \code{surface}.}
+\item{path}{A matrix or dataframe of horizontal coordinates (x, y) or a \code{\link[sp]{SpatialLines}} object which defines the path over a surface. The coordinate reference system (projection) of \code{path} should be the same as that for the \code{surface}.}
 
 \item{surface}{A \code{\link[raster]{raster}} over which the movement that generated the path occurred. The coordinate reference system (projection) of \code{path} should be the same as that for the \code{surface} and the values of the \code{surface} should also be expressed in the same units (e.g., metres).}
 }
@@ -15,10 +15,10 @@ dist_over_surface(path, surface)
 The function returns a number equal to the total distance along the path.
 }
 \description{
-This function calculates the total distance of a path, whose horizontal coordinates are known, over a three-dimensional surface. To implement this function, the \code{path} should be supplied as a matrix or data.frame of coordinates or a \code{\link[sp]{SpatialLines}} object and the \code{surface} should be supplied as a \code{\link[raster]{raster}}. The function takes the horizontal coordinates of the \code{path} and extracts the values of the surface at these points, and then calculates the total distance of the path as the sum of the paired distances between each pair of points.
+This function calculates the total distance of a path, whose horizontal coordinates are known, over a three-dimensional surface. To implement the function, the \code{path} should be supplied as a matrix or dataframe of coordinates or a \code{\link[sp]{SpatialLines}} object and the \code{surface} should be supplied as a \code{\link[raster]{raster}}. The function takes the horizontal coordinates of the \code{path} and extracts the values of the surface at these points, and then calculates the total distance of the path as the sum of the paired distances between each pair of points.
 }
 \details{
-The total distance of a path over a three-dimensional surface is equal to the sum of the pairwise distances between each point (\eqn{i}) and its successor (\eqn{i + 1}) according to the equation: \deqn{\Sigma_{i = 1}^n [\sqrt{(x_{i+1} - x_i)^2 + (y_{i + 1} - y_i)^2 + (z_{i + 1} - z_i)^2)}]} where \eqn{x}, \eqn{y} and \eqn{z} are the x, y and z coordinates of each point in three-dimensional space. Pairwise distances are calculated via \code{\link[flapper]{dist_btw_points_3d}}.
+The total distance of a path over a three-dimensional surface is equal to the sum of the pairwise distances between each point (\eqn{i}) and its successor (\eqn{i + 1}) according to the equation: \deqn{\Sigma_{i = 1}^n \sqrt{(x_{i+1} - x_i)^2 + (y_{i + 1} - y_i)^2 + (z_{i + 1} - z_i)^2)}} where \eqn{x}, \eqn{y} and \eqn{z} are the x, y and z coordinates of each point in three-dimensional space and \eqn{n} is the total number of points minus 1. Pairwise distances are calculated via \code{\link[flapper]{dist_btw_points_3d}}. Note that for realistic distances, some interpolation (e.g., via least-cost paths) between points may be required to generate localisations at sufficiently high resolution to effectively capture the shape of the landscape.
 }
 \examples{
 #### Simulate a hypothetical landscape
@@ -37,30 +37,30 @@ r[] <- mat
 raster::plot(r)
 raster::text(r)
 
-#### Example (1) Total distance between two example adjacent points
+#### Example (1): Total distance between two example adjacent points
 path_cells <- c(1, 2)
 path_matrix <- sp::coordinates(r)[path_cells, ]
 dist_over_surface(path_matrix, r)
 sqrt(5^2 + (10-5)^2)
 
-#### Example (2) Total distance between two example diagonal points
+#### Example (2): Total distance between two example diagonal points
 path_cells <- c(1, 5)
 path_matrix <- sp::coordinates(r)[path_cells, ]
 dist_over_surface(path_matrix, r)
 sqrt(sqrt(5^2 + 5^2)^2 + (5 - 1)^2)
 
-#### Example (3) Total distance along a longer path
+#### Example (3): Total distance along a longer path
 path_cells <- c(1, 2, 3)
 path_matrix <- sp::coordinates(r)[path_cells, ]
 dist_over_surface(path_matrix, r)
 sqrt(5^2 + (10-5)^2) + sqrt(5^2 + (10-3)^2)
 
-#### Example (4) Total distance along an even longer path
+#### Example (4): Total distance along an even longer path
 path_cells <- c(1, 2, 3, 6, 8)
 path_matrix <- sp::coordinates(r)[path_cells, ]
 dist_over_surface(path_matrix, r)
 
-#### Example (5) A SpatialLines object can be used for the path
+#### Example (5): A SpatialLines object can be used for the path
 path_line <- Orcs::coords2Lines(path_matrix, ID = 1, proj4string = proj_utm)
 raster::lines(path_line)
 dist_over_surface(path_line, r)
