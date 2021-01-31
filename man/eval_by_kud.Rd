@@ -36,7 +36,7 @@ eval_by_kud(
 
 \item{grid, h, hlim, kern, extent, boundary}{Arguments passed to \code{estimate_ud} (and ultimately \code{\link[adehabitatHR]{kernelUD}}, where they are defined) to estimate kernel utilisation distributions. If  \code{\link[flapper]{kud_around_coastline}} is supplied to \code{estimate_ud}, then \code{grid} must be a \code{\link[sp]{SpatialPixelsDataFrame}}.}
 
-\item{process}{(optional) A function, applied to a \code{\link[raster]{raster}}, to process the home range raster (extracted from from \code{\link[adehabitatHR]{getvolumeUD}}). For example, \code{function(r) { r[r > 95] <- NA; return(r) }} can help produce prettier plots by masking areas beyond the 95 percent contour.}
+\item{process}{(optional) A function, applied to a \code{\link[raster]{raster}}, to process the home range raster (extracted from from \code{\link[adehabitatHR]{getvolumeUD}}). For example, \code{function(r) { r[r > 95] <- NA; return(r) }} can help to produce prettier plots by masking areas beyond the 95 percent contour.}
 
 \item{plot}{An integer vector (\code{1:4L}) that defines which plots to produce. \code{1} and \code{2} plot the receiver array and the simulated or estimated path respectively. In contrast, \code{3} and \code{4} plot the receiver array and the kernel utilisation distribution based on the simulated or estimated path respectively.}
 
@@ -57,7 +57,7 @@ The function returns up to four plots that provide a qualitative evaluation of a
 This function provides a qualitative evaluation of a movement-path estimation procedure when the true movement path is known by graphically comparing the two paths and the resultant patterns of space use that emerge from these using kernel utilisation distributions. To implement the function, the simulated and estimated paths need to be provided as SpatialPointsDataFrames. For each path, the function estimates the resultant home range under a kernel utilisation distribution model and then produces up to four plots that show the two paths and the two estimated home ranges. When the estimation procedure performs well, the patterns of space use inferred from the simulated and estimated paths should be similar. In contrast, differences between these patterns can help to reveal the circumstances under which the movement-path estimation procedure performs less well.
 }
 \details{
-This function can be combined with \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_sa}} or \code{\link[flapper]{sim_path_ou_1}}, \code{\link[flapper]{sim_detections}} and space use algorithms (e.g., \code{\link[flapper]{coa}}) to evaluate the relative performance of different approaches for the inference of patterns of space use under different array designs, movement models and/or detection models.
+This function can be combined with \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} functions, \code{\link[flapper]{sim_detections}} and space use algorithms (e.g., \code{\link[flapper]{coa}}) to evaluate the relative performance of different approaches for the inference of patterns of space use under different array designs, movement models and/or detection models.
 }
 \examples{
 #### Steps
