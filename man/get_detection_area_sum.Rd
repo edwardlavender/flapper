@@ -14,7 +14,7 @@ get_detection_area_sum(
 )
 }
 \arguments{
-\item{xy, detection_range, coastline, plot, ...}{Arguments required to calculate and visualise detection centroids via \code{\link[flapper]{get_detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{range}), barriers to detection (\code{coastline}), and whether or not to plot the centroids (\code{plot}).}
+\item{xy, detection_range, coastline, plot, ...}{Arguments required to calculate and visualise detection centroids via \code{\link[flapper]{get_detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{detection_range}), barriers to detection (\code{coastline}), and whether or not to plot the centroids (\code{plot}).}
 
 \item{scale}{A number that scales the total area (m). The default (\code{1/(1000^2)}) converts the units of \eqn{m^2} to \eqn{km^2}.}
 }
