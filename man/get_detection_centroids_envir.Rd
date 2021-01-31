@@ -28,7 +28,7 @@ get_detection_centroids_envir(
 
 \item{sample_replace}{(optional) If \code{sample_size} is specified, \code{sample_replace} is a logical input that defines whether to implement sampling with (\code{sample_replace = TRUE}, the default) or without (\code{sample_replace = FALSE}) replacement (see the 'replace' argument of \code{\link[base]{sample}}).}
 
-\item{sample_probs}{(optional) If \code{sample_size} is specified, \code{sample_probs} is a function that calculates the detection probability given the distance (m) between an cell and a receiver.}
+\item{sample_probs}{(optional) If \code{sample_size} is specified, \code{sample_probs} is a function that calculates the detection probability given the distance (m) between a cell and a receiver.}
 
 \item{cl}{A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is closed within the function.}
 
@@ -37,7 +37,7 @@ get_detection_centroids_envir(
 \item{verbose}{A logical variable that defines whether or not relay messages to the console to monitor function progress.}
 }
 \value{
-The function returns a list of dataframes (one for each element in \code{xy} i.e., each receiver), each of which includes the cell IDs of \code{envir} from which values were extracted ('cell'), the value of the environmental variable in that cell ('envir') and, if applicable, the distance between that cell and the receiver ('dist', m) and the detection probability in that cell ('prob').
+The function returns a list of dataframes (one for each element in \code{xy}; i.e., each receiver), each of which includes the cell IDs of \code{envir} from which values were extracted ('cell'), the value of the environmental variable in that cell ('envir') and, if applicable, the distance between that cell and the receiver ('dist', m) and the detection probability in that cell ('prob').
 }
 \description{
 This function is used to sample environmental conditions from within the detection centroids of receivers. To implement the function, a SpatialPoints object that defines receiver locations (\code{xy}) must be provided, along with the detection range (\code{detection_range}) of receivers. This information is used to define detection centroids, via \code{\link[flapper]{get_detection_centroids}}. Within each receiver's centroid, all values of an environmental variable, or a random sample of values, are extracted from a user-defined \code{\link[raster]{raster}} (\code{envir}). Under random sampling, values can be sampled according to a detection probability function (\code{sample_probs}). The function returns a list of dataframes, one for each receiver, that include the sampled values.
@@ -53,10 +53,10 @@ xy <- sp::spTransform(xy, proj_utm)
 
 #### Example (1): Extract all depth values within each receiver's centroid
 depths_by_centroid <- get_detection_centroids_envir(xy = xy,
-                                                detection_range = 425,
-                                                coastline = dat_coast,
-                                                envir = dat_gebco
-                                                )
+                                                    detection_range = 425,
+                                                    coastline = dat_coast,
+                                                    envir = dat_gebco
+                                                    )
 # The function returns a list of dataframes, one for each receiver
 # ... with the cell IDs and the value of the environmental variable
 utils::str(depths_by_centroid)
@@ -74,11 +74,11 @@ prettyGraphics::pretty_boxplot(depths_by_centroid$receiver_id,
 #### Example (2): Extract a random sample of values
 # (We'll keep the values small for speed)
 depths_by_centroid <- get_detection_centroids_envir(xy = xy,
-                                                detection_range = 425,
-                                                coastline = dat_coast,
-                                                envir = dat_gebco,
-                                                sample_size = 2
-                                                 )
+                                                   detection_range = 425,
+                                                   coastline = dat_coast,
+                                                   envir = dat_gebco,
+                                                   sample_size = 2
+                                                   )
 utils::str(depths_by_centroid)
 
 #### Example (3) Extract a random sample of values with weighted probabilities
@@ -86,10 +86,10 @@ utils::str(depths_by_centroid)
 calc_detection_pr <-
   function(dist){
     dpr <- get_detection_pr(distance = dist,
-                        beta_0 = 2.5,
-                        beta_1 = -0.01,
-                        inv_link = stats::plogis,
-                        output = 2L)
+                            beta_0 = 2.5,
+                            beta_1 = -0.01,
+                            inv_link = stats::plogis,
+                            output = 2L)
     return(dpr)
   }
 # Implement sampling with replacement according to detection probability

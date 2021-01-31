@@ -17,7 +17,7 @@ get_detection_area_ts(
 )
 }
 \arguments{
-\item{xy, detection_range, coastline, scale}{Arguments required to calculate the total area surveyed by receivers (at each time point) via \code{\link[flapper]{get_detection_area_sum}}.}
+\item{xy, detection_range, coastline, scale}{Arguments required to calculate the total area surveyed by receivers (at each time point) via \code{\link[flapper]{get_detection_area_sum}}. For this function, \code{xy} should be a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that includes both receiver locations and corresponding deployment times (in columns named 'receiver_start_date' and 'receiver_end_date' respectively).}
 
 \item{plot}{A logical input that defines whether or not to plot a time series of the total area sampled by receivers.}
 
@@ -53,18 +53,22 @@ dat <- get_detection_area_ts(xy)
 # So we will also supply a cluster to improve the computation time.
 \dontrun{
 dat <- get_detection_area_ts(xy,
-                       detection_range = 500,
-                       coastline = dat_coast,
-                       cl = parallel::makeCluster(2L),
-                       varlist = "dat_coast"
-                       )
+                             detection_range = 500,
+                             coastline = dat_coast,
+                             cl = parallel::makeCluster(2L),
+                             varlist = "dat_coast"
+                             )
 }
 
 #### Example (3) Hide or customise the plot
 dat <- get_detection_area_ts(xy, plot = FALSE)
-dat <- get_detection_area_ts(xy,
-                       pretty_axis_args = list(axis = list(list(format = "\%b-\%y"),
-                                                           list())),
+dat <-
+  get_detection_area_ts(xy,
+                        pretty_axis_args =
+                          list(
+                            axis = list(list(format = "\%b-\%y"),
+                                        list()
+                                        )),
                        xlab = "Time (month-year)",
                        ylab = expression(paste("Area (", m^2, ")")),
                        type = "l")

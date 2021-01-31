@@ -31,8 +31,8 @@ This is a simple metric of sampling effort. For acoustic receivers, \code{\link[
 \examples{
 #### Example (1): Number of operational receivers over an acoustic telemetry study
 dat_n <- get_n_operational_ts(data = dat_moorings,
-                          start = "receiver_start_date",
-                          stop = "receiver_end_date")
+                              start = "receiver_start_date",
+                              stop = "receiver_end_date")
 utils::head(dat_n)
 
 #### Example (2): Number of individuals at liberty over a tagging study
@@ -40,27 +40,41 @@ utils::head(dat_n)
 # ...  and assume that all individuals remained tagged until this time
 dat_ids$tag_end_date <- as.Date("2017-06-05")
 dat_n <- get_n_operational_ts(data = dat_ids,
-                          start = "tag_start_date",
-                          stop = "tag_end_date")
+                              start = "tag_start_date",
+                              stop = "tag_end_date")
 
 #### Example (3): Specify the time period under consideration
 dat_n <- get_n_operational_ts(data = dat_ids,
-                          start = "tag_start_date",
-                          stop = "tag_end_date",
-                          times = seq(min(dat_moorings$receiver_start_date),
-                                      max(dat_moorings$receiver_end_date), 1)
-                          )
+                              start = "tag_start_date",
+                              stop = "tag_end_date",
+                              times = seq(min(dat_moorings$receiver_start_date),
+                                          max(dat_moorings$receiver_end_date), 1)
+                              )
 
 #### Example (4): Suppress or customise the plot
 dat_n <- get_n_operational_ts(data = dat_ids,
-                          start = "tag_start_date",
-                          stop = "tag_end_date",
-                          plot = FALSE)
+                              start = "tag_start_date",
+                              stop = "tag_end_date",
+                              plot = FALSE)
 dat_n <- get_n_operational_ts(data = dat_ids,
-                          start = "tag_start_date",
-                          stop = "tag_end_date",
-                          xlab = "Time", ylab = "N (individuals)",
-                          type = "l")
+                              start = "tag_start_date",
+                              stop = "tag_end_date",
+                              xlab = "Time", ylab = "N (individuals)",
+                              type = "l")
+
+#### Example (5): Additional examples with simulated data
+# Example with one unit deployed on each day
+tmp <- data.frame(id = 1:3L,
+                  start = as.Date(c("2016-01-01", "2016-01-02", "2016-01-03")),
+                  stop = as.Date(c("2016-01-01", "2016-01-02", "2016-01-03"))
+                  )
+get_n_operational_ts(data = tmp, start = "start", stop = "stop")
+# Example with one unit deployed over a longer period
+tmp <- data.frame(id = 1:3L,
+                  start = as.Date(c("2016-01-01", "2016-01-02", "2016-01-03")),
+                  stop = as.Date(c("2016-01-10", "2016-01-02", "2016-01-03"))
+                  )
+get_n_operational_ts(data = tmp, start = "start", stop = "stop")
 
 }
 \author{

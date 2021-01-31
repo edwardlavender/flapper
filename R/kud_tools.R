@@ -5,11 +5,11 @@
 #' @title Process a kernel utilisation distribution around a barrier
 #' @description Given an animal movement path over a gridded surface, this function estimates a 'raw' kernel utilisation distribution (from \code{\link[adehabitatHR]{kernelUD}}) and then processes the distribution to account for barriers to movement, such as coastline. To implement the function, the movement path(s) should be supplied as a SpatialPointsDataFrame and the grid over which estimation is implemented as a SpatialPixelsDataFrame with values 0 and 1 defining unsuitable and suitable habitat respectively.
 #'
-#' @param xy A \code{\link[sp]{SpatialPointsDataFrame}} object that defines the movement path(s). This should contain a column that defines the individual IDs as a factor.
-#' @param grid A \code{\link[sp]{SpatialPixelsDataFrame}} object that defines the grid over which estimation is implemented and habitat suitability (0, unsuitable; or 1, suitable).
+#' @param xy A \code{\link[sp]{SpatialPointsDataFrame}} object that defines the movement path(s). This should contain a column that defines the individual ID(s) as a factor.
+#' @param grid A \code{\link[sp]{SpatialPixelsDataFrame}} object that defines the grid over which estimation is implemented and binary habitat suitability (0, unsuitable; or 1, suitable).
 #' @param ... Additional arguments passed to \code{\link[adehabitatHR]{kernelUD}}.
 #'
-#' @details Utilisation distributions (UDs) are bivariate probability distributions that describe the probability (density) of locating an individual in any given area at a randomly chosen time. These can be estimated using the \code{\link[adehabitatHR]{kernelUD}} function. The algorithms implemented by this function can incorporate simple barriers, but restrictions on the shapes of barriers mean that in many real-world settings (e.g., in areas with complex coastline) these cannot be implemented. As a result, a pragmatic (if somewhat unsatisfactory) approach is to post-process the raw utilisation distribution by removing areas in which movement is impossible and then re-normalising the distribution (so that probabilities sum to one). This function achieves this by implementing the estimation over a grid, which defines whether (1) or not (0) an area is 'habitat'. After the estimation of the raw UD across the grid, probability density scores are combined (multipled) with the habitat suitability score (0, 1) and then renormalised (by dividing by the total score across suitable areas).
+#' @details Utilisation distributions (UDs) are bivariate probability distributions that describe the probability (density) of locating an individual in any given area at a randomly chosen time. These can be estimated using the \code{\link[adehabitatHR]{kernelUD}} function. The algorithms implemented by this function can incorporate simple barriers, but restrictions on the shapes of barriers mean that in many real-world settings (e.g., in areas with complex coastline) barriers cannot be implemented. As a result, a pragmatic (if somewhat unsatisfactory) approach is to post-process the raw utilisation distribution by removing areas in which movement is impossible and then re-normalise the distribution (so that probabilities sum to one). This function achieves this by implementing the estimation over a grid, which defines whether (1) or not (0) an area is 'habitat'. After the estimation of the raw UD across the grid, probability density scores are combined (multipled) with the habitat suitability score (0, 1) and then renormalised (by dividing by the total score across suitable areas).
 #'
 #' @return The function returns an object of class 'estUDm'. This is a list, with one component per animal, of \code{\link[adehabitatHR]{estUD-class}} objects. The 'h' slot of the output (\code{output@h}) has been modified so that the method ('meth') is given as 'specified'.
 #'
@@ -32,9 +32,10 @@
 #'                             col = viridis::viridis(n),
 #'                             length = 0.02)
 #' ## (2) Define path as a SpatialPointsDataFrame (SpatialPoints is not allowed)
-#' path <- sp::SpatialPointsDataFrame(path_ls$xy_mat,
-#'                                    data = data.frame(ID = factor(rep(1, nrow(path_ls$xy_mat)))),
-#'                                    proj4string = raster::crs(dat_coast))
+#' path <- sp::SpatialPointsDataFrame(
+#'   path_ls$xy_mat,
+#'   data = data.frame(ID = factor(rep(1, nrow(path_ls$xy_mat)))),
+#'                     proj4string = raster::crs(dat_coast))
 #' ## (3) Define grid over which to implement estimation
 #' # ... The grid needs to be sufficiently small to capture the coastline
 #' # ... reasonably while being large enough to enable calculation

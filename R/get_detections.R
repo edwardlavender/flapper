@@ -251,7 +251,7 @@ get_detection_area_sum <- function(xy,
 #' @title Calculate the area sampled by receivers through time
 #' @description This function extends \code{\link[flapper]{get_detection_area_sum}} to calculate how the total area sampled by receivers changes through time.
 #'
-#' @param xy,detection_range,coastline,scale Arguments required to calculate the total area surveyed by receivers (at each time point) via \code{\link[flapper]{get_detection_area_sum}}.
+#' @param xy,detection_range,coastline,scale Arguments required to calculate the total area surveyed by receivers (at each time point) via \code{\link[flapper]{get_detection_area_sum}}. For this function, \code{xy} should be a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that includes both receiver locations and corresponding deployment times (in columns named 'receiver_start_date' and 'receiver_end_date' respectively).
 #' @param plot A logical input that defines whether or not to plot a time series of the total area sampled by receivers.
 #' @param verbose A logical input that defines whether or not to print messages to the console to relay function progress.
 #' @param cl (optional) A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. The connection to the cluster is closed within the function.
@@ -278,18 +278,22 @@ get_detection_area_sum <- function(xy,
 #' # So we will also supply a cluster to improve the computation time.
 #' \dontrun{
 #' dat <- get_detection_area_ts(xy,
-#'                        detection_range = 500,
-#'                        coastline = dat_coast,
-#'                        cl = parallel::makeCluster(2L),
-#'                        varlist = "dat_coast"
-#'                        )
+#'                              detection_range = 500,
+#'                              coastline = dat_coast,
+#'                              cl = parallel::makeCluster(2L),
+#'                              varlist = "dat_coast"
+#'                              )
 #' }
 #'
 #' #### Example (3) Hide or customise the plot
 #' dat <- get_detection_area_ts(xy, plot = FALSE)
-#' dat <- get_detection_area_ts(xy,
-#'                        pretty_axis_args = list(axis = list(list(format = "%b-%y"),
-#'                                                            list())),
+#' dat <-
+#'   get_detection_area_ts(xy,
+#'                         pretty_axis_args =
+#'                           list(
+#'                             axis = list(list(format = "%b-%y"),
+#'                                         list()
+#'                                         )),
 #'                        xlab = "Time (month-year)",
 #'                        ylab = expression(paste("Area (", m^2, ")")),
 #'                        type = "l")
@@ -333,7 +337,6 @@ get_detection_area_ts <- function(xy,
   if(!is.null(cl)) parallel::stopCluster(cl)
   rcov <- dplyr::bind_rows(rcov)
 
-
   #### Visualise time series
   cat_to_console("... Visualising time series")
   if(plot) prettyGraphics::pretty_plot(rcov$date, rcov$receiver_area,...)
@@ -370,8 +373,8 @@ get_detection_area_ts <- function(xy,
 #' @examples
 #' #### Example (1): Number of operational receivers over an acoustic telemetry study
 #' dat_n <- get_n_operational_ts(data = dat_moorings,
-#'                           start = "receiver_start_date",
-#'                           stop = "receiver_end_date")
+#'                               start = "receiver_start_date",
+#'                               stop = "receiver_end_date")
 #' utils::head(dat_n)
 #'
 #' #### Example (2): Number of individuals at liberty over a tagging study
@@ -379,27 +382,41 @@ get_detection_area_ts <- function(xy,
 #' # ...  and assume that all individuals remained tagged until this time
 #' dat_ids$tag_end_date <- as.Date("2017-06-05")
 #' dat_n <- get_n_operational_ts(data = dat_ids,
-#'                           start = "tag_start_date",
-#'                           stop = "tag_end_date")
+#'                               start = "tag_start_date",
+#'                               stop = "tag_end_date")
 #'
 #' #### Example (3): Specify the time period under consideration
 #' dat_n <- get_n_operational_ts(data = dat_ids,
-#'                           start = "tag_start_date",
-#'                           stop = "tag_end_date",
-#'                           times = seq(min(dat_moorings$receiver_start_date),
-#'                                       max(dat_moorings$receiver_end_date), 1)
-#'                           )
+#'                               start = "tag_start_date",
+#'                               stop = "tag_end_date",
+#'                               times = seq(min(dat_moorings$receiver_start_date),
+#'                                           max(dat_moorings$receiver_end_date), 1)
+#'                               )
 #'
 #' #### Example (4): Suppress or customise the plot
 #' dat_n <- get_n_operational_ts(data = dat_ids,
-#'                           start = "tag_start_date",
-#'                           stop = "tag_end_date",
-#'                           plot = FALSE)
+#'                               start = "tag_start_date",
+#'                               stop = "tag_end_date",
+#'                               plot = FALSE)
 #' dat_n <- get_n_operational_ts(data = dat_ids,
-#'                           start = "tag_start_date",
-#'                           stop = "tag_end_date",
-#'                           xlab = "Time", ylab = "N (individuals)",
-#'                           type = "l")
+#'                               start = "tag_start_date",
+#'                               stop = "tag_end_date",
+#'                               xlab = "Time", ylab = "N (individuals)",
+#'                               type = "l")
+#'
+#' #### Example (5): Additional examples with simulated data
+#' # Example with one unit deployed on each day
+#' tmp <- data.frame(id = 1:3L,
+#'                   start = as.Date(c("2016-01-01", "2016-01-02", "2016-01-03")),
+#'                   stop = as.Date(c("2016-01-01", "2016-01-02", "2016-01-03"))
+#'                   )
+#' get_n_operational_ts(data = tmp, start = "start", stop = "stop")
+#' # Example with one unit deployed over a longer period
+#' tmp <- data.frame(id = 1:3L,
+#'                   start = as.Date(c("2016-01-01", "2016-01-02", "2016-01-03")),
+#'                   stop = as.Date(c("2016-01-10", "2016-01-02", "2016-01-03"))
+#'                   )
+#' get_n_operational_ts(data = tmp, start = "start", stop = "stop")
 #'
 #' @author Edward Lavender
 #' @export
@@ -442,7 +459,7 @@ get_n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,..
 #' @param match_to (optional) A dataframe against which to match the calculated overlap duration(s). This must contain an 'individual_id' and 'receiver_id' column, as in \code{ids} and \code{moorings} respectively. If supplied, an integer vector of overlap durations for individual/receiver combinations, matched against the individuals/receivers in this dataframe, is returned (see also Value).
 #' @param ... Additional arguments (none implemented).
 #'
-#' @return The function returns a dataframe with the deployment overlap duration for specific or all combinations of individuals and receivers, with the 'individual_id', 'receiver_id', 'tag_start_date', 'tag_end_date', 'receiver_start_date' and 'receiver_end_date' columns retained. The 'get_id_rec_overlap' column defines the temporal overlap (days). Alternatively, if \code{match_to} is supplied, a vector of overlap durations that matches each individual/receiver observation in that dataframe is returned.
+#' @return The function returns a dataframe with the deployment overlap duration for specific or all combinations of individuals and receivers, with the 'individual_id', 'receiver_id', 'tag_start_date', 'tag_end_date', 'receiver_start_date' and 'receiver_end_date' columns retained, plus 'tag_interval' and 'receiver_interval' columns that define individual and receiver deployment periods as \code{\link[lubridate]{Interval-class}} objects. The 'id_rec_overlap' column defines the temporal overlap (days). Alternatively, if \code{match_to} is supplied, a vector of overlap durations that matches each individual/receiver observation in that dataframe is returned.
 #'
 #' @examples
 #' #### Prepare data to include required columns
@@ -452,30 +469,31 @@ get_n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,..
 #' # ... except tag_end_date:
 #' dat_ids$tag_end_date <- as.Date("2017-06-05")
 #'
-#' #### Example (1): Temporal between all combinations
+#' #### Example (1): Temporal overlap between all combinations
 #' # ... of individuals and receivers
 #' dat <- get_id_rec_overlap(dat_ids, dat_moorings)
 #'
-#' #### Example (2) Temporal overlap between all combinations of specified
+#' #### Example (2): Temporal overlap between all combinations of specified
 #' #... individuals/receivers
 #' dat <- get_id_rec_overlap(dat_ids,
-#'                       dat_moorings,
-#'                       individual_id = c(25, 26),
-#'                       receiver_id = c(3, 4),
-#'                       type = 2L)
+#'                           dat_moorings,
+#'                           individual_id = c(25, 26),
+#'                           receiver_id = c(3, 4),
+#'                           type = 2L)
 #'
-#' #### Example (3) Temporal overlap between specified individual/receiver pairs
+#' #### Example (3): Temporal overlap between specified individual/receiver pairs
 #' dat <- get_id_rec_overlap(dat_ids,
-#'                       dat_moorings,
-#'                       individual_id = c(25, 26),
-#'                       receiver_id = c(3, 4),
-#'                       type = 1L)
+#'                           dat_moorings,
+#'                           individual_id = c(25, 26),
+#'                           receiver_id = c(3, 4),
+#'                           type = 1L)
 #'
-#' #### Example (4) Match temporal overlap to another dataframe
-#' dat_acoustics$get_id_rec_overlap <- get_id_rec_overlap(dat_ids,
-#'                                                dat_moorings,
-#'                                                match_to = dat_acoustics,
-#'                                                type = 1L)
+#' #### Example (4): Match temporal overlap to another dataframe
+#' dat_acoustics$get_id_rec_overlap <-
+#'   get_id_rec_overlap(dat_ids,
+#'                      dat_moorings,
+#'                      match_to = dat_acoustics,
+#'                      type = 1L)
 #'
 #' @author Edward Lavender
 #' @export
@@ -571,12 +589,12 @@ get_id_rec_overlap <- function(ids,
 #' @param envir A \code{\link[raster]{raster}} that defines the values of an environmental variable across the study area. The coordinate reference system should be the Universal Transverse Mercator system.
 #' @param sample_size (optional) An integer that defines the number of samples of the environmental variable to draw from the area around each receiver (see the 'size' argument of \code{\link[base]{sample}}). If this is provided, \code{sample_size} samples are taken from this area; otherwise, all values are extracted.
 #' @param sample_replace (optional) If \code{sample_size} is specified, \code{sample_replace} is a logical input that defines whether to implement sampling with (\code{sample_replace = TRUE}, the default) or without (\code{sample_replace = FALSE}) replacement (see the 'replace' argument of \code{\link[base]{sample}}).
-#' @param sample_probs (optional) If \code{sample_size} is specified, \code{sample_probs} is a function that calculates the detection probability given the distance (m) between an cell and a receiver.
+#' @param sample_probs (optional) If \code{sample_size} is specified, \code{sample_probs} is a function that calculates the detection probability given the distance (m) between a cell and a receiver.
 #' @param cl A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is closed within the function.
 #' @param varlist A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.
 #' @param verbose A logical variable that defines whether or not relay messages to the console to monitor function progress.
 #'
-#' @return The function returns a list of dataframes (one for each element in \code{xy} i.e., each receiver), each of which includes the cell IDs of \code{envir} from which values were extracted ('cell'), the value of the environmental variable in that cell ('envir') and, if applicable, the distance between that cell and the receiver ('dist', m) and the detection probability in that cell ('prob').
+#' @return The function returns a list of dataframes (one for each element in \code{xy}; i.e., each receiver), each of which includes the cell IDs of \code{envir} from which values were extracted ('cell'), the value of the environmental variable in that cell ('envir') and, if applicable, the distance between that cell and the receiver ('dist', m) and the detection probability in that cell ('prob').
 #'
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
@@ -589,10 +607,10 @@ get_id_rec_overlap <- function(ids,
 #'
 #' #### Example (1): Extract all depth values within each receiver's centroid
 #' depths_by_centroid <- get_detection_centroids_envir(xy = xy,
-#'                                                 detection_range = 425,
-#'                                                 coastline = dat_coast,
-#'                                                 envir = dat_gebco
-#'                                                 )
+#'                                                     detection_range = 425,
+#'                                                     coastline = dat_coast,
+#'                                                     envir = dat_gebco
+#'                                                     )
 #' # The function returns a list of dataframes, one for each receiver
 #' # ... with the cell IDs and the value of the environmental variable
 #' utils::str(depths_by_centroid)
@@ -610,11 +628,11 @@ get_id_rec_overlap <- function(ids,
 #' #### Example (2): Extract a random sample of values
 #' # (We'll keep the values small for speed)
 #' depths_by_centroid <- get_detection_centroids_envir(xy = xy,
-#'                                                 detection_range = 425,
-#'                                                 coastline = dat_coast,
-#'                                                 envir = dat_gebco,
-#'                                                 sample_size = 2
-#'                                                  )
+#'                                                    detection_range = 425,
+#'                                                    coastline = dat_coast,
+#'                                                    envir = dat_gebco,
+#'                                                    sample_size = 2
+#'                                                    )
 #' utils::str(depths_by_centroid)
 #'
 #' #### Example (3) Extract a random sample of values with weighted probabilities
@@ -622,10 +640,10 @@ get_id_rec_overlap <- function(ids,
 #' calc_detection_pr <-
 #'   function(dist){
 #'     dpr <- get_detection_pr(distance = dist,
-#'                         beta_0 = 2.5,
-#'                         beta_1 = -0.01,
-#'                         inv_link = stats::plogis,
-#'                         output = 2L)
+#'                             beta_0 = 2.5,
+#'                             beta_1 = -0.01,
+#'                             inv_link = stats::plogis,
+#'                             output = 2L)
 #'     return(dpr)
 #'   }
 #' # Implement sampling with replacement according to detection probability
@@ -780,20 +798,20 @@ get_detection_centroids_envir <- function(xy,
 #' #### Example (2) Detection days between all combinations of specified
 #' #... individuals/receivers
 #' dat <- get_detection_days(dat_acoustics,
-#'                       individual_id = 25,
-#'                       receiver_id = c(25, 21),
-#'                       type = 2L)
+#'                           individual_id = 25,
+#'                           receiver_id = c(25, 21),
+#'                           type = 2L)
 #'
 #' #### Example (3) Detection days between specified individual/receiver pairs
 #' dat <- get_detection_days(dat_acoustics,
-#'                       individual_id = c(25, 26),
-#'                       receiver_id = c(25, 21),
-#'                       type = 1L)
+#'                           individual_id = c(25, 26),
+#'                           receiver_id = c(25, 21),
+#'                           type = 1L)
 #'
 #' #### Example (4) Match detection days to another dataframe
 #' dat_acoustics$detection_days <- get_detection_days(dat_acoustics,
-#'                                                match_to = dat_acoustics,
-#'                                                type = 1L)
+#'                                                    match_to = dat_acoustics,
+#'                                                    type = 1L)
 #'
 #' utils::head(dat_acoustics)
 #'

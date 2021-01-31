@@ -30,7 +30,7 @@ get_id_rec_overlap(
 \item{...}{Additional arguments (none implemented).}
 }
 \value{
-The function returns a dataframe with the deployment overlap duration for specific or all combinations of individuals and receivers, with the 'individual_id', 'receiver_id', 'tag_start_date', 'tag_end_date', 'receiver_start_date' and 'receiver_end_date' columns retained. The 'get_id_rec_overlap' column defines the temporal overlap (days). Alternatively, if \code{match_to} is supplied, a vector of overlap durations that matches each individual/receiver observation in that dataframe is returned.
+The function returns a dataframe with the deployment overlap duration for specific or all combinations of individuals and receivers, with the 'individual_id', 'receiver_id', 'tag_start_date', 'tag_end_date', 'receiver_start_date' and 'receiver_end_date' columns retained, plus 'tag_interval' and 'receiver_interval' columns that define individual and receiver deployment periods as \code{\link[lubridate]{Interval-class}} objects. The 'id_rec_overlap' column defines the temporal overlap (days). Alternatively, if \code{match_to} is supplied, a vector of overlap durations that matches each individual/receiver observation in that dataframe is returned.
 }
 \description{
 This function calculates the duration of the overlap (in days) between individuals' time at liberty and receivers' operational periods. To implement this function, a dataframe with individual deployment periods and another with receiver deployment periods must be specified. The duration of the overlap between these intervals can be calculated for all combinations of individuals and receivers within these two dataframes, for all combinations of specified individuals and receivers, or for specific individual/receiver pairs. The function returns a dataframe of the overlap duration for these individual/receiver combinations or a vector of values that is matched against another dataframe.
@@ -43,30 +43,31 @@ This function calculates the duration of the overlap (in days) between individua
 # ... except tag_end_date:
 dat_ids$tag_end_date <- as.Date("2017-06-05")
 
-#### Example (1): Temporal between all combinations
+#### Example (1): Temporal overlap between all combinations
 # ... of individuals and receivers
 dat <- get_id_rec_overlap(dat_ids, dat_moorings)
 
-#### Example (2) Temporal overlap between all combinations of specified
+#### Example (2): Temporal overlap between all combinations of specified
 #... individuals/receivers
 dat <- get_id_rec_overlap(dat_ids,
-                      dat_moorings,
-                      individual_id = c(25, 26),
-                      receiver_id = c(3, 4),
-                      type = 2L)
+                          dat_moorings,
+                          individual_id = c(25, 26),
+                          receiver_id = c(3, 4),
+                          type = 2L)
 
-#### Example (3) Temporal overlap between specified individual/receiver pairs
+#### Example (3): Temporal overlap between specified individual/receiver pairs
 dat <- get_id_rec_overlap(dat_ids,
-                      dat_moorings,
-                      individual_id = c(25, 26),
-                      receiver_id = c(3, 4),
-                      type = 1L)
+                          dat_moorings,
+                          individual_id = c(25, 26),
+                          receiver_id = c(3, 4),
+                          type = 1L)
 
-#### Example (4) Match temporal overlap to another dataframe
-dat_acoustics$get_id_rec_overlap <- get_id_rec_overlap(dat_ids,
-                                               dat_moorings,
-                                               match_to = dat_acoustics,
-                                               type = 1L)
+#### Example (4): Match temporal overlap to another dataframe
+dat_acoustics$get_id_rec_overlap <-
+  get_id_rec_overlap(dat_ids,
+                     dat_moorings,
+                     match_to = dat_acoustics,
+                     type = 1L)
 
 }
 \author{
