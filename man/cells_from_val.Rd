@@ -20,7 +20,7 @@ cells_from_val(x, y, interval = 1L, cells = TRUE, na.rm = TRUE, ...)
 \item{...}{Additional arguments (none implemented).}
 }
 \value{
-The function returns a RasterLayer (if \code{cells = FALSE}) or an integer vector of numbers (if \code{cells = TRUE}) that defines that cells that are equal to, or lie within, specified value(s) \code{y}.
+The function returns a RasterLayer (if \code{cells = FALSE}) or an integer vector of numbers (if \code{cells = TRUE}) that defines the cells that are equal to, or lie within, specified value(s) \code{y}.
 }
 \description{
 This function obtains a RasterLayer or the cells of a RasterLayer that are equal to a specified value or lie within a specified range of values. To implement this function, a \code{\link[raster]{raster}} (\code{x}) and a value or range of values (\code{y}) for which a RasterLayer or the numbers of cells corresponding to those values are desired must be supplied. If a range of values is supplied, an additional argument (\code{interval}) controls whether or not cells within and equal to or simply within the specified range are returned.

@@ -46,13 +46,13 @@ The function returns an n-row, two-column matrix that defines the simulated loca
 This function simulates movement paths under a discrete-time Ornstein-Uhlenbeck process in which the parameters of the movement model are assumed to remain constant through time.
 }
 \details{
-Ornstein-Uhlenbeck processes are convenient models for animal movement around a 'home range' centre. In the model, a parameter (\code{k}) 'pulls' the location of the individual (\eqn{\vec{r}}) back towards the centre of its home range (\eqn{\vec{r}^H}) as it moves away from this centre. This function implements the discretised form of the Ornstein-Uhlenbeck model in which the parameters of the movement model remain constant through time and in which movement is not constrained by barriers described by Alós et al. (2016) (see equations (8) and (9) in particular). Under this model, the position \eqn{\vec{r}} of the animal at time \eqn{n + 1} is given by:
+Ornstein-Uhlenbeck processes are convenient models for animal movement around a 'home range' centre. In the model, a parameter (\code{k}) 'pulls' the location of the individual (\eqn{\vec{r}}) back towards the centre of its home range (\eqn{\vec{r}^H}) as it moves away from this centre. This function implements the discretised form of the Ornstein-Uhlenbeck model in which the parameters of the movement model remain constant through time, and in which movement is not constrained by barriers, described by Alós et al. (2016) (see equations (8) and (9) in particular). Under this model, the position \eqn{\vec{r}} of the animal at time \eqn{n + 1} is given by:
 
 \deqn{\vec{r}_{n + 1} = \vec{r}^H + e^{-k \Delta t} (\vec{r}_n - \vec{r}^H) + \vec{R}_n,}
 
 where \eqn{\vec{r}^H} is the location of the home range centre; \eqn{k} is the strength of the central harmonic force; \eqn{\Delta t} is the duration between time steps; and \eqn{\vec{R}_n} is a bi-dimensional normally distributed random variable with mean zero and standard deviation (\eqn{\sigma}) given by:
 
-\deqn{\sigma = \sqrt{ \frac{\epsilon (1 - e^{-2 k \Delta t}}) {2 k}}.}
+\deqn{\sigma = \sqrt{ \frac{\epsilon (1 - e^{-2 k \Delta t})} {2 k}}.}
 
 Note that the default plotting parameters for this function require the \code{\link[viridis]{viridis}} package for pretty visualisation.
 }
@@ -82,7 +82,7 @@ path <- sim_path_ou_1(n = n,
 
 }
 \references{
-Alós, J. et al. (2016) Bayesian State-Space Modelling of Conventional Acoustic Tracking Provides Accurate Descriptors of Home Range Behavior in a Small-Bodied Coastal Fish Species. Plos One 11, e0154089
+Alós, J. et al. (2016) Bayesian State-Space Modelling of Conventional Acoustic Tracking Provides Accurate Descriptors of Home Range Behavior in a Small-Bodied Coastal Fish Species. Plos One 11, e0154089.
 }
 \seealso{
 For movement simulations, see \code{\link[flapper]{sim_path_*}} for the full list of functions currently implemented in \code{\link[flapper]{flapper}}. For example, \code{\link[flapper]{sim_path_sa}} simulates a movement path based on step lengths and turning angles. This can support movement within restricted areas. More broadly, \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement.

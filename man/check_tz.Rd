@@ -2,7 +2,10 @@
 % Please edit documentation in R/utils.R
 \name{check_tz}
 \alias{check_tz}
-\title{Check the timezone of an object and force UTC if absent}
+\title{Check the time zone of an object and force UTC if absent}
+\source{
+This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
+}
 \usage{
 check_tz(arg = deparse(substitute(input)), input)
 }

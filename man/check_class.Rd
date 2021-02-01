@@ -2,7 +2,10 @@
 % Please edit documentation in R/utils.R
 \name{check_class}
 \alias{check_class}
-\title{Check the class of an function input to a parent function}
+\title{Check the class of a function input to a parent function}
+\source{
+This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
+}
 \usage{
 check_class(
   arg = deparse(substitute(input)),
@@ -18,7 +21,7 @@ check_class(
 
 \item{input}{The input to an argument of a parent function.}
 
-\item{if_class}{(optional) A character vector of classes of object. If supplied, the function will only proceed to check the class of the object if the \code{class(input)} is one of \code{if_class}. This is useful if \code{check_class()} is implemented in a loop.}
+\item{if_class}{(optional) A character vector of object class(es). If supplied, the function will only proceed to check the class of the object if the \code{class(input)} is one of \code{if_class}. This is useful if \code{check_class()} is implemented in a loop.}
 
 \item{to_class}{The required class of the input.}
 
@@ -27,7 +30,7 @@ check_class(
 \item{coerce_input}{A function used to coerce \code{input} to the correct object type, if \code{type = "warning"}.}
 }
 \value{
-The function checks the class of the input. If the class is not the same as required by the parent function (i.e., as specified by \code{class}), the function returns a helpful error message, or a warning and an object whose class has been coerced to the correct class.
+The function checks the class of the input. If the class is not the same as required by the parent function (i.e., as specified by \code{to_class}), the function returns a helpful error message, or a warning and an object whose class has been coerced to the correct class.
 }
 \description{
 This function checks that the class of an input to a parent function is appropriate. If not, the function either produces a helpful error message or returns a warning.

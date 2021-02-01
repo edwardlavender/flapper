@@ -21,7 +21,7 @@ make_matrix_ids(
 
 \item{delta_t}{A number or character that defines the time interval between successive time steps. This is passed to the 'by' argument of \code{\link[base]{seq.POSIXt}}.}
 
-\item{as_POSIXct}{A function that coerces supplied any supplied times (\code{ids$tag_start_date}, \code{ids$tag_end_date}, \code{start} and \code{end}) that are not POSIXct objects to POSIXct objects.}
+\item{as_POSIXct}{A function that coerces any supplied times (\code{ids$tag_start_date}, \code{ids$tag_end_date}, \code{start} and \code{end}) that are not POSIXct objects to POSIXct objects.}
 
 \item{set_names}{A logical variable that defines whether or not to set the row and column names of the matrix to the time steps and the individual IDs respectively.}
 

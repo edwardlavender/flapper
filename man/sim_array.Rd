@@ -22,7 +22,7 @@ sim_array(
 )
 }
 \arguments{
-\item{boundaries}{An \code{\link[raster]{extent}} object that defines the boundaries of (simulated) study area.}
+\item{boundaries}{An \code{\link[raster]{extent}} object that defines the boundaries of the (simulated) study area.}
 
 \item{coastline}{(optional) This argument is used to incorporate the presence of barriers, such as coastline, in the area. There are three options. If \code{coastline = NULL}, no barriers are incorporated. If \code{coastline = "simple_random"}, then a triangular island is simulated in the study area. Alternatively, a spatial object, such as a SpatialPolygonsDataFrame, that defines the coastline in an area can be incorporated into the array design by passing this \code{coastline}.}
 
@@ -30,7 +30,7 @@ sim_array(
 
 \item{n_receivers}{An integer that defines the number of receivers in the array. This is ignored if receiver locations are specified via \code{arrangement}.}
 
-\item{arrangement, ...}{A character string or a SpatialPoints object that defines the arrangement of receivers. Supported character string options for simulated arrays are \code{"regular"}, \code{"random"} and \code{"stratified"}, \code{"nonaligned"}, \code{"hexagonal"} and \code{"clustered"} (see \code{\link[sp]{spsample}}, which is used to simulate receiver locations). Additional arguments can be passed to this function via \code{...} for further control. Otherwise, a SpatialPoints object that defines the coordinates of receivers (in the same coordinate reference system as \code{boundaries} and, if applicable, \code{coastline}) is assumed to have been provided.}
+\item{arrangement, ...}{A character string or a SpatialPoints object that defines the arrangement of receivers. Supported character string options for simulated arrays are \code{"regular"}, \code{"random"}, \code{"stratified"}, \code{"nonaligned"}, \code{"hexagonal"} and \code{"clustered"} (see \code{\link[sp]{spsample}}, which is used to simulate receiver locations). Additional arguments can be passed to this function via \code{...} for further control. Otherwise, a SpatialPoints object that defines the coordinates of receivers (in the same coordinate reference system as \code{boundaries} and, if applicable, \code{coastline}) is assumed to have been provided.}
 
 \item{seed}{An integer that is used to set the seed to enable reproducible simulations (see \code{\link[base]{set.seed}}).}
 
@@ -46,7 +46,7 @@ sim_array(
 The function returns a named list of (a) the spatial objects that define the simulated array ('array') and (b) the arguments used to generate this array ('args'). The 'array' element is a named list contains the following elements: 'boundaries', an \code{\link[raster]{Extent-class}} object that defines the boundaries of the area (as inputted); 'area', a \code{\link[sp]{SpatialPolygons-class}} object that defines the boundaries of the area; 'land' and 'sea', \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects that define the land and sea respectively; and 'xy', a \code{\link[sp]{SpatialPoints-class}} object that defines receiver locations. If \code{plot = TRUE}, the function also returns a plot of the array.
 }
 \description{
-This function is designed to simulate different kinds of array designs for monitoring stations. The function has been particularly inspired by the need to simulate passive acoustic telemetry array designs, which comprise networks of acoustic hydrophones that listen for acoustic transmissions from tagged marine animals. To implement the function, it is necessary to define the boundaries of the area (\code{boundaries}). Barriers to movement, such as coastline, within this area can be simulated or included from real datasets. The area is populated with a specified number of receivers (\code{n_receivers}) that are simulated under different array designs (namely, uniform, regular or random arrangements) or incorporated from real data. The function returns a list of spatial objects that define the array and, if requested, a plot of the area.
+This function is designed to simulate different kinds of array designs for monitoring stations. The function has been particularly inspired by the need to simulate passive acoustic telemetry array designs, which comprise networks of acoustic hydrophones that listen for acoustic transmissions from tagged marine animals. To implement the function, it is necessary to define the boundaries of the area (\code{boundaries}). Barriers to movement, such as coastline, within this area can be simulated or included from real datasets. The area is populated with a specified number of receivers (\code{n_receivers}) that are simulated under different array designs (namely, regular, random, stratified, non-aligned, hexagonal and clustered arrangements) or incorporated from real data. The function returns a list of spatial objects that define the array and, if requested, a plot of the area.
 }
 \details{
 Note that this function does not currently support temporally varying array designs.
@@ -66,7 +66,7 @@ array <- sim_array(boundaries = raster::extent(-10, 10, -10, 10),
                    seed = 1
                    )
 
-#### Example (3) Add custom coastline
+#### Example (3): Add custom coastline
 array <- sim_array(boundaries = raster::extent(dat_coast),
                    coastline = dat_coast,
                    add_land = list(col = "darkgreen"),
@@ -74,11 +74,11 @@ array <- sim_array(boundaries = raster::extent(dat_coast),
                    seed = 1
                    )
 
-#### Example (4) Change the number of receivers
+#### Example (4): Change the number of receivers
 array <- sim_array(n_receivers = 5)
 array <- sim_array(n_receivers = 25)
 
-#### Example (5) Change the arrangement of receivers
+#### Example (5): Change the arrangement of receivers
 ## Explore different arrangements
 array <- sim_array(n_receivers = 25, arrangement = "random")
 array <- sim_array(n_receivers = 25, arrangement = "regular")

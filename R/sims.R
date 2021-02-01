@@ -3,13 +3,13 @@
 #### sim_array()
 
 #' @title Simulate (marine) monitoring arrays
-#' @description This function is designed to simulate different kinds of array designs for monitoring stations. The function has been particularly inspired by the need to simulate passive acoustic telemetry array designs, which comprise networks of acoustic hydrophones that listen for acoustic transmissions from tagged marine animals. To implement the function, it is necessary to define the boundaries of the area (\code{boundaries}). Barriers to movement, such as coastline, within this area can be simulated or included from real datasets. The area is populated with a specified number of receivers (\code{n_receivers}) that are simulated under different array designs (namely, uniform, regular or random arrangements) or incorporated from real data. The function returns a list of spatial objects that define the array and, if requested, a plot of the area.
+#' @description This function is designed to simulate different kinds of array designs for monitoring stations. The function has been particularly inspired by the need to simulate passive acoustic telemetry array designs, which comprise networks of acoustic hydrophones that listen for acoustic transmissions from tagged marine animals. To implement the function, it is necessary to define the boundaries of the area (\code{boundaries}). Barriers to movement, such as coastline, within this area can be simulated or included from real datasets. The area is populated with a specified number of receivers (\code{n_receivers}) that are simulated under different array designs (namely, regular, random, stratified, non-aligned, hexagonal and clustered arrangements) or incorporated from real data. The function returns a list of spatial objects that define the array and, if requested, a plot of the area.
 #'
-#' @param boundaries An \code{\link[raster]{extent}} object that defines the boundaries of (simulated) study area.
+#' @param boundaries An \code{\link[raster]{extent}} object that defines the boundaries of the (simulated) study area.
 #' @param coastline (optional) This argument is used to incorporate the presence of barriers, such as coastline, in the area. There are three options. If \code{coastline = NULL}, no barriers are incorporated. If \code{coastline = "simple_random"}, then a triangular island is simulated in the study area. Alternatively, a spatial object, such as a SpatialPolygonsDataFrame, that defines the coastline in an area can be incorporated into the array design by passing this \code{coastline}.
 #' @param land_inside_coastline A logical variable that defines whether or not the land is 'inside' the polygon(s) defined by \code{coastline} (\code{land_inside_coastline = TRUE}) or the sea is 'inside' the polygon(s) (\code{land_inside_coastline = FALSE}).
 #' @param n_receivers An integer that defines the number of receivers in the array. This is ignored if receiver locations are specified via \code{arrangement}.
-#' @param arrangement,... A character string or a SpatialPoints object that defines the arrangement of receivers. Supported character string options for simulated arrays are \code{"regular"}, \code{"random"} and \code{"stratified"}, \code{"nonaligned"}, \code{"hexagonal"} and \code{"clustered"} (see \code{\link[sp]{spsample}}, which is used to simulate receiver locations). Additional arguments can be passed to this function via \code{...} for further control. Otherwise, a SpatialPoints object that defines the coordinates of receivers (in the same coordinate reference system as \code{boundaries} and, if applicable, \code{coastline}) is assumed to have been provided.
+#' @param arrangement,... A character string or a SpatialPoints object that defines the arrangement of receivers. Supported character string options for simulated arrays are \code{"regular"}, \code{"random"}, \code{"stratified"}, \code{"nonaligned"}, \code{"hexagonal"} and \code{"clustered"} (see \code{\link[sp]{spsample}}, which is used to simulate receiver locations). Additional arguments can be passed to this function via \code{...} for further control. Otherwise, a SpatialPoints object that defines the coordinates of receivers (in the same coordinate reference system as \code{boundaries} and, if applicable, \code{coastline}) is assumed to have been provided.
 #' @param seed An integer that is used to set the seed to enable reproducible simulations (see \code{\link[base]{set.seed}}).
 #' @param plot A logical variable that defines whether or not plot the array (via \code{\link[prettyGraphics]{pretty_map}}).
 #' @param xlim,ylim (optional) Axis limits for the plot. These can be specified in any way supported by \code{\link[prettyGraphics]{pretty_axis}}.
@@ -35,7 +35,7 @@
 #'                    seed = 1
 #'                    )
 #'
-#' #### Example (3) Add custom coastline
+#' #### Example (3): Add custom coastline
 #' array <- sim_array(boundaries = raster::extent(dat_coast),
 #'                    coastline = dat_coast,
 #'                    add_land = list(col = "darkgreen"),
@@ -43,11 +43,11 @@
 #'                    seed = 1
 #'                    )
 #'
-#' #### Example (4) Change the number of receivers
+#' #### Example (4): Change the number of receivers
 #' array <- sim_array(n_receivers = 5)
 #' array <- sim_array(n_receivers = 25)
 #'
-#' #### Example (5) Change the arrangement of receivers
+#' #### Example (5): Change the arrangement of receivers
 #' ## Explore different arrangements
 #' array <- sim_array(n_receivers = 25, arrangement = "random")
 #' array <- sim_array(n_receivers = 25, arrangement = "regular")
@@ -219,8 +219,8 @@ sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
 #' @title Functions for the simulation of movement paths
 #' @description \link{flapper} includes a number of functions for the simulation of movement paths (\code{sim_path_*()}), listed here for convenience:
 #' \itemize{
-#'   \item{\link{sim_path_sa}} simulates discrete-time movement paths from step lengths and turning angles
-#'   \item{\link{sim_path_ou_1}} simulates discrete-time movement paths under a Ornstein-Uhlenbeck process with time-fixed parameters
+#'   \item{\link{sim_path_sa}} simulates discrete-time movement paths from step lengths and turning angles.
+#'   \item{\link{sim_path_ou_1}} simulates discrete-time movement paths under a Ornstein-Uhlenbeck process with time-fixed parameters.
 #' }
 #' @seealso \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement.
 #' @name sim_path_*
@@ -246,7 +246,7 @@ NULL
 #' @param verbose A logical variable that defines whether or not to print messages to the console that relay function progress.
 #' @param ... Additional arguments. For \code{\link[flapper]{sim_path_sa}}, these are passed to \code{\link[prettyGraphics]{pretty_map}} to customise the map. For the default \code{\link[flapper]{sim_angles}} and \code{\link[flapper]{sim_steps}} functions, \code{...} is required but additional parameters are ignored.
 #'
-#' @details *Strictly speaking, only sequential positions are restricted to be within the allowed area. Yet since steps in the current implementation of the function are linear, the simulation of relatively large step lengths in an area with complex barriers to movement (e.g., convoluted coastlines), may lead to movement over inappropriate areas (e.g., over a peninsula) even through sequential positions are within the allowed area (e.g., either side of a peninsula). This problem can be mitigated by simulating time series for which sequential observations are closer in time (and thus for which step lengths are more constrained). For longer time series for which short time steps are undesirable, least-cost paths may be implemented to ensure biologically meaningful movements in future (but this is more computationally demanding for rapid simulations).
+#' @details *Strictly speaking, only sequential positions are restricted to be within the allowed area. Yet since steps in the current implementation of the function are linear, the simulation of relatively large step lengths in an area with complex barriers to movement (e.g., convoluted coastlines), may lead to movement over inappropriate areas (e.g., over a peninsula) even through sequential positions are within the allowed area (e.g., either side of a peninsula). This problem can be mitigated by simulating time series for which sequential observations are closer in time (and thus for which step lengths are more constrained). For longer time series for which short time steps are undesirable, least-cost paths (e.g., see \code{\link[flapper]{lcp_over_surface}}) may be implemented to ensure biologically meaningful movements in future (but this is more computationally demanding for rapid simulations).
 #'
 #' This function requires the \code{\link[circular]{circular}} package.
 #'
@@ -310,7 +310,7 @@ NULL
 #' # Define a sim_angle function that depends on some previous angle
 #' # While the time step is less than the lag, the function needs to be
 #' # ... able to handle missing angles and return sensible values in these
-#' # ... cases e.g., via is.null structure:
+#' # ... cases e.g., via an 'is.null' structure:
 #' sim_angles_wrn_with_lag <- function(angle = NULL,...){
 #'   if(is.null(angle)) {
 #'     cat("\n... ... method (1) activated...\n") # useful check
@@ -520,13 +520,13 @@ sim_angles <- function(...) {
 #' @param verbose A logical variable that defines whether or not to print messages to the console that relay function progress.
 #' @param ... Additional arguments, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the map.
 #'
-#' @details Ornstein-Uhlenbeck processes are convenient models for animal movement around a 'home range' centre. In the model, a parameter (\code{k}) 'pulls' the location of the individual (\eqn{\vec{r}}) back towards the centre of its home range (\eqn{\vec{r}^H}) as it moves away from this centre. This function implements the discretised form of the Ornstein-Uhlenbeck model in which the parameters of the movement model remain constant through time and in which movement is not constrained by barriers described by Alós et al. (2016) (see equations (8) and (9) in particular). Under this model, the position \eqn{\vec{r}} of the animal at time \eqn{n + 1} is given by:
+#' @details Ornstein-Uhlenbeck processes are convenient models for animal movement around a 'home range' centre. In the model, a parameter (\code{k}) 'pulls' the location of the individual (\eqn{\vec{r}}) back towards the centre of its home range (\eqn{\vec{r}^H}) as it moves away from this centre. This function implements the discretised form of the Ornstein-Uhlenbeck model in which the parameters of the movement model remain constant through time, and in which movement is not constrained by barriers, described by Alós et al. (2016) (see equations (8) and (9) in particular). Under this model, the position \eqn{\vec{r}} of the animal at time \eqn{n + 1} is given by:
 #'
 #' \deqn{\vec{r}_{n + 1} = \vec{r}^H + e^{-k \Delta t} (\vec{r}_n - \vec{r}^H) + \vec{R}_n,}
 #'
 #' where \eqn{\vec{r}^H} is the location of the home range centre; \eqn{k} is the strength of the central harmonic force; \eqn{\Delta t} is the duration between time steps; and \eqn{\vec{R}_n} is a bi-dimensional normally distributed random variable with mean zero and standard deviation (\eqn{\sigma}) given by:
 #'
-#' \deqn{\sigma = \sqrt{ \frac{\epsilon (1 - e^{-2 k \Delta t}}) {2 k}}.}
+#' \deqn{\sigma = \sqrt{ \frac{\epsilon (1 - e^{-2 k \Delta t})} {2 k}}.}
 #'
 #' Note that the default plotting parameters for this function require the \code{\link[viridis]{viridis}} package for pretty visualisation.
 #'
@@ -558,7 +558,7 @@ sim_angles <- function(...) {
 #'                       pretty_axis_args = list(1:4)
 #'                       )
 #'
-#' @references Alós, J. et al. (2016) Bayesian State-Space Modelling of Conventional Acoustic Tracking Provides Accurate Descriptors of Home Range Behavior in a Small-Bodied Coastal Fish Species. Plos One 11, e0154089
+#' @references Alós, J. et al. (2016) Bayesian State-Space Modelling of Conventional Acoustic Tracking Provides Accurate Descriptors of Home Range Behavior in a Small-Bodied Coastal Fish Species. Plos One 11, e0154089.
 #'
 #' @author Edward Lavender
 #' @export
@@ -663,7 +663,7 @@ summarise_along_walk <- function(vec, every, summarise = sum, na.rm = FALSE,...)
 #### sim_detections()
 
 #' @title Simulate detections
-#' @description This function simulates detections at passive acoustic telemetry receivers under a detection model that depends on distance. To implement the function, the underlying movement path that gives rise to detections (or not) must be supplied (via \code{path}) along with the locations of receivers (\code{xy}) at which individuals can be detected. At each point along the movement path (i.e., time step), the function calculates the distances from that point to all of the receivers and evaluates a user-supplied detection probability function, based on distance, to determine detection probability at each receiver. The function then simulates binary detection outcomes from a binomial distribution conditional on this probability, and returns these in a matrix with one simulated outcome for each time step and receiver.
+#' @description This function simulates detections at passive acoustic telemetry receivers under a detection model that depends on distance. To implement the function, the underlying movement path that gives rise to detections (or not) must be supplied (via \code{path}) along with the locations of receivers (\code{xy}) at which detections can be made. At each point along the movement path (i.e., time step), the function calculates the distances from that point to all of the receivers and evaluates a user-supplied detection probability function, based on distance, to determine detection probability at each receiver. The function then simulates binary detection outcomes from a binomial distribution conditional on this probability, and returns these in a matrix with one simulated outcome for each time step and receiver.
 #'
 #' @param path A two-column matrix of the coordinates of the movement path (x, y).
 #' @param xy A two-column matrix of the coordinates of receivers (x, y).
@@ -672,7 +672,7 @@ summarise_along_walk <- function(vec, every, summarise = sum, na.rm = FALSE,...)
 #' @param by_timestep A logical variable that defines whether or not \code{calc_detection_pr} needs to be applied to each time step separately. This may be necessary if some of the parameters of the detection model are vectors (see Examples).
 #' @param delta_t (optional) An integer that defines the number of time steps over which to aggregate detections. If provided, detections are summed over each \code{delta_t} interval and returned along with averaged distances and probabilities (see Value).
 #' @param plot A logical variable that defines whether or not to plot detections (and probabilities) against distances.
-#' @param jitter,add_prob,xlim,... Plot customisation options. \code{jitter} is a function that jitters \code{n} simulated outcomes (0, 1) in the vertical direction. \code{add_prob} is a named list of arguments, passed to \code{\link[graphics]{points}}, used to customise the addition of calculated probabilities to the plot. (\code{add_prob} suppresses the addition of probabilities to the plot.) \code{xlim} is a vector of x axis limits. By default, \code{xlim = c(0, 1000)} to improve resolution in the area of the plot that is of interest (under a Universal Transverse Mercator CRS, for most realistic detection probability functions, detection probability beyond 1000 will be negligible) and plotting speed. Additional arguments can be passed to \code{\link[prettyGraphics]{pretty_plot}} to customise the plot via \code{...}.
+#' @param jitter,add_prob,xlim,... Plot customisation options. \code{jitter} is a function that jitters \code{n} simulated outcomes (0, 1) in the vertical direction. \code{add_prob} is a named list of arguments, passed to \code{\link[graphics]{points}}, used to customise the addition of calculated probabilities to the plot. (\code{add_prob = NULL} suppresses the addition of probabilities to the plot.) \code{xlim} is a vector of x axis limits. By default, \code{xlim = c(0, 1000)} to improve resolution in the area of the plot that is of interest (under a Universal Transverse Mercator CRS, for most realistic detection probability functions, detection probability beyond 1000 will be negligible) and plotting speed. Additional arguments can be passed to \code{\link[prettyGraphics]{pretty_plot}} to customise the plot via \code{...}.
 #' @param verbose A logical variable that defines whether or not to print messages to the console to relay function progress.
 #'
 #' @details The function assumes that the individual transmits an acoustic signal which has the capacity to be detected at each time step. In reality, acoustic transmitters are often programmed with a randomly varying delay, but this is not currently implemented. The function also assumes that all receivers that are supplied are able to make detections. If the receivers at which an individual could be detected change over time, it may be necessary to apply the function iteratively or post-process the outcomes to ensure that individuals are not detected at inactive receivers.
@@ -701,8 +701,8 @@ summarise_along_walk <- function(vec, every, summarise = sum, na.rm = FALSE,...)
 #' #### Step (3) Simulate detections
 #' ## (A) Extract path and receiver coordinates from simulated outcomes above
 #' path <- path_ls$xy_mat
-#' xy  <- array_ls$array$xy
-#' xy <- sp::coordinates(xy)
+#' xy   <- array_ls$array$xy
+#' xy   <- sp::coordinates(xy)
 #' ## (B) Simulate detections under different probability functions (see below).
 #'
 #' #### Example (1) Threshold probability function
@@ -753,7 +753,7 @@ summarise_along_walk <- function(vec, every, summarise = sum, na.rm = FALSE,...)
 #' # Visualise simulated detection probability surface at some suitable distances
 #' pp <- graphics::par(mfrow = c(2, 2))
 #' lapply(c(0, 50, 100, 500), function(dist){
-#'   r <- raster::calc(beta_surface, function(x) stats::plogis(2.5 + x * dist))
+#'   r <- raster::calc(beta_surface, function(beta) stats::plogis(2.5 + beta * dist))
 #'   raster::plot(r)
 #' })
 #' graphics::par(pp)

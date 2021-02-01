@@ -34,7 +34,7 @@ sim_detections(
 
 \item{plot}{A logical variable that defines whether or not to plot detections (and probabilities) against distances.}
 
-\item{jitter, add_prob, xlim, ...}{Plot customisation options. \code{jitter} is a function that jitters \code{n} simulated outcomes (0, 1) in the vertical direction. \code{add_prob} is a named list of arguments, passed to \code{\link[graphics]{points}}, used to customise the addition of calculated probabilities to the plot. (\code{add_prob} suppresses the addition of probabilities to the plot.) \code{xlim} is a vector of x axis limits. By default, \code{xlim = c(0, 1000)} to improve resolution in the area of the plot that is of interest (under a Universal Transverse Mercator CRS, for most realistic detection probability functions, detection probability beyond 1000 will be negligible) and plotting speed. Additional arguments can be passed to \code{\link[prettyGraphics]{pretty_plot}} to customise the plot via \code{...}.}
+\item{jitter, add_prob, xlim, ...}{Plot customisation options. \code{jitter} is a function that jitters \code{n} simulated outcomes (0, 1) in the vertical direction. \code{add_prob} is a named list of arguments, passed to \code{\link[graphics]{points}}, used to customise the addition of calculated probabilities to the plot. (\code{add_prob = NULL} suppresses the addition of probabilities to the plot.) \code{xlim} is a vector of x axis limits. By default, \code{xlim = c(0, 1000)} to improve resolution in the area of the plot that is of interest (under a Universal Transverse Mercator CRS, for most realistic detection probability functions, detection probability beyond 1000 will be negligible) and plotting speed. Additional arguments can be passed to \code{\link[prettyGraphics]{pretty_plot}} to customise the plot via \code{...}.}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console to relay function progress.}
 }
@@ -42,7 +42,7 @@ sim_detections(
 If \code{delta_t = NULL}, then function returns a named list with three matrices that define, for each path position (rows) and each receiver (columns), (a) the distance of that position from each receiver ('dist_mat'), (b) the probability of detection at that receiver ('prob_mat') and (c) the simulated outcome (0, no detection; 1, detection) ('det_mat'). If \code{delta_t} is specified, then the function returns a list with a 'raw' and an 'agg' element. The raw elements contains the matrices described above; the 'agg' element contains the aggregated versions of these matrices, with detections summed over each \code{delta_t} interval and distances and probabilities averaged (using the arithmetic mean) over each interval. If \code{plot = TRUE}, the function also returns a plot of the (raw) detections (0, 1) and, if specified, the corresponding probabilities.
 }
 \description{
-This function simulates detections at passive acoustic telemetry receivers under a detection model that depends on distance. To implement the function, the underlying movement path that gives rise to detections (or not) must be supplied (via \code{path}) along with the locations of receivers (\code{xy}) at which individuals can be detected. At each point along the movement path (i.e., time step), the function calculates the distances from that point to all of the receivers and evaluates a user-supplied detection probability function, based on distance, to determine detection probability at each receiver. The function then simulates binary detection outcomes from a binomial distribution conditional on this probability, and returns these in a matrix with one simulated outcome for each time step and receiver.
+This function simulates detections at passive acoustic telemetry receivers under a detection model that depends on distance. To implement the function, the underlying movement path that gives rise to detections (or not) must be supplied (via \code{path}) along with the locations of receivers (\code{xy}) at which detections can be made. At each point along the movement path (i.e., time step), the function calculates the distances from that point to all of the receivers and evaluates a user-supplied detection probability function, based on distance, to determine detection probability at each receiver. The function then simulates binary detection outcomes from a binomial distribution conditional on this probability, and returns these in a matrix with one simulated outcome for each time step and receiver.
 }
 \details{
 The function assumes that the individual transmits an acoustic signal which has the capacity to be detected at each time step. In reality, acoustic transmitters are often programmed with a randomly varying delay, but this is not currently implemented. The function also assumes that all receivers that are supplied are able to make detections. If the receivers at which an individual could be detected change over time, it may be necessary to apply the function iteratively or post-process the outcomes to ensure that individuals are not detected at inactive receivers.
@@ -69,8 +69,8 @@ prettyGraphics::add_sp_path(path_ls$xy_mat, col = viridis::viridis(n), length = 
 #### Step (3) Simulate detections
 ## (A) Extract path and receiver coordinates from simulated outcomes above
 path <- path_ls$xy_mat
-xy  <- array_ls$array$xy
-xy <- sp::coordinates(xy)
+xy   <- array_ls$array$xy
+xy   <- sp::coordinates(xy)
 ## (B) Simulate detections under different probability functions (see below).
 
 #### Example (1) Threshold probability function
@@ -121,7 +121,7 @@ beta <- raster::extract(beta_surface, xy_sp)
 # Visualise simulated detection probability surface at some suitable distances
 pp <- graphics::par(mfrow = c(2, 2))
 lapply(c(0, 50, 100, 500), function(dist){
-  r <- raster::calc(beta_surface, function(x) stats::plogis(2.5 + x * dist))
+  r <- raster::calc(beta_surface, function(beta) stats::plogis(2.5 + beta * dist))
   raster::plot(r)
 })
 graphics::par(pp)

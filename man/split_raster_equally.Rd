@@ -32,5 +32,5 @@ graphics::par(pp)
 
 }
 \references{
-Forkel M, Wutzler T (2015) greenbrown - land surface phenology and trend analysis. A package for the R software. Version 2.2, 2015-04-15, http://greenbrown.r-forge.r-project.org/.
+Forkel M, Wutzler T (2015) greenbrown -- land surface phenology and trend analysis. A package for the R software. Version 2.2, 2015-04-15, http://greenbrown.r-forge.r-project.org/.
 }

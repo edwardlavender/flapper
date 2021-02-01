@@ -14,7 +14,7 @@ make_df_detections(
 \arguments{
 \item{acoustics}{A detection matrix (time stamps x receivers) in which the cells define whether (1) or not (0) a detection was made at each time stamp/receiver combination. 'Meaningful' time stamps and receiver IDs can be taken from the row and column names of this matrix, if specified (see \code{set_names}).}
 
-\item{only_keep_detections}{A logical variable that defines whether or not to retain only observations that correspond to detections. (If \code{only_keep_detections = FALSE} the returned dataframe includes time stamps without detections.)}
+\item{only_keep_detections}{A logical variable that defines whether or not to retain only observations that correspond to detections. (If \code{only_keep_detections = FALSE}, the returned dataframe includes time stamps without detections.)}
 
 \item{set_names}{A logical variable that defines whether or not to take the row and column names of \code{acoustics} as the time stamps and receiver IDs. (If \code{set_names = FALSE}, time stamps and receiver IDs are simply given as integer vectors of 1 to the number of rows or columns respectively.)}
 

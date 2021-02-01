@@ -137,7 +137,7 @@ invert_poly <- function(x, boundaries = raster::extent(x),...){
 #' @param na.rm A logical variable that defines whether or not to ignore NAs.
 #' @param ... Additional arguments (none implemented).
 #'
-#' @return The function returns a RasterLayer (if \code{cells = FALSE}) or an integer vector of numbers (if \code{cells = TRUE}) that defines that cells that are equal to, or lie within, specified value(s) \code{y}.
+#' @return The function returns a RasterLayer (if \code{cells = FALSE}) or an integer vector of numbers (if \code{cells = TRUE}) that defines the cells that are equal to, or lie within, specified value(s) \code{y}.
 #'
 #' @examples
 #' # Define an example RasterLayer
@@ -258,7 +258,7 @@ mask_io <- function(x, mask, mask_inside = FALSE,...){
 #' graphics::par(pp)
 #'
 #' @source The function taken and slightly modified from the 'greenbrown' package (see https://rdrr.io/rforge/greenbrown/src/R/SplitRasterEqually.R). The function is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
-#' @references Forkel M, Wutzler T (2015) greenbrown - land surface phenology and trend analysis. A package for the R software. Version 2.2, 2015-04-15, http://greenbrown.r-forge.r-project.org/.
+#' @references Forkel M, Wutzler T (2015) greenbrown -- land surface phenology and trend analysis. A package for the R software. Version 2.2, 2015-04-15, http://greenbrown.r-forge.r-project.org/.
 #' @export
 
 split_raster_equally <- function(r, n) {
@@ -304,7 +304,7 @@ split_raster_equally <- function(r, n) {
 #' @description This function is designed to populate a raster with simulated values. To implement the function, a (blank) raster should be supplied. A user-defined function, or list of functions, is evaluated across this raster, or across sub-regions of this raster, to generate a new raster with simulated values.
 #'
 #' @param blank A \code{\link[raster]{raster}}.
-#' @param n An integer that defines the number of (approximately equal area) into which to split \code{blank}.
+#' @param n An integer that defines the number of (approximately equal area) pieces into which to split \code{blank}.
 #' @param sim_values A function or, if \code{n > 1L}, a list of functions, that, for a given number of cells, simulate new values for those cells.
 #' @param mask,mask_inside Arguments required to implement a spatial mask via \code{\link[flapper]{mask_io}}.
 #' @param plot An integer that defines whether or not to plot a histogram of simulated values (\code{1L}), a heat map of the simulated raster (\code{2L}) or both (\code{1:2L}).

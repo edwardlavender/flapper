@@ -55,7 +55,7 @@ The function returns a named list of arguments that defines the simulated path (
 This function simulates movement paths from step lengths and turning angles. To implement the function, the number of time steps (\code{n}) needs to be specified and, if applicable, the area within which movement should occur. For example, in marine environments, the inclusion of the sea as a spatial layer would restrict movement within the sea*. The starting location (\code{p_1}) can be provided or simulated. At each time step, user-defined functions are used to simulate step lengths and turning angles, which can depend previous values of those variables via a \code{lag} parameter, from which the next position is calculated. This implementation enables movement paths to be simulated under a variety of movement models, including random walks and correlated random walks, providing that they are conceptualised in terms of step lengths and turning angles. The function returns a list of outputs that includes the simulated path and, if requested, produces a plot of the simulated path.
 }
 \details{
-*Strictly speaking, only sequential positions are restricted to be within the allowed area. Yet since steps in the current implementation of the function are linear, the simulation of relatively large step lengths in an area with complex barriers to movement (e.g., convoluted coastlines), may lead to movement over inappropriate areas (e.g., over a peninsula) even through sequential positions are within the allowed area (e.g., either side of a peninsula). This problem can be mitigated by simulating time series for which sequential observations are closer in time (and thus for which step lengths are more constrained). For longer time series for which short time steps are undesirable, least-cost paths may be implemented to ensure biologically meaningful movements in future (but this is more computationally demanding for rapid simulations).
+*Strictly speaking, only sequential positions are restricted to be within the allowed area. Yet since steps in the current implementation of the function are linear, the simulation of relatively large step lengths in an area with complex barriers to movement (e.g., convoluted coastlines), may lead to movement over inappropriate areas (e.g., over a peninsula) even through sequential positions are within the allowed area (e.g., either side of a peninsula). This problem can be mitigated by simulating time series for which sequential observations are closer in time (and thus for which step lengths are more constrained). For longer time series for which short time steps are undesirable, least-cost paths (e.g., see \code{\link[flapper]{lcp_over_surface}}) may be implemented to ensure biologically meaningful movements in future (but this is more computationally demanding for rapid simulations).
 
 This function requires the \code{\link[circular]{circular}} package.
 }
@@ -115,7 +115,7 @@ path <- sim_path_sa(n = 100, sim_angle = sim_angles_rwn)
 # Define a sim_angle function that depends on some previous angle
 # While the time step is less than the lag, the function needs to be
 # ... able to handle missing angles and return sensible values in these
-# ... cases e.g., via is.null structure:
+# ... cases e.g., via an 'is.null' structure:
 sim_angles_wrn_with_lag <- function(angle = NULL,...){
   if(is.null(angle)) {
     cat("\n... ... method (1) activated...\n") # useful check

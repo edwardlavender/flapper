@@ -3,6 +3,9 @@
 \name{check_dir}
 \alias{check_dir}
 \title{Check a directory exists}
+\source{
+This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
+}
 \usage{
 check_dir(arg = deparse(substitute(input)), input, check_slash = FALSE)
 }
@@ -11,7 +14,7 @@ check_dir(arg = deparse(substitute(input)), input, check_slash = FALSE)
 
 \item{input}{A character string which defines a directory.}
 
-\item{check_slash}{A logical input that defines whether or not to check the end of a string for '/'. If \code{TRUE} and a '/' is lacking, this is added to the returned directory.}
+\item{check_slash}{A logical input that defines whether or not to check the end of the directory string for '/'. If \code{TRUE} and a '/' is lacking, this is added to the returned directory.}
 }
 \value{
 The function checks whether or not a directory exists. If so, the function returns either the directory as inputted, or the directory with a '/' added to the end. If not, the function returns an informative error message.

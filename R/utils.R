@@ -19,14 +19,15 @@ NULL
 ######################################
 #### check...()
 
-#' @title Check that arguments supplied via ... are allowed
-#' @description This function checks that arguments supplied via ... are allowed. This function was written to support other functions, specifically via the return of a helpful error message if arguments that cannot be supplied via ... have been supplied. The function is not intended for general use.
+#' @title Check that arguments supplied via \code{...} are allowed
+#' @description This function checks that arguments supplied via \code{...} are allowed. This function was written to support other functions, specifically via the return of a helpful error message if arguments that cannot be supplied via \code{...} have been supplied. The function is not intended for general use.
 #'
 #' @param not_allowed A character vector of the names of function arguments that are not allowed.
-#' @param ... Other arguments
+#' @param ... Arguments passed via \code{...} to a parent function.
 #'
-#' @return The function checks other arguments supplied via ...; if these contain an argument that is not allowed, the function returns an error. Otherwise, nothing is returned.
+#' @return The function checks arguments supplied via \code{...}; if these contain an argument that is not allowed, the function returns an error. Otherwise, nothing is returned.
 #'
+#' @source This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
 #' @author Edward Lavender
 #' @keywords internal
 #'
@@ -57,6 +58,7 @@ check... <- function(not_allowed,...){
 #'
 #' @return The function returns \code{input}, an error or a warning and \code{default} depending on whether or not \code{input} is within \code{supp} (i.e., whether or not the input to the argument of a parent function is supported).
 #'
+#' @source This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
 #' @author Edward Lavender
 #' @keywords internal
 #'
@@ -84,16 +86,17 @@ check_value <- function(arg = deparse(substitute(input)), input, supp, warn = TR
 ###################################
 #### check_class()
 
-#' @title Check the class of an function input to a parent function
+#' @title Check the class of a function input to a parent function
 #' @description This function checks that the class of an input to a parent function is appropriate. If not, the function either produces a helpful error message or returns a warning.
 #' @param arg A character string which defines the argument of the parent function.
 #' @param input The input to an argument of a parent function.
-#' @param if_class (optional) A character vector of classes of object. If supplied, the function will only proceed to check the class of the object if the \code{class(input)} is one of \code{if_class}. This is useful if \code{check_class()} is implemented in a loop.
+#' @param if_class (optional) A character vector of object class(es). If supplied, the function will only proceed to check the class of the object if the \code{class(input)} is one of \code{if_class}. This is useful if \code{check_class()} is implemented in a loop.
 #' @param to_class The required class of the input.
 #' @param type A character which specifies whether to return an error (\code{"stop"}) or a warning ("warning").
 #' @param coerce_input A function used to coerce \code{input} to the correct object type, if \code{type = "warning"}.
-#' @return The function checks the class of the input. If the class is not the same as required by the parent function (i.e., as specified by \code{class}), the function returns a helpful error message, or a warning and an object whose class has been coerced to the correct class.
+#' @return The function checks the class of the input. If the class is not the same as required by the parent function (i.e., as specified by \code{to_class}), the function returns a helpful error message, or a warning and an object whose class has been coerced to the correct class.
 #'
+#' @source This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
 #' @author Edward Lavender
 #' @keywords internal
 #'
@@ -146,6 +149,7 @@ check_class <-
 #' @param type A function which defines the failure criteria. For example, if \code{type = all}, the function will return an error unless all the names in \code{req} are contained within \code{input}. This is the default. If \code{type = any}, the function will return an error only if none of the names in \code{req} are contained within \code{input}.
 #' @return If the input fails the check, the function returns a helpful error message. Otherwise, nothing is returned.
 #'
+#' @source This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
 #' @author Edward Lavender
 #' @keywords internal
 #'
@@ -166,12 +170,13 @@ check_names <- function(arg = deparse(substitute(input)), input, req, extract_na
 ######################################
 #### check_tz()
 
-#' @title Check the timezone of an object and force UTC if absent
+#' @title Check the time zone of an object and force UTC if absent
 #' @description This function checks the time zone of an inputted  object. If the object is of class Date or POSIXct and a time zone is absent, then "UTC" is forced. Otherwise, the object is returned unchanged.
 #' @param arg (optional) A character string which defines the argument of the parent function.
 #' @param input An object.
 #' @return An object as inputted in which, if the object is of class Date or POSIXct and a time zone is absent, time zone "UTC" is forced.
 #'
+#' @source This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
 #' @author Edward Lavender
 #' @keywords internal
 
@@ -198,7 +203,8 @@ check_tz <-
 #' @param input A list.
 #' @param ignore_empty A logical input which defines whether or not to ignore empty lists.
 #' @return The function returns a helpful error message for unnamed lists (ignoring empty lists if requested) or the inputted list unchanged.
-
+#'
+#' @source This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
 #' @author Edward Lavender
 #' @keywords internal
 
@@ -223,9 +229,10 @@ check_named_list <- function(arg = deparse(substitute(input)), input, ignore_emp
 #' @description This function checks whether a directory exists and, if not, returns an informative error message. The inputted directory can be edited with the addition of a '/' if requested.
 #' @param arg (optional) A character string which defines the argument of a parent function.
 #' @param input A character string which defines a directory.
-#' @param check_slash A logical input that defines whether or not to check the end of a string for '/'. If \code{TRUE} and a '/' is lacking, this is added to the returned directory.
+#' @param check_slash A logical input that defines whether or not to check the end of the directory string for '/'. If \code{TRUE} and a '/' is lacking, this is added to the returned directory.
 #' @return The function checks whether or not a directory exists. If so, the function returns either the directory as inputted, or the directory with a '/' added to the end. If not, the function returns an informative error message.
 #'
+#' @source This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
 #' @author Edward Lavender
 #' @keywords internal
 #'

@@ -15,7 +15,7 @@ make_matrix_receivers(
 )
 }
 \arguments{
-\item{moorings}{A dataframe that defines receiver IDs and deployment times. This must contain the following columns: an identifier for receivers (named 'receiver_id'), the start time of receiver' deployment periods ('receiver_start_date') and the end time of receivers' deployment periods ('receiver_end_date'). Deployment times can be recorded as Date or POSIXct objects but, if the former is provided, they need to be coerced to POSIXct objects. This can be done automatically (see \code{as_POSIXct}).}
+\item{moorings}{A dataframe that defines receiver IDs and deployment times. This must contain the following columns: an identifier for receivers (named 'receiver_id'), the start time of receiver' deployment periods ('receiver_start_date') and the end time of receivers' deployment periods ('receiver_end_date') (see \code{\link[flapper]{dat_moorings}} for an example). Deployment times can be recorded as Date or POSIXct objects but, if the former is provided, they need to be coerced to POSIXct objects. This can be done automatically (see \code{as_POSIXct}).}
 
 \item{start, end}{Date or POSIXct objects that define the start and end time. If unspecified, these are taken from the range of deployment times in \code{moorings}.}
 

@@ -2,20 +2,23 @@
 % Please edit documentation in R/utils.R
 \name{check...}
 \alias{check...}
-\title{Check that arguments supplied via ... are allowed}
+\title{Check that arguments supplied via \code{...} are allowed}
+\source{
+This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
+}
 \usage{
 check...(not_allowed, ...)
 }
 \arguments{
 \item{not_allowed}{A character vector of the names of function arguments that are not allowed.}
 
-\item{...}{Other arguments}
+\item{...}{Arguments passed via \code{...} to a parent function.}
 }
 \value{
-The function checks other arguments supplied via ...; if these contain an argument that is not allowed, the function returns an error. Otherwise, nothing is returned.
+The function checks arguments supplied via \code{...}; if these contain an argument that is not allowed, the function returns an error. Otherwise, nothing is returned.
 }
 \description{
-This function checks that arguments supplied via ... are allowed. This function was written to support other functions, specifically via the return of a helpful error message if arguments that cannot be supplied via ... have been supplied. The function is not intended for general use.
+This function checks that arguments supplied via \code{...} are allowed. This function was written to support other functions, specifically via the return of a helpful error message if arguments that cannot be supplied via \code{...} have been supplied. The function is not intended for general use.
 }
 \author{
 Edward Lavender

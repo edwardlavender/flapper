@@ -17,7 +17,7 @@ sim_surface(
 \arguments{
 \item{blank}{A \code{\link[raster]{raster}}.}
 
-\item{n}{An integer that defines the number of (approximately equal area) into which to split \code{blank}.}
+\item{n}{An integer that defines the number of (approximately equal area) pieces into which to split \code{blank}.}
 
 \item{sim_values}{A function or, if \code{n > 1L}, a list of functions, that, for a given number of cells, simulate new values for those cells.}
 

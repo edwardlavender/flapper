@@ -3,6 +3,9 @@
 \name{check_named_list}
 \alias{check_named_list}
 \title{Check that a list is named}
+\source{
+This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
+}
 \usage{
 check_named_list(arg = deparse(substitute(input)), input, ignore_empty = TRUE)
 }
