@@ -173,9 +173,13 @@ contact Marine Scotland Science and NatureScot for further information.
 
 ## Data processing tools
 
-A number of functions facilitate the assembly, processing and checking
-of passive acoustic telemetry time series:
+A number of functions facilitate the acquisition, assembly, processing
+and checking of passive acoustic telemetry time series:
 
+  - **Data acquisition.**
+      - `query_*()` functions query online databases:
+          - `query_open_topo()` queries the Topo Data Application
+            Programming Interface for elevation/bathymetry data;
   - **Data assembly.**
       - `assemble_sentinel_counts()` assembles counts of
         transmissions/detections from sentinel tags for modelling

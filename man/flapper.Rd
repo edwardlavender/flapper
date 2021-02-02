@@ -9,8 +9,12 @@ flapper is an R package designed to facilitate the use of passive acoustic telem
 }
 \section{Data processing}{
 
-Some functions facilitate the assembly, processing and checking of passive acoustic telemetry time series:
+Some functions facilitate the acquisition, assembly, processing and checking of passive acoustic telemetry time series:
 \itemize{
+  \item Data acquisition
+  \itemize{
+     \item \link{query_open_topo} queries the Topo Data Application Programming Interface for elevation/bathymetry data;
+     }
   \item Data assembly
    \itemize{
      \item \link{assemble_sentinel_counts} assembles counts of transmissions/detections from sentinel tags for modelling purposes (i.e., to model detection probability);

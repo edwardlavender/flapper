@@ -15,6 +15,7 @@ Suggests:
     glatos,
     animation, scales, viridis,
     circular, 
+    httr, jsonlite,
     rmarkdown, knitr
 Remotes: 
     github::edwardlavender/prettyGraphics, 

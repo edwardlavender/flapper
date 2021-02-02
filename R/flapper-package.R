@@ -4,8 +4,12 @@
 #' @description flapper is an R package designed to facilitate the use of passive acoustic telemetry (PAT) data for ecological inferences, especially those pertaining to animal space use. This includes functions for processing PAT data, spatial tools, new algorithms for inferring space use and simulations designed to evaluate the efficacy of existing and new algorithms for inferring space use. Package development has been motivated by the collection of PAT data for a Critically Endangered benthopelagic elasmobranch (the flapper skate, \emph{Dipturus intermedius}) off the west coast of Scotland.
 #'
 #' @section Data processing:
-#' Some functions facilitate the assembly, processing and checking of passive acoustic telemetry time series:
+#' Some functions facilitate the acquisition, assembly, processing and checking of passive acoustic telemetry time series:
 #' \itemize{
+#'   \item Data acquisition
+#'   \itemize{
+#'      \item \link{query_open_topo} queries the Topo Data Application Programming Interface for elevation/bathymetry data;
+#'      }
 #'   \item Data assembly
 #'    \itemize{
 #'      \item \link{assemble_sentinel_counts} assembles counts of transmissions/detections from sentinel tags for modelling purposes (i.e., to model detection probability);
