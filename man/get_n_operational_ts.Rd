@@ -20,7 +20,7 @@ get_n_operational_ts(data, start, stop, times = NULL, plot = TRUE, ...)
 \item{...}{Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}}, to customise the plot.}
 }
 \value{
-The function returns a dataframe that, for each time step ('time'), defines the number of operational units at that time ('n'). If \code{plot = TRUE}, the function also plots a time series of the number of operational units.
+The function returns a dataframe that, for each time step (`time'), defines the number of operational units at that time (`n'). If \code{plot = TRUE}, the function also plots a time series of the number of operational units.
 }
 \description{
 This function calculates the number of operational units through time (e.g., the number of individuals at liberty or the number of active acoustic receivers over the course of a study). To implement the function, a dataframe (\code{data}) must be supplied that defines the start and end time of each unit's operational period. Then, for each time step in a user-specified sequence of times, or an automatically generated sequence of times from the earliest start time to the latest end time in \code{data}, the function counts the number of units that were operational on each time step and returns a dataframe (and, if specified, a plot) with this information.

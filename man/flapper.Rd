@@ -38,8 +38,8 @@ Some functions facilitate spatial operations that support ecological investigati
 \itemize{
   \item \link{buffer_and_crop} buffers a spatial object (e.g., receiver locations) and uses this buffered object to crop another (e.g., the local bathymetry);
   \item \link{cells_from_val} returns the cells (or a raster of the cells) of a raster that are equal to a specified value or lie within a specified range of values;
-  \item \link{invert_poly} inverts a polygon (e.g, to define the ‘sea’ from a polygon of the ‘land’);
-  \item \link{mask_io} masks values in a raster that lie inside or outside of a spatial mask (e.g., to mask the ‘land’ from the ‘sea’);
+  \item \link{invert_poly} inverts a polygon (e.g, to define the `sea' from a polygon of the `land');
+  \item \link{mask_io} masks values in a raster that lie inside or outside of a spatial mask (e.g., to mask the `land' from the `sea');
   \item \link{sim_surface} populates a raster with simulated values;
   \item \link{split_raster_equally} splits a raster into equal pieces (using code from the greenbrown (http://greenbrown.r-forge.r-project.org) package);
   \item \link{update_extent} shrinks or inflates an extent object;
@@ -89,7 +89,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
   }
   \item The acoustic-centroid depth-contour (ACDC) algorithm
   \itemize{
-    \item \link{acdc_setup_mobility} examines the assumption of a constant 'mobility' parameter;
+    \item \link{acdc_setup_mobility} examines the assumption of a constant `mobility' parameter;
     \item \link{acdc_setup_n_centroids} suggests the number of acoustic centroids for the algorithm;
     \item \link{acdc_setup_centroids} defines the acoustic centroids for the algorithm;
     \item \link{acdc} implements the algorithm, via the back-end function \link{.acdc};

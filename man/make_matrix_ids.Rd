@@ -15,11 +15,11 @@ make_matrix_ids(
 )
 }
 \arguments{
-\item{ids}{A dataframe that defines individual IDs and deployment times. This must contain the following columns: an identifier for individuals (named 'individual_id'), the start time of individuals' deployment periods ('tag_start_date') and the end time of individuals' deployment periods ('tag_end_date'). Deployment times can be recorded as Date or POSIXct objects but, if the former is provided, they need to be coerced to POSIXct objects. This can be done automatically (see \code{as_POSIXct}).}
+\item{ids}{A dataframe that defines individual IDs and deployment times. This must contain the following columns: an identifier for individuals (named `individual_id'), the start time of individuals' deployment periods (`tag_start_date') and the end time of individuals' deployment periods (`tag_end_date'). Deployment times can be recorded as Date or POSIXct objects but, if the former is provided, they need to be coerced to POSIXct objects. This can be done automatically (see \code{as_POSIXct}).}
 
 \item{start, end}{Date or POSIXct objects that define the start and end time. If unspecified, these are taken from the range of deployment times in \code{ids}.}
 
-\item{delta_t}{A number or character that defines the time interval between successive time steps. This is passed to the 'by' argument of \code{\link[base]{seq.POSIXt}}.}
+\item{delta_t}{A number or character that defines the time interval between successive time steps. This is passed to the `by' argument of \code{\link[base]{seq.POSIXt}}.}
 
 \item{as_POSIXct}{A function that coerces any supplied times (\code{ids$tag_start_date}, \code{ids$tag_end_date}, \code{start} and \code{end}) that are not POSIXct objects to POSIXct objects.}
 

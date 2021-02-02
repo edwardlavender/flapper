@@ -7,17 +7,17 @@
 process_quality_check(acoustics, moorings, ids)
 }
 \arguments{
-\item{acoustics}{A dataframe which comprises passive acoustic telemetry detection time series. This must contain the following named columns: 'timestamp', a POSIXct vector which defines the time of each detection; 'receiver_id', a unique identifier of each receiver; and 'individual_id', a unique identifier of each individual (see \code{\link[flapper]{dat_acoustics}} for an example).}
+\item{acoustics}{A dataframe which comprises passive acoustic telemetry detection time series. This must contain the following named columns: `timestamp', a POSIXct vector which defines the time of each detection; `receiver_id', a unique identifier of each receiver; and `individual_id', a unique identifier of each individual (see \code{\link[flapper]{dat_acoustics}} for an example).}
 
-\item{moorings}{A dataframe which contains passive acoustic telemetry receiver metadata. This must contain the following named columns: 'receiver_id', a unique identifier for each receiver deployment; 'receiver_start_date', a POSIXct vector which defines the time of each receiver's deployment; and 'receiver_end_date', a POSIXct vector which defines the end of each receiver's deployment (see \code{\link[flapper]{dat_moorings}} for an example). If objects of class Date are provided for 'receiver_start_date' and 'receiver_end_date', these are coerced to POSIXct objects with a warning.}
+\item{moorings}{A dataframe which contains passive acoustic telemetry receiver metadata. This must contain the following named columns: `receiver_id', a unique identifier for each receiver deployment; `receiver_start_date', a POSIXct vector which defines the time of each receiver's deployment; and `receiver_end_date', a POSIXct vector which defines the end of each receiver's deployment (see \code{\link[flapper]{dat_moorings}} for an example). If objects of class Date are provided for `receiver_start_date' and `receiver_end_date', these are coerced to POSIXct objects with a warning.}
 
-\item{ids}{A dataframe which contains the passive acoustic telemetry individual metadata. This must contain the following named columns: 'individual_id', a unique identifier for each individual; 'tag_start_date', a POSIXct vector which defines the time of each tag's deployment; and 'tag_end_date', a POSIXct vector which defines the end of each tag's deployment (see \code{\link[flapper]{dat_ids}} for an example). If objects of class Date are provided for 'tag_start_date' and 'tag_end_date', these are coerced to POSIXct objects with a warning.}
+\item{ids}{A dataframe which contains the passive acoustic telemetry individual metadata. This must contain the following named columns: `individual_id', a unique identifier for each individual; `tag_start_date', a POSIXct vector which defines the time of each tag's deployment; and `tag_end_date', a POSIXct vector which defines the end of each tag's deployment (see \code{\link[flapper]{dat_ids}} for an example). If objects of class Date are provided for `tag_start_date' and `tag_end_date', these are coerced to POSIXct objects with a warning.}
 }
 \value{
 For each check, the function returns a message or a warning with relevant details.
 }
 \description{
-This function passes through passive acoustic telemetry datasets through some basic quality checks (see Details). Following data processing, these provide a useful 'final check' prior to analysis.
+This function passes through passive acoustic telemetry datasets through some basic quality checks (see Details). Following data processing, these provide a useful `final check' prior to analysis.
 }
 \details{
 The function implements the following checks:
@@ -29,7 +29,7 @@ The function implements the following checks:
 \item False detections. False detections should be flagged.
 }
 
-\code{\link[flapper]{process_quality_check}} is mainly designed to be implemented after data-processing has already taken place as a basic 'final check' for common issues in passive acoustic telemetry datasets. For each check, the function returns a message or warning depending on the outcome; subsequently, the most appropriate course of action (e.g., retention versus removal of flagged observations in \code{acoustics} will depend on the context). Other important checks -- such as checking for receivers which were lost and later recovered, excluding observations during receiver servicing dates, excluding observations during tag capture events and further investigation of false detections -- may be required.
+\code{\link[flapper]{process_quality_check}} is mainly designed to be implemented after data-processing has already taken place as a basic `final check' for common issues in passive acoustic telemetry datasets. For each check, the function returns a message or warning depending on the outcome; subsequently, the most appropriate course of action (e.g., retention versus removal of flagged observations in \code{acoustics} will depend on the context). Other important checks -- such as checking for receivers which were lost and later recovered, excluding observations during receiver servicing dates, excluding observations during tag capture events and further investigation of false detections -- may be required.
 }
 \examples{
 #### Prepare data

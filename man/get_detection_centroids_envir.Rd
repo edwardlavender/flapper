@@ -24,9 +24,9 @@ get_detection_centroids_envir(
 
 \item{envir}{A \code{\link[raster]{raster}} that defines the values of an environmental variable across the study area. The coordinate reference system should be the Universal Transverse Mercator system.}
 
-\item{sample_size}{(optional) An integer that defines the number of samples of the environmental variable to draw from the area around each receiver (see the 'size' argument of \code{\link[base]{sample}}). If this is provided, \code{sample_size} samples are taken from this area; otherwise, all values are extracted.}
+\item{sample_size}{(optional) An integer that defines the number of samples of the environmental variable to draw from the area around each receiver (see the `size' argument of \code{\link[base]{sample}}). If this is provided, \code{sample_size} samples are taken from this area; otherwise, all values are extracted.}
 
-\item{sample_replace}{(optional) If \code{sample_size} is specified, \code{sample_replace} is a logical input that defines whether to implement sampling with (\code{sample_replace = TRUE}, the default) or without (\code{sample_replace = FALSE}) replacement (see the 'replace' argument of \code{\link[base]{sample}}).}
+\item{sample_replace}{(optional) If \code{sample_size} is specified, \code{sample_replace} is a logical input that defines whether to implement sampling with (\code{sample_replace = TRUE}, the default) or without (\code{sample_replace = FALSE}) replacement (see the `replace' argument of \code{\link[base]{sample}}).}
 
 \item{sample_probs}{(optional) If \code{sample_size} is specified, \code{sample_probs} is a function that calculates the detection probability given the distance (m) between a cell and a receiver.}
 
@@ -37,7 +37,7 @@ get_detection_centroids_envir(
 \item{verbose}{A logical variable that defines whether or not relay messages to the console to monitor function progress.}
 }
 \value{
-The function returns a list of dataframes (one for each element in \code{xy}; i.e., each receiver), each of which includes the cell IDs of \code{envir} from which values were extracted ('cell'), the value of the environmental variable in that cell ('envir') and, if applicable, the distance between that cell and the receiver ('dist', m) and the detection probability in that cell ('prob').
+The function returns a list of dataframes (one for each element in \code{xy}; i.e., each receiver), each of which includes the cell IDs of \code{envir} from which values were extracted (`cell'), the value of the environmental variable in that cell (`envir') and, if applicable, the distance between that cell and the receiver (`dist', m) and the detection probability in that cell (`prob').
 }
 \description{
 This function is used to sample environmental conditions from within the detection centroids of receivers. To implement the function, a SpatialPoints object that defines receiver locations (\code{xy}) must be provided, along with the detection range (\code{detection_range}) of receivers. This information is used to define detection centroids, via \code{\link[flapper]{get_detection_centroids}}. Within each receiver's centroid, all values of an environmental variable, or a random sample of values, are extracted from a user-defined \code{\link[raster]{raster}} (\code{envir}). Under random sampling, values can be sampled according to a detection probability function (\code{sample_probs}). The function returns a list of dataframes, one for each receiver, that include the sampled values.

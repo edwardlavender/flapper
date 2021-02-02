@@ -15,9 +15,9 @@ get_id_rec_overlap(
 )
 }
 \arguments{
-\item{ids}{A dataframe that defines individual deployment periods. This must contain a column that defines individual IDs (named 'individual_id') and the time of tagging (named 'tag_start_date') and time of tag retrieval ('tag_end_date') (see \code{\link[flapper]{dat_ids}} for an example).}
+\item{ids}{A dataframe that defines individual deployment periods. This must contain a column that defines individual IDs (named `individual_id') and the time of tagging (named `tag_start_date') and time of tag retrieval (`tag_end_date') (see \code{\link[flapper]{dat_ids}} for an example).}
 
-\item{moorings}{A dataframe that defines receiver deployment periods. This must contain a column that defines receiver IDs (named 'receiver_id') and the time of receiver deployment (named 'receiver_start_date') and retrieval (named 'receiver_end_date') (see \code{\link[flapper]{dat_moorings}} for an example).}
+\item{moorings}{A dataframe that defines receiver deployment periods. This must contain a column that defines receiver IDs (named `receiver_id') and the time of receiver deployment (named `receiver_start_date') and retrieval (named `receiver_end_date') (see \code{\link[flapper]{dat_moorings}} for an example).}
 
 \item{individual_id}{(optional) A vector of individuals for which to calculate overlap duration.}
 
@@ -25,12 +25,12 @@ get_id_rec_overlap(
 
 \item{type}{If both \code{individual_id} and \code{receiver_id} are specified, then \code{type} is an integer that defines whether or not to calculate overlap duration for (a) each individual/receiver pair (\code{type = 1L}) or (b) all combinations of specified individuals/receivers (\code{type = 2L}).}
 
-\item{match_to}{(optional) A dataframe against which to match the calculated overlap duration(s). This must contain an 'individual_id' and 'receiver_id' column, as in \code{ids} and \code{moorings} respectively. If supplied, an integer vector of overlap durations for individual/receiver combinations, matched against the individuals/receivers in this dataframe, is returned (see also Value).}
+\item{match_to}{(optional) A dataframe against which to match the calculated overlap duration(s). This must contain an `individual_id' and `receiver_id' column, as in \code{ids} and \code{moorings} respectively. If supplied, an integer vector of overlap durations for individual/receiver combinations, matched against the individuals/receivers in this dataframe, is returned (see also Value).}
 
 \item{...}{Additional arguments (none implemented).}
 }
 \value{
-The function returns a dataframe with the deployment overlap duration for specific or all combinations of individuals and receivers, with the 'individual_id', 'receiver_id', 'tag_start_date', 'tag_end_date', 'receiver_start_date' and 'receiver_end_date' columns retained, plus 'tag_interval' and 'receiver_interval' columns that define individual and receiver deployment periods as \code{\link[lubridate]{Interval-class}} objects. The 'id_rec_overlap' column defines the temporal overlap (days). Alternatively, if \code{match_to} is supplied, a vector of overlap durations that matches each individual/receiver observation in that dataframe is returned.
+The function returns a dataframe with the deployment overlap duration for specific or all combinations of individuals and receivers, with the `individual_id', `receiver_id', `tag_start_date', `tag_end_date', `receiver_start_date' and `receiver_end_date' columns retained, plus `tag_interval' and `receiver_interval' columns that define individual and receiver deployment periods as \code{\link[lubridate]{Interval-class}} objects. The `id_rec_overlap' column defines the temporal overlap (days). Alternatively, if \code{match_to} is supplied, a vector of overlap durations that matches each individual/receiver observation in that dataframe is returned.
 }
 \description{
 This function calculates the duration of the overlap (in days) between individuals' time at liberty and receivers' operational periods. To implement this function, a dataframe with individual deployment periods and another with receiver deployment periods must be specified. The duration of the overlap between these intervals can be calculated for all combinations of individuals and receivers within these two dataframes, for all combinations of specified individuals and receivers, or for specific individual/receiver pairs. The function returns a dataframe of the overlap duration for these individual/receiver combinations or a vector of values that is matched against another dataframe.

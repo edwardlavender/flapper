@@ -88,7 +88,7 @@ buffer_and_crop <- function(to_buffer,
 #### invert_poly()
 
 #' @title Invert a (spatial) polygon
-#' @description This function inverts a (spatial) polygon so that the 'inside' of the original polygon becomes the 'outside' and vice-versa. The function was motivated by marine applications in which polygons that define the coastline 'contain' land and need to be inverted to define the sea.
+#' @description This function inverts a (spatial) polygon so that the `inside' of the original polygon becomes the `outside' and vice-versa. The function was motivated by marine applications in which polygons that define the coastline `contain' land and need to be inverted to define the sea.
 #'
 #' @param x An \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} object.
 #' @param boundaries A \code{\link[raster]{extent}} object that defines the boundaries of the area under consideration. By default, this is defined by the extent of \code{x}.
@@ -257,7 +257,7 @@ mask_io <- function(x, mask, mask_inside = FALSE,...){
 #' lapply(l, function(r) prettyGraphics::pretty_map(add_rasters = list(x = r)))
 #' graphics::par(pp)
 #'
-#' @source The function taken and slightly modified from the 'greenbrown' package (see https://rdrr.io/rforge/greenbrown/src/R/SplitRasterEqually.R). The function is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
+#' @source The function taken and slightly modified from the `greenbrown' package (see https://rdrr.io/rforge/greenbrown/src/R/SplitRasterEqually.R). The function is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
 #' @references Forkel M, Wutzler T (2015) greenbrown -- land surface phenology and trend analysis. A package for the R software. Version 2.2, 2015-04-15, http://greenbrown.r-forge.r-project.org/.
 #' @export
 

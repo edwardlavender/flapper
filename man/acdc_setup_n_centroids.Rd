@@ -16,7 +16,7 @@ acdc_setup_n_centroids(
 \arguments{
 \item{detections}{A POSIXct vector of time stamps when detections were made (for a particular individual).}
 
-\item{moorings}{A dataframe that defines passive acoustic telemetry receiver locations and deployment periods. This must contain the following columns: 'receiver_id', a unique identifier of each receiver; 'receiver_lat' and 'receiver_long', the latitude and longitude of each receiver in decimal degrees; and 'receiver_start_date' and 'receiver_end_date', the start and end time of each receiver's deployment period (see \code{\link[flapper]{dat_moorings}} for an example).}
+\item{moorings}{A dataframe that defines passive acoustic telemetry receiver locations and deployment periods. This must contain the following columns: `receiver_id', a unique identifier of each receiver; `receiver_lat' and `receiver_long', the latitude and longitude of each receiver in decimal degrees; and `receiver_start_date' and `receiver_end_date', the start and end time of each receiver's deployment period (see \code{\link[flapper]{dat_moorings}} for an example).}
 
 \item{mobility}{A number that defines the distance (m) that an individual could move in the time period between archival observations (see also \code{\link[flapper]{acdc_setup_centroids}}).}
 
@@ -27,7 +27,7 @@ acdc_setup_n_centroids(
 \item{...}{Additional arguments passed to \code{\link[prettyGraphics]{pretty_hist}}.}
 }
 \value{
-The function returns an integer vector with the upper and lower suggested value for the number of centroids from methods (1) and (2). The parameters used to generate these suggestions (i.e., \code{detections}, \code{moorings}, \code{mobility} and \code{double}) are also included in a 'param' attribute.
+The function returns an integer vector with the upper and lower suggested value for the number of centroids from methods (1) and (2). The parameters used to generate these suggestions (i.e., \code{detections}, \code{moorings}, \code{mobility} and \code{double}) are also included in a `param' attribute.
 }
 \description{
 The ACDC algorithm requires a list of acoustic centroids from \code{\link[flapper]{acdc_setup_centroids}}. The number of centroids that is required depends on (a) the duration between detections; (b) the distances among receivers; (c) the area of interest; and (d) other considerations such as the spatial extent and resolution of the bathymetry data that is required by the ACDC algorithm and presence or absence of a long tail of archival observations after the final acoustic detection. This function implements two approaches to facilitate a sensible choice of the number of centroids for the ACDC algorithm (see Details). This ensures that the number of centroids is sufficient to cover requirements but not so large that the centroids become slow to compute and unwieldy. The function requires a time series of detections, the deployment details of passive acoustic telemetry receivers and a mobility parameter. Given these inputs, the function returns a suggested upper and lower bound for the number of centroids.
@@ -49,7 +49,7 @@ utils::str(n_timesteps)
 
 }
 \seealso{
-This function is designed to facilitate an informed choice for the 'n_timesteps' argument in \code{\link[flapper]{acdc_setup_centroids}}. \code{\link[flapper]{acdc_setup_mobility}} can also guide the implementation of this function. This underpins the ACDC algorithm, which is implemented by \code{\link[flapper]{acdc}}.
+This function is designed to facilitate an informed choice for the `n_timesteps' argument in \code{\link[flapper]{acdc_setup_centroids}}. \code{\link[flapper]{acdc_setup_mobility}} can also guide the implementation of this function. This underpins the ACDC algorithm, which is implemented by \code{\link[flapper]{acdc}}.
 }
 \author{
 Edward Lavender

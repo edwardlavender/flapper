@@ -4,7 +4,7 @@
 \alias{split_raster_equally}
 \title{Split a raster into equal-area parts}
 \source{
-The function taken and slightly modified from the 'greenbrown' package (see https://rdrr.io/rforge/greenbrown/src/R/SplitRasterEqually.R). The function is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
+The function taken and slightly modified from the `greenbrown' package (see https://rdrr.io/rforge/greenbrown/src/R/SplitRasterEqually.R). The function is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
 }
 \usage{
 split_raster_equally(r, n)

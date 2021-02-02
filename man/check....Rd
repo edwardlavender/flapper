@@ -4,7 +4,7 @@
 \alias{check...}
 \title{Check that arguments supplied via \code{...} are allowed}
 \source{
-This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
+This function is taken from the `utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
 }
 \usage{
 check...(not_allowed, ...)

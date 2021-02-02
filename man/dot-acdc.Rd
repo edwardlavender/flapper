@@ -24,9 +24,9 @@
 )
 }
 \arguments{
-\item{acoustics}{A dataframe that contains passive acoustic telemetry detection time series for a specific individual (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named 'receiver_id' (that must match that inputted to the \code{rs} argument of \code{\link[flapper]{acdc_setup_centroids}}); a POSIXct vector of time stamps when detections were made, named 'timestamp'; and a numeric vector of those time stamps, named 'timestamp_num'.}
+\item{acoustics}{A dataframe that contains passive acoustic telemetry detection time series for a specific individual (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named `receiver_id' (that must match that inputted to the \code{rs} argument of \code{\link[flapper]{acdc_setup_centroids}}); a POSIXct vector of time stamps when detections were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'.}
 
-\item{archival}{A dataframe that contains depth time series for the same individual (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named 'depth'; a POSIXct vector of time stamps when observations were made, named 'timestamp'; and a numeric vector of those time stamps, named 'timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.}
+\item{archival}{A dataframe that contains depth time series for the same individual (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; a POSIXct vector of time stamps when observations were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.}
 
 \item{bathy}{A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).}
 
@@ -57,7 +57,7 @@
 \item{...}{Additional arguments (none implemented).}
 }
 \value{
-The function returns a \code{\link[flapper]{.acdc-class}} object with the following elements: ‘map’, ‘record’, ‘time’, ‘args’, 'chunks' and 'simplify'. The main output element is the ‘map’ RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The ‘record’ element records time-specific information on the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{plot}). The ‘time’ element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The ‘args’ element is a named list of user inputs that record the parameters used to generate the outputs (if \code{keep_args = TRUE}, otherwise the 'args' element is \code{NULL}).
+The function returns a \code{\link[flapper]{.acdc-class}} object with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific information on the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{plot}). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{keep_args = TRUE}, otherwise the `args' element is \code{NULL}).
 }
 \description{
 This function is the back-end of the ACDC algorithm.
@@ -133,7 +133,7 @@ out_acdc <- .acdc(acoustics = acc,
 
 }
 \seealso{
-\code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function, aided by \code{\link[flapper]{acdc_setup_centroids}}. \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant 'mobility' parameter. \code{\link[flapper]{acdc}} is the front-end of the algorithm. \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
+\code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function, aided by \code{\link[flapper]{acdc_setup_centroids}}. \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc}} is the front-end of the algorithm. \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
 }
 \author{
 Edward Lavender

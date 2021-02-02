@@ -10,7 +10,7 @@
 #'
 #' @details Open Topo Data is an elevation API. Further information, including on supported datasets, supported numbers of locations (which, at the time of writing, is limited to 100) and other details are provided here: https://www.opentopodata.org/. This function requires the \code{\link[httr]{httr}} and \code{\link[jsonlite]{jsonlite}} packages to query databases.
 #'
-#' @return The function returns elevation ('z') values from the specified database as a matrix, if code \code{x} is a matrix, or a \code{\link[raster]{raster}}, if code \code{x} is a \code{\link[raster]{raster}} or an \code{\link[raster]{Extent}} object. Coordinates/areas without data are returned as NAs.
+#' @return The function returns elevation (`z') values from the specified database as a matrix, if code \code{x} is a matrix, or a \code{\link[raster]{raster}}, if code \code{x} is a \code{\link[raster]{raster}} or an \code{\link[raster]{Extent}} object. Coordinates/areas without data are returned as NAs.
 #'
 #' @examples
 #' \dontrun{

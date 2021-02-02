@@ -25,7 +25,7 @@ get_detection_pr(
 \item{...}{Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}}, to customise the plot. These are only implemented if \code{output = 1L} or \code{output = 3L}.}
 }
 \value{
-The function calculates detection probability at each specified distance and returns a plot, a vector of detection probabilities, or both, depending on the value of the \code{output} argument. If a vector of detection probabilities is returned, this contains the following attributes: 'X', the model matrix; 'beta', the regression coefficients; and 'inv_link', the inverse link function.
+The function calculates detection probability at each specified distance and returns a plot, a vector of detection probabilities, or both, depending on the value of the \code{output} argument. If a vector of detection probabilities is returned, this contains the following attributes: `X', the model matrix; `beta', the regression coefficients; and `inv_link', the inverse link function.
 }
 \description{
 This function calculates detection probability (e.g., of an acoustic detection) at specified distances from the sampling device (e.g., a passive acoustic telemetry receiver) using user-defined parameters (i.e., a model intercept, a coefficient for the effect of distance and an inverse link function). The function returns a plot of detection probability with distance and/or a vector of detection probabilities.

@@ -17,7 +17,7 @@ get_detection_area_ts(
 )
 }
 \arguments{
-\item{xy, detection_range, coastline, scale}{Arguments required to calculate the total area surveyed by receivers (at each time point) via \code{\link[flapper]{get_detection_area_sum}}. For this function, \code{xy} should be a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that includes both receiver locations and corresponding deployment times (in columns named 'receiver_start_date' and 'receiver_end_date' respectively).}
+\item{xy, detection_range, coastline, scale}{Arguments required to calculate the total area surveyed by receivers (at each time point) via \code{\link[flapper]{get_detection_area_sum}}. For this function, \code{xy} should be a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that includes both receiver locations and corresponding deployment times (in columns named `receiver_start_date' and `receiver_end_date' respectively).}
 
 \item{plot}{A logical input that defines whether or not to plot a time series of the total area sampled by receivers.}
 
@@ -30,7 +30,7 @@ get_detection_area_ts(
 \item{...}{Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}}, to customise the plot produced.}
 }
 \value{
-The function returns a dataframe with, for each date ('date') from the time of the first receiver's deployment to the time of the last receiver's retrieval, the number of receivers operational on that date ('n') and the total area sampled ('receiver_area'). If \code{plot = TRUE}, the function also returns a plot of the area sampled by receivers through time.
+The function returns a dataframe with, for each date (`date') from the time of the first receiver's deployment to the time of the last receiver's retrieval, the number of receivers operational on that date (`n') and the total area sampled (`receiver_area'). If \code{plot = TRUE}, the function also returns a plot of the area sampled by receivers through time.
 }
 \description{
 This function extends \code{\link[flapper]{get_detection_area_sum}} to calculate how the total area sampled by receivers changes through time.

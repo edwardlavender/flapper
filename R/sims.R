@@ -7,7 +7,7 @@
 #'
 #' @param boundaries An \code{\link[raster]{extent}} object that defines the boundaries of the (simulated) study area.
 #' @param coastline (optional) This argument is used to incorporate the presence of barriers, such as coastline, in the area. There are three options. If \code{coastline = NULL}, no barriers are incorporated. If \code{coastline = "simple_random"}, then a triangular island is simulated in the study area. Alternatively, a spatial object, such as a SpatialPolygonsDataFrame, that defines the coastline in an area can be incorporated into the array design by passing this \code{coastline}.
-#' @param land_inside_coastline A logical variable that defines whether or not the land is 'inside' the polygon(s) defined by \code{coastline} (\code{land_inside_coastline = TRUE}) or the sea is 'inside' the polygon(s) (\code{land_inside_coastline = FALSE}).
+#' @param land_inside_coastline A logical variable that defines whether or not the land is `inside' the polygon(s) defined by \code{coastline} (\code{land_inside_coastline = TRUE}) or the sea is `inside' the polygon(s) (\code{land_inside_coastline = FALSE}).
 #' @param n_receivers An integer that defines the number of receivers in the array. This is ignored if receiver locations are specified via \code{arrangement}.
 #' @param arrangement,... A character string or a SpatialPoints object that defines the arrangement of receivers. Supported character string options for simulated arrays are \code{"regular"}, \code{"random"}, \code{"stratified"}, \code{"nonaligned"}, \code{"hexagonal"} and \code{"clustered"} (see \code{\link[sp]{spsample}}, which is used to simulate receiver locations). Additional arguments can be passed to this function via \code{...} for further control. Otherwise, a SpatialPoints object that defines the coordinates of receivers (in the same coordinate reference system as \code{boundaries} and, if applicable, \code{coastline}) is assumed to have been provided.
 #' @param seed An integer that is used to set the seed to enable reproducible simulations (see \code{\link[base]{set.seed}}).
@@ -18,7 +18,7 @@
 #'
 #' @details Note that this function does not currently support temporally varying array designs.
 #'
-#' @return The function returns a named list of (a) the spatial objects that define the simulated array ('array') and (b) the arguments used to generate this array ('args'). The 'array' element is a named list contains the following elements: 'boundaries', an \code{\link[raster]{Extent-class}} object that defines the boundaries of the area (as inputted); 'area', a \code{\link[sp]{SpatialPolygons-class}} object that defines the boundaries of the area; 'land' and 'sea', \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects that define the land and sea respectively; and 'xy', a \code{\link[sp]{SpatialPoints-class}} object that defines receiver locations. If \code{plot = TRUE}, the function also returns a plot of the array.
+#' @return The function returns a named list of (a) the spatial objects that define the simulated array (`array') and (b) the arguments used to generate this array (`args'). The `array' element is a named list contains the following elements: `boundaries', an \code{\link[raster]{Extent-class}} object that defines the boundaries of the area (as inputted); `area', a \code{\link[sp]{SpatialPolygons-class}} object that defines the boundaries of the area; `land' and `sea', \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects that define the land and sea respectively; and `xy', a \code{\link[sp]{SpatialPoints-class}} object that defines receiver locations. If \code{plot = TRUE}, the function also returns a plot of the array.
 #'
 #' @examples
 #' #### Example (1): Simulate an array using default parameters
@@ -250,7 +250,7 @@ NULL
 #'
 #' This function requires the \code{\link[circular]{circular}} package.
 #'
-#' @return The function returns a named list of arguments that defines the simulated path ('xy_mat', 'angle_mat', 'step_mat' and 'path') and a named list of arguments that were used to generate the path ('args'). 'xy_mat' is an n-row, two-column matrix that defines the simulated position (x, y) at each time step; 'angle_mat' and 'step_mat' are n-row, one-column matrices that define the simulated turning angle (degrees) and step length (in map units) at each time step; and 'path' is a \code{\link[sp]{SpatialLines}} representation of the movement path.
+#' @return The function returns a named list of arguments that defines the simulated path (`xy_mat', `angle_mat', `step_mat' and `path') and a named list of arguments that were used to generate the path (`args'). `xy_mat' is an n-row, two-column matrix that defines the simulated position (x, y) at each time step; `angle_mat' and `step_mat' are n-row, one-column matrices that define the simulated turning angle (degrees) and step length (in map units) at each time step; and `path' is a \code{\link[sp]{SpatialLines}} representation of the movement path.
 #'
 #' @seealso For movement simulations, see \code{\link[flapper]{sim_path_*}} for the full list of functions currently implemented in \code{\link[flapper]{flapper}}. For example, \code{\link[flapper]{sim_path_ou_1}} simulates a movement path based on past locations according to an Ornstein-Uhlenbeck process (which is not based on step lengths and turning angles). More broadly, \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_*}} and \code{\link[flapper]{sim_detections}} provide an integrated workflow for simulating acoustic arrays, movement paths in these areas and detections at receivers arising from movement.
 #'
@@ -511,8 +511,8 @@ sim_angles <- function(...) {
 #'
 #' @param n An integer that defines the number of time steps in the simulation.
 #' @param r_1 (optional) A matrix with one row and two columns that defines the starting location (x, y).  If \code{r_1 = NULL}, then a random location is simulated from a uniform distribution with a minimum and maximum value of 0 and 1 respectively.
-#' @param r_h  A matrix with one row and two columns that defines the 'home range' centre location (x, y).
-#' @param k A number that defines the strength of the 'central harmonic force' that pulls an individual back towards its home range centre.
+#' @param r_h  A matrix with one row and two columns that defines the `home range' centre location (x, y).
+#' @param k A number that defines the strength of the `central harmonic force' that pulls an individual back towards its home range centre.
 #' @param delta_t A number that defines the number of time units between each time step.
 #' @param eps A number that defines the variance.
 #' @param plot A logical variable that defines whether or not to plot the simulated path.
@@ -520,7 +520,7 @@ sim_angles <- function(...) {
 #' @param verbose A logical variable that defines whether or not to print messages to the console that relay function progress.
 #' @param ... Additional arguments, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the map.
 #'
-#' @details Ornstein-Uhlenbeck processes are convenient models for animal movement around a 'home range' centre. In the model, a parameter (\code{k}) 'pulls' the location of the individual (\eqn{\vec{r}}) back towards the centre of its home range (\eqn{\vec{r}^H}) as it moves away from this centre. This function implements the discretised form of the Ornstein-Uhlenbeck model in which the parameters of the movement model remain constant through time, and in which movement is not constrained by barriers, described by Alós et al. (2016) (see equations (8) and (9) in particular). Under this model, the position \eqn{\vec{r}} of the animal at time \eqn{n + 1} is given by:
+#' @details Ornstein-Uhlenbeck processes are convenient models for animal movement around a `home range' centre. In the model, a parameter (\code{k}) `pulls' the location of the individual (\eqn{\vec{r}}) back towards the centre of its home range (\eqn{\vec{r}^H}) as it moves away from this centre. This function implements the discretised form of the Ornstein-Uhlenbeck model in which the parameters of the movement model remain constant through time, and in which movement is not constrained by barriers, described by Alós et al. (2016) (see equations (8) and (9) in particular). Under this model, the position \eqn{\vec{r}} of the animal at time \eqn{n + 1} is given by:
 #'
 #' \deqn{\vec{r}_{n + 1} = \vec{r}^H + e^{-k \Delta t} (\vec{r}_n - \vec{r}^H) + \vec{R}_n,}
 #'
@@ -677,7 +677,7 @@ summarise_along_walk <- function(vec, every, summarise = sum, na.rm = FALSE,...)
 #'
 #' @details The function assumes that the individual transmits an acoustic signal which has the capacity to be detected at each time step. In reality, acoustic transmitters are often programmed with a randomly varying delay, but this is not currently implemented. The function also assumes that all receivers that are supplied are able to make detections. If the receivers at which an individual could be detected change over time, it may be necessary to apply the function iteratively or post-process the outcomes to ensure that individuals are not detected at inactive receivers.
 #'
-#' @return If \code{delta_t = NULL}, then function returns a named list with three matrices that define, for each path position (rows) and each receiver (columns), (a) the distance of that position from each receiver ('dist_mat'), (b) the probability of detection at that receiver ('prob_mat') and (c) the simulated outcome (0, no detection; 1, detection) ('det_mat'). If \code{delta_t} is specified, then the function returns a list with a 'raw' and an 'agg' element. The raw elements contains the matrices described above; the 'agg' element contains the aggregated versions of these matrices, with detections summed over each \code{delta_t} interval and distances and probabilities averaged (using the arithmetic mean) over each interval. If \code{plot = TRUE}, the function also returns a plot of the (raw) detections (0, 1) and, if specified, the corresponding probabilities.
+#' @return If \code{delta_t = NULL}, then function returns a named list with three matrices that define, for each path position (rows) and each receiver (columns), (a) the distance of that position from each receiver (`dist_mat'), (b) the probability of detection at that receiver (`prob_mat') and (c) the simulated outcome (0, no detection; 1, detection) (`det_mat'). If \code{delta_t} is specified, then the function returns a list with a `raw' and an `agg' element. The raw elements contains the matrices described above; the `agg' element contains the aggregated versions of these matrices, with detections summed over each \code{delta_t} interval and distances and probabilities averaged (using the arithmetic mean) over each interval. If \code{plot = TRUE}, the function also returns a plot of the (raw) detections (0, 1) and, if specified, the corresponding probabilities.
 #'
 #' @examples
 #' #### Step (1) Simulate an array in an area

@@ -23,9 +23,9 @@ sim_path_ou_1(
 
 \item{r_1}{(optional) A matrix with one row and two columns that defines the starting location (x, y).  If \code{r_1 = NULL}, then a random location is simulated from a uniform distribution with a minimum and maximum value of 0 and 1 respectively.}
 
-\item{r_h}{A matrix with one row and two columns that defines the 'home range' centre location (x, y).}
+\item{r_h}{A matrix with one row and two columns that defines the `home range' centre location (x, y).}
 
-\item{k}{A number that defines the strength of the 'central harmonic force' that pulls an individual back towards its home range centre.}
+\item{k}{A number that defines the strength of the `central harmonic force' that pulls an individual back towards its home range centre.}
 
 \item{delta_t}{A number that defines the number of time units between each time step.}
 
@@ -46,7 +46,7 @@ The function returns an n-row, two-column matrix that defines the simulated loca
 This function simulates movement paths under a discrete-time Ornstein-Uhlenbeck process in which the parameters of the movement model are assumed to remain constant through time.
 }
 \details{
-Ornstein-Uhlenbeck processes are convenient models for animal movement around a 'home range' centre. In the model, a parameter (\code{k}) 'pulls' the location of the individual (\eqn{\vec{r}}) back towards the centre of its home range (\eqn{\vec{r}^H}) as it moves away from this centre. This function implements the discretised form of the Ornstein-Uhlenbeck model in which the parameters of the movement model remain constant through time, and in which movement is not constrained by barriers, described by Alós et al. (2016) (see equations (8) and (9) in particular). Under this model, the position \eqn{\vec{r}} of the animal at time \eqn{n + 1} is given by:
+Ornstein-Uhlenbeck processes are convenient models for animal movement around a `home range' centre. In the model, a parameter (\code{k}) `pulls' the location of the individual (\eqn{\vec{r}}) back towards the centre of its home range (\eqn{\vec{r}^H}) as it moves away from this centre. This function implements the discretised form of the Ornstein-Uhlenbeck model in which the parameters of the movement model remain constant through time, and in which movement is not constrained by barriers, described by Alós et al. (2016) (see equations (8) and (9) in particular). Under this model, the position \eqn{\vec{r}} of the animal at time \eqn{n + 1} is given by:
 
 \deqn{\vec{r}_{n + 1} = \vec{r}^H + e^{-k \Delta t} (\vec{r}_n - \vec{r}^H) + \vec{R}_n,}
 

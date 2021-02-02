@@ -7,9 +7,9 @@
 process_receiver_id(acoustics, moorings)
 }
 \arguments{
-\item{acoustics}{A dataframe which comprises passive acoustic telemetry detection time series. This must contain two named columns: 'timestamp', a POSIXct vector which defines the time of each detection; and 'receiver', a vector which defines the receiver at which each detection was made. The column 'receiver' should also be found in \code{moorings} (see below).}
+\item{acoustics}{A dataframe which comprises passive acoustic telemetry detection time series. This must contain two named columns: `timestamp', a POSIXct vector which defines the time of each detection; and `receiver', a vector which defines the receiver at which each detection was made. The column `receiver' should also be found in \code{moorings} (see below).}
 
-\item{moorings}{A dataframe which contains passive acoustic telemetry receiver metadata. This must contain four named columns: 'receiver', as above for \code{acoustics}; 'receiver_id', a unique identifier for each receiver deployment; 'receiver_start_date', a POSIXct vector which defines the time of each receiver deployment; and 'receiver_end_date', a POSIXct vector which defines the end of each receiver deployment. If objects of class Date are provided for 'receiver_start_date' and 'receiver_end_date', these are coerced to POSIXct objects with a warning so that the timing of receiver detections and deployment is comparable (i.e., of the same object type).}
+\item{moorings}{A dataframe which contains passive acoustic telemetry receiver metadata. This must contain four named columns: `receiver', as above for \code{acoustics}; `receiver_id', a unique identifier for each receiver deployment; `receiver_start_date', a POSIXct vector which defines the time of each receiver deployment; and `receiver_end_date', a POSIXct vector which defines the end of each receiver deployment. If objects of class Date are provided for `receiver_start_date' and `receiver_end_date', these are coerced to POSIXct objects with a warning so that the timing of receiver detections and deployment is comparable (i.e., of the same object type).}
 }
 \value{
 The function returns a vector of receiver IDs, as defined in the \code{moorings$receiver_id} column, which correspond to each detection in the \code{acoustics} dataframe.

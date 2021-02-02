@@ -20,7 +20,7 @@ dc(
 )
 }
 \arguments{
-\item{archival_ls}{A list of dataframes, with one element for each time unit (e.g., month), which contain depth time series to be related to the local bathymetry. Each dataframe should contain a column of depths ('depth') and a column that defines the time unit ('time_unit'). Depth should be recorded using absolute values in the same units as the bathymetry (see below).}
+\item{archival_ls}{A list of dataframes, with one element for each time unit (e.g., month), which contain depth time series to be related to the local bathymetry. Each dataframe should contain a column of depths (`depth') and a column that defines the time unit (`time_unit'). Depth should be recorded using absolute values in the same units as the bathymetry (see below).}
 
 \item{bathy}{A \code{\link[raster]{raster}} of the bathymetry in an area within which the animal is likely to have been located over the study. Bathymetry values should be recorded as absolute values and in the same units as for depths (see \code{archival_ls}).}
 

@@ -14,7 +14,7 @@ get_detection_days(
 )
 }
 \arguments{
-\item{acoustics}{A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: a vector of individual IDs, named 'individual_id'; a vector of receiver IDs, named 'receiver_id'; and a POSIXct vector of time stamps when detections were made, named 'timestamp'.}
+\item{acoustics}{A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: a vector of individual IDs, named `individual_id'; a vector of receiver IDs, named `receiver_id'; and a POSIXct vector of time stamps when detections were made, named `timestamp'.}
 
 \item{individual_id}{(optional) A vector of individuals for which to calculate detection days.}
 
@@ -22,7 +22,7 @@ get_detection_days(
 
 \item{type}{If both \code{individual_id} and \code{receiver_id} are specified, then \code{type} is an integer that defines whether or not to calculate detection days for (a) each individual/receiver pair (\code{type = 1L}) or (b) all combinations of individuals/receivers.}
 
-\item{match_to}{(optional) A dataframe against which to match detection days. This must contain the 'individual_id' and 'receiver_id' column, as in \code{acoustics}. If supplied, an integer vector of detection days for individual/receiver combinations, matched against the individuals/receivers in \code{match_to}, is returned (see also Value).}
+\item{match_to}{(optional) A dataframe against which to match detection days. This must contain the `individual_id' and `receiver_id' column, as in \code{acoustics}. If supplied, an integer vector of detection days for individual/receiver combinations, matched against the individuals/receivers in \code{match_to}, is returned (see also Value).}
 
 \item{...}{Additional arguments passed to \code{\link[pbapply]{pblapply}}.}
 }
@@ -30,7 +30,7 @@ get_detection_days(
 The function returns a dataframe with the detection days for all, or specified, combinations of individuals and receivers. Note that if \code{acoustics} only contains individuals/receivers that made detections, then this will only contain individuals/receivers for/at which detections were made. Alternatively, if \code{match_to} is supplied, a vector of detection days, matched against each individual/receiver observation in that dataframe, is returned.
 }
 \description{
-The function calculates the total number of days (termed 'detection days') during which individuals were detected at passive acoustic telemetry receivers. To implement the function, a dataframe with passive acoustic telemetry detections of individuals at receivers must be supplied. Detection days can be calculated for all combinations of individuals/receivers in this dataframe, for all combinations of specified individuals and receivers, or for specific individual/receiver pairs. The function returns a dataframe of detection days for these individual/receiver combinations or a vector of detection days that is matched against another dataframe.
+The function calculates the total number of days (termed `detection days') during which individuals were detected at passive acoustic telemetry receivers. To implement the function, a dataframe with passive acoustic telemetry detections of individuals at receivers must be supplied. Detection days can be calculated for all combinations of individuals/receivers in this dataframe, for all combinations of specified individuals and receivers, or for specific individual/receiver pairs. The function returns a dataframe of detection days for these individual/receiver combinations or a vector of detection days that is matched against another dataframe.
 }
 \examples{
 #### Example (1): Detection days between all combinations

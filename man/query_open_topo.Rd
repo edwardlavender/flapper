@@ -27,7 +27,7 @@ query_open_topo(
 \item{...}{Additional arguments passed to \code{\link[raster]{raster}} if \code{x} is an \code{\link[raster]{Extent}} object, such as the \code{resolution}.}
 }
 \value{
-The function returns elevation ('z') values from the specified database as a matrix, if code \code{x} is a matrix, or a \code{\link[raster]{raster}}, if code \code{x} is a \code{\link[raster]{raster}} or an \code{\link[raster]{Extent}} object. Coordinates/areas without data are returned as NAs.
+The function returns elevation (`z') values from the specified database as a matrix, if code \code{x} is a matrix, or a \code{\link[raster]{raster}}, if code \code{x} is a \code{\link[raster]{raster}} or an \code{\link[raster]{Extent}} object. Coordinates/areas without data are returned as NAs.
 }
 \description{
 This function queries the Open Topo Data elevation Application Programming Interface (API) to extract elevation data for inputted coordinates, rasters, or areas.

@@ -22,27 +22,27 @@ acdc_animate(
 \arguments{
 \item{expr_param}{A named list of arguments, passed to \code{\link[flapper]{acdc_plot}}, to create plots.}
 
-\item{html_name}{A string that defines the name of the html file (see 'htmlfile' argument in \code{\link[animation]{saveHTML}}).}
+\item{html_name}{A string that defines the name of the html file (see `htmlfile' argument in \code{\link[animation]{saveHTML}}).}
 
-\item{image_name}{A string that defines the names of the individual .png files creates (see 'img.name' argument in \code{\link[animation]{saveHTML}}).}
+\item{image_name}{A string that defines the names of the individual .png files creates (see `img.name' argument in \code{\link[animation]{saveHTML}}).}
 
-\item{html_title, html_description}{Character strings that provide a title and a description that are displayed within the html animation (see 'title' and 'description' arguments in \code{\link[animation]{saveHTML}}).}
+\item{html_title, html_description}{Character strings that provide a title and a description that are displayed within the html animation (see `title' and `description' arguments in \code{\link[animation]{saveHTML}}).}
 
-\item{navigator}{A logical variable that defines whether or not to add a navigator panel to the animation (see 'navigator' argument in \code{\link[animation]{saveHTML}}).}
+\item{navigator}{A logical variable that defines whether or not to add a navigator panel to the animation (see `navigator' argument in \code{\link[animation]{saveHTML}}).}
 
-\item{ani_height, ani_width, ani_res}{Numbers that define the size and the resolution of the animation (see 'ani.height' 'ani.width' and 'ani.res' arguments in \code{\link[animation]{ani.options}}).}
+\item{ani_height, ani_width, ani_res}{Numbers that define the size and the resolution of the animation (see `ani.height' `ani.width' and `ani.res' arguments in \code{\link[animation]{ani.options}}).}
 
-\item{interval}{A number that defines the time interval between sequential frames (see 'interval' argument in \code{\link[animation]{ani.options}}).}
+\item{interval}{A number that defines the time interval between sequential frames (see `interval' argument in \code{\link[animation]{ani.options}}).}
 
-\item{verbose}{A logical or character variable that defines whether or not, or what, to write as a footer to the html animation (see 'verbose' argument in \code{\link[animation]{ani.options}}).}
+\item{verbose}{A logical or character variable that defines whether or not, or what, to write as a footer to the html animation (see `verbose' argument in \code{\link[animation]{ani.options}}).}
 
 \item{...}{Additional arguments passed to \code{\link[animation]{ani.options}}.}
 }
 \value{
-The function produces an animation in .html format in the working directory (or a sub-directory of this). A folder named 'images' is also produced which contains the images for each time step. The 'css' and 'js' folders are also produced by \code{\link[animation]{saveHTML}} which creates the animation.
+The function produces an animation in .html format in the working directory (or a sub-directory of this). A folder named `images' is also produced which contains the images for each time step. The `css' and `js' folders are also produced by \code{\link[animation]{saveHTML}} which creates the animation.
 }
 \description{
-This function is a simple wrapper for \code{\link[flapper]{acdc_plot}} and \code{\link[animation]{saveHTML}} which creates an animation of the ACDC algorithm over time. To implement this function, a named list of arguments for \code{\link[flapper]{acdc_plot}}, which creates the plots, must be supplied. This is embedded within \code{\link[animation]{saveHTML}}, which creates a folder in the working directory named 'images' that contains a .png file for each time step and an animation as a .html file.
+This function is a simple wrapper for \code{\link[flapper]{acdc_plot}} and \code{\link[animation]{saveHTML}} which creates an animation of the ACDC algorithm over time. To implement this function, a named list of arguments for \code{\link[flapper]{acdc_plot}}, which creates the plots, must be supplied. This is embedded within \code{\link[animation]{saveHTML}}, which creates a folder in the working directory named `images' that contains a .png file for each time step and an animation as a .html file.
 }
 \details{
 This function requires the \code{\link[animation]{animation}} package.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/acdc.R
 \name{acdc_setup_mobility}
 \alias{acdc_setup_mobility}
-\title{Examine the constant 'mobility' assumption of the ACDC algorithm}
+\title{Examine the constant `mobility' assumption of the ACDC algorithm}
 \usage{
 acdc_setup_mobility(
   depth,
@@ -31,7 +31,7 @@ acdc_setup_mobility(
 The function returns a numeric vector of distances and, if \code{plot = TRUE}, a histogram of those distances.
 }
 \description{
-In the simplest and fastest (and only) version of the ACDC algorithm currently implemented by \code{\link[flapper]{flapper}}, the rate at which acoustic centroids expand and contract depends on a single 'mobility' parameter that describes how the uncertainty in an individual's location changes through time according to the passive acoustic telemetry data. These changes essentially reflect the maximum horizontal distance that an individual can move in the time period between archival observations. However, in some situations, a fixed parameter for horizontal movement may not be well supported by archival data, particularly for animals that change dramatically in depth and for which changes in depth are likely to curtail the extent of horizontal movement*. Thus, this function investigates the extent to which the horizontal distance an animal could travel changes through time if the mobility parameter is instead conceptualised as the diagonal distance between sequential depth observations.
+In the simplest and fastest (and only) version of the ACDC algorithm currently implemented by \code{\link[flapper]{flapper}}, the rate at which acoustic centroids expand and contract depends on a single `mobility' parameter that describes how the uncertainty in an individual's location changes through time according to the passive acoustic telemetry data. These changes essentially reflect the maximum horizontal distance that an individual can move in the time period between archival observations. However, in some situations, a fixed parameter for horizontal movement may not be well supported by archival data, particularly for animals that change dramatically in depth and for which changes in depth are likely to curtail the extent of horizontal movement*. Thus, this function investigates the extent to which the horizontal distance an animal could travel changes through time if the mobility parameter is instead conceptualised as the diagonal distance between sequential depth observations.
 }
 \details{
 The function uses a Pythagorean approximation to estimate the \eqn{distance} that an individual could travel in each time step (\eqn{t}), given the maximum horizontal distance that the individual could move (\eqn{mobility}) and sequential changes in \eqn{depth}, according to the equation:

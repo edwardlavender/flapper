@@ -28,7 +28,7 @@ coa(
 \item{...}{Additional arguments (none implemented).}
 }
 \value{
-The function returns a matrix or a dataframe, depending on the \code{output} argument, that represents a time series of COAs. If \code{na_omit = TRUE}, the time series may have 'gaps' over which COAs could not be calculated due to the absence of detections.
+The function returns a matrix or a dataframe, depending on the \code{output} argument, that represents a time series of COAs. If \code{na_omit = TRUE}, the time series may have `gaps' over which COAs could not be calculated due to the absence of detections.
 }
 \description{
 This function implements the arithmetic mean-position algorithm to calculate an individual's centres of activity (COAs) though time from detections at passive acoustic telemetry receivers, as described by Simpfendorfer et al (2002). Under this approach, each COA is calculated as the arithmetic mean of the locations of receivers at which an individual was detected over a specified time interval, weighted by the frequency of detections at each of those receivers. To implement the function, a detection matrix that defines the number of detections of an individual along sequence of time steps at each receiver (e.g., from \code{\link[flapper]{make_matrix_detections}}) needs to be supplied, along a matrix of receiver locations in a planar coordinate system. For each time interval, the function calculates the centre of activity and returns a matrix or dataframe with this information.
@@ -94,7 +94,7 @@ coa_mat <- coa(mat = detection_matrix_by_id[[1]],
 Simpfendorfer, C. A., M. R. Heupel, and R. E. Hueter. 2002. Estimation of short-term centers of activity from an array of omnidirectional hydrophones and its use in studying animal movements. Canadian Journal of Fisheries and Aquatic Sciences 59:23-32.
 }
 \seealso{
-\code{\link[flapper]{coa_setup_delta_t}} suggests suitable time intervals over which to calculate COAs. \code{\link[flapper]{make_matrix_detections}} makes the detection matrices from detection time series data required by this function. For data in the VEMCO Vue export format, the 'COA' function in the VTrack package (https://github.com/RossDwyer/VTrack) can also be used to calculate centres of activity.
+\code{\link[flapper]{coa_setup_delta_t}} suggests suitable time intervals over which to calculate COAs. \code{\link[flapper]{make_matrix_detections}} makes the detection matrices from detection time series data required by this function. For data in the VEMCO Vue export format, the `COA' function in the VTrack package (https://github.com/RossDwyer/VTrack) can also be used to calculate centres of activity.
 }
 \author{
 Edward Lavender

@@ -17,7 +17,7 @@ invert_poly(x, boundaries = raster::extent(x), ...)
 The function returns a \code{\link[sp]{SpatialPolygons-class}} object.
 }
 \description{
-This function inverts a (spatial) polygon so that the 'inside' of the original polygon becomes the 'outside' and vice-versa. The function was motivated by marine applications in which polygons that define the coastline 'contain' land and need to be inverted to define the sea.
+This function inverts a (spatial) polygon so that the `inside' of the original polygon becomes the `outside' and vice-versa. The function was motivated by marine applications in which polygons that define the coastline `contain' land and need to be inverted to define the sea.
 }
 \examples{
 #### Example (1): Compare original and inverted polygon

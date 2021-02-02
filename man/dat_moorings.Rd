@@ -9,7 +9,7 @@ A dataframe with 40 observations and 8 variables:
 \describe{
   \item{receiver_id}{An integer which distinguishes each unique receiver deployment.}
   \item{receiver}{A character which defines each receiver.}
-  \item{sentinel_id}{A character which defines each receiver's built-in acoustic transmitter ('sentinel tag'). Some receivers did not have sentinel tags; their \code{sentinel_id} is \code{NA}.}
+  \item{sentinel_id}{A character which defines each receiver's built-in acoustic transmitter (`sentinel tag'). Some receivers did not have sentinel tags; their \code{sentinel_id} is \code{NA}.}
   \item{receiver_start_date}{A date which defines the start date of each receiver's deployment.}
   \item{receiver_end_date}{A date which defines the end date of each receiver's deployment.}
   \item{receiver_long}{A number which defines the longitude (decimal degrees) of each receiver.}

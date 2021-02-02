@@ -22,15 +22,15 @@ coa_setup_delta_t(
 )
 }
 \arguments{
-\item{acoustics}{A dataframe with passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a specific individual. This should contain the following columns: a vector of receiver IDs, named 'receiver_id'; and a POSIXct vector of time stamps, named 'timestamp'.}
+\item{acoustics}{A dataframe with passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a specific individual. This should contain the following columns: a vector of receiver IDs, named `receiver_id'; and a POSIXct vector of time stamps, named `timestamp'.}
 
-\item{delta_t}{A number or character, passed to the 'breaks' argument of \code{\link[base]{cut.POSIXt}}, that defines the time interval to be evaluated.}
+\item{delta_t}{A number or character, passed to the `breaks' argument of \code{\link[base]{cut.POSIXt}}, that defines the time interval to be evaluated.}
 
 \item{method}{An integer (\code{1L}, \code{2L} or \code{1:2L}) that defines the method(s) used to evaluate the time intervals (see Description).}
 
 \item{implementation}{An integer (\code{1L} or \code{2L}) that defines the metric(s) used in the evaluation: \code{1}, the total number of receivers/detections; or \code{2}, the percent of receivers/number of detections per receiver (see Description). If \code{implementation = 2L} and the total number of receivers is constant through time, the function reverts to \code{implementation = 1L}, the results of which are more interpretable.}
 
-\item{moorings}{(optional) If \code{implementation = 2L}, \code{moorings} is a dataframe that defines, for each receiver, the deployment period. This is required to calculate the number of operational receivers over time (via \code{\link[flapper]{get_n_operational_ts}}). This must contain the following columns: a vector of receiver IDs that includes all receivers in \code{acoustics}, named 'receiver_id'; and the times of receiver deployment and retrieval, named 'receiver_start_date' and 'receiver_end_date' respectively. These are coerced to POSIXct vectors, if required, to match \code{acoustics$timestamp}.}
+\item{moorings}{(optional) If \code{implementation = 2L}, \code{moorings} is a dataframe that defines, for each receiver, the deployment period. This is required to calculate the number of operational receivers over time (via \code{\link[flapper]{get_n_operational_ts}}). This must contain the following columns: a vector of receiver IDs that includes all receivers in \code{acoustics}, named `receiver_id'; and the times of receiver deployment and retrieval, named `receiver_start_date' and `receiver_end_date' respectively. These are coerced to POSIXct vectors, if required, to match \code{acoustics$timestamp}.}
 
 \item{xlab, ylab, main}{Character strings that define the x and y axis labels and the plot title. If \code{method = 1:2L}, a single input will label both plots identically, whereas a list with one element for each method will label the plots differently.}
 
@@ -43,7 +43,7 @@ coa_setup_delta_t(
 \item{verbose}{A logical variable that defines whether or not to print messages to the console to relay function progress.}
 }
 \value{
-The function returns a named list and a plot for each \code{method}. The list contains a 'data' element that is a named list of dataframes for each method ('m1', 'm2') and implementation ('i1', 'i2'). For 'm1_i1', the dataframe contains the number of receivers with detections ('n_receiver_with_detections') and the percent of the time series for which that number of receivers made detections ('pc_of_ts'). For 'm1_i2', the percentage of receivers with detections ('pc_receiver_with_detections') is given instead. For 'm2_i1', the number of detections ('n_detections') is given; for 'm2_i2', it is the number of detections per receiver ('n_detections_per_receiver'). The list also contains an 'args' element that records the inputs to \code{acoustics} and \code{delta_t} for reference.
+The function returns a named list and a plot for each \code{method}. The list contains a `data' element that is a named list of dataframes for each method (`m1', `m2') and implementation (`i1', `i2'). For `m1_i1', the dataframe contains the number of receivers with detections (`n_receiver_with_detections') and the percent of the time series for which that number of receivers made detections (`pc_of_ts'). For `m1_i2', the percentage of receivers with detections (`pc_receiver_with_detections') is given instead. For `m2_i1', the number of detections (`n_detections') is given; for `m2_i2', it is the number of detections per receiver (`n_detections_per_receiver'). The list also contains an `args' element that records the inputs to \code{acoustics} and \code{delta_t} for reference.
 }
 \description{
 This function implements the two approaches introduced by Simpfendorfer et al. (2002) to suggest suitable time interval(s) over which to estimate centres of activity (COAs). Both approaches rely on prior specification of a candidate time interval (\code{delta_t}) and provide a qualitative assessment of its suitability. The manual iteration of this scheme over multiple intervals provides a measure of their relative suitability.

@@ -1,12 +1,12 @@
 #' @title Convert a detection matrix into a dataframe
 #' @description This function converts a matrix of detections (0, 1) by time stamp and receiver into a dataframe.
 #'
-#' @param acoustics A detection matrix (time stamps x receivers) in which the cells define whether (1) or not (0) a detection was made at each time stamp/receiver combination. 'Meaningful' time stamps and receiver IDs can be taken from the row and column names of this matrix, if specified (see \code{set_names}).
+#' @param acoustics A detection matrix (time stamps x receivers) in which the cells define whether (1) or not (0) a detection was made at each time stamp/receiver combination. `Meaningful' time stamps and receiver IDs can be taken from the row and column names of this matrix, if specified (see \code{set_names}).
 #' @param only_keep_detections A logical variable that defines whether or not to retain only observations that correspond to detections. (If \code{only_keep_detections = FALSE}, the returned dataframe includes time stamps without detections.)
 #' @param set_names A logical variable that defines whether or not to take the row and column names of \code{acoustics} as the time stamps and receiver IDs. (If \code{set_names = FALSE}, time stamps and receiver IDs are simply given as integer vectors of 1 to the number of rows or columns respectively.)
 #' @param as_POSIXct If \code{set_names = TRUE}, \code{as_POSIXct} is a function that converts the row names of \code{acoustics} into POSIXct time stamps.
 #'
-#' @return The function returns a dataframe with time stamps ('timestamp') and receivers ('receiver_id'). If \code{set_names = FALSE}, these are integer vectors that match the dimensions of \code{acoustics}. Otherwise they are are taken from row and column names of \code{acoustics}. In this case, if \code{as_POSIXct} is defined, time stamps are returned in POSIXct format and receivers are returned as a factor. If \code{only_keep_detections = FALSE}, the dataframe also includes a 'detection' column that defines whether (1) or not (0) a detection was made for each observation; otherwise, this column is dropped (mirroring real-world data).
+#' @return The function returns a dataframe with time stamps (`timestamp') and receivers (`receiver_id'). If \code{set_names = FALSE}, these are integer vectors that match the dimensions of \code{acoustics}. Otherwise they are are taken from row and column names of \code{acoustics}. In this case, if \code{as_POSIXct} is defined, time stamps are returned in POSIXct format and receivers are returned as a factor. If \code{only_keep_detections = FALSE}, the dataframe also includes a `detection' column that defines whether (1) or not (0) a detection was made for each observation; otherwise, this column is dropped (mirroring real-world data).
 #'
 #' @examples
 #' #### Define detection matrix

@@ -4,7 +4,7 @@
 \alias{check_tz}
 \title{Check the time zone of an object and force UTC if absent}
 \source{
-This function is taken from the 'utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
+This function is taken from the `utils.add' package (https://github.com/edwardlavender/utils.add). It is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
 }
 \usage{
 check_tz(arg = deparse(substitute(input)), input)

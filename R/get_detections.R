@@ -11,7 +11,7 @@
 #' @param output An integer (\code{1L}, \code{2L} or \code{3L}) that defines the output type. \code{1L} returns a plot of detection probability against distance; \code{2L} returns a numeric vector of detection probabilities; and \code{3L} returns both of the above.
 #' @param ... Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}}, to customise the plot. These are only implemented if \code{output = 1L} or \code{output = 3L}.
 #'
-#' @return The function calculates detection probability at each specified distance and returns a plot, a vector of detection probabilities, or both, depending on the value of the \code{output} argument. If a vector of detection probabilities is returned, this contains the following attributes: 'X', the model matrix; 'beta', the regression coefficients; and 'inv_link', the inverse link function.
+#' @return The function calculates detection probability at each specified distance and returns a plot, a vector of detection probabilities, or both, depending on the value of the \code{output} argument. If a vector of detection probabilities is returned, this contains the following attributes: `X', the model matrix; `beta', the regression coefficients; and `inv_link', the inverse link function.
 #'
 #' @examples
 #' #### Example (1): Implement the function using the default parameters
@@ -86,7 +86,7 @@ get_detection_pr <- function(distance = 1:1000,
 #### get_detection_centroids()
 
 #' @title Define detection centroids around receivers
-#' @description This function defines the areas surveyed by receivers (termed 'detection centroids') as a spatial object, based on an estimate of the detection range (m) and any barriers to detection. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The function defines a spatial buffer around each receiver according to the estimated detection range, cuts out any barriers to detection, such as the coastline, and returns a SpatialPolygons object that defines the combined detection centroid across all receivers or receiver-specific detection centroids.
+#' @description This function defines the areas surveyed by receivers (termed `detection centroids') as a spatial object, based on an estimate of the detection range (m) and any barriers to detection. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The function defines a spatial buffer around each receiver according to the estimated detection range, cuts out any barriers to detection, such as the coastline, and returns a SpatialPolygons object that defines the combined detection centroid across all receivers or receiver-specific detection centroids.
 #'
 #' @param xy A \code{\link[sp]{SpatialPoints-class}} or \code{\link[sp]{SpatialPointsDataFrame-class}} object that defines receiver locations. The coordinate reference system should be the Universe Transverse Mercator coordinate reference system.
 #' @param detection_range A number that defines the detection range (m) of receivers.
@@ -251,14 +251,14 @@ get_detection_area_sum <- function(xy,
 #' @title Calculate the area sampled by receivers through time
 #' @description This function extends \code{\link[flapper]{get_detection_area_sum}} to calculate how the total area sampled by receivers changes through time.
 #'
-#' @param xy,detection_range,coastline,scale Arguments required to calculate the total area surveyed by receivers (at each time point) via \code{\link[flapper]{get_detection_area_sum}}. For this function, \code{xy} should be a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that includes both receiver locations and corresponding deployment times (in columns named 'receiver_start_date' and 'receiver_end_date' respectively).
+#' @param xy,detection_range,coastline,scale Arguments required to calculate the total area surveyed by receivers (at each time point) via \code{\link[flapper]{get_detection_area_sum}}. For this function, \code{xy} should be a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that includes both receiver locations and corresponding deployment times (in columns named `receiver_start_date' and `receiver_end_date' respectively).
 #' @param plot A logical input that defines whether or not to plot a time series of the total area sampled by receivers.
 #' @param verbose A logical input that defines whether or not to print messages to the console to relay function progress.
 #' @param cl (optional) A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. The connection to the cluster is closed within the function.
 #' @param varlist (optional) A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.
 #' @param ... Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}}, to customise the plot produced.
 #'
-#' @return The function returns a dataframe with, for each date ('date') from the time of the first receiver's deployment to the time of the last receiver's retrieval, the number of receivers operational on that date ('n') and the total area sampled ('receiver_area'). If \code{plot = TRUE}, the function also returns a plot of the area sampled by receivers through time.
+#' @return The function returns a dataframe with, for each date (`date') from the time of the first receiver's deployment to the time of the last receiver's retrieval, the number of receivers operational on that date (`n') and the total area sampled (`receiver_area'). If \code{plot = TRUE}, the function also returns a plot of the area sampled by receivers through time.
 #'
 #' @examples
 #' #### Define SpatialPointsDataFrame with receiver locations and deployment dates
@@ -368,7 +368,7 @@ get_detection_area_ts <- function(xy,
 #'
 #' @details This is a simple metric of sampling effort. For acoustic receivers, \code{\link[flapper]{get_detection_area_ts}} provides another metric of sampling effort.
 #'
-#' @return The function returns a dataframe that, for each time step ('time'), defines the number of operational units at that time ('n'). If \code{plot = TRUE}, the function also plots a time series of the number of operational units.
+#' @return The function returns a dataframe that, for each time step (`time'), defines the number of operational units at that time (`n'). If \code{plot = TRUE}, the function also plots a time series of the number of operational units.
 #'
 #' @examples
 #' #### Example (1): Number of operational receivers over an acoustic telemetry study
@@ -451,15 +451,15 @@ get_n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,..
 
 #' @title Calculate the overlap between individuals' time at liberty and receivers' operational periods
 #' @description This function calculates the duration of the overlap (in days) between individuals' time at liberty and receivers' operational periods. To implement this function, a dataframe with individual deployment periods and another with receiver deployment periods must be specified. The duration of the overlap between these intervals can be calculated for all combinations of individuals and receivers within these two dataframes, for all combinations of specified individuals and receivers, or for specific individual/receiver pairs. The function returns a dataframe of the overlap duration for these individual/receiver combinations or a vector of values that is matched against another dataframe.
-#' @param ids A dataframe that defines individual deployment periods. This must contain a column that defines individual IDs (named 'individual_id') and the time of tagging (named 'tag_start_date') and time of tag retrieval ('tag_end_date') (see \code{\link[flapper]{dat_ids}} for an example).
-#' @param moorings A dataframe that defines receiver deployment periods. This must contain a column that defines receiver IDs (named 'receiver_id') and the time of receiver deployment (named 'receiver_start_date') and retrieval (named 'receiver_end_date') (see \code{\link[flapper]{dat_moorings}} for an example).
+#' @param ids A dataframe that defines individual deployment periods. This must contain a column that defines individual IDs (named `individual_id') and the time of tagging (named `tag_start_date') and time of tag retrieval (`tag_end_date') (see \code{\link[flapper]{dat_ids}} for an example).
+#' @param moorings A dataframe that defines receiver deployment periods. This must contain a column that defines receiver IDs (named `receiver_id') and the time of receiver deployment (named `receiver_start_date') and retrieval (named `receiver_end_date') (see \code{\link[flapper]{dat_moorings}} for an example).
 #' @param individual_id (optional) A vector of individuals for which to calculate overlap duration.
 #' @param receiver_id (optional) A vector of receivers for which to calculate overlap duration.
 #' @param type If both \code{individual_id} and \code{receiver_id} are specified, then \code{type} is an integer that defines whether or not to calculate overlap duration for (a) each individual/receiver pair (\code{type = 1L}) or (b) all combinations of specified individuals/receivers (\code{type = 2L}).
-#' @param match_to (optional) A dataframe against which to match the calculated overlap duration(s). This must contain an 'individual_id' and 'receiver_id' column, as in \code{ids} and \code{moorings} respectively. If supplied, an integer vector of overlap durations for individual/receiver combinations, matched against the individuals/receivers in this dataframe, is returned (see also Value).
+#' @param match_to (optional) A dataframe against which to match the calculated overlap duration(s). This must contain an `individual_id' and `receiver_id' column, as in \code{ids} and \code{moorings} respectively. If supplied, an integer vector of overlap durations for individual/receiver combinations, matched against the individuals/receivers in this dataframe, is returned (see also Value).
 #' @param ... Additional arguments (none implemented).
 #'
-#' @return The function returns a dataframe with the deployment overlap duration for specific or all combinations of individuals and receivers, with the 'individual_id', 'receiver_id', 'tag_start_date', 'tag_end_date', 'receiver_start_date' and 'receiver_end_date' columns retained, plus 'tag_interval' and 'receiver_interval' columns that define individual and receiver deployment periods as \code{\link[lubridate]{Interval-class}} objects. The 'id_rec_overlap' column defines the temporal overlap (days). Alternatively, if \code{match_to} is supplied, a vector of overlap durations that matches each individual/receiver observation in that dataframe is returned.
+#' @return The function returns a dataframe with the deployment overlap duration for specific or all combinations of individuals and receivers, with the `individual_id', `receiver_id', `tag_start_date', `tag_end_date', `receiver_start_date' and `receiver_end_date' columns retained, plus `tag_interval' and `receiver_interval' columns that define individual and receiver deployment periods as \code{\link[lubridate]{Interval-class}} objects. The `id_rec_overlap' column defines the temporal overlap (days). Alternatively, if \code{match_to} is supplied, a vector of overlap durations that matches each individual/receiver observation in that dataframe is returned.
 #'
 #' @examples
 #' #### Prepare data to include required columns
@@ -587,14 +587,14 @@ get_id_rec_overlap <- function(ids,
 
 #' @param xy,detection_range,coastline,plot,... Arguments required to calculate and visualise detection centroids via \code{\link[flapper]{get_detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{detection_range}), barriers to detection (\code{coastline}) and whether or not to plot the centroids (\code{plot}). Additional arguments can be passed via \code{...} but note that \code{byid} is necessarily \code{TRUE} and should not be provided.
 #' @param envir A \code{\link[raster]{raster}} that defines the values of an environmental variable across the study area. The coordinate reference system should be the Universal Transverse Mercator system.
-#' @param sample_size (optional) An integer that defines the number of samples of the environmental variable to draw from the area around each receiver (see the 'size' argument of \code{\link[base]{sample}}). If this is provided, \code{sample_size} samples are taken from this area; otherwise, all values are extracted.
-#' @param sample_replace (optional) If \code{sample_size} is specified, \code{sample_replace} is a logical input that defines whether to implement sampling with (\code{sample_replace = TRUE}, the default) or without (\code{sample_replace = FALSE}) replacement (see the 'replace' argument of \code{\link[base]{sample}}).
+#' @param sample_size (optional) An integer that defines the number of samples of the environmental variable to draw from the area around each receiver (see the `size' argument of \code{\link[base]{sample}}). If this is provided, \code{sample_size} samples are taken from this area; otherwise, all values are extracted.
+#' @param sample_replace (optional) If \code{sample_size} is specified, \code{sample_replace} is a logical input that defines whether to implement sampling with (\code{sample_replace = TRUE}, the default) or without (\code{sample_replace = FALSE}) replacement (see the `replace' argument of \code{\link[base]{sample}}).
 #' @param sample_probs (optional) If \code{sample_size} is specified, \code{sample_probs} is a function that calculates the detection probability given the distance (m) between a cell and a receiver.
 #' @param cl A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is closed within the function.
 #' @param varlist A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.
 #' @param verbose A logical variable that defines whether or not relay messages to the console to monitor function progress.
 #'
-#' @return The function returns a list of dataframes (one for each element in \code{xy}; i.e., each receiver), each of which includes the cell IDs of \code{envir} from which values were extracted ('cell'), the value of the environmental variable in that cell ('envir') and, if applicable, the distance between that cell and the receiver ('dist', m) and the detection probability in that cell ('prob').
+#' @return The function returns a list of dataframes (one for each element in \code{xy}; i.e., each receiver), each of which includes the cell IDs of \code{envir} from which values were extracted (`cell'), the value of the environmental variable in that cell (`envir') and, if applicable, the distance between that cell and the receiver (`dist', m) and the detection probability in that cell (`prob').
 #'
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
@@ -779,13 +779,13 @@ get_detection_centroids_envir <- function(xy,
 #### get_detection_days()
 
 #' @title Calculate detection days
-#' @description The function calculates the total number of days (termed 'detection days') during which individuals were detected at passive acoustic telemetry receivers. To implement the function, a dataframe with passive acoustic telemetry detections of individuals at receivers must be supplied. Detection days can be calculated for all combinations of individuals/receivers in this dataframe, for all combinations of specified individuals and receivers, or for specific individual/receiver pairs. The function returns a dataframe of detection days for these individual/receiver combinations or a vector of detection days that is matched against another dataframe.
+#' @description The function calculates the total number of days (termed `detection days') during which individuals were detected at passive acoustic telemetry receivers. To implement the function, a dataframe with passive acoustic telemetry detections of individuals at receivers must be supplied. Detection days can be calculated for all combinations of individuals/receivers in this dataframe, for all combinations of specified individuals and receivers, or for specific individual/receiver pairs. The function returns a dataframe of detection days for these individual/receiver combinations or a vector of detection days that is matched against another dataframe.
 #'
-#' @param acoustics A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: a vector of individual IDs, named 'individual_id'; a vector of receiver IDs, named 'receiver_id'; and a POSIXct vector of time stamps when detections were made, named 'timestamp'.
+#' @param acoustics A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: a vector of individual IDs, named `individual_id'; a vector of receiver IDs, named `receiver_id'; and a POSIXct vector of time stamps when detections were made, named `timestamp'.
 #' @param individual_id (optional) A vector of individuals for which to calculate detection days.
 #' @param receiver_id (optional) A vector of receivers for which to calculate detection days.
 #' @param type If both \code{individual_id} and \code{receiver_id} are specified, then \code{type} is an integer that defines whether or not to calculate detection days for (a) each individual/receiver pair (\code{type = 1L}) or (b) all combinations of individuals/receivers.
-#' @param match_to (optional) A dataframe against which to match detection days. This must contain the 'individual_id' and 'receiver_id' column, as in \code{acoustics}. If supplied, an integer vector of detection days for individual/receiver combinations, matched against the individuals/receivers in \code{match_to}, is returned (see also Value).
+#' @param match_to (optional) A dataframe against which to match detection days. This must contain the `individual_id' and `receiver_id' column, as in \code{acoustics}. If supplied, an integer vector of detection days for individual/receiver combinations, matched against the individuals/receivers in \code{match_to}, is returned (see also Value).
 #' @param ... Additional arguments passed to \code{\link[pbapply]{pblapply}}.
 #'
 #' @return The function returns a dataframe with the detection days for all, or specified, combinations of individuals and receivers. Note that if \code{acoustics} only contains individuals/receivers that made detections, then this will only contain individuals/receivers for/at which detections were made. Alternatively, if \code{match_to} is supplied, a vector of detection days, matched against each individual/receiver observation in that dataframe, is returned.
