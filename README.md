@@ -67,9 +67,9 @@ complex barriers to movement (e.g., coastline) alongside algorithms
 (most of which are exclusive to `flapper`) for inferring space use from
 discrete detections at receivers, especially:
 
-  - **`lcp_over_surface()`.** This function calculates the shortest
-    pathways and/or their distances over a surface using efficient `C++`
-    algorithms from the
+  - **`lcp_*()`.** These functions facilitate the calculation of
+    shortest paths and their distances between and around points using
+    efficient `C++` algorithms from the
     [cppRouting](https://github.com/vlarmet/cppRouting) package. This
     makes it easy to use biologically meaningful distances (that account
     for the bathymetric surface over which a benthic animal must move,
@@ -84,6 +84,10 @@ discrete detections at receivers, especially:
     two-dimensional bathymetry surface to determine the extent to which
     different parts of an area might have (or have not) been used, or
     effectively represent occupied depths, over time.
+  - **`dcpf()`.** This function implements the ‘depth-contour particle
+    filtering’ (DCPF) algorithm, an extension of the DC algorithm that
+    incorporates a movement model to reconstruct possible movement paths
+    over a surface from observed depth time series.
   - **`acdc()`.** This function implements the ‘acoustic-centroid
     depth-contour’ (ACDC) algorithm to examine patterns of space use.
     This is a new approach that integrates the locational information
@@ -92,10 +96,10 @@ discrete detections at receivers, especially:
     time over the period of observations.
   - **`acdcpf()`** and **`acdcmp()`** are extensions of the ACDC
     algorithm that will be added to the package in the near future.
-  - **`sim_*()`.** These functions provide flexible routines for the
-    simulation of receiver arrays, movement paths and detections and can
-    be used to evaluate alternative algorithms for inferences about
-    patterns of space use under different conditions.
+  - **`sim_*()`.** These functions provide flexible, joined-up routines
+    for the simulation of receiver arrays, movement paths and detections
+    and can be used to evaluate alternative algorithms for inferences
+    about patterns of space use under different conditions.
 
 ## Installation
 
@@ -240,9 +244,21 @@ Often, Euclidean distances may not be a suitable representation of
 distance. This is especially the case for coastal benthic/demersal
 species in bathymetrically complex environments, for which navigation
 between locations may require movement over hilly terrain and around
-coastline. Thus, `lcp_over_surface()` calculates shortest pathways
-and/or the distances of the shortest pathways over a surface between
-origin and destination coordinates.
+coastline. For this reason, a number of functions facilitate the
+calculation of shortest paths/distances:
+
+  - `lcp_costs()` calculates the distances between connected cells in a
+    raster, accounting for planar (x, y, diagonal) and vertical (z)
+    distances;
+  - `lcp_graph_surface()` constructs connected graphs for least-cost
+    paths analysis;
+  - `lcp_from_point()` calculates least-cost distances from a point on a
+    raster to all of the other cells of a raster;
+  - `lcp_over_surface()` calculates shortest path(s) and/or the
+    distances of the shortest path(s) over a surface between origin and
+    destination coordinates;
+  - `lcp_interp()` interpolates paths between sequential locations using
+    least-cost paths analysis;
 
 ## Detection statistics
 
@@ -295,7 +311,7 @@ following functions:
   - `kud_around_coastline()` facilitates the estimation of home ranges
     (e.g., from estimated COAs) in areas of complex coastline;
 
-### The depth contour (DC) algorithm
+### The depth-contour (DC) algorithm
 
 Alongside the COA algorithm, `flapper` introduces a number of new
 algorithms for the inferring patterns of space use. The depth-contour
@@ -306,12 +322,33 @@ benthic/demersal, this algorithm uses observed depths (± some error) to
 define the subset of possible locations of each individual within a
 defined area. This is implemented via `dc()`.
 
+### The depth-contour particle filtering (DCPF) algorithm
+
+The depth-contour particle filtering algorithm (DCPF) extends the DC
+algorithm through incorporation of a movement model to reconstruct
+movement paths over a surface that are consistent with the observations
+(and model assumptions). This is especially useful for small scale
+applications, such as reconstructing the movements of benthic animals
+tagged with archival tags for short periods of time post-release. This
+approach is implemented with the `dcpf*()` family of functions:
+
+  - `dcpf_setup_movement_pr` provides a simple movement model that
+    defines the probability of movement between locations given the
+    distance between them;
+  - `dcpf()` implements the DCPF algorithm;
+  - `dcpf_loglik()` calculates the log-likelihood of reconstructed
+    paths, given the movement model;
+  - `dcpf_plot_1d()` plots the depth time series from observed and
+    reconstructed paths;
+  - `dcpf_plot_2d()` maps the reconstructed paths in two-dimensions;
+  - `dcpf_plot_3d()` maps the reconstructed paths in three-dimensions;
+
 ### The acoustic-centroid depth-contour (ACDC) algorithm
 
 The acoustic-centroid depth-contour (ACDC) algorithm extends the DC
 algorithm by using PAT data to inform the area within which depth
-contours are most likely to be found. This algorithm is supported by a
-number of functions:
+contours are most likely to be found. This algorithm is implemented with
+the `acdc*()` family of functions:
 
   - `acdc_setup_mobility()` examines the assumption of a constant
     ‘mobility’ parameter;

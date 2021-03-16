@@ -30,21 +30,31 @@
 #' Some functions facilitate spatial operations that support ecological investigations and space use algorithms:
 #' \itemize{
 #'   \item \link{buffer_and_crop} buffers a spatial object (e.g., receiver locations) and uses this buffered object to crop another (e.g., the local bathymetry);
-#'   \item \link{cells_from_val} returns the cells (or a raster of the cells) of a raster that are equal to a specified value or lie within a specified range of values;
+#'   \item \link{cells_from_val} returns the cells (or a \code{\link[raster]{raster}} of the cells) of a \code{\link[raster]{raster}} that are equal to a specified value or lie within a specified range of values;
 #'   \item \link{invert_poly} inverts a polygon (e.g, to define the `sea' from a polygon of the `land');
-#'   \item \link{mask_io} masks values in a raster that lie inside or outside of a spatial mask (e.g., to mask the `land' from the `sea');
-#'   \item \link{sim_surface} populates a raster with simulated values;
-#'   \item \link{split_raster_equally} splits a raster into equal pieces (using code from the greenbrown (http://greenbrown.r-forge.r-project.org) package);
+#'   \item \link{mask_io} masks values in a \code{\link[raster]{raster}} that lie inside or outside of a spatial mask (e.g., to mask the `land' from the `sea');
+#'   \item \link{sim_surface} populates a \code{\link[raster]{raster}} with simulated values;
+#'   \item \link{split_raster_equally} splits a \code{\link[raster]{raster}} into equal pieces (using code from the greenbrown (http://greenbrown.r-forge.r-project.org) package);
 #'   \item \link{update_extent} shrinks or inflates an extent object;
 #' }
 #'
 #' @section Distance calculations:
-#' Some functions facilitate distance calculations, including the calculation of distances between receivers, along 3-dimensional movement paths, and of the shortest paths over a surface:
+#' Some functions facilitate distance calculations, including the calculation of distances between receivers, along 3-dimensional movement paths, and of the shortest paths over a surface.
 #' \itemize{
-#'   \item \link{dist_btw_receivers} calculates the Euclidean distances between all combinations of receivers;
-#'   \item \link{dist_btw_points_3d} calculates the Euclidean distances between points in three-dimensional space;
-#'   \item \link{dist_over_surface} calculates the Euclidean distance along a path over a three-dimensional surface;
-#'   \item \link{lcp_over_surface} calculates the shortest path and/or the distances of the shortest paths over a surface between origin and destination coordinates;
+#'   \item Euclidean distances
+#'   \itemize{
+#'     \item \link{dist_btw_receivers} calculates the Euclidean distances between all combinations of receivers;
+#'     \item \link{dist_btw_points_3d} calculates the Euclidean distances between points in three-dimensional space;
+#'     \item \link{dist_over_surface} calculates the Euclidean distance along a path over a three-dimensional surface;
+#'   }
+#'   \item Shortest (least-cost) distances
+#'   \itemize{
+#'     \item \link{lcp_costs} calculates the distances between connected cells in a \code{\link[raster]{raster}}, accounting for planar (x, y, diagonal) and vertical (z) distances;
+#'     \item \link{lcp_graph_surface} constructs connected graphs for least-cost paths analysis;
+#'     \item \link{lcp_from_point} calculates least-cost distances from a point on a \code{\link[raster]{raster}} to all of the other cells of a \code{\link[raster]{raster}};
+#'     \item \link{lcp_over_surface} calculates the shortest path(s) and/or the distances of the shortest path(s) over a surface between origin and destination coordinates;
+#'     \item \link{lcp_interp} interpolates paths between sequential locations using least-cost paths analysis;
+#'   }
 #' }
 #'
 #' @section Detection statistics:
@@ -70,9 +80,18 @@
 #'     \item \link{coa} implements the arithmetic version of the mean-position algorithm to calculate COAs;
 #'     \item \link{kud_around_coastline} facilitates the estimation of home ranges (e.g., from estimated COAs) in areas of complex coastline;
 #'   }
-#'   \item The depth contour (DC) algorithm
+#'   \item The depth-contour (DC) algorithm
 #'   \itemize{
 #'     \item \link{dc} implements the DC algorithm;
+#'   }
+#'   \item The depth-contour particle filtering (DCPF) algorithm
+#'   \itemize{
+#'     \item \link{dcpf_setup_movement_pr} provides a simple movement model that defines the probability of movement between locations given the distance between them;
+#'     \item \link{dcpf} implements the DCPF algorithm;
+#'     \item \link{dcpf_loglik} calculates the log-likelihood of reconstructed paths, given the movement model;
+#'     \item \link{dcpf_plot_1d} plots the depth time series from observed and reconstructed paths;
+#'     \item \link{dcpf_plot_2d} maps the reconstructed paths in two-dimensions;
+#'     \item \link{dcpf_plot_3d} maps the reconstructed paths in three-dimensions;
 #'   }
 #'   \item The acoustic-centroid depth-contour (ACDC) algorithm
 #'   \itemize{

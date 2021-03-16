@@ -74,6 +74,69 @@ axis(side = 2)
 # ... to help illustrate examples quickly.
 library(flapper)
 
+
+#####################################
+#### dat_dcpf
+
+#### Define data [example 1 in package]
+
+## Sample species
+# In this example, we consider flapper skate (Dipturus intermedius)
+# ... off the west coast of Scotland.
+
+## Define starting location (optional) in UTM coordinates
+xy <- matrix(c(708886.3, 6254404), ncol = 2)
+## Define 'observed' depth time series using absolute values
+# Imagine these are observations made every two minutes
+depth <- c(163.06, 159.71, 153.49, 147.04, 139.86, 127.19, 114.75,
+           99.44,  87.01,  78.16,  70.03,  60.23,  49.96,  35.39,
+           27.75,  20.13,  12.73,  11.32)
+
+## Define surface over which movement must occur
+# We will use the example dat_gebco bathymetry dataset
+# This is relatively coarse in resolution, so we need to re-sample
+# ... the raster to generate a finer-resolution raster such that
+# ... our animal (e.g., a skate) can transition between cells
+# ... in the two-minutes between depth observations. For speed,
+# ... we will focus on a small area around the origin. We could
+# ... also process the raster in other ways (e.g., mask any areas of land)
+# ... to improve efficiency.
+surface    <- dat_gebco
+boundaries <- raster::extent(707884.6, 709884.6, 6253404, 6255404)
+blank      <- raster::raster(boundaries, res = c(5, 5))
+surface    <- raster::resample(surface, blank)
+
+## Define movement model
+# The default movement model is suitable, with skate moving typically
+# ... less than 200 m in a two-minute period.
+
+## Visualise movement surface, with starting location overlaid
+prettyGraphics::pretty_map(add_rasters = list(x = surface),
+                           add_points = list(x = xy),
+                           verbose = FALSE)
+
+#### Example (1): Implement algorithm using default options
+# Note that because the bathymetry data is very coarse, we have to
+# ... force the depth_error to be high in this example.
+paths <- dcpf(archival = depth,
+              bathy = surface,
+              origin  = xy,
+              depth_error = 30,
+              calc_distance = "euclid",
+              calc_movement_pr =
+                function(distance) {
+                  pr <- stats::plogis(10 + distance * -0.05)
+                  pr[distance > 500] <- 0
+                  return(pr)
+                },
+              n = 10L,
+              seed = 1)
+# The function returns a dataframe with information for each path
+utils::str(paths)
+dat_dcpf <- paths
+
+
+#####################################
 #### dat_acdc_contours:
 # ... an example dataset of acoustic centroids required for ACDC algorithm
 # ... useful for demonstrating the acdc algorithm
@@ -105,6 +168,8 @@ dat_centroids <- acdc_setup(rs = dat_moorings$receiver_id,
 saveRDS(dat_centroids, paste0(tempdir(), "/dat_centroids.rds"))
 file.size(paste0(tempdir(), "/dat_centroids.rds"))/1e6
 
+
+#####################################
 #### dat_acdc(): an example output from the .acdc() function
 # ... useful for demonstrating plotting functions
 
@@ -167,6 +232,7 @@ usethis::use_data(dat_archival, overwrite = TRUE)
 usethis::use_data(dat_coast, overwrite = TRUE)
 usethis::use_data(dat_gebco, overwrite = TRUE)
 # function example data
+usethis::use_data(dat_dcpf, overwrite = TRUE)
 usethis::use_data(dat_centroids, overwrite = TRUE)
 usethis::use_data(dat_acdc, overwrite = TRUE)
 

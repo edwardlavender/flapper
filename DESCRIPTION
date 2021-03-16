@@ -13,7 +13,7 @@ Imports:
     Tools4ETS
 Suggests:
     glatos,
-    animation, scales, viridis,
+    plotly, animation, scales, viridis,
     circular, 
     httr, jsonlite,
     rmarkdown, knitr
