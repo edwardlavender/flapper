@@ -206,6 +206,8 @@ and checking of passive acoustic telemetry time series:
         their plausibility;
       - `process_quality_check()` passes acoustic data through some
         basic quality checks prior to analysis;
+      - `process_behav_rest()` identifies ‘resting’ behaviour within
+        depth time series;
 
 ## Spatial tools
 

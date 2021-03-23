@@ -28,6 +28,7 @@ Some functions facilitate the acquisition, assembly, processing and checking of 
     \item \link{process_receiver_id} adds unique receiver IDs to a dataframe (e.g., if the same receiver has been deployed more than once);
     \item \link{process_false_detections_sf} passes putative false detections through a spatial filter which incorporates ancillary information on receiver locations and animal swimming speeds to interrogate their plausibility;
     \item \link{process_quality_check} passes acoustic data through some basic quality checks prior to analysis;
+    \item \link{process_behav_rest} identifies `resting' behaviour within depth time series;
    }
 }
 }
