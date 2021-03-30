@@ -16,6 +16,7 @@ sim_path_sa(
   plot = TRUE,
   add_points = list(pch = 21, bg = "darkgreen"),
   add_path = list(length = 0.05, col = viridis::viridis(n)),
+  add_area = if (is.null(area)) NULL else list(),
   seed = NULL,
   verbose = TRUE,
   ...
@@ -40,7 +41,7 @@ sim_angles(...)
 
 \item{plot}{A logical variable that defines whether or not to produce a plot of the area (if provided) and the simulated movement path.}
 
-\item{add_points, add_path}{(optional) Named lists of arguments that are used to customise the appearance of points (the starting location) and the path on the map.}
+\item{add_area, add_points, add_path}{(optional) Named lists of arguments that are used to customise the appearance of the area, points (the starting location) and the path on the map, passed to the \code{add_polys}, \code{add_points} and \code{add_points} arguments of \code{\link[prettyGraphics]{pretty_map}}.}
 
 \item{seed}{(optional) An integer that defines the seed (for reproducible simulations: see \code{\link[base]{set.seed}}).}
 
@@ -75,7 +76,7 @@ sea  <- invert_poly(dat_coast)
 path <- sim_path_sa(n = 100,
                     area = sea,
                     p_1 = matrix(c(706529.1, 6262293), ncol = 2),
-                    add_polys = list(x = sea, col = "skyblue"))
+                    add_area = list(x = sea, col = "skyblue"))
 
 #### Example (4): Change the movement model(s) to use alternative distributions/parameters
 

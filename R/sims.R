@@ -241,7 +241,7 @@ NULL
 #' @param sim_step A function that is used to simulate step lengths. This follows the same rules as for \code{sim_angle}. For convenience, a default function is included that simulates angles from a gamma distribution with shape and scale parameters of 15 (see \code{\link[stats]{rgamma}}).
 #' @param lag If \code{sim_angle} and/or \code{sim_step} have been defined such that they depend on some previous angle/step length, then \code{lag} is an integer that defines the number of time steps between the current time step and some previous time step that affects the current turning angle and/or step length.
 #' @param plot A logical variable that defines whether or not to produce a plot of the area (if provided) and the simulated movement path.
-#' @param add_points,add_path (optional) Named lists of arguments that are used to customise the appearance of points (the starting location) and the path on the map.
+#' @param add_area,add_points,add_path (optional) Named lists of arguments that are used to customise the appearance of the area, points (the starting location) and the path on the map, passed to the \code{add_polys}, \code{add_points} and \code{add_points} arguments of \code{\link[prettyGraphics]{pretty_map}}.
 #' @param seed (optional) An integer that defines the seed (for reproducible simulations: see \code{\link[base]{set.seed}}).
 #' @param verbose A logical variable that defines whether or not to print messages to the console that relay function progress.
 #' @param ... Additional arguments. For \code{\link[flapper]{sim_path_sa}}, these are passed to \code{\link[prettyGraphics]{pretty_map}} to customise the map. For the default \code{\link[flapper]{sim_angles}} and \code{\link[flapper]{sim_steps}} functions, \code{...} is required but additional parameters are ignored.
@@ -270,7 +270,7 @@ NULL
 #' path <- sim_path_sa(n = 100,
 #'                     area = sea,
 #'                     p_1 = matrix(c(706529.1, 6262293), ncol = 2),
-#'                     add_polys = list(x = sea, col = "skyblue"))
+#'                     add_area = list(x = sea, col = "skyblue"))
 #'
 #' #### Example (4): Change the movement model(s) to use alternative distributions/parameters
 #'
@@ -347,6 +347,7 @@ sim_path_sa <- function(n = 10,
                        plot = TRUE,
                        add_points = list(pch = 21, bg = "darkgreen"),
                        add_path = list(length = 0.05, col = viridis::viridis(n)),
+                       add_area = if(is.null(area)) NULL else list(),
                        seed = NULL,
                        verbose = TRUE,...){
 
@@ -456,9 +457,11 @@ sim_path_sa <- function(n = 10,
     cat_to_console("... Plotting simulated path...")
     if(!is.null(add_points)) add_points$x <- xy_mat[1, ]
     if(!is.null(add_path)) add_path$x <- xy_mat
+    if(!is.null(add_area)) add_area$x <- area
     prettyGraphics::pretty_map(x = area,
                                add_points = add_points,
-                               add_path = add_path,...)
+                               add_path = add_path,
+                               add_polys = add_area,...)
   }
 
   #### Return outputs
