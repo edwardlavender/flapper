@@ -27,6 +27,108 @@ dcpf_setup_movement_pr <- function(distance) {
 
 ########################################
 ########################################
+#### dcpf_setup_cells_by_time()
+
+#' @title Define the \code{cells_by_time} list for the DCPF algorithm
+#' @description For a time series of depth observations for a benthic animal (\code{archival}), this function defines a list of integer vectors, one for each time step, that defines the IDs of all of the cells on a bathymetry \code{\link[raster]{raster}} (\code{bathy}) that the individual could have occupied at that time step, given its depth and a measurement error parameter. This procedure is necessary for the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dcpf}}).
+#'
+#' @param archival A numeric vector of depth observations for \code{\link[flapper]{dcpf}}.
+#' @param bathy A \code{\link[raster]{raster}} of the bathymetry for \code{\link[flapper]{dcpf}}.
+#' @param depth_error The measurement error parameter in \code{\link[flapper]{dcpf}}.
+#' @param cl (optional) A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is stopped within the function.
+#' @param varlist (optional) A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.
+#' @param verbose A logical input that defines whether or not to print messages to the console to monitor function progress.
+#'
+#' @details While this routine can be implemented internally within the DCPF algorithm via \code{\link[flapper]{dcpf}}, it can be beneficial to implement the routine beforehand and pass the resultant list to \code{\link[flapper]{dcpf}}. This is especially the case for large bathymetry surfaces for which computations can take some time.
+#'
+#' @return The function returns a list, with one element for each time step (i.e., observation in \code{archival}) that defines the IDs of all the cells in \code{bathy} that the individual could have occupied at that time step, given the data and the \code{depth_error} parameter.
+#' @examples
+#' #### Define a sequence of depth observations for DCPF algorithm (see ?dcpf)
+#' depth <- c(163.06, 159.71, 153.49, 147.04, 139.86, 127.19, 114.75,
+#'            99.44,  87.01,  78.16,  70.03,  60.23,  49.96,  35.39,
+#'            27.75,  20.13,  12.73,  11.32)
+#'
+#' #### Define bathymetry surface for DCPF algorithm (see ?dcpf)
+#' surface    <- dat_gebco
+#' boundaries <- raster::extent(707884.6, 709884.6, 6253404, 6255404)
+#' blank      <- raster::raster(boundaries, res = c(5, 5))
+#' surface    <- raster::resample(surface, blank)
+#'
+#' #### Example (1): Implement function with default options
+#' cells_by_time <- dcpf_setup_cells_by_time(archival = depth,
+#'                                           bathy = surface,
+#'                                           depth_error = 30)
+#' # The function returns a list of vectors that define all of the cells the individual
+#' # ... could possibly have occupied at each time step, based only on depth, the
+#' # ... bathymetry and the depth error
+#' utils::str(cells_by_time)
+#'
+#' #### Example (2): Implement the function in parallel
+#' # This is only beneficial for large areas/long time series
+#' cells_by_time <- dcpf_setup_cells_by_time(archival = depth,
+#'                                           bathy = surface,
+#'                                           depth_error = 30,
+#'                                           cl = parallel::makeCluster(2L),
+#'                                           varlist = "surface")
+#'
+#' #### Example (3): The function returns an error if there are any
+#' # ... time points with no possible positions for the individual, given the
+#' # ... depth, bathymetry and depth error. This may indicate that the depth error
+#' # ... is too small, the area of the bathymetry is too small (i.e., the individual
+#' # ... may have moved beyond this area) or other model assumptions (e.g.,
+#' # ... benthic habit) are violated.
+#' \dontrun{
+#'   cells_by_time <- dcpf_setup_cells_by_time(archival = depth,
+#'                                             bathy = surface,
+#'                                             depth_error = 0.1)
+#' }
+#' @seealso The DCPF algorithm is implemented by \code{\link[flapper]{dcpf}}.
+#' @author Edward Lavender
+#' @export
+#'
+
+dcpf_setup_cells_by_time <- function(archival, bathy, depth_error, cl = NULL, varlist = NULL, verbose = TRUE){
+
+  #### Function set up
+  cat_to_console <- function(..., show = verbose){
+    if(show) cat(paste(..., "\n"))
+  }
+  t_onset <- Sys.time()
+  cat_to_console(paste0("flapper::dcpf_setup_cells_by_time() called (@ ", t_onset, ")..."))
+
+  #### Get possible cells the individual could have occupied at each time step
+  cat_to_console("... Step 1/2: Determining possible cells the individual could have occupied based on depth at each time step...")
+  if(!is.null(cl)) parallel::clusterExport(cl = cl, varlist = varlist)
+  cells_by_time <- pbapply::pblapply(archival, cl = cl, function(y){
+    # y <- archival[1]
+    cells <- flapper::cells_from_val(x = bathy,
+                                     y = c(y - depth_error, y + depth_error))
+    return(cells)
+  })
+  if(!is.null(cl)) parallel::stopCluster(cl)
+
+  #### Check there are possible cells at all time steps
+  cat_to_console("... Step 2/2: Checking there are possible cells at each time step...")
+  pbapply::pblapply(1:length(cells_by_time), function(t){
+    cells_at_time <- cells_by_time[[t]]
+    if(length(cells_at_time) < 1) {
+      y1 <- archival[t] - depth_error
+      y2 <- archival[t] + depth_error
+      stop("There are no cells within the required depth range {", y1, ", ", y2, "} at time ", t, ".", call. = FALSE)
+    }
+  })
+  cat_to_console("... .... Checks passed.")
+
+  #### Return outputs
+  t_end <- Sys.time()
+  total_duration <- difftime(t_end, t_onset, units = "mins")
+  cat_to_console(paste0("... flapper::dcpf_setup_cells_by_time() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+  return(cells_by_time)
+}
+
+
+########################################
+########################################
 #### dcpf()
 
 #' @title The depth-contour particle filtering (DCPF) algorithm
@@ -38,13 +140,17 @@ dcpf_setup_movement_pr <- function(distance) {
 #'
 #' @param archival A numeric vector of depth (m) observations. Depth should be recorded using absolute values in the same units as the bathymetry (\code{bathy}, see below). Observations are assumed to have been made at regular time intervals.
 #' @param bathy A \code{\link[raster]{raster}} of the bathymetry in the area within which the individual was located over the study. Bathymetry values should be recorded as absolute values and in the same units (m) as for depths (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator projection. The resolution of this layer needs to be sufficiently high such that an individual could transition between cells in the duration between \code{archival} observations (see \code{calc_movement_pr}). If the `shortest distances' method is used for distance calculations (i.e., \code{calc_distance = "lcp"}, see below), then the resolution of the surface in x and y directions should also be equal (for surface's with unequal horizontal resolution, \code{\link[raster]{resample}} can be used to equalise resolution: see \code{\link[flapper]{lcp_over_surface}}). For computational efficiency, it is beneficial if \code{bathy} is cropped to the smallest possible area, with any areas in which movement is impossible (e.g., on land for benthic animals) set to NA (see \code{\link[raster]{crop}}, \code{\link[raster]{mask}} and the processing implemented by \code{\link[flapper]{lcp_over_surface}}).
+#' @param cells_by_time (optional) A list, with one element per time step, that defines the IDs of all the cells in \code{bathy} that the individual could have occupied at each time step based on its depth, \code{bathy} and the measurement error (\code{depth_error}, see below). This can be computed via \code{\link[flapper]{dcpf_setup_cells_by_time}}. If un-supplied, it is computed internally.
 #' @param origin (optional) A matrix that defines the coordinates (x, y) of the individual's initial location. Coordinates should follow the restrictions for \code{bathy} and lie on a plane (i.e., Universal Transverse Mercator projection).
 #' @param depth_error A number that defines the interval around each depth (m) observation that defines the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at that time. For example, \code{depth_error = 2.5} m implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth (m) +/- 2.5 m. The appropriate value for depth_error depends on measurement error for the \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations).
 #' @param calc_distance A character that defines the method used to calculate distances between a point (i.e., a sampled location) and the surrounding cells. This drives the probability of movement into those cells via a movement model (see \code{calc_movement_pr}). Currently supported options are Euclidean distances (\code{"euclid"}) or shortest (least-cost) distances (\code{"lcp"}), which represent the shortest distance that an individual would have to move over the surface (\code{bathy}) to traverse between locations (accounting for both planar and vertical distances). Note that this option requires that resolution of \code{bathy} in the x and y directions is equal. At small spatial scales, this option provides more realistic distances in hilly landscapes, but it is more computationally expensive. At larger scales, horizontal distances tend to overwhelm vertical distances, so Euclidean distances may be acceptable. A pragmatic option is to implement the algorithm (possibly for a subset of the \code{archival} time series) using the Euclidean distances method and then interpolate least-cost paths between sequential positions returned by this approach (see \code{\link[flapper]{lcp_interp}}). This approach will demonstrate whether sequential positions are plausible (i.e., not too far apart) once the bathymetry is taken into account. If so, the shortest-distances derived using this method can then be used for post-hoc adjustment of movement probabilities. Alternatively, this approach may demonstrate that the algorithm should be re-implemented using the shortest distances method (see \code{\link[flapper]{lcp_interp}}).
+#' @param calc_distance_graph (optional) If \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in \code{bathy} from \code{\link[flapper]{lcp_graph_surface}}. This is useful in iterative applications in the same environment, especially for large bathymetry rasters (see \code{bathy}) because the calculations of movement costs between adjacent cells and graph construction - both required for the calculation of shortest paths - can be skipped.
 #' @param calc_movement_pr The movement model. Currently, the only supported option is a function that calculates the probability of movement between two locations in the time between depth observations, given the distance between them. The default option is a declining logistic curve, designed for flapper skate (\emph{Dipturus intermedius}), representing a high probability of movement between nearby locations and a lower probability of movement between distant locations (see \code{\link[flapper]{dcpf_setup_movement_pr}}). For computational efficiency, it is beneficial if the probability of movement is set to zero beyond a distance considered to be highly unlikely, because such locations are excluded from subsequent calculations (see \code{\link[flapper]{dcpf_setup_movement_pr}} and the \code{mobility} argument, below).
+#' @param calc_movement_pr_from_origin (optional) If an \code{origin} is supplied, \code{calc_movement_pr_from_origin} can be supplied to define the probability of sampling possible starting locations depending on their distance from the \code{origin}. By default, \code{calc_movement_pr_from_origin = calc_movement_pr} and the same guidance applies to both arguments. Specifying \code{calc_movement_pr_from_origin} specifically may be necessary if the duration between the time at which the \code{origin} was observed and the first \code{archival} observation differs from the regular interval between \code{archival} observations. This allows the effect of the \code{origin} to be weaker or stronger than the effect of locations at later time steps on sampled locations, if necessary.
 #' @param mobility (optional) A number that defines the maximum horizontal distance (m) that the individual could travel in the time period between \code{archival} observations. While this is optional, it is usually computationally beneficial to define \code{mobility} because this restricts distance and movement probability calculations at each time step within the smallest appropriate range (rather than across the full surface).
+#' @param mobility_from_origin (optional) As above for \code{mobility}, but for the first time step (i.e., the horizontal movement the individual could have moved from the \code{origin}) (see \code{calc_movement_pr_from_origin}).
 #' @param n An integer that defines the number of particles (i.e., the number of locations sampled at each time step from the set of possible locations at that time step).
-#' @param cl,use_all_cores Parallelisation options. The algorithm can be parallelised within time steps over (1) paths via \code{cl} (a cluster object created by \code{\link[parallel]{makeCluster}}) or (2) within paths for the calculation of shortest distances (if \code{calc_distance = "lcp"}) via a logical input (\code{TRUE}) to \code{use_all_cores}. The most efficient solution is context-specific.
+#' @param cl,use_all_cores Parallelisation options. The algorithm can be parallelised within time steps over (1) paths via \code{cl} (a cluster object created by \code{\link[parallel]{makeCluster}}) or (2) within paths for the calculation of shortest distances (if \code{calc_distance = "lcp"}) via a logical input (\code{TRUE}) to \code{use_all_cores}. The most efficient solution is context-specific. For \code{calc_distance = "euclid"}, paralellisation is typically only beneficial for relatively large numbers of particles (e.g., \code{n = 100}), because the substantial computation overhead associated with parallelisation across paths at each time step is substantial. For \code{calc_distance = "lcp"}, \code{use_all_cores = TRUE} is typically a better option for parallelisation; however, this may only be beneficial if \code{mobility} relatively large.
 #' @param seed (optional) An integer to define the seed for reproducible simulations (see \code{\link[base]{set.seed}}).
 #' @param verbose A logical variable that defines whether or not to print messages to the console to relay function progress
 #' @param ... Additional arguments (none implemented).
@@ -56,7 +162,7 @@ dcpf_setup_movement_pr <- function(distance) {
 #'
 #' From each starting position, the Euclidean or shortest distances to cells of the appropriate depth at the next time step are calculated and passed to a movement model that assigns movement probabilities to each cell. While movement probabilities are likely to be behaviourally dependent, time-varying movement parameters are not currently learnt from data or implemented. As such, the movement model will typically depend on the maximum distance that an individual could travel within the time period between depth observations. Across all particles, cells within the required depth range with a movement probability of more than zero from the set of locations from which \code{n} particles are re-sampled, with replacement and according to their probability, at the next time step. This process repeats until the end of the time series. However, note that in the current implementation of the algorithm, unlike for the start of this process, there is no constraint that forces the individual to return to a specified geographical location at the end of the time series. Indeed, other than an (optional) \code{origin} and the information provided by the depth time series (\code{archival}), geographic restrictions (e.g., from acoustic detections) on the location of the animal over the period of observations cannot be incorporated. Therefore, this algorithm is best-suited to small scale applications (e.g., to examine the movements of individuals tagged with archival for short periods of time immediately post-release). If geographical observations (i.e., detections at acoustic receivers) are available for an individual over its time at liberty, the ACDCPF algorithm (currently unavailable) is required to integrate this information into the construction of movement paths.
 #'
-#' The result is a set of simulated pathways over a surface that are consistent with the data and the model parameters. While the number of particles is predetermined by \code{n}, more than \code{n} possible pathways may be defined by all of the combinations of sequential particle movements. Indeed, if there are vast numbers of possible paths through the landscape captured by particle movements, the function can run into vector memory limitations when assembling paths. Therefore, it is advisable to initiate the algorithm with a small number of paths to get a sense of how many possible paths there are, before increasing the number of paths incrementally. In the future, this may be resolved with a separate routine for processing paths (e.g., \code{dcpf_simplify}, like \code{\link[flapper]{acdc_simplify}}), but this is not currently implemented.}
+#' The result is a set of simulated pathways over a surface that are consistent with the data and the model parameters. While the number of particles is predetermined by \code{n}, more than \code{n} possible pathways may be defined by all of the combinations of sequential particle movements. Indeed, if there are vast numbers of possible paths through the landscape captured by particle movements, the function can run into vector memory limitations when assembling paths. Therefore, it is advisable to initiate the algorithm with a small number of paths to get a sense of how many possible paths there are, before increasing the number of paths incrementally. In the future, this may be resolved by allowing path processing outside of this function, but this is not currently implemented.}
 #'
 #' \subsection{Convergence}{Algorithm convergence is not guaranteed. There are four main circumstances in which the algorithm may fail to return any paths that span the start to the end of the depth time series:
 #'  \enumerate{
@@ -168,7 +274,10 @@ dcpf_setup_movement_pr <- function(distance) {
 #' # ... in improving the computation time, because calculations are more involved.
 #'
 #' #### Example (5): Parallelisation for Euclidean distances is via cl argument
-#' # ... which implements parallelisation across paths
+#' # ... which implements parallelisation across paths. (This is typically
+#' # ... more beneficial for larger numbers of particles and may be slower
+#' # ... for small numbers of particles due to the computational overhead
+#' # ... associated with parallelisation.)
 #' paths <- dcpf(archival = depth,
 #'               bathy = surface,
 #'               origin  = xy,
@@ -182,6 +291,9 @@ dcpf_setup_movement_pr <- function(distance) {
 #'
 #' #### Example (6): Parallelisation for shortest distances is usually best
 #' # ... via use_all_cores = TRUE
+#' # However, the benefits of parallelisation depend on the number of least-cost
+#' # ... paths calculations that need to be performed, which depends on the size
+#' # ... of bathy, and may be minimal (or negative) for small areas.
 #' paths <- dcpf(archival = depth,
 #'               bathy = surface,
 #'               origin  = xy,
@@ -206,11 +318,15 @@ dcpf_setup_movement_pr <- function(distance) {
 
 dcpf <- function(archival,
                  bathy,
+                 cells_by_time = NULL,
                  origin = NULL,
                  depth_error = 2.5,
                  calc_distance = c("euclid", "lcp"),
+                 calc_distance_graph = NULL,
                  calc_movement_pr = dcpf_setup_movement_pr,
+                 calc_movement_pr_from_origin = calc_movement_pr,
                  mobility = NULL,
+                 mobility_from_origin = mobility,
                  n = 10L,
                  cl = NULL, use_all_cores = FALSE,
                  seed = NULL,
@@ -218,12 +334,12 @@ dcpf <- function(archival,
 
   #### Set up function
   # Function onset
-  cat_to_cf <- function(..., show = verbose){
+  cat_to_console <- function(..., show = verbose){
     if(show) cat(paste(..., "\n"))
   }
   t_onset <- Sys.time()
-  cat_to_cf(paste0("flapper::dcpf() called (@ ", t_onset, ")..."))
-  cat_to_cf("... Setting up function...")
+  cat_to_console(paste0("flapper::dcpf() called (@ ", t_onset, ")..."))
+  cat_to_console("... Setting up function...")
   # List for outputs
   out_dcpf <- list(dcpf = NULL,
                    args = list(archival= archival,
@@ -238,7 +354,9 @@ dcpf <- function(archival,
                                use_all_cores = use_all_cores,
                                seed = NULL,
                                verbose = TRUE,
-                               dots = ...))
+                               dots = list(...)
+                               )
+                   )
   # Seed
   if(!is.null(seed)) set.seed(seed)
   # Blank list to store path histories
@@ -248,86 +366,87 @@ dcpf <- function(archival,
   proj    <- raster::crs(bathy)
   mask_na <- is.na(bathy)
   boundaries <- raster::extent(bathy)
+  if(is.null(mobility_from_origin)) bathy_sbt_1 <- bathy
   if(is.null(mobility)) bathy_sbt <- bathy
   # Set up distance calculations
   calc_distance <- match.arg(calc_distance)
   if(calc_distance == "lcp") {
-    cat_to_cf("... Setting up cost-surface for calc_distance = 'lcp'...")
+    cat_to_console("... Setting up cost-surface for calc_distance = 'lcp'...")
     if(!all.equal(raster::res(bathy)[1], raster::res(bathy)[2])){
       stop("raster::res(bathy)[1] must equal raster::res(bathy)[2] for this option.")
     }
-    costs <- lcp_costs(bathy, verbose = verbose)
-    cost  <- costs$dist_total
-    graph <- lcp_graph_surface(surface = bathy, cost = cost, verbose = verbose)
+    if(is.null(calc_distance_graph)){
+      costs <- lcp_costs(bathy, verbose = verbose)
+      cost  <- costs$dist_total
+      calc_distance_graph <- lcp_graph_surface(surface = bathy, cost = cost, verbose = verbose)
+    }
   } else {
-    if(use_all_cores) {
+    if(use_all_cores){
       warning("use_all_cores = TRUE ignored for calc_distance = 'euclid'.",
               call. = FALSE, immediate. = TRUE)
       use_all_cores <- FALSE
     }
+    if(!is.null(calc_distance_graph)){
+      warning("'calc_distance_graph' ignored for calc_distance = 'euclid'.",
+              call. = FALSE, immediate = TRUE)
+      calc_distance_graph <- NULL
+    }
   }
   # Other cluster options
-  if(!is.null(cl) & use_all_cores) {
+  if(!is.null(cl) & use_all_cores){
     warning("'cl' and 'use_all_cores' cannot both be specified: setting cl = NULL.",
             call. = FALSE, immediate. = TRUE)
     cl <- NULL
   }
-  if(!is.null(cl)) .cl <- cl else .cl <- NULL
+  .cl <- cl
 
   #### Get possible cells the individual could have occupied at each time step based on depth
-  cat_to_cf("... Determining possible cells the individual could have occupied based on depth at each time step...")
-  cells_by_time <- lapply(archival, function(y){
-    # y <- archival[1]
-    cells <- flapper::cells_from_val(x = bathy,
-                                     y = c(y - depth_error, y + depth_error))
-    return(cells)
-  })
-  # Check there are possible cells at all time steps
-  lapply(1:length(cells_by_time), function(t){
-    cells_at_time <- cells_by_time[[t]]
-    if(length(cells_at_time) < 1) {
-      y1 <- archival[t] - depth_error
-      y2 <- archival[t] + depth_error
-      stop("There are no cells within the required depth range {", y1, ", ", y2, "} at time ", t, ".")
-    }
-  })
+  if(is.null(cells_by_time)){
+    cells_by_time <- dcpf_setup_cells_by_time(archival = archival,
+                                              bathy = bathy,
+                                              depth_error = depth_error,
+                                              cl = NULL,
+                                              verbose = verbose)
+  }
 
   #### For first time step define set of cells
-  cat_to_cf("... Determining the set of possible starting locations (t = 1)...")
+  cat_to_console("... Determining the set of possible starting locations (t = 1)...")
   cells_at_time_current     <- cells_by_time[[1]]
   cells_at_time_current     <- data.frame(id_current = cells_at_time_current,
                                           pr_current = 1)
   # Adjust cell probabilities by distance from origin, if applicable, using mobility model
   if(!is.null(origin)){
-    # Crop raster to focus on area within mobility for speed
-    if(!is.null(mobility)){
-      origin_sp <- sp::SpatialPoints(origin, proj4string = proj)
-      buf       <- rgeos::gBuffer(origin_sp, width = mobility)
-      bathy_sbt <- raster::crop(bathy, buf)
-    }
+    # Crop raster to focus on area within mobility_from_origin for speed
+    if(!is.null(mobility_from_origin)){
+       origin_sp <- sp::SpatialPoints(origin, proj4string = proj)
+       buf       <- rgeos::gBuffer(origin_sp, width = mobility_from_origin)
+     }
     # Get distances
     if(calc_distance == "euclid"){
-      dist_1 <- raster::distanceFromPoints(bathy_sbt, origin)
+      if(!is.null(mobility_from_origin)) bathy_sbt_1 <- raster::crop(bathy, buf)
+      dist_1 <- raster::distanceFromPoints(bathy_sbt_1, origin)
+      if(!is.null(mobility_from_origin)) dist_1 <- raster::extend(dist_1, boundaries, NA)
     } else if(calc_distance == "lcp"){
+      bathy_sbt_1 <- raster::mask(bathy, buf)
       get_destination_index <- function(x) !is.na(x) & x >= archival[1] - depth_error & x <= archival[1] + depth_error
       dist_1 <- lcp_from_point(origin = origin,
                                destination = get_destination_index,
-                               surface = bathy_sbt,
-                               graph = graph,
+                               surface = bathy_sbt_1,
+                               graph = calc_distance_graph,
                                use_all_cores = use_all_cores,
                                verbose = verbose)
     }
-    pr_1 <- raster::calc(dist_1, calc_movement_pr)
+    pr_1 <- raster::calc(dist_1, calc_movement_pr_from_origin)
     pr_1[is.na(pr_1)] <- 0
     pr_1[bathy < archival[1] - depth_error] <- 0
     pr_1[bathy > archival[1] + depth_error] <- 0
     pr_1[mask_na] <- 0
-    if(!is.null(mobility)) pr_1 <- raster::extend(pr_1, boundaries, 0)
+    # if(!is.null(mobility_from_origin)) pr_1 <- raster::extend(pr_1, boundaries, 0)
     cells_at_time_current$pr_current  <- raster::extract(pr_1, cells_at_time_current$id)
   }
 
   #### Implement algorithm iteratively
-  cat_to_cf("... Implementing algorithm iteratively over time steps...")
+  cat_to_console("... Implementing algorithm iteratively over time steps...")
   for(t in 1:(length(archival))){
 
     #### For the current time step, select likely cells
@@ -335,13 +454,13 @@ dcpf <- function(archival,
     # ... movement model is insufficient
     # ... algorithm 'unlucky' in that all n paths up to this point are 'dead ends'
     # ... depth_error is too small
-    cat_to_cf(paste0("... ... Time = ", t, "..."))
+    cat_to_console(paste0("... ... Time = ", t, "..."))
     if(all(cells_at_time_current$pr_current == 0)) {
       message("The probability of all cells at time ", t, " is 0. Either (1) the algorithm has been 'unlucky' and all n = ", n, " paths up to this point are 'dead ends', (2) the mobility model ('mobility') is too limiting and/or (3) the depth error parameter ('depth_error') is too small. The function will now stop, returning outputs up until this point.")
       return(history)
     }
     ## select cells
-    cat_to_cf("... ... ... Selecting candidate starting positions for the current time step...")
+    cat_to_console("... ... ... Selecting candidate starting positions for the current time step...")
     cells_at_time_current_sbt <- cells_at_time_current[sample(x = 1:length(cells_at_time_current$id_current),
                                                               size = n,
                                                               prob = cells_at_time_current$pr_current,
@@ -352,7 +471,7 @@ dcpf <- function(archival,
 
     #### For each particle, identify possible next locations
     if(t <= (length(archival) - 1)) {
-      cat_to_cf("... ... ... For each particle, identifying possible positions for the next time step...")
+      cat_to_console("... ... ... For each particle, identifying possible positions for the next time step...")
       cells_at_time_next <- cells_by_time[[t + 1]]
       mask_1 <- bathy < archival[t + 1] - depth_error
       mask_2 <- bathy > archival[t + 1] + depth_error
@@ -369,15 +488,18 @@ dcpf <- function(archival,
         if(!is.null(mobility)){
           cell_j_sp <- sp::SpatialPoints(cell_j_xy, proj4string = proj)
           buf       <- rgeos::gBuffer(cell_j_sp, width = mobility)
-          bathy_sbt <- raster::crop(bathy, buf)
+          # bathy_sbt <- raster::crop(bathy, buf)
         }
         if(calc_distance == "euclid"){
+          if(!is.null(mobility)) bathy_sbt <- raster::crop(bathy, buf)
           dist_j <- raster::distanceFromPoints(bathy_sbt, cell_j_xy)
+          if(!is.null(mobility)) dist_j <- raster::extend(dist_j, boundaries, NA)
         } else if(calc_distance == "lcp"){
+          if(!is.null(mobility)) bathy_sbt <- raster::mask(bathy, buf)
           dist_j <- lcp_from_point(origin = cell_j_xy,
                                    destination = get_destination_index,
                                    surface = bathy_sbt,
-                                   graph = graph,
+                                   graph = calc_distance_graph,
                                    use_all_cores = use_all_cores,
                                    verbose = FALSE)
         }
@@ -386,7 +508,7 @@ dcpf <- function(archival,
         pr_j[mask_1]  <- 0
         pr_j[mask_2]  <- 0
         pr_j[mask_na] <- 0
-        if(!is.null(mobility)) pr_j <- raster::extend(pr_j, boundaries, 0)
+        # if(!is.null(mobility)) pr_j <- raster::extend(pr_j, boundaries, 0)
         pr_j <- data.frame(id_current = cell_j$id_current, pr_current = cell_j$pr_current, id_next = 1:n_cell, pr_next = as.vector(pr_j))
         pr_j <- pr_j[pr_j$pr_next > 0, ]
         if(nrow(pr_j) > 0) out <- NULL else out <- pr_j
@@ -402,17 +524,57 @@ dcpf <- function(archival,
       colnames(cells_at_time_current) <- c("id_previous", "pr_previous", "id_current", "pr_current")
     }
   }
-  if(!is.null(cl)) parallel::stopCluster(cl = .cl)
+  if(!is.null(.cl) & inherits(.cl, "cluster")) parallel::stopCluster(cl = .cl)
 
   #### Process paths from cell pairs (id_current, id_next)
-  cat_to_cf("... Processing movement paths...")
+  cat_to_console("... Processing movement paths...")
+  out_dcpf$dcpf <- dcpf_simplify(history = history, bathy = bathy, verbose = verbose)$dcpf
+
+  #### Return outputs
+  if(!is.null(seed)) set.seed(NULL)
+  t_end <- Sys.time()
+  total_duration <- difftime(t_end, t_onset, units = "mins")
+  cat_to_console(paste0("... flapper::dcpf() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+  return(out_dcpf)
+
+}
+
+
+########################################
+########################################
+#### dcpf_simplify()
+
+#' @title Simplify the outputs of \code{\link[flapper]{dcpf}} for incomplete paths
+#' @description This function is designed to simplify the list of positions returned by \code{\link[flapper]{dcpf}} for incomplete paths into a set of movement paths. Normally, this routine is implemented by \code{\link[flapper]{dcpf}} internally but if the algorithm fails to converge, an unprocessed list of outputs is returned rather than processed movement paths, in which this function can be used to process the paths.
+#' @param history A named list from an unconverged call to \code{\link[flapper]{dcpf}}.
+#' @param bathy A \code{\link[raster]{raster}} of the bathymetry for \code{\link[flapper]{dcpf}}.
+#' @param verbose A logical input that defines whether or not to print messages to the console to monitor function progress.
+#'
+#' @return The function returns a named list of movement paths, as returned for converged paths by \code{\link[flapper]{dcpf}}.
+#'
+#' @author Edward Lavender
+#' @export
+
+dcpf_simplify <- function(history, bathy, verbose = TRUE){
+
+  #### Function set up
+  cat_to_console <- function(..., show = verbose){
+    if(show) cat(paste(..., "\n"))
+  }
+  t_onset <- Sys.time()
+  cat_to_console(paste0("flapper::dcpf_simplify() called (@ ", t_onset, ")..."))
+  out <- list(dcpf = NULL, args = NULL)
   path <- list()
+
+  #### Assemble paths
+  cat_to_console("... Step 1/3: Assembling paths...")
   path[[1]] <- history[[1]]
   path[[1]]$id_1 <- path[[1]]$id_current
   path[[1]]$pr_1 <- path[[1]]$pr_current
   path[[1]] <- path[[1]][, c("id_1", "pr_1", "id_current")]
-  for(t in 1:(length(archival) - 1)){
+  for(t in 1:(length(history) - 1)){
     history_for_pair <- dplyr::right_join(path[[t]], history[[t + 1]], by = c("id_current" = "id_previous"))
+    history_for_pair <- dplyr::distinct(history_for_pair)
     history_for_pair[, paste0("id_", t+1)]  <- history_for_pair$id_current.y
     history_for_pair[, paste0("pr_", t+1)]  <- history_for_pair$pr_current
     history_for_pair[, "id_current"] <- history_for_pair$id_current.y
@@ -423,9 +585,12 @@ dcpf <- function(archival,
     path[[t+1]] <- history_for_pair
   }
   # Isolate the last element of the list, which contains all paths
-  paths <- path[[length(archival)]]
+  paths <- path[[length(history)]]
   paths$id_current <- NULL
+
+  #### Reformat paths
   # Reformat paths into a list of dataframes, one for each path, containing the path id, cell id and cell pr
+  cat_to_console("... Step 2/3: Formatting paths...")
   path_ls <- lapply(1:nrow(paths), function(i){
     d <- paths[i, ]
     dat_for_path <- data.frame(path_id = i,
@@ -434,21 +599,21 @@ dcpf <- function(archival,
     )
     return(dat_for_path)
   })
-  # Define a dataframe with each path, including cell coordinates and depths
+
+  #### Define a dataframe with each path, including cell coordinates and depths
+  cat_to_console("... Step 3/3: Adding cell coordinates and depths...")
   path_df <- do.call(rbind, path_ls)
   path_df[, c("cell_x", "cell_y")] <- raster::xyFromCell(bathy, path_df$cell_id)
   path_df[, "cell_z"] <- raster::extract(bathy, path_df[, c("cell_x", "cell_y")])
-  path_df[, "timestep"] <- rep(1:length(archival), length(unique(path_df$path_id)))
+  path_df[, "timestep"] <- rep(1:length(history), length(unique(path_df$path_id)))
   path_df <- path_df[, c("path_id", "timestep", "cell_id", "cell_x", "cell_y", "cell_z", "cell_pr")]
-  out_dcpf$dcpf <- path_df
+  out$dcpf <- path_df
 
   #### Return outputs
-  if(!is.null(seed)) set.seed(NULL)
   t_end <- Sys.time()
   total_duration <- difftime(t_end, t_onset, units = "mins")
-  cat_to_cf(paste0("... flapper::dcpf() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
-  return(out_dcpf)
-
+  cat_to_console(paste0("... flapper::dcpf_simplify() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+  return(out)
 }
 
 
@@ -536,12 +701,15 @@ dcpf_plot_1d <- function(archival,
   check_names(input = paths, req = c("path_id", "cell_z"))
   if(!prompt) prettyGraphics::pretty_plot(archival*scale,
                                           pretty_axis_args = pretty_axis_args,
-                                          xlab = xlab, ylab = ylab,...)
+                                          xlab = xlab, ylab = ylab,
+                                          type = type,...)
   lapply(split(paths, paths$path_id), function(d){
     if(prompt) prettyGraphics::pretty_plot(archival*scale,
                                            pretty_axis_args = pretty_axis_args,
-                                           xlab = xlab, ylab = ylab,...)
-    add_lines$x <- d$cell_z*scale
+                                           xlab = xlab, ylab = ylab,
+                                           type = type,...)
+    add_lines$x <- 1:nrow(d)
+    add_lines$y <- d$cell_z*scale
     do.call(graphics::lines, add_lines)
     if(prompt) readline(prompt = "Press [enter] to continue...")
   })
@@ -594,7 +762,7 @@ dcpf_plot_2d <- function(paths,
                          bathy,
                          add_paths = list(),
                          prompt = FALSE,...){
-  check_names(input = paths, req = c("path_id", "cell_z"))
+  check_names(input = paths, req = c("path_id", "cell_x", "cell_y"))
   if(!prompt) prettyGraphics::pretty_map(add_rasters = list(x = bathy),...)
   lapply(split(paths, paths$path_id), function(d){
     if(prompt) prettyGraphics::pretty_map(add_rasters = list(x = bathy),...)
@@ -666,8 +834,9 @@ dcpf_plot_3d <- function(paths,
                          stretch = -5,
                          aspectmode = "data",
                          prompt = FALSE,...){
-  # Check for plotly
+  # Checks
   if(!requireNamespace("plotly", quietly = TRUE)) stop("This function requires the 'plotly' package. Please install it with `install.packages('plotly')` first.")
+  check_names(input = paths, req = c("path_id", "cell_x", "cell_y", "cell_z"))
   # Define a list of outputs
   p_ls <- list()
   # Plot the surface

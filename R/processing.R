@@ -683,8 +683,8 @@ process_behav_rest <- function(archival,
       archival %>%
       dplyr::mutate(state_2 = data.table::frollapply(.data$state_1,
                                                      n = th_time,
-                                                     FUN = weights, align = align,...))
-    # dplyr::mutate(state_2 = dplyr::if_else(is.na(.data$state_2), .data$state_1, .data$state_2))
+                                                     FUN = weights, align = align,...)) %>%
+    dplyr::mutate(state_2 = dplyr::if_else(is.na(.data$state_2), .data$state_1, .data$state_2))
 
     # Assign discrete states based on threshold proportion parameter
     if(!is.null(discrete)){

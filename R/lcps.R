@@ -37,11 +37,11 @@
 lcp_costs <- function(surface, verbose = TRUE,...){
 
   #### Define functions to compute distances between connected of cells
-  cat_to_cf <- function(..., show = verbose){
+  cat_to_console <- function(..., show = verbose){
     if(show) cat(paste(..., "\n"))
   }
   t_onset <- Sys.time()
-  cat_to_cf(paste0("flapper::lcp_costs() called (@ ", t_onset, ")..."))
+  cat_to_console(paste0("flapper::lcp_costs() called (@ ", t_onset, ")..."))
   if(!all.equal(raster::res(surface)[1], raster::res(surface)[2])){
     stop("The resolution of the surface should be equal in the x and y directions. Consider calling raster::resample() before implementing this function.")
   }
@@ -52,13 +52,13 @@ lcp_costs <- function(surface, verbose = TRUE,...){
   calc_bishop <- function(i) lbishop
 
   #### Define transition matrices with the distances between connected cells
-  cat_to_cf(paste0("... Defining transition matrices..."))
+  cat_to_console(paste0("... Defining transition matrices..."))
   tr <- gdistance::transition(surface, calc_height, directions = 8, symm = TRUE)
   tr_rook <- gdistance::transition(surface, calc_rook, directions = 4, symm = TRUE)
   tr_bishop <- gdistance::transition(surface, calc_bishop, directions = "bishop", symm = TRUE)
 
   ## Extract transitionMatrix with distances
-  cat_to_cf(paste0("... Calculating distance matrices..."))
+  cat_to_console(paste0("... Calculating distance matrices..."))
   # vertical distances between connected cells
   vdist_mat  <- gdistance::transitionMatrix(tr)
   # planar rook distances between connected cells
@@ -71,7 +71,7 @@ lcp_costs <- function(surface, verbose = TRUE,...){
   tdist_mat <- sqrt(hdist_mat^2 + vdist_mat^2)
 
   ## Define cost components/surfaces in output matrix
-  cat_to_cf(paste0("... Assembling LCP costs..."))
+  cat_to_console(paste0("... Assembling LCP costs..."))
   out <- list(dist_rook = rook_mat,
               dist_bishop = bishop_mat,
               dist_planar = hdist_mat,
@@ -82,7 +82,7 @@ lcp_costs <- function(surface, verbose = TRUE,...){
   #### Return outputs
   t_end <- Sys.time()
   total_duration <- difftime(t_end, t_onset, units = "mins")
-  cat_to_cf(paste0("... flapper::lcp_costs() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+  cat_to_console(paste0("... flapper::lcp_costs() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
   return(out)
 }
 
@@ -123,16 +123,16 @@ lcp_costs <- function(surface, verbose = TRUE,...){
 lcp_graph_surface <- function(surface, cost, verbose = TRUE,...){
 
   #### Set up function
-  cat_to_cf <- function(..., show = verbose){
+  cat_to_console <- function(..., show = verbose){
     if(show) cat(paste(..., "\n"))
   }
   t_onset <- Sys.time()
-  cat_to_cf(paste0("flapper::lcp_graph() called (@ ", t_onset, ")..."))
+  cat_to_console(paste0("flapper::lcp_graph_surface() called (@ ", t_onset, ")..."))
   cells <- 1:raster::ncell(surface)
   surface_df <- data.frame(cell = cells, value = as.vector(surface))
 
   #### Define a dataframe of edges with associated costs
-  cat_to_cf("... Defining nodes, edges and costs to make graph...")
+  cat_to_console("... Defining nodes, edges and costs to make graph...")
   non_zero_indices <- Matrix::which(cost != 0, arr.ind = TRUE)
   edges <- data.frame(from = cells[non_zero_indices[, 1]],
                       to = cells[non_zero_indices[, 2]],
@@ -144,12 +144,12 @@ lcp_graph_surface <- function(surface, cost, verbose = TRUE,...){
   coord <- data.frame(node = cells, X = rxy[, 1], Y = rxy[, 2])
 
   #### Make graph
-  cat_to_cf("... Constructing graph object...")
+  cat_to_console("... Constructing graph object...")
   makegraph_param <- list(df = edges, directed = TRUE, coords = coord)
   graph <- do.call(cppRouting::makegraph, makegraph_param)
   t_end <- Sys.time()
   total_duration <- difftime(t_end, t_onset, units = "mins")
-  cat_to_cf(paste0("... flapper::lcp_cost() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+  cat_to_console(paste0("... flapper::lcp_graph_surface() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
   return(graph)
 }
 
@@ -249,11 +249,11 @@ lcp_from_point <- function(origin,
                            verbose = TRUE,...){
 
   #### Get surface info
-  cat_to_cf <- function(..., show = verbose){
+  cat_to_console <- function(..., show = verbose){
     if(show) cat(paste(..., "\n"))
   }
   t_onset <- Sys.time()
-  cat_to_cf(paste0("flapper::lcp_from_point() called (@ ", t_onset, ")..."))
+  cat_to_console(paste0("flapper::lcp_from_point() called (@ ", t_onset, ")..."))
   cells <- 1:raster::ncell(surface)
   surface_df <- data.frame(cell = cells, value = as.vector(surface))
   origin_cell <- raster::cellFromXY(surface, origin)
@@ -262,14 +262,14 @@ lcp_from_point <- function(origin,
 
   #### Get cost surface (once), if un-supplied
   if(is.null(cost) & is.null(graph)) {
-    cat_to_cf("... Calculating cost surface...")
+    cat_to_console("... Calculating cost surface...")
     costs <- lcp_costs(surface, verbose = verbose)
     tdist_mat <- costs$dist_total
   } else tdist_mat <- cost
 
   #### Define a dataframe of edges with associated costs
   if(is.null(graph)){
-    cat_to_cf("... Defining nodes, edges and costs to make graph...")
+    cat_to_console("... Defining nodes, edges and costs to make graph...")
     non_zero_indices <- Matrix::which(tdist_mat != 0, arr.ind = TRUE)
     edges <- data.frame(from = cells[non_zero_indices[, 1]],
                         to = cells[non_zero_indices[, 2]],
@@ -281,13 +281,13 @@ lcp_from_point <- function(origin,
     coord <- data.frame(node = cells, X = rxy[, 1], Y = rxy[, 2])
 
     #### Make graph
-    cat_to_cf("... Constructing graph object...")
+    cat_to_console("... Constructing graph object...")
     makegraph_param <- list(df = edges, directed = TRUE, coords = coord)
     graph <- do.call(cppRouting::makegraph, makegraph_param)
   }
 
   #### Get LCP distances
-  cat_to_cf("... Calling cppRouting::get_distance_matrix() to get least-cost distances...")
+  cat_to_console("... Calling cppRouting::get_distance_matrix() to get least-cost distances...")
   get_distance_param <- list(Graph = graph,
                              from = origin_cell,
                              to = destination_cell,
@@ -297,7 +297,7 @@ lcp_from_point <- function(origin,
   dist_lcp <- as.numeric(dist_lcp)
 
   #### Make a raster
-  cat_to_cf("... Making raster of least-cost distances from origin ...")
+  cat_to_console("... Making raster of least-cost distances from origin ...")
   r <- surface
   r <- raster::setValues(r, NA)
   r[origin_cell] <- 0
@@ -306,7 +306,7 @@ lcp_from_point <- function(origin,
   #### Return outputs
   t_end <- Sys.time()
   total_duration <- difftime(t_end, t_onset, units = "mins")
-  cat_to_cf(paste0("... flapper::lcp_from_point() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+  cat_to_console(paste0("... flapper::lcp_from_point() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
   return(r)
 
 }
@@ -824,6 +824,11 @@ lcp_over_surface <-
     #### Set up raster
 
     #### Define a list of outputs
+    cat_to_console <- function(..., show = verbose){
+      if(show) cat(paste(..., "\n"))
+    }
+    t_onset <- Sys.time()
+    cat_to_console(paste0("flapper::lcp_over_surface() called (@ ", t_onset, ")..."))
     out      <- list()
     out$time <- data.frame(event = "onset", time = Sys.time())
     out$args <- list(origin = origin,
@@ -846,15 +851,9 @@ lcp_over_surface <-
                      verbose = TRUE,
                      dots = ...)
 
-    #### Utils
-    # Print messages to the console if verbose
-    cat_to_console <- function(..., show = verbose){
-      if(show) cat(paste(..., "\n"))
-    }
-
     #### Checks
     if(check){
-      cat_to_console("Checking user inputs...")
+      cat_to_console("... Checking user inputs...")
       # Check origin/destination coordinates are inputted as matrices
       check_class(input = origin, to_class = "matrix", type = "stop")
       check_class(input = destination, to_class = "matrix", type = "stop")
@@ -898,13 +897,13 @@ lcp_over_surface <-
 
     #### Crop raster
     if(!is.null(crop)){
-      cat_to_console("Cropping raster to inputted extent...")
+      cat_to_console("... Cropping raster to inputted extent...")
       surface <- raster::crop(surface, crop)
     }
 
     #### Crop raster around Euclidean transect(s) for speed
     if(!is.null(buffer)){
-      cat_to_console("Cropping raster to buffer zone around a Euclidean transect between the origin and destination...")
+      cat_to_console("... Cropping raster to buffer zone around a Euclidean transect between the origin and destination...")
       # Check only one origin/destination node
       if(nrow(origin) > 1 | nrow(destination) > 1){
         stop("More than one set of origin or destination coordinates inputted; 'buffer' cannot be implemented.")
@@ -921,14 +920,14 @@ lcp_over_surface <-
 
     #### Aggregate raster
     if(!is.null(aggregate)){
-      cat_to_console("Aggregating raster...")
+      cat_to_console("... Aggregating raster...")
       aggregate$x <- surface
       surface <- do.call(raster::aggregate, aggregate)
     }
 
     #### Mask raster
     if(!is.null(mask)){
-      cat_to_console("Masking raster...")
+      cat_to_console("... Masking raster...")
       surface <- mask_io(x = surface, mask = mask, mask_inside = mask_inside, updatevalue = Inf)
     }
 
@@ -979,7 +978,7 @@ lcp_over_surface <-
     #### Set up transition matrix
 
     #### Define cell connections and distances between adjacent cells
-    cat_to_console("Defining cost matrix...")
+    cat_to_console("... Defining cost matrix...")
 
     #### Define parameters
     # Basis param
@@ -1049,7 +1048,7 @@ lcp_over_surface <-
 
     #### Calculate Euclidean distances (for comparison to LCP distances)
     if(goal %in% c(1, 3)){
-      cat_to_console("Calculating Euclidean distance(s)...")
+      cat_to_console("... Calculating Euclidean distance(s)...")
       if(combination == "pair") allpairs <- FALSE else if(combination == "matrix") allpairs <- TRUE
       dist_euclid <- raster::pointDistance(origin, destination, lonlat = FALSE, allpairs = allpairs)
       if(nrow(origin) == 1 & nrow(destination) == 1) dist_euclid <- as.numeric(dist_euclid)
@@ -1062,11 +1061,11 @@ lcp_over_surface <-
 
     #### LCP distances/paths
     if(method == "gdistance"){
-      cat_to_console("Using method = 'gdistance'...")
+      cat_to_console("... Using method = 'gdistance'...")
 
       #### Calculate the reciprocal of the costs
       # ... (i.e. the total ease of movement between connected cells):
-      cat_to_console("... Defining 'ease' matrix...")
+      cat_to_console("... ... Defining 'ease' matrix...")
       cells_non_zero <- Matrix::which(tdist_mat > 0, arr.ind = TRUE)
       ease_mat <- tdist_mat
       ease_mat[cells_non_zero] <- 1/ease_mat[cells_non_zero]
@@ -1089,7 +1088,7 @@ lcp_over_surface <-
       if(goal %in% c(1, 3)){
 
         ## Define parameters to compute least-cost distances
-        cat_to_console("... Implementing Dijkstra's algorithm to compute least-cost distance(s)...")
+        cat_to_console("... ... Implementing Dijkstra's algorithm to compute least-cost distance(s)...")
         costDistance_param <- list(x = tr, fromCoords = origin, toCoords = destination)
         out$gdistance_param <- list(costDistance_param = costDistance_param)
 
@@ -1123,7 +1122,7 @@ lcp_over_surface <-
 
       #### Calculate least-cost paths between points
       if(goal %in% c(2, 3)){
-        cat_to_console("... Implementing Dijkstra's algorithm to compute least-cost path(s)...")
+        cat_to_console("... ... Implementing Dijkstra's algorithm to compute least-cost path(s)...")
         shortestPath_param <- list(x = tr, fromCoords = origin, toCoords = destination)
         out$gdistance_param$shortestPath_param <- shortestPath_param
 
@@ -1201,10 +1200,10 @@ lcp_over_surface <-
 
 
     } else if(method == "cppRouting"){
-      cat_to_console("Using method = 'cppRouting'...")
+      cat_to_console("... Using method = 'cppRouting'...")
 
       #### Define a dataframe of edges with associated costs
-      cat_to_console("... Defining nodes, edges and costs to make graph...")
+      cat_to_console("... ... Defining nodes, edges and costs to make graph...")
       # from, to, cost
       # edges <- expand.grid(from = cells, to = cells)
       # edges$cost <- as.vector(tdist_mat)
@@ -1221,7 +1220,7 @@ lcp_over_surface <-
       coord <- data.frame(node = cells, X = rxy[, 1], Y = rxy[, 2])
 
       #### Make graph
-      cat_to_console("... Constructing graph object...")
+      cat_to_console("... ... Constructing graph object...")
       makegraph_param <- list(df = edges, directed = TRUE, coords = coord)
       out$cppRouting_param <- list(makegraph_param = makegraph_param)
       graph <- do.call(cppRouting::makegraph, makegraph_param)
@@ -1230,7 +1229,7 @@ lcp_over_surface <-
       #### Compute all shortest distance between origin and destination nodes
       if(goal %in% c(1, 3)){
         # Define parameters to compute distances
-        cat_to_console(paste("... Implementing",  cppRouting_algorithm, "algorithm to compute least-cost distance(s)..."))
+        cat_to_console(paste("... ... Implementing",  cppRouting_algorithm, "algorithm to compute least-cost distance(s)..."))
         get_distance_param <- list(Graph = graph,
                                    from = origin_cell,
                                    to = destination_cell,
@@ -1255,7 +1254,7 @@ lcp_over_surface <-
         ## Set up to compute shortest paths
         # Define function to compute paths and add parameters to output list
         if(combination == "pair"){
-          cat_to_console(paste("... Implementing",  cppRouting_algorithm, "algorithm to compute least-cost paths(s)..."))
+          cat_to_console(paste("... ... Implementing",  cppRouting_algorithm, "algorithm to compute least-cost paths(s)..."))
           get_path_param <- list(Graph = graph,
                                  from = origin_cell,
                                  to = destination_cell,
@@ -1266,7 +1265,7 @@ lcp_over_surface <-
           get_path <- cppRouting::get_path_pair
           out$cppRouting_param$get_path_pair_param <- get_path_param
         } else if(combination == "matrix"){
-          cat_to_console("... Implementing Dijkstra's algorithm recursively to compute least-cost paths(s)...")
+          cat_to_console("... .... Implementing Dijkstra's algorithm recursively to compute least-cost paths(s)...")
           get_path_param <- list(Graph = graph,
                                  from = origin_cell,
                                  to = destination_cell,
@@ -1338,9 +1337,11 @@ lcp_over_surface <-
     }
 
     #### Return outputs
-    out$time <- rbind(out$time, data.frame(event = "finish", time = Sys.time()))
+    t_end <- Sys.time()
+    total_duration <- difftime(t_end, t_onset, units = "mins")
+    out$time <- rbind(out$time, data.frame(event = "finish", time = t_end))
     out$time$serial_duration <- Tools4ETS::serial_difference(out$time$time)
-    cat_to_console("Done.")
+    cat_to_console(paste0("... flapper::lcp_over_surface() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
     return(out)
 
   }
@@ -1466,18 +1467,18 @@ lcp_over_surface <-
 lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = TRUE, verbose = TRUE){
 
   #### Set up
-  cat_to_cf <- function(..., show = verbose){
+  cat_to_console <- function(..., show = verbose){
     if(show) cat(paste(..., "\n"))
   }
   t_onset <- Sys.time()
-  cat_to_cf(paste0("flapper::lcp_interp() called (@ ", t_onset, ")..."))
-  cat_to_cf("... Setting up function...")
+  cat_to_console(paste0("flapper::lcp_interp() called (@ ", t_onset, ")..."))
+  cat_to_console("... Setting up function...")
   out <- list(paths = paths)
   check_names(input = paths, req = c("path_id", "timestep", "cell_x", "cell_y"))
   check...(c("origin", "destination", "combination", "goal"),...)
 
   #### Reformat dataframe with the 'previous' and 'current' step for each path
-  cat_to_cf("... Processing paths...")
+  cat_to_console("... Processing paths...")
   paths_xy <- lapply(split(paths, paths$path_id), function(d){
     d$cell_x_previous = dplyr::lag(d$cell_x)
     d$cell_y_previous = dplyr::lag(d$cell_y)
@@ -1487,10 +1488,16 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
   }) %>% dplyr::bind_rows()
   paths_xy <- paths_xy[stats::complete.cases(paths_xy), ]
 
+  #### Get non-duplicate pairs for speed
+  paths_xy$pair <- paste0("(", paths_xy$cell_x_previous, ",", paths_xy$cell_y_previous, "), ",
+                          "(", paths_xy$cell_x_current, ",", paths_xy$cell_y_current, ")")
+  paths_xy$dup <- duplicated(paths_xy$pair)
+  paths_xy_sbt <- paths_xy[!paths_xy$dup, ]
+
   #### Calculate least-cost paths between coordinates
-  cat_to_cf("... Calculating least-cost paths via flapper::lcp_over_surface()...")
-  origin <- as.matrix(paths_xy[, c("cell_x_previous", "cell_y_previous")])
-  destination <- as.matrix(paths_xy[, c("cell_x_current", "cell_y_current")])
+  cat_to_console("... Calculating least-cost paths via flapper::lcp_over_surface()...")
+  origin <- as.matrix(paths_xy_sbt[, c("cell_x_previous", "cell_y_previous")])
+  destination <- as.matrix(paths_xy_sbt[, c("cell_x_current", "cell_y_current")])
   paths_lc <- lcp_over_surface(origin = origin,
                                destination = destination,
                                surface = surface,
@@ -1499,6 +1506,12 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
                                verbose = verbose,...)
   # Extract xy coordinates for LCP between each origin and destination pairs
   paths_lc_xy <- paths_lc$path_lcp$coordinates
+  # Reformat to add back duplicate paths
+  names(paths_lc_xy) <- paths_xy_sbt$pair
+  paths_lc_xy <- lapply(split(paths_xy, 1:nrow(paths_xy)), function(d){
+    paths_lc_xy[d$pair]
+  })
+  # Add cell coordinate and time steps to dataframe
   paths_lc_xy <- lapply(1:length(paths_lc_xy), function(i){
     xy <- paths_lc_xy[[i]]
     xy <- data.frame(xy)
@@ -1508,7 +1521,7 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
   })
 
   #### Join all coordinates for each path into a single element of a list
-  cat_to_cf("... Processing least-cost paths...")
+  cat_to_console("... Processing least-cost paths...")
   n <- length(which(paths_xy$path_id == 1))
   paths_lc_xyz_by_path <- lapply(seq(1, nrow(paths_xy), by = n), function(start){
     # Get coordinates
@@ -1536,7 +1549,7 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
   out$path_lcp <- paths_lc_xyz
   #### Summarise distances
   if(calc_distance){
-    cat_to_cf("... Summarising distances for each least-cost path...")
+    cat_to_console("... Summarising distances for each least-cost path...")
     dists <-
       paths_lc_xyz %>%
       dplyr::group_by(.data$path_id, .data$timestep) %>%
@@ -1554,7 +1567,7 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
   if(!calc_distance) out <- out$path_lcp
   t_end <- Sys.time()
   total_duration <- difftime(t_end, t_onset, units = "mins")
-  cat_to_cf(paste0("... flapper::lcp_interp() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+  cat_to_console(paste0("... flapper::lcp_interp() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
   return(out)
 
 }
