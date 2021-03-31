@@ -208,6 +208,8 @@ and checking of passive acoustic telemetry time series:
         basic quality checks prior to analysis;
       - `process_behav_rest()` identifies ‘resting’ behaviour within
         depth time series;
+      - `process_surface()` determines an ‘optimum’ raster aggregation
+        method and error induced by this process;
 
 ## Spatial tools
 
@@ -235,6 +237,8 @@ ecological investigations and space use algorithms:
 Some functions facilitate standard distance calculations using Euclidean
 distances:
 
+  - `dist_btw_clicks()` calculates distances and draws segments between
+    sequential mouse clicks on a map;
   - `dist_btw_receivers()` calculates the Euclidean distances between
     all combinations of receivers;
   - `dist_btw_points_3d()` calculates the Euclidean distances between

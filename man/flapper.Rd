@@ -29,6 +29,7 @@ Some functions facilitate the acquisition, assembly, processing and checking of 
     \item \link{process_false_detections_sf} passes putative false detections through a spatial filter which incorporates ancillary information on receiver locations and animal swimming speeds to interrogate their plausibility;
     \item \link{process_quality_check} passes acoustic data through some basic quality checks prior to analysis;
     \item \link{process_behav_rest} identifies `resting' behaviour within depth time series;
+    \item \link{process_surface} determines an 'optimum' \code{\link[raster]{raster}} aggregation method and error induced by this process;
    }
 }
 }
@@ -53,6 +54,7 @@ Some functions facilitate distance calculations, including the calculation of di
 \itemize{
   \item Euclidean distances
   \itemize{
+    \item \link{dist_btw_clicks} calculates distances and draws segments between sequential mouse clicks on a map;
     \item \link{dist_btw_receivers} calculates the Euclidean distances between all combinations of receivers;
     \item \link{dist_btw_points_3d} calculates the Euclidean distances between points in three-dimensional space;
     \item \link{dist_over_surface} calculates the Euclidean distance along a path over a three-dimensional surface;

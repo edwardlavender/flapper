@@ -695,3 +695,105 @@ process_behav_rest <- function(archival,
   #### Return outputs
   return(archival$state_2)
 }
+
+
+#########################################
+#########################################
+#### process_surface()
+
+#' @title Process a Raster* by aggregation and quantify the error induced by this process
+#' @description This function reduces the resolution of a \code{\link[raster]{raster}} by multiple aggregation methods and then quantifies the relative error induced by each method from the differences between the original values and the aggregated values. To implement the function, a \code{\link[raster]{raster}} (\code{x}) must be supplied as well as an aggregation factor (\code{fact}) and a named list of functions (\code{stat}) used to aggregate the \code{\link[raster]{raster}}. The \code{\link[raster]{raster}} is aggregated using each method (function) and mapped back onto the original resolution for calculation of the differences between the original \code{\link[raster]{raster}} and the aggregated \code{\link[raster]{raster}}(s). The function returns a visual statistical summary of the differences (if \code{plot = TRUE}) and a named list comprising the aggregated \code{\link[raster]{raster}}(s) and the re-sampled version(s) of those mapped back onto the original resolution.
+#'
+#' @param x A \code{\link[raster]{raster}} to be processed. For implementations preceding a call to of one of \code{\link[flapper]{flapper}}'s particle filtering algorithms, \code{x} should be planar (i.e., Universal Transverse Mercator projection) with equal resolution in the x, y directions and identical units in the x, y and z directions (e.g., see \code{\link[flapper]{dcpf}}).
+#' @param fact A positive integer that defines by how much \code{x} should be aggregated (see \code{\link[raster]{aggregate}}).
+#' @param stat A named list of functions used to aggregate \code{x} (see the \code{fun} argument of \code{\link[raster]{aggregate}}).
+#' @param ... Additional arguments passed to \code{\link[raster]{aggregate}} to control aggregation.
+#' @param plot A logical input that defines whether or not to plot a summary of the differences between the original \code{\link[raster]{raster}} (\code{x}) and the aggregated \code{\link[raster]{raster}}(s). If specified, the minimum, median and maximum difference are shown for each statistic (\code{stat}).
+#' @param cl (optional) A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is stopped within the function.
+#' @param varlist (optional) A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.
+#' @param verbose A logical input that defines whether or not to print messages to the console to relay function progress.
+#'
+#' @details This function was motivated by the particle filtering algorithms in \code{\link[flapper]{flapper}} (e.g., \code{\link[flapper]{dcpf}}). For these algorithms, it is computationally beneficial to reduce \code{\link[raster]{raster}} resolution, where possible, by aggregation. To facilitate this process, this function quantifies the relative error induced by different aggregation functions. If appropriate, the particle filtering algorithm(s) can then be implemented using the aggregated \code{\link[raster]{raster}} that minimises the error, with the magnitude of that error propagated via the \code{depth_error} parameter.
+#'
+#' @return The function returns a plot of the differences between the original and aggregated \code{\link[raster]{raster}}(s), if \code{plot = TRUE}, and a named list of (a) the aggregated \code{\link[raster]{raster}}(s) (`agg_by_stat'), (b) the aggregated, resampled \code{\link[raster]{raster}}(s) (`agg_by_stat_rs') and (c) the summary statistics plotted.
+#'
+#' @examples
+#' # Define the raster for which to implement the function
+#' x <- dat_gebco
+#' blank <- raster::raster(raster::extent(x), crs = raster::crs(x), resolution = 250)
+#' x <- raster::resample(x, blank, method = "bilinear")
+#' # Implement function using a list of statistics
+#' out <- process_surface(x, fact = 2, stat = list(min = min, mean = mean, median = median, max = max))
+#' summary(out)
+#'
+#' @seealso \code{\link[raster]{aggregate}}, \code{\link[raster]{resample}}
+#' @author Edward Lavender
+#' @export
+
+process_surface <- function(x,
+                            fact = 2L,
+                            stat = list(mean = mean),...,
+                            plot = TRUE,
+                            cl = NULL, varlist = NULL,
+                            verbose = TRUE){
+
+  # Set up function
+  t_onset <- Sys.time()
+  cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+  cat_to_console(paste0("flapper::process_surface() called (@ ", t_onset, ")..."))
+  check_named_list(input = stat)
+
+  # Define blank raster with same extent
+  x_blank <- x
+
+  # Aggregate raster by each statistic
+  cat_to_console("... Aggregating raster...")
+  if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
+  x_agg_by_stat <- pbapply::pblapply(stat, cl = cl, function(foo){
+    x_agg <- raster::aggregate(x, fact = fact, fun = foo,...)
+    return(x_agg)
+  })
+
+  # Re-sample aggregated rasters to original resolution
+  cat_to_console("... Resampling aggregated raster(s) back onto the original resolution...")
+  x_agg_by_stat_rs <- pbapply::pblapply(x_agg_by_stat, cl = cl, function(x_agg){
+    x_agg_rs <- raster::resample(x_agg, x_blank, method = "ngb")
+    return(x_agg_rs)
+  })
+  if(!is.null(cl)) parallel::stopCluster(cl)
+
+  # Get differences between original raster and aggregated (resampled) rasters for each statistic
+  cat_to_console("... Computing differences between the original and aggregated raster(s)...")
+  x_agg_by_stat_rs_diff <- pbapply::pblapply(x_agg_by_stat_rs, function(x_agg_rs){
+    x_agg_rs_diff <- x - x_agg_rs
+    return(x_agg_rs_diff)
+  })
+
+  # Summarise differences
+  if(plot){
+    cat_to_console("... Summarising the differences between rasters across statistic(s)...")
+    mins <- sapply(x_agg_by_stat_rs_diff, raster::cellStats, stat = "min")
+    meds <- sapply(x_agg_by_stat_rs_diff, raster::cellStats, stat = "mean")
+    maxs <- sapply(x_agg_by_stat_rs_diff, raster::cellStats, stat = "max")
+    xp <- factor(names(stat), levels = names(stat))
+    prettyGraphics::pretty_plot(xp, meds,
+                                ylim = range(c(mins, maxs)),
+                                type = "n", xlab= "Statistic", ylab = "Difference [x - x_agg]")
+    prettyGraphics::add_error_bars(x = xp, fit = meds, lwr = mins, upr = maxs)
+    x_summary_stats <- data.frame(stat = names(stat),
+                                min = mins,
+                                median = meds,
+                                max = maxs)
+  } else x_summary_stats <- NULL
+
+
+  # Return outputs
+  out <- list(agg_by_stat = x_agg_by_stat,
+              agg_by_stat_rs_diff = x_agg_by_stat_rs_diff,
+              summary_stats = x_summary_stats)
+  t_end <- Sys.time()
+  duration <- difftime(t_end, t_onset, units = "mins")
+  cat_to_console(paste0("... flapper::process_surface() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
+  return(out)
+
+}

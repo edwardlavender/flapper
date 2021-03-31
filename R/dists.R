@@ -68,6 +68,50 @@ dist_btw_receivers <-
 
 }
 
+
+######################################
+######################################
+#### dist_btw_clicks()
+
+#' @title Calculate the distance between sequential mouse clicks on a map
+#' @description This function calculates the distance between sequential mouse clicks on a plotted map, by combining \code{\link[graphics]{locator}} with a distance calculator, such as \code{\link[raster]{pointDistance}}.
+#'
+#' @param calc_distance A function that calculates distances between two sets of points, such as \code{\link[raster]{pointDistance}}. The first two arguments of this function must accept a dataframe comprising the x and y coordinates of the first and second set of points respectively. The function must return a numeric vector of distances between these.
+#' @param ... Additional arguments passed to \code{calc_distance}, such as \code{lonlat} for \code{\link[raster]{pointDistance}}.
+#' @param add_paths (optional) A named list of arguments, passed to \code{\link[prettyGraphics]{add_sp_path}}, to customise the paths added to the plot. \code{add_paths = NULL} suppresses this option.
+#'
+#' @return The function returns a dataframe with an integer ID for each path segment (`segment'), the first and second x and y coordinates (`x', `x2', `y', `y2`) and the distances between these points (`dist'). If \code{add_paths} is not \code{NULL}, the segments are drawn on the map.
+#'
+#' @examples
+#' \dontrun{
+#' raster::plot(dat_gebco)
+#' dist_btw_clicks(lonlat = FALSE)
+#' }
+#'
+#' @author Edward Lavender
+#' @export
+#'
+
+dist_btw_clicks <- function(calc_distance = raster::pointDistance,..., add_paths = list(length = 0.025)){
+  cat("Please click locations on the map and press [Esc] when you are done...\n")
+  dat <- locator()
+  cat("Getting distances...\n")
+  dat <- data.frame(segment = 1:length(dat$x),
+                    x = dat$x,
+                    x2 = dplyr::lead(dat$x),
+                    y = dat$y,
+                    y2 = dplyr::lead(dat$y))
+  if(!is.null(add_paths)){
+    add_paths$x <- dat$x
+    add_paths$y <- dat$y
+    do.call(prettyGraphics::add_sp_path, add_paths)
+  }
+  dat <- dat[complete.cases(dat), ]
+  dat$dist <- raster::pointDistance(dat[, c("x", "y")], dat[, c("x2", "y2")],...)
+  return(dat)
+}
+
+
 ######################################
 ######################################
 #### dist_btw_points_3d()

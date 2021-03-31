@@ -95,6 +95,7 @@ A number of functions facilitate the acquisition, assembly, processing and check
     * `process_false_detections_sf()` passes putative false detections through a spatial filter which incorporates information on receiver locations and animal swimming speeds to interrogate their plausibility;
     * `process_quality_check()` passes acoustic data through some basic quality checks prior to analysis; 
     * `process_behav_rest()` identifies 'resting' behaviour within depth time series;
+    * `process_surface()` determines an 'optimum' raster aggregation method and error induced by this process;
 
 ## Spatial tools 
 
@@ -112,6 +113,7 @@ A number of functions facilitate spatial operations that support ecological inve
 
 Some functions facilitate standard distance calculations using Euclidean distances:
 
+* `dist_btw_clicks()` calculates distances and draws segments between sequential mouse clicks on a map; 
 * `dist_btw_receivers()` calculates the Euclidean distances between all combinations of receivers;
 * `dist_btw_points_3d()` calculates the Euclidean distances between points in three-dimensional space;
 * `dist_over_surface()` calculates the total Euclidean distance along a path over a three-dimensional surface;
