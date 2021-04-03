@@ -14,7 +14,7 @@ lcp_interp(
 )
 }
 \arguments{
-\item{paths}{A dataframe that defines movement paths. This must contain a unique, integer identifier for each path from 1 to the number of paths (`path_id'); an integer time step index (`timestep') and the coordinates of sequential locations (`cell_x' and `cell_y'). The example dataset comprising movement paths reconstructed over the seabed by the depth-contour particle filtering algorithm (\code{\link[flapper]{dat_dcpf}}) exemplifies of the appropriate format.}
+\item{paths}{A dataframe that defines movement paths. This must contain a unique, integer identifier for each path from 1 to the number of paths (`path_id'); an integer time step index (`timestep') and the coordinates of sequential locations (`cell_x' and `cell_y'). The example dataset comprising movement paths reconstructed over the seabed by the depth-contour particle filtering algorithm (\code{\link[flapper]{dat_dcpf_paths}}) exemplifies of the appropriate format.}
 
 \item{surface}{A \code{\link[raster]{raster}} of the surface over which the object (i.e., individual) moved between sequential locations. \code{\link[flapper]{lcp_over_surface}} forces some restrictions on the form of this raster. The \code{surface} must be planar (i.e., Universal Transverse Mercator projection) with units of metres and equal resolution in the x, y and z directions (see \code{\link[flapper]{lcp_over_surface}}).}
 
@@ -46,10 +46,10 @@ This function can also be useful for visualising movement paths (e.g., via \code
 # We will interpolate LCPs between sequential locations
 # ... of a skate on the seabed
 # ... reconstructed by the DCPF algorithm (dcpf()), using the
-# ... example dat_dcpf dataset. We extract the paths
+# ... example dat_dcpf_* datasets. We extract the paths
 # ... and the surface over which movement occurred from this object:
-paths   <- dat_dcpf$dcpf
-surface <- dat_dcpf$args$bathy
+paths   <- dat_dcpf_paths
+surface <- dat_dcpf_histories$args$bathy
 
 #### Example (1): Implement lcp_interp() for an example path
 # ... with calc_distance = FALSE
@@ -99,7 +99,7 @@ paths_interp_3$dist_lcp$key <-
 paths_1$dist <-
   paths_interp_3$dist_lcp$dist[match(paths_1$key, paths_interp_3$dist_lcp$key)]
 # Examine shortest distances with respect to movement model used to implement DCPF
-prettyGraphics::pretty_plot(dat_dcpf$args$calc_movement_pr(1:1000), type = "l")
+prettyGraphics::pretty_plot(dat_dcpf_histories$args$calc_movement_pr(1:1000), type = "l")
 graphics::rug(paths_1$dist, col = "red", pos = 0, lwd = 2)
 # In this case, every step in this path has non zero probability, suggesting
 # ... the Euclidean approach worked reasonably well (there aren't 'impossible'
@@ -109,17 +109,17 @@ graphics::rug(paths_1$dist, col = "red", pos = 0, lwd = 2)
 # Given the Euclidean approach has generated a reasonable path, we can adjust
 # ... the probabilities associated with sequential steps so that they are based,
 # ... more realistically, on shortest distances:
-paths_1$cell_pr_2 <- dat_dcpf$args$calc_movement_pr(paths_1$dist)
+paths_1$cell_pr_2 <- dat_dcpf_histories$args$calc_movement_pr(paths_1$dist)
 prettyGraphics::pretty_plot(paths_1$cell_pr, paths_1$cell_pr_2)
 graphics::abline(0, 1, lty = 3)
 # In this case, probabilities are mostly similar
 
 ## Alternatively, we could re-implement the algorithm using shortest distances
 # Re-implement algorithm
-dcpf_args <- dat_dcpf$args
+dcpf_args <- dat_dcpf_histories$args
 dcpf_args$calc_distance <- "lcp"
-dcpf_results <- do.call(dcpf, dcpf_args)
-paths <- dcpf_results$dcpf
+dcpf_history <- do.call(dcpf, dcpf_args)
+paths <- dcpf_simplify(dcpf_history)
 # Interpolate paths
 paths_interp_4 <- lcp_interp(paths, surface)
 # Show the probabilities reported by the DCPF algorithm are the same as those

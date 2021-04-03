@@ -2,22 +2,28 @@
 % Please edit documentation in R/dcpf.R
 \name{dcpf_simplify}
 \alias{dcpf_simplify}
-\title{Simplify the outputs of \code{\link[flapper]{dcpf}} for incomplete paths}
+\title{Convert particle histories from \code{\link[flapper]{dcpf}} into movement paths}
 \usage{
-dcpf_simplify(history, bathy, verbose = TRUE)
+dcpf_simplify(record, verbose = TRUE)
 }
 \arguments{
-\item{history}{A named list from an unconverged call to \code{\link[flapper]{dcpf}}.}
-
-\item{bathy}{A \code{\link[raster]{raster}} of the bathymetry for \code{\link[flapper]{dcpf}}.}
+\item{record}{A \code{\link[flapper]{.dcpf-class}} object from \code{\link[flapper]{dcpf}}.}
 
 \item{verbose}{A logical input that defines whether or not to print messages to the console to monitor function progress.}
 }
 \value{
-The function returns a named list of movement paths, as returned for converged paths by \code{\link[flapper]{dcpf}}.
+The function returns a \code{\link[flapper]{dcpf-class}} object, which is a dataframe that defines the movement paths.
 }
 \description{
-This function is designed to simplify the list of positions returned by \code{\link[flapper]{dcpf}} for incomplete paths into a set of movement paths. Normally, this routine is implemented by \code{\link[flapper]{dcpf}} internally but if the algorithm fails to converge, an unprocessed list of outputs is returned rather than processed movement paths, in which this function can be used to process the paths.
+This function is designed to simplify the \code{\link[flapper]{.dcpf-class}} object from \code{\link[flapper]{dcpf}} that defines sampled particle histories into a set of movement paths.
+}
+\details{
+If there are vast numbers of possible paths through the landscape captured by particle movements, the function can run into vector memory limitations when assembling paths.
+}
+\examples{
+# An example with the example DCPF particle histories dataset included in flapper
+paths <- dcpf_simplify(dat_dcpf_histories)
+
 }
 \author{
 Edward Lavender

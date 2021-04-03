@@ -18,9 +18,9 @@ dcpf_plot_1d(
 )
 }
 \arguments{
-\item{archival}{A numeric vector of depth (m) observations, as used by \code{\link[flapper]{dcpf}}.}
+\item{archival}{A dataframe of depth (m) observations named `depth', as used by \code{\link[flapper]{dcpf}}.}
 
-\item{paths}{A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{dcpf}}. At a minimum, this should contain a unique identifier for each path (named `path_id’) and the depth associated with each cell along each path (`cell_z').}
+\item{paths}{A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{dcpf}} via \code{\link[flapper]{dcpf_simplify}} (see \code{\link[flapper]{dcpf-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id’) and the depth associated with each cell along each path (`cell_z').}
 
 \item{scale}{A number that vertically scales the depth time series for the observations and the reconstructed path(s). By default, absolute values for depth are assumed and negated for ease of visualisation.}
 
@@ -37,13 +37,13 @@ The function returns a plot of the observed and reconstructed depth time series,
 This function plots the observed depth time series and the depth time series associated with each path reconstructed by the depth-contour particle filtering (DCPF) algorithm.
 }
 \details{
-Observed and reconstructed depth time series can differ due to measurement error, which is controlled via the \code{depth_error} parameter in the DCPF algorithm (see \code{\link[flapper]{dcpf}}).
+Observed and reconstructed depth time series can differ due to measurement error, which is controlled via the \code{calc_depth_error} function in the DCPF algorithm (see \code{\link[flapper]{dcpf}}).
 }
 \examples{
 #### Implement dcpf() algorithm
-# Here, we extract the necessary information from pre-defined outputs for speed
-archival <- dat_dcpf$args$archival
-paths    <- dat_dcpf$dcpf
+# Here, we use pre-defined outputs for speed
+archival <- dat_dcpf_histories$args$archival
+paths    <- dat_dcpf_paths
 
 #### Example (1): The default implementation
 dcpf_plot_1d(archival, paths)
@@ -55,13 +55,14 @@ dcpf_plot_1d(archival, paths, add_lines = list(col = "red", lwd = 0.5))
 
 #### Example (3): Plot individual comparisons
 if(interactive()){
-  pp <- par(mfrow = c(3, 4))
+  pp <- graphics::par(mfrow = c(3, 4))
   dcpf_plot_1d(depth, paths, prompt = TRUE)
-  par(pp)
+  graphics::par(pp)
 }
+
 }
 \seealso{
-\code{\link[flapper]{dcpf}} implements the DCPF algorithm. \code{\link[flapper]{dcpf_plot_1d}}, \code{\link[flapper]{dcpf_plot_2d}} and \code{\link[flapper]{dcpf_plot_3d}} provide plotting routines. \code{\link[flapper]{dcpf_loglik}} calculates the log-likelihood of each path.
+\code{\link[flapper]{dcpf}} implements the DCPF algorithm. \code{\link[flapper]{dcpf_plot_history}} visualises particle histories and \code{\link[flapper]{dcpf_simplify}} processes the outputs into a dataframe of movement paths. \code{\link[flapper]{dcpf_plot_1d}}, \code{\link[flapper]{dcpf_plot_2d}} and \code{\link[flapper]{dcpf_plot_3d}} provide plotting routines for paths. \code{\link[flapper]{dcpf_loglik}} calculates the log-likelihood of each path.
 }
 \author{
 Edward Lavender

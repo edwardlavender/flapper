@@ -91,6 +91,7 @@ xy <- matrix(c(708886.3, 6254404), ncol = 2)
 depth <- c(163.06, 159.71, 153.49, 147.04, 139.86, 127.19, 114.75,
            99.44,  87.01,  78.16,  70.03,  60.23,  49.96,  35.39,
            27.75,  20.13,  12.73,  11.32)
+depth <- data.frame(depth = depth)
 
 ## Define surface over which movement must occur
 # We will use the example dat_gebco bathymetry dataset
@@ -118,22 +119,25 @@ prettyGraphics::pretty_map(add_rasters = list(x = surface),
 #### Example (1): Implement algorithm using default options
 # Note that because the bathymetry data is very coarse, we have to
 # ... force the depth_error to be high in this example.
-paths <- dcpf(archival = depth,
+dcpf_1 <- dcpf(archival = depth,
               bathy = surface,
               origin  = xy,
-              depth_error = 30,
+              calc_depth_error = function(...) c(-30, 30),
               calc_distance = "euclid",
               calc_movement_pr =
-                function(distance) {
+                function(distance,...) {
                   pr <- stats::plogis(10 + distance * -0.05)
                   pr[distance > 500] <- 0
                   return(pr)
                 },
               n = 10L,
-              seed = 1)
-# The function returns a dataframe with information for each path
-utils::str(paths)
-dat_dcpf <- paths
+              seed = 2)
+# The function returns a list with particle histories and arguments
+utils::str(dcpf_1)
+# Blank cells_by_time optional element in args to reduce dataset size
+dcpf_1$args$cells_by_time <- NULL
+dat_dcpf_histories <- dcpf_1
+dat_dcpf_paths     <- dcpf_simplify(dat_dcpf_histories)
 
 
 #####################################
@@ -232,7 +236,8 @@ usethis::use_data(dat_archival, overwrite = TRUE)
 usethis::use_data(dat_coast, overwrite = TRUE)
 usethis::use_data(dat_gebco, overwrite = TRUE)
 # function example data
-usethis::use_data(dat_dcpf, overwrite = TRUE)
+usethis::use_data(dat_dcpf_histories, overwrite = TRUE)
+usethis::use_data(dat_dcpf_paths, overwrite = TRUE)
 usethis::use_data(dat_centroids, overwrite = TRUE)
 usethis::use_data(dat_acdc, overwrite = TRUE)
 

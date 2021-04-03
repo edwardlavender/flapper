@@ -94,7 +94,7 @@ dist_btw_receivers <-
 
 dist_btw_clicks <- function(calc_distance = raster::pointDistance,..., add_paths = list(length = 0.025)){
   cat("Please click locations on the map and press [Esc] when you are done...\n")
-  dat <- locator()
+  dat <- graphics::locator()
   cat("Getting distances...\n")
   dat <- data.frame(segment = 1:length(dat$x),
                     x = dat$x,
@@ -106,7 +106,7 @@ dist_btw_clicks <- function(calc_distance = raster::pointDistance,..., add_paths
     add_paths$y <- dat$y
     do.call(prettyGraphics::add_sp_path, add_paths)
   }
-  dat <- dat[complete.cases(dat), ]
+  dat <- dat[stats::complete.cases(dat), ]
   dat$dist <- raster::pointDistance(dat[, c("x", "y")], dat[, c("x2", "y2")],...)
   return(dat)
 }

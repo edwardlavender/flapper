@@ -9,7 +9,7 @@ dcpf(
   bathy,
   cells_by_time = NULL,
   origin = NULL,
-  depth_error = 2.5,
+  calc_depth_error = function(...) c(-2.5, 2.5),
   calc_distance = c("euclid", "lcp"),
   calc_distance_graph = NULL,
   calc_movement_pr = dcpf_setup_movement_pr,
@@ -17,6 +17,9 @@ dcpf(
   mobility = NULL,
   mobility_from_origin = mobility,
   n = 10L,
+  resample = NULL,
+  update_history = NULL,
+  update_history_from_time_step = 1,
   cl = NULL,
   use_all_cores = FALSE,
   seed = NULL,
@@ -25,21 +28,21 @@ dcpf(
 )
 }
 \arguments{
-\item{archival}{A numeric vector of depth (m) observations. Depth should be recorded using absolute values in the same units as the bathymetry (\code{bathy}, see below). Observations are assumed to have been made at regular time intervals.}
+\item{archival}{A dataframe of depth time series (for a single individual). At a minimum, this should contain a column named `depth' with depth observations. Depth should be recorded using absolute values in the same units as the bathymetry (\code{bathy}, see below). Observations are assumed to have been made at regular time intervals. Other columns can be included for variables which influence the movement model (see \code{calc_movement_pr}).}
 
-\item{bathy}{A \code{\link[raster]{raster}} of the bathymetry in the area within which the individual was located over the study. Bathymetry values should be recorded as absolute values and in the same units (m) as for depths (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator projection. The resolution of this layer needs to be sufficiently high such that an individual could transition between cells in the duration between \code{archival} observations (see \code{calc_movement_pr}). If the `shortest distances' method is used for distance calculations (i.e., \code{calc_distance = "lcp"}, see below), then the resolution of the surface in x and y directions should also be equal (for surface's with unequal horizontal resolution, \code{\link[raster]{resample}} can be used to equalise resolution: see \code{\link[flapper]{lcp_over_surface}}). For computational efficiency, it is beneficial if \code{bathy} is cropped to the smallest possible area, with any areas in which movement is impossible (e.g., on land for benthic animals) set to NA (see \code{\link[raster]{crop}}, \code{\link[raster]{mask}} and the processing implemented by \code{\link[flapper]{lcp_over_surface}}).}
+\item{bathy}{A \code{\link[raster]{raster}} of the bathymetry in the area within which the individual was located over the study. Bathymetry values should be recorded as absolute values and in the same units (m) as for depths (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator projection. The resolution of this layer needs to be sufficiently high such that an individual could transition between cells in the duration between \code{archival} observations (see \code{calc_movement_pr}). If the `shortest distances' method is used for distance calculations (i.e., \code{calc_distance = "lcp"}, see below), then the resolution of the surface in x and y directions should also be equal (for surface's with unequal horizontal resolution, \code{\link[raster]{resample}} can be used to equalise resolution: see \code{\link[flapper]{lcp_over_surface}}). For computational efficiency, it is beneficial if \code{bathy} is cropped to the smallest possible area, with any areas in which movement is impossible (e.g., on land for benthic animals) set to NA (see \code{\link[raster]{crop}}, \code{\link[raster]{mask}} and the processing implemented by \code{\link[flapper]{lcp_over_surface}}). It may also be desirable to aggregate high-resolution \code{\link[raster]{raster}}s (see \code{\link[flapper]{process_surface}}).}
 
-\item{cells_by_time}{(optional) A list, with one element per time step, that defines the IDs of all the cells in \code{bathy} that the individual could have occupied at each time step based on its depth, \code{bathy} and the measurement error (\code{depth_error}, see below). This can be computed via \code{\link[flapper]{dcpf_setup_cells_by_time}}. If un-supplied, it is computed internally.}
+\item{cells_by_time}{(optional) A list, with one element per time step, that defines the IDs of all the cells in \code{bathy} that the individual could have occupied at each time step based on its depth, \code{bathy} and the measurement error (see \code{calc_depth_error}, below). This can be computed via \code{\link[flapper]{dcpf_setup_cells_by_time}}. If un-supplied, it is computed internally.}
 
 \item{origin}{(optional) A matrix that defines the coordinates (x, y) of the individual's initial location. Coordinates should follow the restrictions for \code{bathy} and lie on a plane (i.e., Universal Transverse Mercator projection).}
 
-\item{depth_error}{A number that defines the interval around each depth (m) observation that defines the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at that time. For example, \code{depth_error = 2.5} m implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth (m) +/- 2.5 m. The appropriate value for depth_error depends on measurement error for the \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations).}
+\item{calc_depth_error}{A function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.}
 
-\item{calc_distance}{A character that defines the method used to calculate distances between a point (i.e., a sampled location) and the surrounding cells. This drives the probability of movement into those cells via a movement model (see \code{calc_movement_pr}). Currently supported options are Euclidean distances (\code{"euclid"}) or shortest (least-cost) distances (\code{"lcp"}), which represent the shortest distance that an individual would have to move over the surface (\code{bathy}) to traverse between locations (accounting for both planar and vertical distances). Note that this option requires that resolution of \code{bathy} in the x and y directions is equal. At small spatial scales, this option provides more realistic distances in hilly landscapes, but it is more computationally expensive. At larger scales, horizontal distances tend to overwhelm vertical distances, so Euclidean distances may be acceptable. A pragmatic option is to implement the algorithm (possibly for a subset of the \code{archival} time series) using the Euclidean distances method and then interpolate least-cost paths between sequential positions returned by this approach (see \code{\link[flapper]{lcp_interp}}). This approach will demonstrate whether sequential positions are plausible (i.e., not too far apart) once the bathymetry is taken into account. If so, the shortest-distances derived using this method can then be used for post-hoc adjustment of movement probabilities. Alternatively, this approach may demonstrate that the algorithm should be re-implemented using the shortest distances method (see \code{\link[flapper]{lcp_interp}}).}
+\item{calc_distance}{A character that defines the method used to calculate distances between a point (i.e., a sampled location) and the surrounding cells. This drives the probability of movement into those cells via a movement model (see \code{calc_movement_pr} and \code{calc_movement_pr_from_origin}). Currently supported options are Euclidean distances (\code{"euclid"}) or shortest (least-cost) distances (\code{"lcp"}), which represent the shortest distance that an individual would have to move over the surface (\code{bathy}) to traverse between locations (accounting for both planar and vertical distances). Note that this option requires that resolution of \code{bathy} in the x and y directions is equal. At small spatial scales, this option provides more realistic distances in hilly landscapes, but it is more computationally expensive. At larger scales, horizontal distances tend to overwhelm vertical distances, so Euclidean distances may be acceptable. A pragmatic option initially is to implement the algorithm (possibly for a subset of the \code{archival} time series) using the Euclidean distances method and then interpolate least-cost paths between sequential positions returned by this approach (see \code{\link[flapper]{lcp_interp}}). This approach will demonstrate whether sequential positions are plausible (i.e., not too far apart) once the bathymetry is taken into account. If so, the shortest-distances derived using this method can then be used for post-hoc adjustment of movement probabilities. Alternatively, this approach may demonstrate that the algorithm should be re-implemented using the shortest distances method (see \code{\link[flapper]{lcp_interp}}).}
 
 \item{calc_distance_graph}{(optional) If \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in \code{bathy} from \code{\link[flapper]{lcp_graph_surface}}. This is useful in iterative applications in the same environment, especially for large bathymetry rasters (see \code{bathy}) because the calculations of movement costs between adjacent cells and graph construction - both required for the calculation of shortest paths - can be skipped.}
 
-\item{calc_movement_pr}{The movement model. Currently, the only supported option is a function that calculates the probability of movement between two locations in the time between depth observations, given the distance between them. The default option is a declining logistic curve, designed for flapper skate (\emph{Dipturus intermedius}), representing a high probability of movement between nearby locations and a lower probability of movement between distant locations (see \code{\link[flapper]{dcpf_setup_movement_pr}}). For computational efficiency, it is beneficial if the probability of movement is set to zero beyond a distance considered to be highly unlikely, because such locations are excluded from subsequent calculations (see \code{\link[flapper]{dcpf_setup_movement_pr}} and the \code{mobility} argument, below).}
+\item{calc_movement_pr}{The movement model. This must be a function that calculates the probability of movement between two locations in the time between depth observations, given the distance between them (the first argument) and (optionally) any other pertinent information in the archival dataframe for the relevant time step (the second argument). For example, behavioural states could be defined in a column in the \code{archival} dataframe and then included as part of the movement model. Both arguments must be accepted, even if the second is ignored. The default option is a declining logistic curve, designed for flapper skate (\emph{Dipturus intermedius}), representing a high probability of movement between nearby locations and a lower probability of movement between distant locations (see \code{\link[flapper]{dcpf_setup_movement_pr}}). For computational efficiency, it is beneficial if the probability of movement is set to zero beyond a distance considered to be highly unlikely, because such locations are excluded from subsequent calculations (see \code{\link[flapper]{dcpf_setup_movement_pr}} and the \code{mobility} argument, below). Currently, the movement model cannot incorporate the individual's location (for spatially variable fields such as water currents).}
 
 \item{calc_movement_pr_from_origin}{(optional) If an \code{origin} is supplied, \code{calc_movement_pr_from_origin} can be supplied to define the probability of sampling possible starting locations depending on their distance from the \code{origin}. By default, \code{calc_movement_pr_from_origin = calc_movement_pr} and the same guidance applies to both arguments. Specifying \code{calc_movement_pr_from_origin} specifically may be necessary if the duration between the time at which the \code{origin} was observed and the first \code{archival} observation differs from the regular interval between \code{archival} observations. This allows the effect of the \code{origin} to be weaker or stronger than the effect of locations at later time steps on sampled locations, if necessary.}
 
@@ -49,7 +52,13 @@ dcpf(
 
 \item{n}{An integer that defines the number of particles (i.e., the number of locations sampled at each time step from the set of possible locations at that time step).}
 
-\item{cl, use_all_cores}{Parallelisation options. The algorithm can be parallelised within time steps over (1) paths via \code{cl} (a cluster object created by \code{\link[parallel]{makeCluster}}) or (2) within paths for the calculation of shortest distances (if \code{calc_distance = "lcp"}) via a logical input (\code{TRUE}) to \code{use_all_cores}. The most efficient solution is context-specific. For \code{calc_distance = "euclid"}, paralellisation is typically only beneficial for relatively large numbers of particles (e.g., \code{n = 100}), because the substantial computation overhead associated with parallelisation across paths at each time step is substantial. For \code{calc_distance = "lcp"}, \code{use_all_cores = TRUE} is typically a better option for parallelisation; however, this may only be beneficial if \code{mobility} relatively large.}
+\item{resample}{(optional) An integer that defines the minimum number of unique cells that should be sampled, given the movement model (\code{calc_movement_pr} or \code{calc_movement_pr_from_origin}). If supplied, if fewer than \code{resample} unique cells are sampled at a time step, \code{n} particles are re-sampled with replacement with equal probability from all of the cells with non-zero probability. This may facilitate algorithm convergence if there are some cells that are overwhelmingly more probable (given the movement model) are `dead ends': re-sampling all possible cells with equal probability allows the algorithm to explore less likely routes more easily when the number of routes becomes low. \code{resample} must be less than or equal to \code{n}.}
+
+\item{update_history}{(optional) A list that defines particle histories from an earlier implementation of \code{\link[flapper]{dcpf}} (i.e., the `history' element of a \code{\link[flapper]{.dcpf-class}} object). If provided, the function attempts to continue paths from an earlier time step (see \code{update_history_from_time_step}). This can be useful if the algorithm fails to converge on its initial implementation because the algorithm can be re-started part-way through the time series.}
+
+\item{update_history_from_time_step}{If \code{update_history} is provided, \code{update_history_from_time_step} is an integer that defines the time step (i.e., element in \code{update_history}) from which to restart the algorithm. If provided, the algorithm continues from this point, by taking the starting positions for \code{n} particles from \code{update_history[[update_history_from_time_step]]$id_current}.}
+
+\item{cl, use_all_cores}{Parallelisation options. The algorithm can be parallelised within time steps over (1) paths via \code{cl} (an integer defining the number of child processes (ignored on Windows) or a cluster object created by \code{\link[parallel]{makeCluster}} (see \code{\link[pbapply]{pblapply}})) or (2) within paths for the calculation of shortest distances (if \code{calc_distance = "lcp"}) via a logical input (\code{TRUE}) to \code{use_all_cores}. The most efficient solution is context-specific. For \code{calc_distance = "euclid"}, paralellisation is typically only beneficial for relatively large numbers of particles, because the substantial computation overhead associated with parallelisation across paths at each time step is substantial. For \code{calc_distance = "lcp"}, \code{use_all_cores = TRUE} is typically a better option for parallelisation; however, this may only be beneficial if \code{mobility} relatively large.}
 
 \item{seed}{(optional) An integer to define the seed for reproducible simulations (see \code{\link[base]{set.seed}}).}
 
@@ -58,32 +67,42 @@ dcpf(
 \item{...}{Additional arguments (none implemented).}
 }
 \value{
-The function returns a named list that records the parameters used to generate function outputs (`args'), in a named list, and a dataframe (`dcpf') that records possible movement paths over a surface. The dataframe includes the following columns: a unique identifier for each path (`path_id'); the time step (`time_step'), the location (cell ID and three-dimensional coordinates) on \code{bathy} (`cell_id', `cell_x', `cell_y' and `cell_z') and the probability associated with that cell, given movement from the previous cell (`cell_pr'). Rows are ordered by path and then time step. \code{\link[flapper]{dat_dcpf}} provides an example.
+The function returns a \code{\link[flapper]{.dcpf-class}} object. This is a named list that includes the parameters used to generate function outputs (`args') and the particles sampled at each time step (`history'). The latter can be assembled into a dataframe of movement paths via \code{\link[flapper]{dcpf_simplify}}.
 }
 \description{
 This function implements the depth-contour particle filtering (DCPF) algorithm. This is an extension of the DC algorithm (\code{\link[flapper]{dc}}) that implements particle filtering to reconstruct possible movement paths of an individual (i.e., a benthic animal) over a surface (i.e., the seabed). As in the DC algorithm, at each time step the possible locations of an individual are determined from its depth and the bathymetric landscape (plus a measurement error term). The extension is the incorporation of a  movement model, via a simulation-based particle filtering process, that connects a subset of these locations between time steps into movement paths.
 
-To implement this approach, a numeric vector of depth observations resulting from movement over a surface (\code{archival}), as well as a \code{\link[raster]{raster}} of the surface over which movement occurred (\code{bathy}) and a measurement error parameter (\code{depth_error}), must be supplied. A starting location (\code{origin}) can be supplied to constrain the set of possible locations of the individual within this area. At each time step, \code{n} possible locations (`particles') are sampled (with replacement) from the set of possible locations. For each (\code{1:n}) particle, a movement model is used to simulate where the individual could have moved to at the next time step, if it was in any of those locations. In the current framework, the probability of movement into surrounding cells depends on the distance to those cells, which can be represented as using Euclidean or least-cost distances depending on the distance method (\code{calc_distance}), and a user-defined movement model (\code{calc_movement_pr}) that links distances to movement probabilities.
+To implement this approach, a dataframe of depth observations resulting from movement over a surface (\code{archival}), as well as a \code{\link[raster]{raster}} of the surface over which movement occurred (\code{bathy}) and a function that defines the measurement error with depth (\code{calc_depth_error}), must be supplied. A starting location (\code{origin}) can be supplied to constrain the set of possible locations of the individual within this area. At each time step, \code{n} possible locations (`particles') are sampled (with replacement) from the set of possible locations. For each (\code{1:n}) particle, a movement model is used to simulate where the individual could have moved to at the next time step, if it was in any of those locations. In the current framework, the probability of movement into surrounding cells depends on the distance to those cells, which can be represented as using Euclidean or least-cost distances depending on the distance method (\code{calc_distance}), and user-defined movement models (\code{calc_movement_pr_from_origin} and \code{calc_movement_pr}) that links distances to movement probabilities.
 
 At each subsequent time step, this process repeats, with \code{n} possible locations of the individual sampled according to the probability that the individual could have been in that cell, given a previously sampled location, its depth and the bathymetry. The result is a set of paths over the surface that are consistent with the data and model parameters.
 }
 \details{
-\subsection{Background}{The DCPF algorithm simulates possible movement paths of a benthic animal over the seabed, given a regular sequence of depth observations (\code{archival}), the bathymetry (\code{bathy}) over which movement occurred and a movement model (\code{calc_movement_pr}) that specifies the probability of movement from a given location to any other, given the distance between them. The function was motivated by small scale applications concerning the reconstruction of possible movement paths of flapper skate (\emph{Dipturus intermedius}) tagged with archival tags, following capture and release in a given location, for short-periods of time post-release.}
+\subsection{Background}{The DCPF algorithm simulates possible movement paths of a benthic animal over the seabed, given a regular sequence of depth observations (\code{archival}), the bathymetry (\code{bathy}) over which movement occurred and a movement model (\code{calc_movement_pr}) that specifies the probability of movement from a given location to any other, given the distance between them (and any other pre-defined time-dependent parameters in \code{archival}). The function was motivated by small scale applications concerning the reconstruction of possible movement paths of flapper skate (\emph{Dipturus intermedius}) tagged with archival tags, following capture and release in a given location, for short-periods of time post-release.}
 
-\subsection{Methods}{At the first time step, the function identifies all of the locations in which the animal could have been located, based on its depth, the bathymetry and some measurement error (\code{depth_error}) that depends on the accuracy of the depth observations, the bathymetry data and the magnitude of the tidal range over the period of observations. From this set of possible locations, \code{n} starting points (particles) are selected. If an \code{origin} is specified, this selection can be biased towards cells near the origin by the movement model. (Location probability could also be weighted by the proximity between the observed depth and the depths of cells within the range defined by the observed depth and the measurement error (i.e., \code{archival[1] - depth_error, archival[1] + depth error}), but this is not currently implemented.)
+\subsection{Methods}{At the first time step, the function identifies all of the locations in which the animal could have been located, based on its depth, the bathymetry and some measurement error (determined by \code{calc_depth_error}) that depends on the accuracy of the depth observations, the bathymetry data and the magnitude of the tidal range over the period of observations. From this set of possible locations, \code{n} starting points (particles) are selected. If an \code{origin} is specified, this selection can be biased towards cells near the origin by the movement model. (Location probability could also be weighted by the proximity between the observed depth and the depths of cells within the range defined by the observed depth and the measurement error (i.e., \code{archival$depth[1] + calc_depth_error(archival$depth[1])[1], archival$depth[1] + calc_depth_error(archival$depth[1])[2]}), but this is not currently implemented.)
 
-From each starting position, the Euclidean or shortest distances to cells of the appropriate depth at the next time step are calculated and passed to a movement model that assigns movement probabilities to each cell. While movement probabilities are likely to be behaviourally dependent, time-varying movement parameters are not currently learnt from data or implemented. As such, the movement model will typically depend on the maximum distance that an individual could travel within the time period between depth observations. Across all particles, cells within the required depth range with a movement probability of more than zero from the set of locations from which \code{n} particles are re-sampled, with replacement and according to their probability, at the next time step. This process repeats until the end of the time series. However, note that in the current implementation of the algorithm, unlike for the start of this process, there is no constraint that forces the individual to return to a specified geographical location at the end of the time series. Indeed, other than an (optional) \code{origin} and the information provided by the depth time series (\code{archival}), geographic restrictions (e.g., from acoustic detections) on the location of the animal over the period of observations cannot be incorporated. Therefore, this algorithm is best-suited to small scale applications (e.g., to examine the movements of individuals tagged with archival for short periods of time immediately post-release). If geographical observations (i.e., detections at acoustic receivers) are available for an individual over its time at liberty, the ACDCPF algorithm (currently unavailable) is required to integrate this information into the construction of movement paths.
+From each starting position, the Euclidean or shortest distances to cells of the appropriate depth at the next time step are calculated and passed to a movement model that assigns movement probabilities to each cell. Since movement probabilities are likely to be behaviourally dependent, the movement model can also depend on any other relevant information in \code{archival}. However, currently, the model cannot depend on sampled locations; therefore, at least under some conditions, the movement model will need to reflect the maximum distance that an individual could travel within the time period between depth observations, accounting for the possible effects of water currents and any other influences on swimming speed. Across all particles, cells within the required depth range with a movement probability of more than zero from the set of locations from which \code{n} particles are sampled, with replacement and according to their probability, at the next time step. This process repeats until the end of the time series. However, note that in the current implementation of the algorithm, unlike for the start of this process, there is no constraint that forces the individual to return to a specified geographical location at the end of the time series. Indeed, other than an (optional) \code{origin} and the information provided by the depth time series (\code{archival}), geographic restrictions (e.g., from acoustic detections) on the location of the animal over the period of observations cannot be incorporated. Therefore, this algorithm is best-suited to small scale applications (e.g., to examine the movements of individuals tagged with archival for short periods of time immediately post-release). If geographical observations (i.e., detections at acoustic receivers) are available for an individual over its time at liberty, the ACDCPF algorithm (currently unavailable) is required to integrate this information into the construction of movement paths.
 
-The result is a set of simulated pathways over a surface that are consistent with the data and the model parameters. While the number of particles is predetermined by \code{n}, more than \code{n} possible pathways may be defined by all of the combinations of sequential particle movements. Indeed, if there are vast numbers of possible paths through the landscape captured by particle movements, the function can run into vector memory limitations when assembling paths. Therefore, it is advisable to initiate the algorithm with a small number of paths to get a sense of how many possible paths there are, before increasing the number of paths incrementally. In the future, this may be resolved by allowing path processing outside of this function, but this is not currently implemented.}
+The result is a set of simulated particles, which can be assembled into pathways over a surface that are consistent with the data and the model parameters with \code{\link[flapper]{dcpf_simplify}}. While the number of particles is predetermined by \code{n}, more than \code{n} possible pathways may be defined by all of the combinations of sequential particle movements.}
 
 \subsection{Convergence}{Algorithm convergence is not guaranteed. There are four main circumstances in which the algorithm may fail to return any paths that span the start to the end of the depth time series:
  \enumerate{
    \item \strong{Chance.} All \code{n} paths may be `dead ends'. This possibility can be mitigated by increasing \code{n}.
-   \item \strong{Movement model.} The movement model may be too limiting. This possibility can be mitigated by ensuring that the movement model realistically represents the probability that an individual can transition between cells given the distance between them.
+   \item \strong{Movement model.} The movement model may be too limiting. This possibility can be mitigated by ensuring that the movement model realistically represents the probability that an individual can transition between cells given the distance between them. This may be guided by data on the study species or similar species. The movement model may need to account for the effect of water currents, which may increase maximum `swimming' speeds in some directions. (Unfortunately, spatially variable swimming speeds are not currently implemented.) If maximum swimming speeds are uncertain, implementing the algorithm over longer time series (e.g., every \eqn{2^{nd}} observation in \code{archival}), with a suitably relaxed movement model, may facilitate convergence if maximum speeds are unlikely to be maintained for long periods.
    \item \strong{Depth error.} The depth error may be too restrictive, given the accuracy of the depth observations, the bathymetry data and the tidal height across an area. This possibility can be mitigated by ensuring that the depth error is appropriate.
    \item \strong{Other assumptions.} Other assumptions (e.g., strict benthic habit) may be violated.
  }
-In these scenarios, the function returns a message that it is about to fail and a list, with one element for each time step, that records the sampled locations and their associated probabilities for each time step from the start of the algorithm until the current time step, before stopping.
+In these scenarios, the function returns a message that it is about to fail and the results from the start of the algorithm until the current time step, before stopping.
+}
+
+\subsection{Computational considerations}{ This algorithm is computationally intensive. It is advisable that it is run initially with a small time series in a small area and a small number of particles. For larger datasets, there are some tricks that can improve computation time.
+  \itemize{
+    \item \strong{Temporal resolution.} Reduce the temporal resolution of the \code{archival} time series so that there are fewer time steps.
+    \item \strong{Bathymetric resolution.} Reduce the resolution of \code{bathy}, propagating the additional error induced by this process via \code{calc_depth_error} (e.g., see \code{\link[flapper]{process_surface}}).
+    \item \strong{Mobility limits.} Check whether or not setting mobility limits (\code{mobility}, \code{mobility_from_origin}) improves speed.
+    \item \strong{Distance calculations}. This step is particularly slow because the distance from each location to many or all surrounding locations are calculated. To speed up this step, implement \code{calc_distance = "euclid"} and, if necessary, interpolate least-cost paths after algorithm completion via \code{\link[flapper]{lcp_interp}}. In the future, a Markov chain Monte Carlo style approach may be implemented in which distances (and probabilities) for randomly selected `proposal' cells are calculated, with those cells then rejected or retained, rather than calculating distances to many or all surrounding cells, but this is unlikely to be faster in many settings.
+    \item \strong{Parallelisation.} Test alternative options for parallelisation. For the \code{cl} argument, specifying an integer on non-Windows platforms may be faster than a cluster from \code{\link[parallel]{makeCluster}} (see \code{\link[pbapply]{pblapply}}). Parallelisation may be slower in some circumstances.
+  }
 }
 }
 \examples{
@@ -100,6 +119,7 @@ xy <- matrix(c(708886.3, 6254404), ncol = 2)
 depth <- c(163.06, 159.71, 153.49, 147.04, 139.86, 127.19, 114.75,
            99.44,  87.01,  78.16,  70.03,  60.23,  49.96,  35.39,
            27.75,  20.13,  12.73,  11.32)
+depth <- data.frame(depth = depth)
 
 ## Define surface over which movement occurred
 # We will use the example dat_gebco bathymetry dataset
@@ -115,9 +135,26 @@ boundaries <- raster::extent(707884.6, 709884.6, 6253404, 6255404)
 blank      <- raster::raster(boundaries, res = c(5, 5))
 surface    <- raster::resample(surface, blank)
 
+## Define depth error function
+# Because the bathymetry data is very coarse, and the bathymetry is
+# ... very complex in this region of Scotland, we have to
+# ... force a high depth error to be high in this example.
+# The calc_depth_error() function can depend on depth, but in this example
+# ... we assume the depth error is independent of depth.
+cde <- function(...) c(-30, 30)
+
+## Check that there are locations on the surface within the requisite depth range
+# ... at each time step via dcpf_setup_cells_by_time(). This is optional, but
+# ... will speed up the initial stages of the algorithm because it does not
+# ... have to compute the cells_by_time list.
+cells_by_time <- dcpf_setup_cells_by_time(depth, surface, calc_depth_error = cde)
+# ... Checks passed.
+
 ## Define movement model
 # The default movement model is suitable, with skate moving typically
 # ... less than 200 m in a two-minute period.
+# You could use a separate movement model (and mobility restriction) for the origin
+# ... if necessary, but for brevity we don't implement that here.
 
 ## Visualise movement surface, with starting location overlaid
 prettyGraphics::pretty_map(add_rasters = list(x = surface),
@@ -125,22 +162,19 @@ prettyGraphics::pretty_map(add_rasters = list(x = surface),
                            verbose = FALSE)
 
 #### Example (1): Implement algorithm using default options
-# Note that because the bathymetry data is very coarse, and the bathymetry is
-# ... actually very complex in this region of Scotland, we have to
-# ... force the depth_error to be high in this example.
-paths <- dcpf(archival = depth,
+out_1 <- dcpf(archival = depth,
               bathy = surface,
+              cells_by_time = cells_by_time,
               origin  = xy,
-              depth_error = 30,
+              calc_depth_error = function(...) c(-30, 30),
               calc_distance = "euclid",
               calc_movement_pr = dcpf_setup_movement_pr,
               n = 10L,
               seed = 1)
-# The function returns a dataframe with information for each path
-utils::str(paths)
+# The function returns a .dcpf-class object
+class(out_1)
+utils::str(out_1)
 # Algorithm duration during testing ~0.21 minutes
-
-\dontrun{
 
 #### Example (2): Implement a blanket mobility restriction
 # This can improve computational efficiency but offers no improvement
@@ -148,23 +182,26 @@ utils::str(paths)
 # ... focusing in on a specific area matches the speed gains of
 # ... implementing the distance/movement
 # ... pr calculations over a smaller area at each time step)
-paths <- dcpf(archival = depth,
+out_2 <- dcpf(archival = depth,
               bathy = surface,
               origin  = xy,
-              depth_error = 30,
+              calc_depth_error = function(...) c(-30, 30),
               calc_distance = "euclid",
               calc_movement_pr = dcpf_setup_movement_pr,
-              mobility = 200,
+              mobility = 250,
               n = 10L,
               seed = 1)
 # Algorithm duration during testing ~0.22 minutes
 
 #### Example (3): Implement algorithm using shortest distances
 # Note the need for a surface with equal resolution if this option is implemented.
-paths <- dcpf(archival = depth,
+# To speed up the initial stages of the algorithm, you can supply the graph
+# ... required for least-cost calculations via calc_distance_graph, but for
+# ... brevity we don't implement that here.
+out_3 <- dcpf(archival = depth,
               bathy = surface,
               origin  = xy,
-              depth_error = 30,
+              calc_depth_error = function(...) c(-30, 30),
               calc_distance = "lcp",
               calc_movement_pr = dcpf_setup_movement_pr,
               n = 10L,
@@ -172,13 +209,13 @@ paths <- dcpf(archival = depth,
 # This option is slower: algorithm duration during testing ~0.73 minutes
 
 #### Example (4): Implement algorithm using shortest distances with mobility restriction
-paths <- dcpf(archival = depth,
+out_4 <- dcpf(archival = depth,
               bathy = surface,
               origin  = xy,
-              depth_error = 30,
+              calc_depth_error = function(...) c(-30, 30),
               calc_distance = "lcp",
               calc_movement_pr = dcpf_setup_movement_pr,
-              mobility = 200,
+              mobility = 250,
               n = 10L,
               seed = 1)
 # Algorithm duration during testing ~0.63 minutes
@@ -190,13 +227,13 @@ paths <- dcpf(archival = depth,
 # ... more beneficial for larger numbers of particles and may be slower
 # ... for small numbers of particles due to the computational overhead
 # ... associated with parallelisation.)
-paths <- dcpf(archival = depth,
+out_5 <- dcpf(archival = depth,
               bathy = surface,
               origin  = xy,
-              depth_error = 30,
+              calc_depth_error = function(...) c(-30, 30),
               calc_distance = "euclid",
               calc_movement_pr = dcpf_setup_movement_pr,
-              mobility = 200,
+              mobility = 250,
               n = 10L,
               cl = parallel::makeCluster(2L),
               seed = 1)
@@ -206,24 +243,220 @@ paths <- dcpf(archival = depth,
 # However, the benefits of parallelisation depend on the number of least-cost
 # ... paths calculations that need to be performed, which depends on the size
 # ... of bathy, and may be minimal (or negative) for small areas.
-paths <- dcpf(archival = depth,
+out_6 <- dcpf(archival = depth,
               bathy = surface,
               origin  = xy,
-              depth_error = 30,
+              calc_depth_error = function(...) c(-30, 30),
               calc_distance = "lcp",
               calc_movement_pr = dcpf_setup_movement_pr,
-              mobility = 200,
+              mobility = 250,
               n = 10L,
               use_all_cores = TRUE,
               seed = 1)
 # But the speed benefits in this case are minimal.
 # Algorithm duration during testing ~0.61 minutes.
 
+#### Example (7): Extend the movement model via variables in archival
+# For example, you could assign behavioural 'states', such as resting versus
+# ... non resting. Here, we use information on the change in depth to restrict
+# ... movement, based on the idea that large changes in depth correlate
+# ... with shorter horizontal movements. This is appropriate for calc_distance =
+# ... 'euclid', which does not account for movement over the bathymetry and
+# ... may be quicker than implementing least-cost distances.
+## Define absolute vertical activity (VA)
+# For the last observation, we need to assign a VA of 0 to ensure that
+# ... we do not include NAs in the calculations.
+depth$va_abs <- abs(depth$depth - dplyr::lead(depth$depth))
+depth$va_abs[nrow(depth)] <- 0
+## Define movement model, depending on distance and a dataframe with other information
+setup_movement_pr <- function(distance, data){
+  beta <- -0.05 + -0.005 * data$va_abs
+  pr <- stats::plogis(10 + distance * beta)
+  pr[distance > 500] <- 0
+  return(pr)
 }
+## Examine the movement model with distance and VA
+pr <- setup_movement_pr(1:1000, data.frame(va_abs = 0))
+prettyGraphics::pretty_plot(pr, type = "n")
+for(va_abs in seq(min(depth$va_abs), max(depth$va_abs), length.out = 5)){
+  lines(1:1000, setup_movement_pr(1:1000, data.frame(va_abs = va_abs)), lwd = 0.25 + va_abs/5)
+}
+## Implement algorithm with adjusted movement model
+out_7 <- dcpf(archival = depth,
+              bathy = surface,
+              origin  = xy,
+              calc_depth_error = function(...) c(-30, 30),
+              calc_distance = "euclid",
+              calc_movement_pr = setup_movement_pr,
+              mobility = 250,
+              n = 10L,
+              seed = 1)
+# In this case, the algorithm has failed to reach the end of the time series,
+# ... which provides a useful example to introduce strategies for managing
+# ... convergence failures (see below). Options include,
+# ... ... Updating the outputs from an earlier time step
+# ... ... Increase the number of particles
+# ... ... Resampling
+# ... ... Reduce the number of temporal resolution
+# ... ... Tweak movement model, depth error, mobility etc.
+
+#### Example (8): Update particle histories from an earlier time step
+# ... via update_history and update_history_from_time_step
+out_8 <- dcpf(archival = depth,
+              bathy = surface,
+              origin  = xy,
+              calc_depth_error = function(...) c(-30, 30),
+              calc_distance = "euclid",
+              calc_movement_pr = setup_movement_pr,
+              mobility = 250,
+              n = 10L,
+              seed = 1,
+              update_history = out_7$history,
+              update_history_from_time_step = 5)
+
+#### Example (9): Implement re-sampling via resample
+# Here, for demonstration purposes, we implement the algorithm from
+# ... scratch with the original movement model, this time re-sampling
+# ... possible positions with equal probability if there are
+# ... fewer than 10 unique positions.
+# ... (Normally resample would be less than n.)
+# In this example, the function re-samples candidate starting positions at t = 9
+out_9 <- dcpf(archival = depth,
+              bathy = surface,
+              origin  = xy,
+              calc_depth_error = function(...) c(-30, 30),
+              calc_distance = "euclid",
+              calc_movement_pr = dcpf_setup_movement_pr,
+              mobility = 250,
+              n = 10L,
+              resample = 10,
+              seed = 1)
+
+#### Example (10): A simulation workflow
+# This example provides a simulation workflow for comparing simulated and
+# ... reconstructed paths. Specifically, we simulate movement in an area,
+# ... so that we know the 'true' path. We then implement the dcpf() algorithm
+# ... to reconstruct possible paths
+# ... and compare the true and reconstructed paths.
+
+## (A) Set seed for reproducibility
+seed <- 2021
+set.seed(seed)
+
+## (B) Define area for simulation
+# Here, we use the sample area as above, but reduce the resolution
+# ... for example speed.
+dat_gebco_planar <- raster::raster(crs = raster::crs(dat_gebco),
+                                   ext = raster::extent(dat_gebco),
+                                   resolution = 25)
+dat_gebco_planar <- raster::resample(dat_gebco, dat_gebco_planar, method = "bilinear")
+# Define 'sea' for movement simulation
+dat_coast <- raster::crop(dat_coast, raster::extent(dat_gebco))
+dat_sea <- invert_poly(dat_coast)
+# Visualise area
+prettyGraphics::pretty_map(dat_gebco_planar,
+                           add_rasters = list(x = dat_gebco_planar),
+                           add_polys = list(x = dat_sea))
+
+## (C) Simulate movement path
+# Define movement parameters
+sim_steps <- function(...) stats::rgamma(1, shape = 15, scale = 5)
+prettyGraphics::pretty_hist(stats::rgamma(10000, shape = 15, scale = 5), breaks = 100)
+# Define animal's origin
+origin_sim <- sp::spsample(dat_sea, n = 1, type = "random")
+origin_sim <- sp::coordinates(origin_sim)
+# Simulate path
+path_sim <- sim_path_sa(n = 10,
+                        p_1 = origin_sim,
+                        area = dat_sea,
+                        sim_step = sim_steps,
+                        add_rasters = list(x = dat_gebco_planar),
+                        seed = seed)
+# Get resultant depth time series
+path_sim <- path_sim$xy_mat
+path_sim <- data.frame(path_id = 1,
+                       cell_id = raster::cellFromXY(dat_gebco_planar, path_sim),
+                       cell_x = path_sim[, 1],
+                       cell_y = path_sim[, 2])
+path_sim$cell_z <- raster::extract(dat_gebco_planar, path_sim$cell_id)
+prettyGraphics::pretty_plot(path_sim$cell_z, type = "l")
+# Simulate 'observed' depth time series given some error
+# ... For illustration, we will make the error smaller in this example
+cde <- function(...) c(-2.5, 2.5)
+depth_obs <- runif(length(path_sim$cell_z),
+                   path_sim$cell_z + cde(path_sim$cell_z)[1],
+                   path_sim$cell_z + cde(path_sim$cell_z)[2])
+depth_obs <- data.frame(depth = depth_obs)
+# Compare 'observed' and 'true' depth time series
+dcpf_plot_1d(depth_obs, path_sim,
+             type = "b", cex = 0.5,
+             add_lines = list(col = "royalblue", type = "l"))
+
+## Implement dcpf() on 'observed' time series
+# We will assume that the origin was known.
+# ... We will mostly use the default options.
+history_dcpf <- dcpf(archival = depth_obs,
+                     bathy = dat_gebco_planar,
+                     origin = origin_sim,
+                     depth_error = cde,
+                     calc_distance = "euclid",
+                     mobility = 200,
+                     n = 10L
+)
+
+## Visualise particle histories in relation to simulated paths
+pp <- graphics::par(mfrow = c(3, 4))
+dcpf_plot_history(history_dcpf,
+                  add_particles = list(pch = 21),
+                  add_paths = list(x = path_sim$cell_x, path_sim$cell_y, length = 0.05),
+                  xlim = range(path_sim$cell_x), ylim = range(path_sim$cell_y),
+                  crop_spatial = TRUE,
+                  prompt = FALSE)
+graphics::par(pp)
+
+## Assemble paths
+path_dcpf <- dcpf_simplify(history_dcpf)
+
+## Compare 'observed' and reconstructed depth time series
+dcpf_plot_1d(depth_obs, path_dcpf)
+
+## Show that the distances between sequential positions are within the restrictions
+# ... of the movement model
+require(rlang)
+path_dcpf <-
+  path_dcpf \%>\% dplyr::group_by(.data$path_id) \%>\%
+  dplyr::mutate(cell_x2 = dplyr::lead(.data$cell_x),
+                cell_y2 = dplyr::lead(.data$cell_y),
+                dist_1 = sqrt((.data$cell_x2 - .data$cell_x)^2 +
+                                (.data$cell_y2 -.data$ cell_y)^2))
+range(path_dcpf$dist_1, na.rm =TRUE)
+
+## Visualise paths
+# Zoom around path
+xlim <- range(c(path_sim$cell_x, path_dcpf$cell_x), na.rm = TRUE)
+ylim <- range(c(path_sim$cell_y, path_dcpf$cell_y), na.rm = TRUE)
+boundaries <- raster::extent(xlim, ylim)
+area <- raster::crop(dat_gebco_planar, boundaries)
+# Define function to add simulated path for comparison
+add_paths_sim <-
+  function() prettyGraphics::add_sp_path(path_sim$cell_x, path_sim$cell_y,
+                                         lwd = 2, length = 0.01)
+# Make plots
+if(interactive()){
+  dcpf_plot_2d(path_dcpf, area, add_paths = list(length = 0.05),
+               add_additional = add_paths_sim,
+               prompt = TRUE)
+}
+
+#### Next steps
+# Use dcpf_plot_history() to visualise particle histories
+# Use dcpf_simplify() to process movement paths
+# ... Use dcpf_loglik() to examine the relative likelihood of alternative paths
+# ... Use dcpf_plot_1d(), dcpf_plot_2d(), dcpf_plot_3d() for plotting paths
 
 }
 \seealso{
-For the movement model, Euclidean distances are obtained from \code{\link[raster]{distanceFromPoints}} or shortest distances are obtained from \code{\link[flapper]{lcp_costs}} and \code{\link[flapper]{lcp_from_point}}. The default movement model applied to these distances is \code{\link[flapper]{dcpf_setup_movement_pr}}. Paths between sequential locations can be interpolated via \code{\link[flapper]{lcp_interp}}, which is a wrapper for the \code{\link[flapper]{lcp_over_surface}} routine. This can be useful for checking whether the faster Euclidean distances method is acceptable and, if so, for post-hoc adjustments of movement probabilities based on shortest distances (see \code{\link[flapper]{lcp_interp}}). The results of the algorithm can be visualised with \code{\link[flapper]{dcpf_plot_1d}}, \code{\link[flapper]{dcpf_plot_2d}} and \code{\link[flapper]{dcpf_plot_3d}}. The log-likelihood of the paths, given the movement model, can be calculated via \code{\link[flapper]{dcpf_loglik}}. In terms of related algorithms, the DC algorithm is implemented via \code{\link[flapper]{dc}}. This is extended by the ACDC algorithm, through the integration of locational information from acoustic detections, via \code{\link[flapper]{acdc}}. For depth time series accompanied by acoustic detections, movement paths can be reconstructed via the ACDCPF algorithm (currently unavailable).
+For the movement model, Euclidean distances are obtained from \code{\link[raster]{distanceFromPoints}} or shortest distances are obtained from \code{\link[flapper]{lcp_from_point}}, via \code{\link[flapper]{lcp_costs}} and \code{\link[flapper]{lcp_graph_surface}} (unless \code{calc_distance_graph} is supplied. The default movement model applied to these distances is \code{\link[flapper]{dcpf_setup_movement_pr}}. \code{\link[flapper]{process_behav_rest}} provides a means to assign resting/non-resting behaviour to \code{archival} time steps for behaviourally dependent movement models. Particle histories can be visualised with \code{\link[flapper]{dcpf_plot_history}} and joined into paths via \code{\link[flapper]{dcpf_simplify}}. For processed paths, movements between sequential locations can be interpolated via \code{\link[flapper]{lcp_interp}}, which is a wrapper for the \code{\link[flapper]{lcp_over_surface}} routine. This can be useful for checking whether the faster Euclidean distances method is acceptable and, if so, for post-hoc adjustments of movement probabilities based on shortest distances (see \code{\link[flapper]{lcp_interp}}). Paths can be visualised with \code{\link[flapper]{dcpf_plot_1d}}, \code{\link[flapper]{dcpf_plot_2d}} and \code{\link[flapper]{dcpf_plot_3d}}. The log-likelihood of the paths, given the movement model, can be calculated via \code{\link[flapper]{dcpf_loglik}}. In terms of related algorithms, the DC algorithm is implemented via \code{\link[flapper]{dc}}. This is extended by the ACDC algorithm, through the integration of locational information from acoustic detections, via \code{\link[flapper]{acdc}}. For depth time series accompanied by acoustic detections, movement paths can be reconstructed via the ACDCPF algorithm (currently unavailable).
 }
 \author{
 Edward Lavender

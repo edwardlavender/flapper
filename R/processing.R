@@ -662,7 +662,9 @@ process_behav_rest <- function(archival,
 ){
   #### Implement function checks
   check_names(input = archival, req = c("depth", fct))
-  check_class(input = fct, to_class = "character", coerce_input = as.character)
+  if(!is.null(fct)){
+    check_class(input = fct, to_class = "character", coerce_input = as.character)
+  }
   if(!is.null(discrete)){
     if(!(discrete >= 0 & discrete <= 1)) stop("'discrete' should be between 0 and 1 inclusive.")
   }

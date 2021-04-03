@@ -7,7 +7,7 @@
 dcpf_loglik(paths, ...)
 }
 \arguments{
-\item{paths}{A dataframe containing movement paths from \code{\link[flapper]{dcpf}}. At a minimum, this should contain a unique identifier for each path (named `path_id') and the probability associated with each cell along each path (`cell_pr').}
+\item{paths}{A dataframe containing movement paths from \code{\link[flapper]{dcpf}} plus \code{\link[flapper]{dcpf_simplify}} (see \code{\link[flapper]{dcpf-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the probability associated with each cell along each path (`cell_pr').}
 
 \item{...}{Additional arguments (none implemented).}
 }
@@ -18,11 +18,11 @@ The function returns a dataframe with the log likelihood (`loglik') of each path
 This function calculates the total log-likelihood of each movement path reconstructed by the depth-contour particle filtering (DCPF) algorithm.
 }
 \details{
-For each path, at each time step the probability associated with the sampled location depends on a user-defined movement model that is driven by the distance between the sampled locations for the individual at the previous and current time steps. This function simply sums the logarithms of these probabilities for each path as a measure of their relative likelihood, given the movement model.
+For each path, at each time step the probability associated with the sampled location depends on a user-defined movement model that is driven by the distance between the sampled locations for the individual at the previous and current time steps (and other user-defined parameters). This function simply sums the logarithms of these probabilities for each path as a measure of their relative likelihood, given the movement model.
 }
 \examples{
-# An example with the example DCPF outputs included in flapper
-dcpf_loglik(dat_dcpf$dcpf)
+# An example with the example DCPF paths dataset included in flapper
+dcpf_loglik(dat_dcpf_paths)
 }
 \author{
 Edward Lavender

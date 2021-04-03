@@ -7,18 +7,18 @@
 dcpf_setup_cells_by_time(
   archival,
   bathy,
-  depth_error,
+  calc_depth_error = function(...) c(-2.5, 2.5),
   cl = NULL,
   varlist = NULL,
   verbose = TRUE
 )
 }
 \arguments{
-\item{archival}{A numeric vector of depth observations for \code{\link[flapper]{dcpf}}.}
+\item{archival}{A dataframe that defines the depth time series for \code{\link[flapper]{dcpf}}. This must contain a column named `depth' with depth observations.}
 
 \item{bathy}{A \code{\link[raster]{raster}} of the bathymetry for \code{\link[flapper]{dcpf}}.}
 
-\item{depth_error}{The measurement error parameter in \code{\link[flapper]{dcpf}}.}
+\item{calc_depth_error}{The measurement error function in \code{\link[flapper]{dcpf}}.}
 
 \item{cl}{(optional) A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is stopped within the function.}
 
@@ -27,19 +27,20 @@ dcpf_setup_cells_by_time(
 \item{verbose}{A logical input that defines whether or not to print messages to the console to monitor function progress.}
 }
 \value{
-The function returns a list, with one element for each time step (i.e., observation in \code{archival}) that defines the IDs of all the cells in \code{bathy} that the individual could have occupied at that time step, given the data and the \code{depth_error} parameter.
+The function returns a list, with one element for each time step (i.e., observation in \code{archival}) that defines the IDs of all the cells in \code{bathy} that the individual could have occupied at that time step, given the data and the \code{calc_depth_error} function.
 }
 \description{
 For a time series of depth observations for a benthic animal (\code{archival}), this function defines a list of integer vectors, one for each time step, that defines the IDs of all of the cells on a bathymetry \code{\link[raster]{raster}} (\code{bathy}) that the individual could have occupied at that time step, given its depth and a measurement error parameter. This procedure is necessary for the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dcpf}}).
 }
 \details{
-While this routine can be implemented internally within the DCPF algorithm via \code{\link[flapper]{dcpf}}, it can be beneficial to implement the routine beforehand and pass the resultant list to \code{\link[flapper]{dcpf}}. This is especially the case for large bathymetry surfaces for which computations can take some time.
+While this routine can be implemented internally within the DCPF algorithm via \code{\link[flapper]{dcpf}}, it can be beneficial to implement the routine beforehand and pass the resultant list to \code{\link[flapper]{dcpf}}. This is especially the case for large bathymetry surfaces for which computations can take some time: this procedure can be parallelised here, while it is not within \code{\link[flapper]{dcpf}}.
 }
 \examples{
-#### Define a sequence of depth observations for DCPF algorithm (see ?dcpf)
+#### Define a dataframe of depth observations for DCPF algorithm (see ?dcpf)
 depth <- c(163.06, 159.71, 153.49, 147.04, 139.86, 127.19, 114.75,
            99.44,  87.01,  78.16,  70.03,  60.23,  49.96,  35.39,
            27.75,  20.13,  12.73,  11.32)
+depth <- data.frame(depth = depth)
 
 #### Define bathymetry surface for DCPF algorithm (see ?dcpf)
 surface    <- dat_gebco
@@ -47,10 +48,10 @@ boundaries <- raster::extent(707884.6, 709884.6, 6253404, 6255404)
 blank      <- raster::raster(boundaries, res = c(5, 5))
 surface    <- raster::resample(surface, blank)
 
-#### Example (1): Implement function with default options
+#### Example (1): Implement the function in series
 cells_by_time <- dcpf_setup_cells_by_time(archival = depth,
                                           bathy = surface,
-                                          depth_error = 30)
+                                          calc_depth_error = function(...) c(-30, 30))
 # The function returns a list of vectors that define all of the cells the individual
 # ... could possibly have occupied at each time step, based only on depth, the
 # ... bathymetry and the depth error
@@ -60,7 +61,7 @@ utils::str(cells_by_time)
 # This is only beneficial for large areas/long time series
 cells_by_time <- dcpf_setup_cells_by_time(archival = depth,
                                           bathy = surface,
-                                          depth_error = 30,
+                                          calc_depth_error = function(...) c(-30, 30),
                                           cl = parallel::makeCluster(2L),
                                           varlist = "surface")
 
@@ -73,7 +74,7 @@ cells_by_time <- dcpf_setup_cells_by_time(archival = depth,
 \dontrun{
   cells_by_time <- dcpf_setup_cells_by_time(archival = depth,
                                             bathy = surface,
-                                            depth_error = 0.1)
+                                            calc_depth_error = function(...) c(-0.1, 0.1))
 }
 }
 \seealso{

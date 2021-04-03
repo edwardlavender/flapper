@@ -7,7 +7,7 @@
 dcpf_plot_2d(paths, bathy, add_paths = list(), prompt = FALSE, ...)
 }
 \arguments{
-\item{paths}{A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{dcpf}}. At a minimum, this should contain a unique identifier for each path (named `path_id') and the x and y coordinates that define the trajectory of each path (`cell_x' and `cell_y').}
+\item{paths}{A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{dcpf}} via \code{\link[flapper]{dcpf_simplify}} (see \code{\link[flapper]{dcpf-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the x and y coordinates that define the trajectory of each path (`cell_x' and `cell_y').}
 
 \item{bathy}{A \code{\link[raster]{raster}} of the bathymetry over which movement was reconstructed.}
 
@@ -25,9 +25,9 @@ This function is a simple wrapper for \code{\link[prettyGraphics]{pretty_map}} t
 }
 \examples{
 #### Implement dcpf() algorithm
-# Here, we extract the necessary information from pre-defined outputs for speed
-paths    <- dat_dcpf$dcpf
-bathy    <- dat_dcpf$args$bathy
+# Here, we use pre-defined outputs for speed
+bathy <- dat_dcpf_histories$args$bathy
+paths <- dat_dcpf_paths
 
 #### Example (1): The default implementation
 dcpf_plot_2d(paths, bathy)
@@ -41,15 +41,15 @@ dcpf_plot_2d(paths, bathy, xlab = "Easting (UTM)", ylab = "Northing (UTM)")
 
 #### Example (3): Plot individual paths separately
 if(interactive()){
-  pp <- par(mfrow = c(3, 4))
+  pp <- graphics::par(mfrow = c(3, 4))
   dcpf_plot_2d(paths, bathy, add_paths = list(length = 0.01),
                prompt = TRUE, verbose = FALSE)
-  par(pp)
+  graphics::par(pp)
 }
 
 }
 \seealso{
-\code{\link[flapper]{dcpf}} implements the DCPF algorithm. \code{\link[flapper]{dcpf_plot_1d}}, \code{\link[flapper]{dcpf_plot_2d}} and \code{\link[flapper]{dcpf_plot_3d}} provide plotting routines. For mapping, it can be useful to interpolate shortest (least-cost) paths between sequential locations via \code{\link[flapper]{lcp_interp}}. \code{\link[flapper]{dcpf_loglik}} calculates the log-likelihood of each path.
+\code{\link[flapper]{dcpf}} implements the DCPF algorithm. \code{\link[flapper]{dcpf_plot_history}} visualises particle histories and \code{\link[flapper]{dcpf_simplify}} processes these into a dataframe of movement paths. \code{\link[flapper]{dcpf_plot_1d}}, \code{\link[flapper]{dcpf_plot_2d}} and \code{\link[flapper]{dcpf_plot_3d}} provide plotting routines for paths. For mapping, it can be useful to interpolate shortest (least-cost) paths between sequential locations via \code{\link[flapper]{lcp_interp}}. \code{\link[flapper]{dcpf_loglik}} calculates the log-likelihood of each path.
 }
 \author{
 Edward Lavender

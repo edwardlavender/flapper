@@ -161,7 +161,10 @@ Alongside the COA algorithm, `flapper` introduces a number of new algorithms for
 The depth-contour particle filtering algorithm (DCPF) extends the DC algorithm through incorporation of a movement model to reconstruct movement paths over a surface that are consistent with the observations (and model assumptions). This is especially useful for small scale applications, such as reconstructing the movements of benthic animals tagged with archival tags for short periods of time post-release. This approach is implemented with the `dcpf*()` family of functions: 
 
 * `dcpf_setup_movement_pr` provides a simple movement model that defines the probability of movement between locations given the distance between them; 
+* `dcpf_setup_cells_by_time` defines the `cells_by_time` list for `dcpf()`;
 * `dcpf()` implements the DCPF algorithm; 
+* `dcpf_plot_history()` plot simulated particle histories; 
+* `dcpf_simplify()` assembles movement paths from particle histories;
 * `dcpf_loglik()` calculates the log-likelihood of reconstructed paths, given the movement model;
 * `dcpf_plot_1d()` plots the depth time series from observed and reconstructed paths;
 * `dcpf_plot_2d()` maps the reconstructed paths in two-dimensions;

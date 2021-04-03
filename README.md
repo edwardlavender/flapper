@@ -341,7 +341,11 @@ approach is implemented with the `dcpf*()` family of functions:
   - `dcpf_setup_movement_pr` provides a simple movement model that
     defines the probability of movement between locations given the
     distance between them;
+  - `dcpf_setup_cells_by_time` defines the `cells_by_time` list for
+    `dcpf()`;
   - `dcpf()` implements the DCPF algorithm;
+  - `dcpf_plot_history()` plot simulated particle histories;
+  - `dcpf_simplify()` assembles movement paths from particle histories;
   - `dcpf_loglik()` calculates the log-likelihood of reconstructed
     paths, given the movement model;
   - `dcpf_plot_1d()` plots the depth time series from observed and

@@ -90,7 +90,10 @@
 #'   \item The depth-contour particle filtering (DCPF) algorithm
 #'   \itemize{
 #'     \item \link{dcpf_setup_movement_pr} provides a simple movement model that defines the probability of movement between locations given the distance between them;
+#'     \item \link{dcpf_setup_cells_by_time} defines the \code{cells_by_time} list for \link{dcpf}
 #'     \item \link{dcpf} implements the DCPF algorithm;
+#'     \item \link{dcpf_plot_history} plots simulated particle histories;
+#'     \item \link{dcpf_simplify} assembles movement paths from particle histories;
 #'     \item \link{dcpf_loglik} calculates the log-likelihood of reconstructed paths, given the movement model;
 #'     \item \link{dcpf_plot_1d} plots the depth time series from observed and reconstructed paths;
 #'     \item \link{dcpf_plot_2d} maps the reconstructed paths in two-dimensions;

@@ -4,10 +4,12 @@
 \alias{dcpf_setup_movement_pr}
 \title{A simple movement model dependent on distance}
 \usage{
-dcpf_setup_movement_pr(distance)
+dcpf_setup_movement_pr(distance, ...)
 }
 \arguments{
 \item{distance}{A numeric vector of distances (m).}
+
+\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a numeric vector of probabilities that represent the probability of movement between two or more areas given the distances between them.
