@@ -37,7 +37,6 @@ update_extent <- function(x, x_shift, y_shift = x_shift){
 }
 
 
-
 ######################################
 ######################################
 #### buffer_and_crop()
@@ -71,8 +70,8 @@ update_extent <- function(x, x_shift, y_shift = x_shift){
 #'
 
 buffer_and_crop <- function(to_buffer,
-                               to_crop,
-                               buffer = NULL,...){
+                            to_crop,
+                            buffer = NULL,...){
   if(!is.null(buffer)){
     check_class(input = buffer, to_class = "list", type = "stop")
     if(!rlang::has_name(to_buffer, "spgeom")) buffer$spgeom <- to_buffer
@@ -80,6 +79,56 @@ buffer_and_crop <- function(to_buffer,
   }
   out <- raster::crop(to_crop, raster::extent(to_buffer),...)
   return(out)
+}
+
+
+######################################
+######################################
+#### crop_from_click()
+
+#' @title Interactively crop a \code{\link[raster]{raster}}
+#' @description Interactively crop a \code{\link[raster]{raster}} to a boundary box specified by mouse clicks.
+#' @param x A \code{\link[raster]{raster}}.
+#' @param plot A logical input that defines whether or not to plot \code{x} before and after cropping.
+#' @param ... Additional arguments passed to \code{\link[prettyGraphics]{pretty_map}} to customise plots.
+#'
+#' @details The function is implemented as follows:
+#' \enumerate{
+#'   \item The function plots the supplied raster (\code{x}), if \code{plot = TRUE};
+#'   \item Boundary coordinates delineating the area to which \code{x} should be cropped are defined by mouse clicks on the plot;
+#'   \item The plotted raster is cropped using the minimum and maximum x and y coordinates of mouse clicks, via \code{\link[raster]{crop}};
+#'   \item The cropped raster is plotted, if \code{plot = TRUE};
+#'   \item The cropped raster is returned.
+#' }
+#' @return The function returns a \code{\link[raster]{raster}} and, if \code{plot = TRUE}, a plot of the area before/after cropping.
+#' @examples
+#' if(interactive()) crop_from_click(dat_gebco)
+#' @author Edward Lavender
+#' @export
+#'
+
+crop_from_click <- function(x, plot = TRUE,...){
+  # Plot the raster
+  if(plot){
+    prettyGraphics::pretty_map(x,
+                               add_rasters = list(x = x),...)
+  }
+  # Capture interactively defined locations
+  cat("Please click four boundary locations on the map and press [Esc] when you are done...")
+  dat <- graphics::locator()
+  # Get extent of area to be cropped
+  dat <- data.frame(x = dat$x, y = dat$y)
+  xlim <- range(dat$x)
+  ylim <- range(dat$y)
+  ext <- raster::extent(xlim[1], xlim[2], ylim[1], ylim[2])
+  # Crop raster
+  x_crop <- raster::crop(x, ext)
+  # Plot cropped raster and return
+  if(plot){
+    prettyGraphics::pretty_map(x_crop,
+                               add_rasters = list(x = x_crop),...)
+  }
+  return(x_crop)
 }
 
 
