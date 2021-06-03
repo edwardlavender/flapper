@@ -9,8 +9,10 @@ This object is a named list, with two elements, which records the parameters use
 
 \describe{
   \item{args}{A named list that records the function arguments used to generate outputs. This is as inputted, but with the `cells_by_time' and `calc_distance_graph' elements added if unsupplied and applicable.}
-  \item{history}{A list of dataframes, one for each time step, that record particle samples. Each dataframe comprises \code{n} rows (one for each particle) and the following three columns:}
+  \item{history}{A list of dataframes, one for each time step, that record particle samples. Each dataframe comprises \code{n} rows (one for each particle) and the following five columns:}
   \itemize{
+    \item{id_previous}{ An integer that uniquely defines a previous location on the bathymetry \code{\link[raster]{raster}} (\code{bathy}). This is absent for the first time step. For subsequent time steps, this is \code{NA} if the fast Euclidean distances method has been used, which does not `remember' previous locations, but specified otherwise.)}
+    \item{pr_current}{ A double that defines the movement probabilities associated with previous locations. This is absent for the first time step. For subsequent time steps, this is \code{NA} if the fast Euclidean distances method has been used, which does not `remember' previous locations, but specified otherwise.}
     \item{id_current}{ An integer that uniquely defines each location on the bathymetry \code{\link[raster]{raster}} (\code{bathy}).}
     \item{pr_current} A double that defines the probability of movement into each cell.
     \item{timestep}{ An integer that defines each time step.}

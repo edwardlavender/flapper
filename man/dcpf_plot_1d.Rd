@@ -20,7 +20,7 @@ dcpf_plot_1d(
 \arguments{
 \item{archival}{A dataframe of depth (m) observations named `depth', as used by \code{\link[flapper]{dcpf}}.}
 
-\item{paths}{A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{dcpf}} via \code{\link[flapper]{dcpf_simplify}} (see \code{\link[flapper]{dcpf-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id’) and the depth associated with each cell along each path (`cell_z').}
+\item{paths}{A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{dcpf}} via \code{\link[flapper]{dcpf_simplify}} (see \code{\link[flapper]{dcpf-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id’), timesteps (`timestep') and the depth associated with each cell along each path (`cell_z').}
 
 \item{scale}{A number that vertically scales the depth time series for the observations and the reconstructed path(s). By default, absolute values for depth are assumed and negated for ease of visualisation.}
 

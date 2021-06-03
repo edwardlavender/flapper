@@ -8,7 +8,7 @@
 A dataframe with that records the reconstructed paths. This includes a unique identifier for each path, the time step, the location (cell ID and three-dimensional coordinates) on \code{bathy} and the probability associated with that cell, given movement from the previous cell, in the following columns:
 \describe{
     \item{path_id}{ An integer that uniquely defines each path.}
-    \item{timestep}{ An integer that defines each time step.}
+    \item{timestep}{ An integer that defines each time step. If an origin is supplied to \code{\link[flapper]{dcpf}} and \code{add_origin = TRUE} in \code{\link[flapper]{dcpf_simplify}}, then time step 0 refers to the origin. Later time steps refer to sequential depth observations.}
     \item{cell_id}{ An integer that defines the cells ID of the surface raster (over which paths were reconstructed) retained by the algorithm.}
     \item{cell_x}{ A double that defines the cell x coordinate.}
     \item{cell_y}{ A double that defines the cell y coordinate.}

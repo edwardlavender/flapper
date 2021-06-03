@@ -4,25 +4,147 @@
 \alias{dcpf_simplify}
 \title{Convert particle histories from \code{\link[flapper]{dcpf}} into movement paths}
 \usage{
-dcpf_simplify(record, verbose = TRUE)
+dcpf_simplify(
+  record,
+  calc_distance = NULL,
+  calc_distance_graph = NULL,
+  max_n_copies = NULL,
+  sample_method = c("random", "weighted", "max"),
+  add_origin = TRUE,
+  verbose = TRUE,
+  ...
+)
 }
 \arguments{
 \item{record}{A \code{\link[flapper]{.dcpf-class}} object from \code{\link[flapper]{dcpf}}.}
 
+\item{calc_distance}{A character that defines the method used to calculate distances between sequential combinations of particles (see \code{\link[flapper]{dcpf}}). Currently supported options are Euclidean distances (\code{"euclid"}) or shortest (least-cost) distances ("lcp"). Note that \code{calc_distance} does not need to be the same method as used for \code{\link[flapper]{dcpf}}: it is often computationally beneficial to implement \code{\link[flapper]{dcpf}} using Euclidean distances and then, for the subset of sampled particles, implement in \code{\link[flapper]{dcpf_simplify}} with \code{calc_distance = "lcp"} to re-compute distances using the shortest-distances algorithm, along with the adjusted probabilities. However, for large paths, the quickest option is to implement both functions using \code{calc_distance = "euclid"} and then interpolate shortest paths only for the set of returned paths (see \code{\link[flapper]{lcp_interp}}). If \code{calc_distance = NULL}, the method saved in \code{record} is used.}
+
+\item{calc_distance_graph}{(optional) If \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in the bathymetry layer (stored in \code{record$args$bathy}). If un-supplied, this is taken from \code{record$args$calc_distance_graph}, if available, or computed via \code{\link[flapper]{lcp_graph_surface}}.}
+
+\item{max_n_copies}{(optional) An integer that specifies the maximum number of copies of a sampled cell that are retained at each time stamp. Each copy represents a different route to that cell. By default, all copies (i.e. routes to that cell are retained) via \code{max_n_copies = NULL}. However, in cases where there are a large number of paths through a landscape, the function can run into vector memory limitations during path assembly, so \code{max_n_copies} may need to be set. In this case, at each time step, if there are more than \code{max_n_copies} paths to a given cell, then a subset of these (\code{max_n_copies}) are sampled, according to the \code{sample_method} argument.}
+
+\item{sample_method}{(optional) If \code{max_n_copies} is supplied, \code{sample_method} is a character that defines the sampling method. Currently supported options are: \code{"random"}, which implements random sampling; \code{"weighted"}, which implements weighted sampling, with random samples taken according to their probability at the current time step; and \code{"max"}, which selects for the top \code{max_n_copies} most likely copies of a given cell according to the probability associated with movement into that cell from the previous location.}
+
+\item{add_origin}{A logical input that defines whether or not to include the origin in the returned dataframe.}
+
 \item{verbose}{A logical input that defines whether or not to print messages to the console to monitor function progress.}
+
+\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a \code{\link[flapper]{dcpf-class}} object, which is a dataframe that defines the movement paths.
 }
 \description{
-This function is designed to simplify the \code{\link[flapper]{.dcpf-class}} object from \code{\link[flapper]{dcpf}} that defines sampled particle histories into a set of movement paths.
+This function is designed to simplify the \code{\link[flapper]{.dcpf-class}} object from \code{\link[flapper]{dcpf}} that defines sampled particle histories into a set of movement paths. The function identifies pairs of cells between which movement may have occurred at each time step (if necessary), (re)calculates distances and probabilities between connected cell pairs and then links pairwise movements between cells into a set of possible movement paths.
 }
 \details{
-If there are vast numbers of possible paths through the landscape captured by particle movements, the function can run into vector memory limitations when assembling paths.
+The implementation of this function depends on how \code{\link[flapper]{dcpf}} has been implemented. Under the default options in \code{\link[flapper]{dcpf}}, the fast Euclidean distances method is used to sample sequential particle positions, in which case the history of each particle through the landscape is not retained and has to be assembled afterwards. In this case, \code{\link[flapper]{dcpf_simplify}} calculates the distances between all combinations of cells at each time step, using either a Euclidean distances or shortest distances algorithm according to the input to \code{calc_distance}. Distances are converted to probabilities using the movement models retained in \code{record} from the call to \code{\link[flapper]{dcpf}} to identify possible movement paths between cells at each time step. Pairwise cell movements are then assembled into complete movement paths. If the fast Euclidean distances method has not been used, then pairwise cell movements are retained by  \code{\link[flapper]{dcpf}}. In this case, the function simply recalculates distances between sequential cell pairs and the associated movement probabilities, which are used to assemble a set of movement paths.
 }
 \examples{
-# An example with the example DCPF particle histories dataset included in flapper
-paths <- dcpf_simplify(dat_dcpf_histories)
+#### Example particle histories
+# In these examples, we will use the example particle histories included in flapper
+summary(dat_dcpf_histories)
+
+#### Example (1): The default implementation
+paths_1 <- dcpf_simplify(dat_dcpf_histories)
+
+## Demonstration that the distance and probabilities calculations are correct
+# This method works for Euclidean distances and when calc_movement_pr applies to
+# ... all time stamps.
+require(magrittr)
+require(rlang)
+paths_1 <-
+  paths_1 \%>\% dplyr::group_by(.data$path_id) \%>\%
+  dplyr::mutate(cell_xp = dplyr::lag(.data$cell_x),
+                cell_yp = dplyr::lag(.data$cell_y),
+                cell_dist_chk = sqrt((.data$cell_xp - .data$cell_x)^2 +
+                                       (.data$cell_yp - .data$cell_y)^2),
+                cell_pr_chk = dat_dcpf_histories$args$calc_movement_pr(.data$cell_dist_chk),
+                dist_equal = .data$cell_dist_chk == .data$cell_dist_chk,
+                pr_equal = .data$cell_pr == .data$cell_pr_chk) \%>\%
+  data.frame()
+utils::head(paths_1)
+
+## Demonstration that the depths of sampled cells are correct
+paths_1$cell_z_chk <- raster::extract(dat_dcpf_histories$args$bathy,
+                                      paths_1$cell_id)
+all.equal(paths_1$cell_z, paths_1$cell_z_chk)
+
+## Compare depth time series
+# There is a relatively large degree of mismatch here, which reflects
+# ... the low resolution bathymetry data used for the algorithm.
+dcpf_plot_1d(dat_dcpf_histories$args$archival, paths_1)
+
+## Examine paths
+# Log likelihood
+dcpf_loglik(paths_1)
+# 2-d visualisation
+dcpf_plot_2d(paths_1, dat_dcpf_histories$args$bathy,
+             add_paths = list(length = 0.05))
+# 3-d visualisation
+dcpf_plot_3d(paths_1, dat_dcpf_histories$args$bathy)
+
+#### Example (2): Re-calculate distances using another method
+# Use shortest distances:
+paths_2a <- dcpf_simplify(dat_dcpf_histories, calc_distance = "lcp")
+# Speed up shortest distance calculations by supplying the graph object:
+costs <- lcp_costs(dat_dcpf_histories$args$bathy)
+graph <- lcp_graph_surface(dat_dcpf_histories$args$bathy, costs$dist_total)
+paths_2b <- dcpf_simplify(dat_dcpf_histories,
+                          calc_distance = "lcp",
+                          calc_distance_graph = graph)
+
+## Demonstrate the LCP calculations are correct
+paths_2d_lcps <- lcp_interp(paths_2b,
+                            dat_dcpf_histories$args$bathy,
+                            calc_distance = TRUE)
+head(cbind(paths_2b$dist, paths_2d_lcps$dist_lcp$dist))
+
+#### Example (3): Restrict the number of routes to each cell at each time step
+# Implement approach for different numbers of copies
+# Since we only have sampled a small number of particles for this simulation
+# ... this does not make any difference here, but it can dramatically reduce
+# ... the time taken to assemble paths and prevent vector memory issues.
+paths_3a <- dcpf_simplify(dat_dcpf_histories, max_n_copies = 1)
+paths_3b <- dcpf_simplify(dat_dcpf_histories, max_n_copies = 5)
+paths_3c <- dcpf_simplify(dat_dcpf_histories, max_n_copies = 7)
+# Compare the number of paths retained
+unique(paths_3a$path_id)
+unique(paths_3b$path_id)
+unique(paths_3c$path_id)
+
+#### Example (4): Change the sampling method used to retain paths
+# Again, this doesn't make a difference here, but it can when there are
+# ... more particles.
+paths_4a <- dcpf_simplify(dat_dcpf_histories,
+                          max_n_copies = 5,
+                          sample_method = "random")
+paths_4b <- dcpf_simplify(dat_dcpf_histories,
+                          max_n_copies = 5,
+                          sample_method = "weighted")
+paths_4c <- dcpf_simplify(dat_dcpf_histories,
+                          max_n_copies = 5,
+                          sample_method = "max")
+# Compare retained paths
+dcpf_loglik(paths_3a)
+dcpf_loglik(paths_3b)
+dcpf_loglik(paths_3c)
+
+#### Example (5): Retain/drop the origin, if specified
+# For the example particle histories, an origin was specified
+dat_dcpf_histories$args$origin
+# This is included as 'timestep = 0' in the returned dataframe
+# ... with the coordinates re-defined on bathy:
+paths_5a <- dcpf_simplify(dat_dcpf_histories)
+paths_5a[1, c("cell_x", "cell_y")]
+raster::xyFromCell(dat_dcpf_histories$args$bathy,
+                   raster::cellFromXY(dat_dcpf_histories$args$bathy,
+                                      dat_dcpf_histories$args$origin))
+head(paths_5a)
+# If specified, the origin is dropped with add_origin = FALS
+paths_5b <- dcpf_simplify(dat_dcpf_histories, add_origin = FALSE)
+head(paths_5b)
 
 }
 \author{

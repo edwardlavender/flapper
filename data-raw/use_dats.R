@@ -124,6 +124,7 @@ dcpf_1 <- dcpf(archival = depth,
               origin  = xy,
               calc_depth_error = function(...) c(-30, 30),
               calc_distance = "euclid",
+              calc_distance_euclid_fast = FALSE,
               calc_movement_pr =
                 function(distance,...) {
                   pr <- stats::plogis(10 + distance * -0.05)
