@@ -58,6 +58,9 @@ dat_acoustics$detection_days <- get_detection_days(dat_acoustics,
 utils::head(dat_acoustics)
 
 }
+\seealso{
+\code{\link[flapper]{get_detection_clump_lengths}}, \code{\link[flapper]{get_residents}}
+}
 \author{
 Edward Lavender
 }

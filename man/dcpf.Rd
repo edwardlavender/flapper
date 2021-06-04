@@ -197,6 +197,8 @@ out_2 <- dcpf(archival = depth,
               seed = 1)
 # Algorithm duration during testing ~0.04 minutes
 
+\dontrun{
+
 #### Example (3): Implement algorithm using shortest distances
 # Note the need for a surface with equal resolution if this option is implemented.
 # To speed up the initial stages of the algorithm, you can supply the graph
@@ -455,6 +457,9 @@ if(interactive()){
                add_additional = add_paths_sim,
                prompt = TRUE)
 }
+
+}
+
 
 }
 \seealso{

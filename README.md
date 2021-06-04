@@ -219,6 +219,8 @@ ecological investigations and space use algorithms:
   - `buffer_and_crop()` buffers a spatial object (e.g., receiver
     locations) and uses this buffered object to crop another (e.g., the
     local bathymetry);
+  - `crop_from_click()` crops a raster to an area defined by mouse
+    clicks;
   - `cells_from_val()` returns the cells (or a raster of the cells) of a
     raster that are equal to a specified value or lie within a specified
     range of values;
@@ -287,6 +289,11 @@ of individuals:
     operational units (e.g., individuals at liberty or active receivers)
   - `get_id_rec_overlap()` calculates the overlap between the deployment
     periods of tagged individuals and receivers;
+  - `get_detection_days()` calculates the total number of days during
+    which each individual was detected (termed ‘detection days’);
+  - `get_detection_clump_lengths()` calculates detection ‘clump’
+    lengths;
+  - `get_residents()` identifies ‘resident’ individuals;
   - `make_matrix_cooccurence()` computes a detection history similarity
     matrix across individuals;
 

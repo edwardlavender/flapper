@@ -296,6 +296,8 @@ dcpf_setup_cells_by_time <- function(archival,
 #'               seed = 1)
 #' # Algorithm duration during testing ~0.04 minutes
 #'
+#' \dontrun{
+#'
 #' #### Example (3): Implement algorithm using shortest distances
 #' # Note the need for a surface with equal resolution if this option is implemented.
 #' # To speed up the initial stages of the algorithm, you can supply the graph
@@ -554,6 +556,9 @@ dcpf_setup_cells_by_time <- function(archival,
 #'                add_additional = add_paths_sim,
 #'                prompt = TRUE)
 #' }
+#'
+#' }
+#'
 #'
 #' @return The function returns a \code{\link[flapper]{.dcpf-class}} object. This is a named list that includes the parameters used to generate function outputs (`args') and the particles sampled at each time step (`history'). The latter can be assembled into a dataframe of movement paths via \code{\link[flapper]{dcpf_simplify}}.
 #'

@@ -815,6 +815,7 @@ get_detection_centroids_envir <- function(xy,
 #'
 #' utils::head(dat_acoustics)
 #'
+#' @seealso \code{\link[flapper]{get_detection_clump_lengths}}, \code{\link[flapper]{get_residents}}
 #' @author Edward Lavender
 #' @export
 #'
@@ -891,3 +892,215 @@ get_detection_days <- function(acoustics,
   return(out)
 
 }
+
+
+######################################
+######################################
+#### get_detection_clump_lengths()
+
+#' @title Get detection clump lengths
+#' @importFrom rlang .data
+#' @description This function gets the frequency distribution of the duration of unique, uninterrupted series of detections (`clumps') over a given time interval--for example, the number of occasions when detections clumped into periods of one, two, three, ..., n days in duration without gaps longer than one day in length.
+#' @param acoustics A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). At a minimum, this should contain a POSIXct vector of time stamps when detections were made named `timestamp'.
+#' @param fct (optional) A character that defines the name of a column in \code{acoustics} that distinguishes acoustic time series for different individuals.
+#' @param interval A character that defines the time interval. This must be supported by \code{\link[lubridate]{round_date}}. The default is \code{"days"}, in which case the function gets the frequency distribution of the duration of clump lengths in units of days, with detections within the same clump occurring within one day of each other.
+#' @param ... Additional arguments (none implemented).
+#'
+#' @details Detection clumps provide a means to assess residency within an array by determining how long individuals tended to spend around receivers.
+#'
+#' @return The function returns a dataframe that defines the frequency distribution of the duration of detection clumps (i.e., the number of occasions when detection clumps lasted different lengths of time). This includes the following columns: (1) `n_interval', the duration of the clump, in units of \code{interval}; (2) `n_occasions', the number of occasions when detections clumped into windows of that duration; and, if \code{fct} is supplied, a column that distinguishes each individual.
+#'
+#' @examples
+#' #### Define a hypothetical series of detections
+#' # with one occasion when the 'chunk length' is 1 day
+#' # ... two separate occasions when the chunk length is two days
+#' # ... ... (i.e., the individual was detected on two consecutive day
+#' # ... .... on two different occasions)
+#' # ... one occasion when the chunk length is 5 days
+#' # ... one occasion when the chunk lenghth is 7 days
+#' eg <-
+#'   data.frame(
+#'     timestamp =
+#'       as.Date(
+#'         c("2016-01-01", # one week of continuous detections
+#'           "2016-01-02",
+#'           "2016-01-03",
+#'           "2016-01-04",
+#'           "2016-01-05",
+#'           "2016-01-06",
+#'           "2016-01-07",
+#'           "2016-02-01", # one day with an isolated detection
+#'           "2016-02-03", # two days with detections
+#'           "2016-02-04",
+#'           "2016-02-15", # another two days with detections
+#'           "2016-02-16",
+#'           "2016-03-01", # five days of continuous detections
+#'           "2016-03-02",
+#'           "2016-03-03",
+#'           "2016-03-04",
+#'           "2016-03-05")))
+#'
+#' #### Example (1): Implement function with default options
+#' # ... (for one individual, with a daily time interval)
+#' get_detection_clump_lengths(eg)
+#'
+#' #### Example (2): Implement function for multiple individuals
+#' # Use a factor to distinguish IDs. As an example:
+#' eg$individual_id <- 1L
+#' get_detection_clump_lengths(eg, fct = "individual_id")
+#'
+#' #### Example (3): Change the time interval
+#' ## E.g. Use an hourly interval:
+#' # There are 17 unique clumps in this dataset, each comprising a single hour
+#' eg$timestamp <- as.POSIXct(eg$timestamp)
+#' get_detection_clump_lengths(eg, interval = "hours")
+#' ## E.g. Use a monthly interval
+#' # There is a single 'three-month' clump of detections for this individual
+#' # ... when viewed at a monthly timescale:
+#' get_detection_clump_lengths(eg, interval = "months")
+#'
+#' @seealso \code{\link[flapper]{get_detection_days}}, \code{\link[flapper]{get_residents}}
+#' @author Edward Lavender
+#' @export
+
+
+get_detection_clump_lengths <-
+  function(acoustics,
+           fct = NULL,
+           interval = "days",...){
+
+    #### Checks
+    check_names(input = acoustics, req = c("timestamp", fct), type = all)
+    splitter <- fct
+    if(is.null(fct)) {
+      splitter <- "individual_id"
+      acoustics[, splitter] <- 1L
+    }
+
+    #### Define a sequence of times at which to identify whether or not detections were recorded
+    times <- seq(min(lubridate::floor_date(acoustics$timestamp, interval)),
+                 max(lubridate::ceiling_date(acoustics$timestamp, interval)),
+                 interval)
+    acoustics$timestamp <- lubridate::round_date(acoustics$timestamp, interval)
+    if(!identical(class(acoustics$timestamp), class(times)))
+      stop("class(acoustics$timestamp) and class(times) are not identical.")
+
+    #### Define a dataframe with .....
+    counts_by_id <-
+      # Loop over each individual
+      lapply(split(acoustics, acoustics[, splitter]), function(d){
+        # Identify whether detections were recorded at each timestamp
+        bool <- times %in% d$timestamp
+        # For each group of consecutive times when detections were made
+        # ... count the number of consecutive times in that group. This
+        # ... gives a dataframe with a unique identifier for each group of
+        # ... consecutive detections and the number of times in that group
+        # ... with detections (e.g., 1 day, 2 days etc.)
+        tmp <- data.frame(grp = data.table::rleid(bool), bool = bool)
+        tmp <-
+          tmp %>%
+          dplyr::filter(.data$bool) %>%
+          dplyr::group_by(.data$grp) %>%
+          dplyr::summarise(n = dplyr::n(), .groups = "drop_last")
+        # Get the frequency distribution of the lengths of strings of consecutive detections
+        # This shows the number of occasions when strings of consecutive detections
+        # ... of a certain length were made
+        # ... e.g., 15 occasions when the number of intervals in a string of consecutive detections
+        # ... was only one, 5 occasions when consecutive detections lasted for two days (etc.)
+        out <- table(tmp$n)
+        out <- data.frame(n_intervals = as.integer(names(out)), n_occasions = as.numeric(out))
+        out <- out %>% dplyr::arrange(.data$n_intervals)
+        if(!is.null(fct)) out[, fct] <- d[1, fct]
+        return(out)
+      })
+    counts <- do.call(rbind, counts_by_id)
+    rownames(counts) <- NULL
+    return(counts)
+  }
+
+
+######################################
+######################################
+#### get_residents()
+
+#' @title Identify `resident' individuals in a passive acoustic telemetry array
+#' @importFrom rlang .data
+#' @description This function identifies `resident' individuals in a passive acoustic telemetry array from acoustic detection time series.
+#'
+#' @param acoustics A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). At a minimum, this should contain a POSIXct vector of time stamps when detections were made named `timestamp'.
+#' @param fct (optional) A character that defines the name of a column in \code{acoustics} that distinguishes acoustic time series for different individuals.
+#' @param resident_threshold_gap A number that specifies the maximum gap (days) between detections for an individual to be considered `resident' over the period of detections.
+#' @param resident_threshold_duration A sorted, numeric vector that specifies the duration (days) over which `regular' detections (spaced less than \code{resident_threshold_gap} apart) must occur for an individual to be considered as `resident'. A vector can be supplied to distinguish multiple residency categories (e.g., short-term residents and long-term residents).
+#' @param resident_labels A character vector of labels, one for each \code{resident_threshold_duration}, for residency categories (e.g., short-term and long-term residents).
+#' @param non_resident_label A character that defines the label given to non-residents.
+#' @param keep A character vector of column names in \code{acoustics} to retain in the returned dataframe (e.g., `sex', `maturity' etc.).
+#'
+#' @details This function assigns residency categories (e.g., non-resident, short-term resident, long-term resident) to individuals in \code{acoustics}, returning a dataframe with one row for each individual and a column for assigned residency categories. `Resident' individuals are defined as individuals with (a) `regular' detections (i.e. detections spaced less than some threshold time (\code{resident_threshold_duration}) apart) that (b) last for a requisite time interval (\code{resident_threshold_duration}). Multiple residency categories can be specified. Under the default options, non-residents are labelled \code{"N"}. Short-term residents (labelled \code{"S"}) are defined as individuals for which sequential detections were less than 31 days apart for more than 91 days (three months). Long-term residents (labelled \code{"L"}) are defined as individuals for which sequential detections were less than 31 days apart for more than 365 days (12 months).
+#'
+#' A \code{method} argument may be added in due course to implement other methods to define `resident' individuals (e.g., based on detection days, see \code{\link[flapper]{get_detection_days}}) .
+#'
+#' @return The function returns a dataframe that defines, for each individual (\code{fct}), the duration (days) between the first detection and the last detection in a series of detections spaced less than \code{resident_threshold_gap} days apart (`time'), and the residency category (as defined by \code{resident_threshold_duration} and \code{resident_labels}).
+#'
+#' @examples
+#' #### Example (1): Implement default options
+#' get_residents(dat_acoustics, fct = "individual_id")
+#' # Compare results to abacus plot
+#' prettyGraphics::pretty_plot(dat_acoustics$timestamp, dat_acoustics$individual_id)
+#'
+#' @seealso \code{\link[flapper]{get_detection_days}}, \code{\link[flapper]{get_detection_clump_lengths}}
+#' @references Lavender, et al. (in review). Movement patterns of a Critically Endangered elasmobranch (\emph{Dipturus intermedius}) in a Marine Protected Area. Aquatic Conservation: Marine and Freshwater Ecosystems.
+#'
+#' @author Edward Lavender
+#' @export
+
+get_residents <- function(acoustics,
+                          fct = NULL,
+                          resident_threshold_gap = 31,
+                          resident_threshold_duration = c(91.2501, 365.25),
+                          resident_labels = c("S", "L"),
+                          non_resident_label = "N",
+                          keep = NULL){
+  #### Checks
+  check_names(input = acoustics, req = c("timestamp", fct), type = all)
+  if(is.unsorted(resident_threshold_duration))
+    stop("'resident_threshold_duration' should be a sorted, numeric vector.")
+  if(length(resident_threshold_duration) != length(resident_labels))
+    stop("The number of resident_threshold_duration(s) and resident_label(s) should be the same.")
+
+  #### Split based on individual ID
+  splitter <- fct
+  if(is.null(fct)) {
+    splitter <- "individual_id"
+    acoustics[, splitter] <- 1L
+  }
+
+  #### Define a dataframe with residence times
+  residents <-
+    acoustics %>%
+    dplyr::group_by(.data[[splitter]]) %>%
+    dplyr::arrange(.data$timestamp) %>%
+    dplyr::mutate(gap = Tools4ETS::serial_difference(.data$timestamp, units = "days"),
+                  flag = Tools4ETS::flag_ts(.data$timestamp, duration_threshold = 24 * 60 * resident_threshold_gap, flag = 3)$flag3,
+                  key = paste0(.data[[splitter]], "-", .data$flag)
+    ) %>%
+    dplyr::group_by(.data$key) %>%
+    dplyr::mutate(time = as.numeric(difftime(max(.data$timestamp), min(.data$timestamp), units = "days"))) %>%
+    dplyr::slice(1L) %>%
+    dplyr::group_by(.data[[splitter]]) %>%
+    dplyr::mutate(time = max(.data$time)) %>%
+    dplyr::slice(1L) %>%
+    dplyr::mutate(resident = factor(non_resident_label, levels = sort(c(non_resident_label, resident_labels)))) %>%
+    data.frame()
+  # Drop excess columns
+  residents <- residents[,  c(splitter, keep, "time", "resident")]
+  if(is.null(fct)) residents[, splitter] <- NULL
+
+  #### Assign residency categories
+  for(i in 1:length(resident_threshold_duration)){
+    residents$resident[residents$time >= resident_threshold_duration[i]] <- resident_labels[i]
+  }
+
+  #### Return dataframe
+  return(residents)
+}
+

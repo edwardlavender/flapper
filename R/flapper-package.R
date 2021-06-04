@@ -32,6 +32,7 @@
 #' Some functions facilitate spatial operations that support ecological investigations and space use algorithms:
 #' \itemize{
 #'   \item \link{buffer_and_crop} buffers a spatial object (e.g., receiver locations) and uses this buffered object to crop another (e.g., the local bathymetry);
+#'   \item \link{crop_from_click} crops a \code{\link[raster]{raster}} to an area defined by mouse clicks;
 #'   \item \link{cells_from_val} returns the cells (or a \code{\link[raster]{raster}} of the cells) of a \code{\link[raster]{raster}} that are equal to a specified value or lie within a specified range of values;
 #'   \item \link{invert_poly} inverts a polygon (e.g, to define the `sea' from a polygon of the `land');
 #'   \item \link{mask_io} masks values in a \code{\link[raster]{raster}} that lie inside or outside of a spatial mask (e.g., to mask the `land' from the `sea');
@@ -70,6 +71,9 @@
 #'   \item \link{get_detection_area_ts} defines a time series of the area surveyed by receivers;
 #'   \item \link{get_n_operational_ts} defines a time series of the number of operational units (e.g., individuals at liberty or active receivers);
 #'   \item \link{get_id_rec_overlap} calculates the overlap between the deployment periods of tagged individuals and receivers;
+#'   \item \link{get_detection_days} calculates the total number of days on which each individual was detected (termed `detection days;);
+#'   \item \link{get_detection_clump_lengths} calculates detection `clump' lengths;
+#'   \item \link{get_residents} identifies `resident' individuals;
 #'   \item \link{make_matrix_cooccurence} computes a detection history similarity matrix across individuals;
 #' }
 #'
