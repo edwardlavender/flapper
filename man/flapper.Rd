@@ -103,6 +103,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
   \item The depth-contour (DC) algorithm
   \itemize{
     \item \link{dc} implements the DC algorithm;
+    \item \link{dcq} implements the quick DC (DCQ) algorithm;
   }
   \item The depth-contour particle filtering (DCPF) algorithm
   \itemize{

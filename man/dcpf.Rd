@@ -65,7 +65,7 @@ dcpf(
 
 \item{seed}{(optional) An integer to define the seed for reproducible simulations (see \code{\link[base]{set.seed}}).}
 
-\item{verbose}{A logical variable that defines whether or not to print messages to the console to relay function progress}
+\item{verbose}{A logical variable that defines whether or not to print messages to the console to relay function progress.}
 
 \item{...}{Additional arguments (none implemented).}
 }

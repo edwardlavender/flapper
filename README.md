@@ -333,7 +333,9 @@ of detections, the DC approach only uses depth observations.
 Specifically, under the assumption that individuals are
 benthic/demersal, this algorithm uses observed depths (± some error) to
 define the subset of possible locations of each individual within a
-defined area. This is implemented via `dc()`.
+defined area. This is implemented via `dc()`. The ‘quick’ depth-contour
+(DCQ) algorithm, implemented via `dcq()`, uses a modified version of
+this algorithm for quicker run times.
 
 ### The depth-contour particle filtering (DCPF) algorithm
 

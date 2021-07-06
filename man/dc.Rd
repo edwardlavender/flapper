@@ -5,128 +5,84 @@
 \title{The depth-contour (DC) algorithm}
 \usage{
 dc(
-  archival_ls,
+  archival,
   bathy,
-  bin = 10,
-  transform = NULL,
-  plot = TRUE,
-  before_plot = NULL,
-  after_plot = NULL,
-  fix_zlim = FALSE,
-  one_page = FALSE,
+  calc_depth_error = function(...) c(-2.5, 2.5),
+  check_availability = TRUE,
+  split = NULL,
   cl = NULL,
+  varlist = NULL,
   verbose = TRUE,
   ...
 )
 }
 \arguments{
-\item{archival_ls}{A list of dataframes, with one element for each time unit (e.g., month), which contain depth time series to be related to the local bathymetry. Each dataframe should contain a column of depths (`depth') and a column that defines the time unit (`time_unit'). Depth should be recorded using absolute values in the same units as the bathymetry (see below).}
+\item{archival}{A dataframe of depth time series (for a single individual). At a minimum, this should contain a column named `depth' with depth observations. Depth should be recorded using absolute values in the same units as the bathymetry (\code{bathy}, see below).}
 
-\item{bathy}{A \code{\link[raster]{raster}} of the bathymetry in an area within which the animal is likely to have been located over the study. Bathymetry values should be recorded as absolute values and in the same units as for depths (see \code{archival_ls}).}
+\item{bathy}{A \code{\link[raster]{raster}} of the bathymetry in an area within which the animal is likely to have been located over the study. Bathymetry values should be recorded as absolute values and in the same units as for depths (see \code{archival}).}
 
-\item{bin}{A number that defines the interval into which depth observations are binned. This should be provided in the same units as depths (see \code{archival_ls}) and the bathymetry (see \code{bathy}). The appropriate value of \code{bin} depends on the measurement error of the \code{bathy} data and the depth time series, the tidal range in an area, computational requirements, and scale of biological research objectives. For large depth time series and/or large, high-resolution bathymetry rasters, it can be useful to test the algorithm's speed using a relatively large bin.}
+\item{calc_depth_error}{A function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.}
 
-\item{transform}{(optional) A function, such as \code{sqrt}, to transform counts. This affects the returned rasters and any plots produced (see Value). Be careful with some functions, such as \code{log}, which can generate problematic outputs (such as z axis limits if these are not defined manually), in some situations (for example, if some cells in the area are not visited).}
+\item{check_availability}{A logical input that defines whether or not to record explicitly, for each time step, whether or not there were any cells on \code{bathy} that matched the observed depth.}
 
-\item{plot}{A logical input that defines whether or not to plot the rasters. If \code{plot = TRUE}, the function produces a plot for each time unit.}
+\item{split, cl, varlist}{(optional) Parallelisation arguments. \code{split} is an integer which, if supplied, splits the \code{archival} dataframe every \code{n}th row into chunks*. The algorithm is applied sequentially within each chunk (if applicable) and chunk-wise maps are summed afterwards to create a single map of space use. The advantage of this approach is that chunks can be analysed in parallel, via \code{cl} and \code{varlist}, while memory use is minimised. \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. \code{varlist} is a character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.}
 
-\item{before_plot, after_plot}{(optional) Stand-alone functions that are executed before and after the plot for each time unit is created, respectively. For example, it may be useful to plot the coast in an area before each raster is plotted, or add custom axes after each plot has been produced.}
+\item{verbose}{A logical variable that defines whether or not to print messages to the console to relay function progress.}
 
-\item{fix_zlim, one_page, ...}{(optional) Plot customisation options. \code{fix_zlim} is a logical input that defines whether or not to fix z axis limits across all plots (to facilitate comparisons), or a vector of two numbers that define a custom range for the z axis which is fixed across all plots. \code{fix_zlim = FALSE} produces plots in which the z axis is allowed to vary flexibly between time units. \code{one_page} is a logical input that defines whether or not to produce all plots on one page; this is only implemented if there are fewer than 25 time units, beyond which there are typically to many plots to fit on one page. Additional plot customisation arguments can be passed to \code{\link[fields]{image.plot}} via \code{...}.}
-
-\item{cl}{A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the slower steps of the algorithm are implemented in parallel. The connection to the cluster is closed within the function.}
-
-\item{verbose}{A logical input that defines whether or not to relay messages to the console to monitor function progress.}
+\item{...}{Additional arguments (none implemented).}
 }
 \value{
-The function returns a named list of rasters, one for each time unit, in which the value of each cell is the number of times that that cell was represented by the corresponding depth bin in the depth time series.
+The function returns a named list with the following elements. `args' is a named list of the arguments used to call the function. `archival' is the \code{archival} dataframe. This includes two new columns that define the lower and upper bounds for the possible depth of the individual on \code{bathy} at each time step (`depth_lwr' and `depth_upper') derived from \code{calc_depth_error} and, if \code{calc_availability = TRUE}, a logical vector that defines whether or not there are any cells on \code{bathy} of the required depth range at each time step. `dc' is a \code{\link[raster]{raster}}, with the same properties as \code{bathy}, in which the value of each cell is the number of times that the depth in that cell overlapped with the individual's depth.
 }
 \description{
-This function implements the depth-contour (DC) algorithm. Under the assumption that individuals are benthic/demersal, this algorithm relates one-dimensional depth time series to a two-dimensional bathymetry surface to determine the extent to which different parts of an area might have (or have not) been used, or effectively represent occupied depths, over time. To implement this function, a list of depth time series, one for each time unit (e.g. month/season) need to be supplied, along with a bathymetry \code{\link[raster]{raster}}. For each time unit, the function counts the number of depth observations in each user-defined depth bin (e.g., 10 m depth bins) and then relates these counts to the local bathymetry to produce a raster in which the value of each cell is given by the number of times in which the depth bin for that cell was used. The function returns a list of rasters, one for each time unit, and a plot of these rasters, if requested.
+This function implements the depth-contour (DC) algorithm. Under the assumption that individuals are benthic/demersal, this algorithm relates one-dimensional depth time series to a two-dimensional bathymetry surface to determine the extent to which different parts of an area might have (or have not) been used, or effectively represent occupied depths, over time. Given a sequence of depth observations (\code{archival}) from a benthic animal and a measurement error parameter (\code{calc_depth_error}), at each time step the function determines the cells on a bathymetry \code{\link[raster]{raster}} (\code{bathy}) that match the observed depth. Across all time steps, matches are summed to produce a single map representing the number of occasions when the depth in each cell matched the observed depth.
+}
+\details{
+*Under the default options (\code{split = NULL}), the function starts with a blank map of the area and iterates over each time step, adding the `possible positions' of the individual to the map at each step. By continuously updating a single map, this approach is slow but minimises memory requirements. An alternative approach is to split the time series into chunks, implement an iterative approach within each chunk, and then maps for each chunk. This is implemented by \code{split}.
 }
 \examples{
-#### Define data for examples
-# Define archival time series with required columns ('depth' and 'time_unit')
-dat_archival <- dat_archival[order(dat_archival$timestamp), ]
-dat_archival$time_unit <- cut(dat_archival$timestamp, "weeks")
-# Define a list of dataframes with one element for each time unit
-archival_ls <- split(dat_archival, f = dat_archival$time_unit)
-# Define bathymetry data (and coastline data for plotting)
-bathy <- prettyGraphics::dat_gebco
-coastline <- prettyGraphics::dat_coast_around_oban
+#### Define depth time series for examples
+# We will use a sample depth time series for one individual
+# We will select a small sample of observations for example speed
+depth <- dat_archival[dat_archival$individual_id == 25, ][1:100, ]
 
-#### Example (1) Implement the dc() algorithm with 25 m bins
-dc_maps <- dc(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 25,
-              plot = FALSE)
-# The function returns a list of rasters, with one raster
-# ... for each time unit.
-dc_maps
+#### Example (1): Implement algorithm with default options
+dc_out <- dc(archival = depth,
+             bathy = dat_gebco)
+# Examine map
+# Each cell shows the number of time steps when the bathymetry data in each cell
+# ... matches the archival data
+prettyGraphics::pretty_map(add_rasters = list(x = dc_out$dc),
+                           add_polys = list(x = dat_coast))
+# Convert counts on map to percentages
+prettyGraphics::pretty_map(add_rasters = list(x = dc_out$dc/nrow(depth) * 100,
+                                              zlim = c(0, 100)),
+                           add_polys = list(x = dat_coast))
+# Check for occasions when the individual's depth was not consistent
+# ... with the depth data for the area and the depth error e.g., possibly
+# ... due to movement beyond this area:
+any(dc_out$archival$availability == FALSE)
 
-#### Example (2): Implement the algorithm in parallel:
-dc_maps <- dc(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 25,
-              plot = FALSE,
-              cl = parallel::makeCluster(2L))
-
-#### Example (3): Visualise the function outputs on one page
-# ... using standard options.
-# Examine results with 25 m bin
-dc_maps <- dc(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 25,
-              plot = TRUE,
-              one_page = TRUE)
-# Examine results with a higher resolution bin
-dc_maps <- dc(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 5,
-              plot = TRUE,
-              one_page = TRUE)
-
-#### Example (4): Plot customisation options
-# fix zlim to be constant across all plots to enable comparability
-dc_maps <- dc(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 5,
-              plot = TRUE,
-              one_page = TRUE,
-              fix_zlim = TRUE)
-# fix zlim using custom limits across all plots
-dc_maps <- dc(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 5,
-              plot = TRUE,
-              one_page = TRUE,
-              fix_zlim = c(0, 5000))
-# Transform the returned and plotted rasters by supplying a function to the
-# ... transform argument
-dc_maps <- dc(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 5,
-              plot = TRUE,
-              one_page = TRUE,
-              transform = sqrt)
-# Customise the plot further via before_plot, after_plot functions
-# ... and other arguments passed via ... E.g., note the need to include
-# ... add = TRUE because the raster plot is added to the plot of the coastline.
-dc_maps <- dc(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 5,
-              plot = TRUE,
-              one_page = TRUE,
-              transform = sqrt,
-              fix_zlim = FALSE,
-              before_plot = function(x) raster::plot(coastline),
-              after_plot = function(x) raster::lines(coastline),
-              add = TRUE,
-              col = topo.colors(100))
+#### Example (2): Implement the algorithm in parallel
+# Trial different options for 'split' and compare speed
+system.time(
+  dc_out <- dc(archival = depth,
+               bathy = dat_gebco,
+               split = 1,
+               cl = parallel::makeCluster(2L)
+  )
+)
+system.time(
+  dc_out <- dc(archival = depth,
+               bathy = dat_gebco,
+               split = 5,
+               cl = parallel::makeCluster(2L)
+  )
+)
 
 }
 \seealso{
-The ACDC algorithm (see \code{\link[flapper]{acdc}}) extends the depth-contour algorithm by integrating information from acoustic detections of individuals at each time step to restrict the locations in which depth contours are identified.
+\code{\link[flapper]{dcq}} implements a faster version of this algorithm termed the `quick depth-contour' (DCQ) algorithm. Rather than considering the depth interval that the individual could have occupied at each time step, the DCQ algorithm considers a sequence of depth bins (e.g., 10 m bins), isolates these on the bathymetry \code{\link[raster]{raster}} (\code{bathy}) and counts the number of matches in each cell. The DCPF algorithm (see \code{\link[flapper]{dcpf}}) extends the DC algorithm via particle filtering to reconstruct possible movement paths over \code{bathy}. The ACDC algorithm (see \code{\link[flapper]{acdc}}) extends the depth-contour algorithm by integrating information from acoustic detections of individuals at each time step to restrict the locations in which depth contours are identified.
 }
 \author{
 Edward Lavender

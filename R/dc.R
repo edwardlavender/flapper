@@ -1,244 +1,186 @@
 #' @title The depth-contour (DC) algorithm
-#' @description This function implements the depth-contour (DC) algorithm. Under the assumption that individuals are benthic/demersal, this algorithm relates one-dimensional depth time series to a two-dimensional bathymetry surface to determine the extent to which different parts of an area might have (or have not) been used, or effectively represent occupied depths, over time. To implement this function, a list of depth time series, one for each time unit (e.g. month/season) need to be supplied, along with a bathymetry \code{\link[raster]{raster}}. For each time unit, the function counts the number of depth observations in each user-defined depth bin (e.g., 10 m depth bins) and then relates these counts to the local bathymetry to produce a raster in which the value of each cell is given by the number of times in which the depth bin for that cell was used. The function returns a list of rasters, one for each time unit, and a plot of these rasters, if requested.
+#' @description This function implements the depth-contour (DC) algorithm. Under the assumption that individuals are benthic/demersal, this algorithm relates one-dimensional depth time series to a two-dimensional bathymetry surface to determine the extent to which different parts of an area might have (or have not) been used, or effectively represent occupied depths, over time. Given a sequence of depth observations (\code{archival}) from a benthic animal and a measurement error parameter (\code{calc_depth_error}), at each time step the function determines the cells on a bathymetry \code{\link[raster]{raster}} (\code{bathy}) that match the observed depth. Across all time steps, matches are summed to produce a single map representing the number of occasions when the depth in each cell matched the observed depth.
 #'
-#' @param archival_ls A list of dataframes, with one element for each time unit (e.g., month), which contain depth time series to be related to the local bathymetry. Each dataframe should contain a column of depths (`depth') and a column that defines the time unit (`time_unit'). Depth should be recorded using absolute values in the same units as the bathymetry (see below).
-#' @param bathy A \code{\link[raster]{raster}} of the bathymetry in an area within which the animal is likely to have been located over the study. Bathymetry values should be recorded as absolute values and in the same units as for depths (see \code{archival_ls}).
-#' @param bin A number that defines the interval into which depth observations are binned. This should be provided in the same units as depths (see \code{archival_ls}) and the bathymetry (see \code{bathy}). The appropriate value of \code{bin} depends on the measurement error of the \code{bathy} data and the depth time series, the tidal range in an area, computational requirements, and scale of biological research objectives. For large depth time series and/or large, high-resolution bathymetry rasters, it can be useful to test the algorithm's speed using a relatively large bin.
-#' @param transform (optional) A function, such as \code{sqrt}, to transform counts. This affects the returned rasters and any plots produced (see Value). Be careful with some functions, such as \code{log}, which can generate problematic outputs (such as z axis limits if these are not defined manually), in some situations (for example, if some cells in the area are not visited).
-#' @param plot A logical input that defines whether or not to plot the rasters. If \code{plot = TRUE}, the function produces a plot for each time unit.
-#' @param before_plot,after_plot (optional) Stand-alone functions that are executed before and after the plot for each time unit is created, respectively. For example, it may be useful to plot the coast in an area before each raster is plotted, or add custom axes after each plot has been produced.
-#' @param fix_zlim,one_page,... (optional) Plot customisation options. \code{fix_zlim} is a logical input that defines whether or not to fix z axis limits across all plots (to facilitate comparisons), or a vector of two numbers that define a custom range for the z axis which is fixed across all plots. \code{fix_zlim = FALSE} produces plots in which the z axis is allowed to vary flexibly between time units. \code{one_page} is a logical input that defines whether or not to produce all plots on one page; this is only implemented if there are fewer than 25 time units, beyond which there are typically to many plots to fit on one page. Additional plot customisation arguments can be passed to \code{\link[fields]{image.plot}} via \code{...}.
-#' @param cl A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the slower steps of the algorithm are implemented in parallel. The connection to the cluster is closed within the function.
-#' @param verbose A logical input that defines whether or not to relay messages to the console to monitor function progress.
+#' @param archival A dataframe of depth time series (for a single individual). At a minimum, this should contain a column named `depth' with depth observations. Depth should be recorded using absolute values in the same units as the bathymetry (\code{bathy}, see below).
+#' @param bathy A \code{\link[raster]{raster}} of the bathymetry in an area within which the animal is likely to have been located over the study. Bathymetry values should be recorded as absolute values and in the same units as for depths (see \code{archival}).
+#' @param calc_depth_error A function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.
+#' @param check_availability A logical input that defines whether or not to record explicitly, for each time step, whether or not there were any cells on \code{bathy} that matched the observed depth.
+#' @param split,cl,varlist (optional) Parallelisation arguments. \code{split} is an integer which, if supplied, splits the \code{archival} dataframe every \code{n}th row into chunks*. The algorithm is applied sequentially within each chunk (if applicable) and chunk-wise maps are summed afterwards to create a single map of space use. The advantage of this approach is that chunks can be analysed in parallel, via \code{cl} and \code{varlist}, while memory use is minimised. \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. \code{varlist} is a character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.
+#' @param verbose A logical variable that defines whether or not to print messages to the console to relay function progress.
+#' @param ... Additional arguments (none implemented).
 #'
-#' @return The function returns a named list of rasters, one for each time unit, in which the value of each cell is the number of times that that cell was represented by the corresponding depth bin in the depth time series.
+#' @details *Under the default options (\code{split = NULL}), the function starts with a blank map of the area and iterates over each time step, adding the `possible positions' of the individual to the map at each step. By continuously updating a single map, this approach is slow but minimises memory requirements. An alternative approach is to split the time series into chunks, implement an iterative approach within each chunk, and then maps for each chunk. This is implemented by \code{split}.
 #'
-#' @seealso The ACDC algorithm (see \code{\link[flapper]{acdc}}) extends the depth-contour algorithm by integrating information from acoustic detections of individuals at each time step to restrict the locations in which depth contours are identified.
+#' @return The function returns a named list with the following elements. `args' is a named list of the arguments used to call the function. `archival' is the \code{archival} dataframe. This includes two new columns that define the lower and upper bounds for the possible depth of the individual on \code{bathy} at each time step (`depth_lwr' and `depth_upper') derived from \code{calc_depth_error} and, if \code{calc_availability = TRUE}, a logical vector that defines whether or not there are any cells on \code{bathy} of the required depth range at each time step. `dc' is a \code{\link[raster]{raster}}, with the same properties as \code{bathy}, in which the value of each cell is the number of times that the depth in that cell overlapped with the individual's depth.
 #'
 #' @examples
-#' #### Define data for examples
-#' # Define archival time series with required columns ('depth' and 'time_unit')
-#' dat_archival <- dat_archival[order(dat_archival$timestamp), ]
-#' dat_archival$time_unit <- cut(dat_archival$timestamp, "weeks")
-#' # Define a list of dataframes with one element for each time unit
-#' archival_ls <- split(dat_archival, f = dat_archival$time_unit)
-#' # Define bathymetry data (and coastline data for plotting)
-#' bathy <- prettyGraphics::dat_gebco
-#' coastline <- prettyGraphics::dat_coast_around_oban
+#' #### Define depth time series for examples
+#' # We will use a sample depth time series for one individual
+#' # We will select a small sample of observations for example speed
+#' depth <- dat_archival[dat_archival$individual_id == 25, ][1:100, ]
 #'
-#' #### Example (1) Implement the dc() algorithm with 25 m bins
-#' dc_maps <- dc(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 25,
-#'               plot = FALSE)
-#' # The function returns a list of rasters, with one raster
-#' # ... for each time unit.
-#' dc_maps
+#' #### Example (1): Implement algorithm with default options
+#' dc_out <- dc(archival = depth,
+#'              bathy = dat_gebco)
+#' # Examine map
+#' # Each cell shows the number of time steps when the bathymetry data in each cell
+#' # ... matches the archival data
+#' prettyGraphics::pretty_map(add_rasters = list(x = dc_out$dc),
+#'                            add_polys = list(x = dat_coast))
+#' # Convert counts on map to percentages
+#' prettyGraphics::pretty_map(add_rasters = list(x = dc_out$dc/nrow(depth) * 100,
+#'                                               zlim = c(0, 100)),
+#'                            add_polys = list(x = dat_coast))
+#' # Check for occasions when the individual's depth was not consistent
+#' # ... with the depth data for the area and the depth error e.g., possibly
+#' # ... due to movement beyond this area:
+#' any(dc_out$archival$availability == FALSE)
 #'
-#' #### Example (2): Implement the algorithm in parallel:
-#' dc_maps <- dc(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 25,
-#'               plot = FALSE,
-#'               cl = parallel::makeCluster(2L))
+#' #### Example (2): Implement the algorithm in parallel
+#' # Trial different options for 'split' and compare speed
+#' system.time(
+#'   dc_out <- dc(archival = depth,
+#'                bathy = dat_gebco,
+#'                split = 1,
+#'                cl = parallel::makeCluster(2L)
+#'   )
+#' )
+#' system.time(
+#'   dc_out <- dc(archival = depth,
+#'                bathy = dat_gebco,
+#'                split = 5,
+#'                cl = parallel::makeCluster(2L)
+#'   )
+#' )
 #'
-#' #### Example (3): Visualise the function outputs on one page
-#' # ... using standard options.
-#' # Examine results with 25 m bin
-#' dc_maps <- dc(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 25,
-#'               plot = TRUE,
-#'               one_page = TRUE)
-#' # Examine results with a higher resolution bin
-#' dc_maps <- dc(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 5,
-#'               plot = TRUE,
-#'               one_page = TRUE)
+#' @seealso \code{\link[flapper]{dcq}} implements a faster version of this algorithm termed the `quick depth-contour' (DCQ) algorithm. Rather than considering the depth interval that the individual could have occupied at each time step, the DCQ algorithm considers a sequence of depth bins (e.g., 10 m bins), isolates these on the bathymetry \code{\link[raster]{raster}} (\code{bathy}) and counts the number of matches in each cell. The DCPF algorithm (see \code{\link[flapper]{dcpf}}) extends the DC algorithm via particle filtering to reconstruct possible movement paths over \code{bathy}. The ACDC algorithm (see \code{\link[flapper]{acdc}}) extends the depth-contour algorithm by integrating information from acoustic detections of individuals at each time step to restrict the locations in which depth contours are identified.
 #'
-#' #### Example (4): Plot customisation options
-#' # fix zlim to be constant across all plots to enable comparability
-#' dc_maps <- dc(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 5,
-#'               plot = TRUE,
-#'               one_page = TRUE,
-#'               fix_zlim = TRUE)
-#' # fix zlim using custom limits across all plots
-#' dc_maps <- dc(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 5,
-#'               plot = TRUE,
-#'               one_page = TRUE,
-#'               fix_zlim = c(0, 5000))
-#' # Transform the returned and plotted rasters by supplying a function to the
-#' # ... transform argument
-#' dc_maps <- dc(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 5,
-#'               plot = TRUE,
-#'               one_page = TRUE,
-#'               transform = sqrt)
-#' # Customise the plot further via before_plot, after_plot functions
-#' # ... and other arguments passed via ... E.g., note the need to include
-#' # ... add = TRUE because the raster plot is added to the plot of the coastline.
-#' dc_maps <- dc(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 5,
-#'               plot = TRUE,
-#'               one_page = TRUE,
-#'               transform = sqrt,
-#'               fix_zlim = FALSE,
-#'               before_plot = function(x) raster::plot(coastline),
-#'               after_plot = function(x) raster::lines(coastline),
-#'               add = TRUE,
-#'               col = topo.colors(100))
-#'
-#' @export
 #' @author Edward Lavender
-#'
+#' @export
 
-dc <- function(archival_ls,
+dc <- function(archival,
                bathy,
-               bin = 10, transform = NULL,
-               plot = TRUE, before_plot = NULL, after_plot = NULL, fix_zlim = FALSE, one_page = FALSE,
-               cl = NULL,
+               calc_depth_error = function(...) c(-2.5, 2.5),
+               check_availability = TRUE,
+               split = NULL,
+               cl = NULL, varlist = NULL,
                verbose = TRUE,...){
 
+  #### Set up function
+  # Function onset
+  cat_to_console <- function(..., show = verbose){
+    if(show) cat(paste(..., "\n"))
+  }
+  t_onset <- Sys.time()
+  cat_to_console(paste0("flapper::dc() called (@ ", t_onset, ")..."))
+  cat_to_console("... Setting up function...")
+
+  #### Define storage container
+  out <- list()
+  out$args <- list(archival = archival,
+                   bathy = bathy,
+                   calc_depth_error = calc_depth_error,
+                   split = split,
+                   cl = cl, varlist = varlist,
+                   verbose = verbose,
+                   dots = list(...))
+
   #### Checks
-  cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
-  cat_to_console("flapper::dc() called...")
-  cat_to_console("... Step 1: Checking user inputs...")
-  check_class(input = archival_ls, to_class = "list", type = "stop")
-  sapply(1:length(archival_ls), function(i){
-    check_names(arg = paste0("archival_ls[[", i, "]]"),
-                input = archival_ls[[i]],
-                req = c("depth", "time_unit")
-                )
-  })
-
-  #### Define the frequency of use of different depth bins
-  # Define a list called 'use_freq_by_time_unit'
-  # ... with one element for each element of 'archival_ls' (i.e., each time unit)
-  # ... which will contain a dataframe that, for each bin, defines how many times
-  # ... cells in that depth bin could have been used.
-  cat_to_console("... Step 2: Calculating the number of observations within each depth bin for each time unit...")
-  max_depth <- max(sapply(archival_ls, function(d) max(d$depth, na.rm = TRUE)))
-  use_freq_by_time_unit <-
-    pbapply::pblapply(archival_ls, cl = NULL, function(df){
-      ## Define histogram breaks from from 0 to the max depth by the size of the depth bin specified.
-      breaks <- seq(0, max_depth, by = bin)
-      ## Because we've specified a regular sequence, the maximum value of the break
-      # ... might be less than the maximum depth, which will cause errors when we create the histogram,
-      # ... so, if this is the case, we'll add an extra interval:
-      if(max(breaks) < max_depth) breaks <- c(breaks, breaks[length(breaks)] + bin)
-      ## Create a histogram of counts of observations at each depth in a vector of breaks
-      # Use right = TRUE so the frequency in a bin defined by lower and upper
-      # ... values x and y is over the interval >= x but < y.
-      h <- graphics::hist(df$depth, breaks = breaks, right = TRUE, plot = FALSE)
-      # Create a dataframe that includes the middle value of each depth bin
-      # ... and the corresponding count of depth records in that bin.
-      use_freq <- data.frame(time_unit = df$time_unit[1], mids = h$mids, counts = h$counts)
-      # Add the lower and upper values associated with each bin
-      use_freq$lower <- use_freq$mids - bin/2
-      use_freq$upper <- use_freq$mids + bin/2
-      # Return the dataframe
-      return(use_freq)
-    })
-
-  #### Define a function to get the cell numbers of cells whose value lies within a specified range
-  .cells_from_val <- function(y){
-    return(cells_from_val(x = bathy, y = y, interval = 1L, cells = TRUE, na.rm = TRUE))
+  # Check arguments passed via ...
+  if(!is.null(names(list(...)))){
+    warning(paste0("The following argument(s) passed via ... are not supported: ",
+                   paste(names(list(...)), collapse = ", "), "."),
+            call. = FALSE, immediate. = TRUE)
+  }
+  # Check archival dataframe
+  if(!inherits(archival, "data.frame")) stop("'archival' must be a data.frame")
+  check_names(input = archival, req = "depth", extract_names = colnames, type = all)
+  if(any(is.na(archival$depth))) stop("'archival$depth' contains NAs.")
+  # Check calc_depth_error
+  de_1 <- calc_depth_error(archival$depth[1])
+  if(length(de_1) != 2){
+    stop("'calc_depth_error' should be a function that returns a numeric vector of length two (i.e., a lower and upper depth adjustment).")
+  }
+  if(de_1[1] > 0 | de_1[2] < 0){
+    stop("'calc_depth_error' should return a negative and a postive adjustment (in that order).")
+  }
+  if(is.null(split) & !is.null(cl)) {
+    warning("'cl' argument ignored unless 'split' is supplied.",
+            immediate. = TRUE, call. = TRUE)
+    cl <- NULL
+    varlist <- NULL
+  }
+  if(is.null(cl) & !is.null(varlist)) {
+    warning("'varlist' is supplied but 'cl' is NULL.",
+            immediate. = TRUE, call. = TRUE)
+    varlist <- NULL
   }
 
-  #### Use depth data to create rasters describing possible patterns in space use:
-  # Create a list of objects, one for each time unit,
-  # ... one element of which will be a raster of the
-  # ... potential number of times in which each cell could have been used
-  # ... based on the frequency with which that depth was visited:
-  cat_to_console("... Step 3: Translating counts of observations within depth bins into maps...")
-  area_use <- bathy
-  area_use <- raster::setValues(area_use, 0)
-  area_use_ls <- pbapply::pblapply(use_freq_by_time_unit, cl = cl, function(use_freq){
-    # use_freq <- use_freq_by_time_unit[[1]]
-    # Determine the cell IDs of cells which lie within the lower and upper values
-    # ... of each depth bin:
-    cells_by_interval <- lapply(split(use_freq[, c("lower", "upper")], 1:nrow(use_freq)), FUN = function(y){
-      cells <- .cells_from_val(as.numeric(y))
-      return(cells)
-    })
-    # Update the area use raster in each of these cells based on the number of times that depth bin was used:
-    # Loop over every element in cells_by_interval (i.e. every depth bin...)
-    for(i in 1:length(cells_by_interval)) {
-      area_use[cells_by_interval[[i]]] <- use_freq$counts[i]
-    }
-    # Transform the raster, if required
-    if(!is.null(transform)) area_use <- transform(area_use)
-    # Return a list of objects
-    ls <- list(cells_by_interval = cells_by_interval,
-               area_use = area_use)
-    return(ls)
-  })
-  if(!is.null(cl)) parallel::stopCluster(cl = cl)
+  #### Implement calc_depth_error()
+  cat_to_console("... Implementing calc_depth_error()...")
+  archival$depth_lwr <- archival$depth + calc_depth_error(archival$depth)[1]
+  archival$depth_upr <- archival$depth + calc_depth_error(archival$depth)[2]
 
-  #### Visualise map of depth/space use for each time unit
-  if(plot){
-
-    ## Define plotting area
-    cat_to_console("... Step 4: Mapping the results...")
-    if(one_page) {
-      if(length(area_use_ls) > 25) {
-        message("The number of time units > 25: ignoring one_page = TRUE...")
-        one_page <- FALSE
-      }
-    }
-    if(one_page) pp <- graphics::par(mfrow = prettyGraphics::par_mf(length(area_use_ls)))
-
-    ## Define zlim, if requested
-    if(is.logical(fix_zlim)) {
-      if(fix_zlim){
-        range_use <- lapply(area_use_ls, function(time_unit){
-          area_use <- time_unit$area_use
-          min_use <- raster::cellStats(area_use, stat = "min", na.rm = TRUE)
-          max_use <- raster::cellStats(area_use, stat = "max", na.rm = TRUE)
-          return(c(min_use, max_use))
-        })
-        range_use <- do.call(rbind, range_use)
-        min_use <- min(range_use[, 1])
-        max_use <- max(range_use[, 2])
-        zlim <- c(min_use, max_use)
-      }
-    }
-
-    ## Loop over each time unit and product a plot
-    lapply(area_use_ls, function(time_unit) {
-      # Isolate raster
-      area_use <- time_unit$area_use
-      # Initial plot (e.g., plot coastline)
-      if(!is.null(before_plot)) before_plot()
-      # Define time-specific zlim, if requested
-      if(is.logical(fix_zlim)){
-        if(!fix_zlim) {
-          min_use <- raster::cellStats(area_use, stat = "min", na.rm = TRUE)
-          max_use <- raster::cellStats(area_use, stat = "max", na.rm = TRUE)
-          zlim <- c(min_use, max_use)
-        }
+  #### Implement algorithm
+  # Define a blank map
+  blank <- bathy
+  blank <- raster::setValues(blank, 0)
+  # Define 'availability'
+  if(check_availability) archival$availability <- NA
+  # Implement algorithm
+  if(is.null(split)){
+    cat_to_console("... Implementing algorithm over time steps...")
+    use <- blank
+    if(verbose) pb <- utils::txtProgressBar(min = 0, max = nrow(archival), style = 3)
+    for(i in 1:nrow(archival)){
+      if(check_availability){
+        avail <- bathy >= archival$depth_lwr[i] & bathy <= archival$depth_upr[i]
+        archival$availability[i] <- raster::maxValue(avail) == 1
+        use <- use + avail
       } else {
-        zlim <- fix_zlim
+        use <- use + (bathy >= archival$depth_lwr[i] & bathy <= archival$depth_upr[i])
       }
-      # Create map
-      fields::image.plot(area_use, zlim = zlim,...)
-      # Updates (e.g., re-add coastline)
-      if(!is.null(after_plot)) after_plot()
+      if(verbose) utils::setTxtProgressBar(pb, i)
+    }
+    if(verbose) close(pb)
+  } else {
+    cat_to_console("... Implementing algorithm over chunks...")
+    archival_ls <- split(archival, rep(1:ceiling(nrow(archival)/split), each = split)[1:nrow(archival)])
+    if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
+    use_and_avail_by_chunk <- pbapply::pblapply(archival_ls, cl = cl, function(d){
+      blank <- raster::setValues(bathy, 0)
+      use <- blank
+      for(i in 1:nrow(d)){
+        if(check_availability){
+          avail <- bathy >= d$depth_lwr[i] & bathy <= d$depth_upr[i]
+          d$availability[i] <- raster::maxValue(avail) == 1
+          use <- use + avail
+        } else {
+          use <- use + (bathy >= d$depth_lwr[i] & bathy <= d$depth_upr[i])
+        }
+      }
+      return(list(avail = d, use = use))
     })
-
-    ## Reset graphics window
-    if(one_page) graphics::par(pp)
+    if(!is.null(cl)) parallel::stopCluster(cl)
+    use_by_chunk   <- lapply(use_and_avail_by_chunk, function(elm) elm$use)
+    avail_by_chunk <- lapply(use_and_avail_by_chunk, function(elm) elm$avail)
+    archival <- do.call(rbind, avail_by_chunk)
+    cat_to_console("... Stacking chunk usage maps...")
+    use <- raster::stack(use_by_chunk)
+    cat_to_console("... Summing chunk usage maps to generate a single map of space use...")
+    use <- sum(use)
   }
 
   #### Return outputs
-  out <- lapply(area_use_ls, function(elm) elm$area_use)
+  out$archival <- archival
+  out$dc <- use
+  t_end <- Sys.time()
+  total_duration <- difftime(t_end, t_onset, units = "mins")
+  cat_to_console(paste0("... flapper::dc() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
   return(out)
 
 }
+
+
+
+
