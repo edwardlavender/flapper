@@ -133,7 +133,7 @@ make_matrix_receivers <- function(moorings,
                                   as_POSIXct = as.POSIXct,
                                   set_names = TRUE,...){
 
-  #### Check dates
+  #### Check inputs
   check_names(input = moorings, req = c("receiver_id", "receiver_start_date", "receiver_end_date"),
               extract_names = colnames, type = all)
   if(!is.null(services)){
