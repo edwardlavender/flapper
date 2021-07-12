@@ -169,7 +169,7 @@ make_matrix_receivers <- function(moorings,
     services_ls <- lapply(split(moorings, 1:nrow(moorings)), function(d){
       out <- NULL
       if(d$receiver_id %in% services$receiver_id){
-        out <- services[which(services$receiver_id %in% moorings$receiver_id), ]
+        out <- services[which(services$receiver_id %in% d$receiver_id), ]
       }
       return(out)
     })
