@@ -184,7 +184,7 @@ eval_by_kud <-
   if(!is.null(add_land)) add_land$x <- array$land
   if(!is.null(add_sea)) add_sea$x <- array$sea
   add_polys <- list(add_land, add_sea)
-  add_polys <- plyr::compact(add_polys)
+  add_polys <- compact(add_polys)
   if(length(add_polys) == 0L) add_polys <- NULL
   if(!is.null(add_receivers)) add_receivers$x <- array$xy
 

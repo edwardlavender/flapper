@@ -876,7 +876,7 @@ dcpf <- function(archival,
           if(nrow(pr_j) > 0) out <- NULL else out <- pr_j
           return(pr_j)
         })
-        cells_from_current_to_next <- plyr::compact(cells_from_current_to_next)
+        cells_from_current_to_next <- compact(cells_from_current_to_next)
         cells_from_current_to_next <- do.call(rbind, cells_from_current_to_next)
       }
 

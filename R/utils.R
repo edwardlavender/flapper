@@ -17,6 +17,35 @@ NULL
 
 ######################################
 ######################################
+#### round_any()
+
+#' @title Round to multiple of any number
+#' @description Round to multiple of any number.
+#' @param x numeric or date-time (POSIXct) vector to round
+#' @param accuracy number to round to; for POSIXct objects, a number of seconds
+#' @param f rounding function: floor, ceiling or round
+#' @source This function and the documentation are taken from the `plyr' package. The function is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
+#' @keywords internal
+#'
+
+round_any <- function(x, accuracy, f = round){f(x/accuracy) * accuracy}
+
+
+######################################
+######################################
+#### compact()
+
+#' @title Compact a list
+#' @description Remove all \code{NULL} entries from a list.
+#' @param l A list.
+#' @source This function is derived from the \code{plyr::compact()} function. The function is defined separately in \code{\link[flapper]{flapper}} to reduce reliance on non-default packages.
+#' @keywords internal
+
+compact <- function(l) l[which(!sapply(l, is.null))]
+
+
+######################################
+######################################
 #### check...()
 
 #' @title Check that arguments supplied via \code{...} are allowed

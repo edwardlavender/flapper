@@ -349,7 +349,7 @@ acdc_setup_centroids <- function(
   #### Define a list of acoustic centroids for each receiver
   cat_to_console("... Building a nested list of acoustic centroids. This is the slow step...")
 
-  ## Define a sequence of centroid radiuss
+  ## Define a sequence of centroid radius
   # Around each receiver, we'll create a polygon of this radius
   radius_seq <- seq(detection_range, length.out = n_timesteps, by = mobility)
 
@@ -421,7 +421,6 @@ acdc_setup_centroids <- function(
   return(spdf_ls)
 
 }
-
 
 
 ######################################
@@ -713,7 +712,7 @@ acdc_setup_centroids <- function(
       receiver_2_id      <- acoustics$receiver_id[timestep_detection+1]
 
       #### Duration between detections to the nearest 2 minutes (floored):
-      time_btw_dets <- plyr::round_any(as.numeric(difftime(receiver_2_timestamp, receiver_1_timestamp, units = "mins")), 2)
+      time_btw_dets <- round_any(as.numeric(difftime(receiver_2_timestamp, receiver_1_timestamp, units = "mins")), 2)
 
 
       ######################################
@@ -1017,7 +1016,7 @@ acdc_setup_centroids <- function(
 #'
 #' In outline, the crux of the approach is the recognition that acoustic detections typically occur irregularly, while archival observations occur at regular intervals. Each detection anchors our knowledge of the location of an individual around a particular receiver (assuming that all detections are true detections). As time passes between acoustic detections, our uncertainty about the geographical location of an individual expands around the receiver at which it was detected before shrinking towards the receiver at which it was next detected. During this time, regular depth observations restrict the number of possible locations in which the individual could have been located at each time step.
 #'
-#' More specifically, when an individual is detected, it must be within some radius – say 800 m – of that receiver. This is the starting acoustic centroid. With a more-refined model of detection probability, it may be possible to predict more precisely where the individual is likely to have been within this centroid (but this approach is not yet implemented). The observed depth at this time further restricts the positions in which the individual could have been, assuming a benthic/demersal lifestyle and a non-homogenous bathymetric landscape. Moving forward in time, a number of depth records may be made before another acoustic detection. During this time, our uncertainty about where the individual could have been gets larger, because it could have moved further away from the receiver, so the acoustic centroids that define this uncertainty expand to a maximum size at the halfway point between acoustic detections. After that, the individual must have started to move towards the receiver at which it was next detected, so these acoustic centroids start to shrink towards that receiver. If the individual was detected by different receivers, the overlap between the centroids of these two receivers at the halfway point defines the set of positions in which the individual could have been at this time. Thereafter, our uncertainty in the individual's location is given by the overlap between the expansion of this centroid region and the contraction of the centroid around the receiver at which it was next detected. Thus, when the individual is detected again, our uncertainty about where it could have been collapses to the detection radius around the next receiver, possibly weighted by a model of detection probability around this receiver (although that is not yet implemented). The rate of change in centroid size depends a movement parameter that describes an average swimming speed, which will depend on some underlying estimated behavioural state (although that is not yet implemented).
+#' More specifically, when an individual is detected, it must be within some radius---say 800 m---of that receiver. This is the starting acoustic centroid. With a more-refined model of detection probability, it may be possible to predict more precisely where the individual is likely to have been within this centroid (but this approach is not yet implemented). The observed depth at this time further restricts the positions in which the individual could have been, assuming a benthic/demersal lifestyle and a non-homogeneous bathymetric landscape. Moving forward in time, a number of depth records may be made before another acoustic detection. During this time, our uncertainty about where the individual could have been gets larger, because it could have moved further away from the receiver, so the acoustic centroids that define this uncertainty expand to a maximum size at the halfway point between acoustic detections. After that, the individual must have started to move towards the receiver at which it was next detected, so these acoustic centroids start to shrink towards that receiver. If the individual was detected by different receivers, the overlap between the centroids of these two receivers at the halfway point defines the set of positions in which the individual could have been at this time. Thereafter, our uncertainty in the individual's location is given by the overlap between the expansion of this centroid region and the contraction of the centroid around the receiver at which it was next detected. Thus, when the individual is detected again, our uncertainty about where it could have been collapses to the detection radius around the next receiver, possibly weighted by a model of detection probability around this receiver (although that is not yet implemented). The rate of change in centroid size depends a movement parameter that describes an average swimming speed, which will depend on some underlying estimated behavioural state (although that is not yet implemented).
 #'
 #' The result is a map that shows where the individual could have spent more or less (or no) time over the time interval under construction. The main limitation of this approach is that reconstructs where the individual could have been, but not where it was. In reality, the individual's current position constrains where it can go next. The ACDCPF/MP algorithms are extensions of this approach that incorporate a movement model for this reason.
 #'

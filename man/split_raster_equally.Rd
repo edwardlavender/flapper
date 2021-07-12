@@ -23,6 +23,9 @@ This function splits a raster object into parts with approximately equal area.
 \details{
 The raster (\code{r}) should not only contain NAs.
 }
+\note{
+This function requires the `plyr' package.
+}
 \examples{
 l <- split_raster_equally(dat_gebco, 2)
 l <- split_raster_equally(dat_gebco, 3)

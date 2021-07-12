@@ -297,6 +297,7 @@ mask_io <- function(x, mask, mask_inside = FALSE,...){
 #' @param r A \code{\link[raster]{raster}}.
 #' @param n An integer that defines the number of parts into which to split the raster.
 #' @details The raster (\code{r}) should not only contain NAs.
+#' @note This function requires the `plyr' package.
 #' @return The function returns a list containing the split raster components.
 #'
 #' @examples
@@ -311,6 +312,8 @@ mask_io <- function(x, mask, mask_inside = FALSE,...){
 #' @export
 
 split_raster_equally <- function(r, n) {
+  # Check for plyr
+  if(!requireNamespace("plyr", quietly = TRUE)) stop("This function requires the 'plyr' package.")
   # get total number of non NA grid cells
   mean.r <- raster::calc(r, function(x) {
     s <- sum(!is.na(x))
