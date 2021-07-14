@@ -295,6 +295,7 @@ of individuals:
     which each individual was detected (termed ‘detection days’);
   - `get_detection_clump_lengths()` calculates detection ‘clump’
     lengths;
+  - `get_detection_overlaps()` identifies ‘overlapping’ detections;
   - `get_residents()` identifies ‘resident’ individuals;
   - `make_matrix_cooccurence()` computes a detection history similarity
     matrix across individuals;

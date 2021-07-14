@@ -74,6 +74,7 @@
 #'   \item \link{get_id_rec_overlap} calculates the overlap between the deployment periods of tagged individuals and receivers;
 #'   \item \link{get_detection_days} calculates the total number of days on which each individual was detected (termed `detection days;);
 #'   \item \link{get_detection_clump_lengths} calculates detection `clump' lengths;
+#'   \item \link{get_detection_overlaps} identifies `overlapping' detections;
 #'   \item \link{get_residents} identifies `resident' individuals;
 #'   \item \link{make_matrix_cooccurence} computes a detection history similarity matrix across individuals;
 #' }

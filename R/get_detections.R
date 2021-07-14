@@ -189,7 +189,7 @@ get_detection_centroids <- function(xy,
 #' @param services (optional) A dataframe that defines receiver IDs and servicing \code{\link[base]{Dates}} (times during the deployment period of a receiver when it was not active due to servicing). If provided, this must contain the following columns: an integer identifier for serviced receivers (named ‘receiver_id’) and two columns that define the time of the service(s) (‘service_start_date’ and ‘service_end_date’) (see \code{\link[flapper]{make_matrix_receivers}}).
 #' @param ... Additional arguments (none implemented).
 #'
-#' @details This function requires the \code{\link[tidyr]{tidyr-package}} (specifically \code{\link[tidyr]{pivot_longer}}.
+#' @details This function requires the \code{\link[tidyr]{tidyr-package}} (specifically \code{\link[tidyr]{pivot_longer}}).
 #'
 #' @return The function returns a list with two elements:
 #' \itemize{
@@ -1248,6 +1248,191 @@ get_detection_clump_lengths <-
     rownames(counts) <- NULL
     return(counts)
   }
+
+
+########################################
+########################################
+#### get_detection_overlaps()
+
+#' @title Get `overlapping' detections
+#' @description This function isolates detections that occurred at `effectively the same time' at different receivers with overlapping or non-overlapping detection centroids. To implement the function, a dataframe of acoustic detections for a specific individual (\code{acoustics}) is required. Within this dataframe, the function isolates any detections that occurred within a user-specified time interval (\code{clock_drift}) at different receivers. If a list of the receivers with overlapping detection centroids in space and time is supplied (\code{overlaps}), the function also flags the subset of these detections that occurred at receivers with overlapping or non-overlapping detection centroids. This information is important for identifying potential false detections and the implementation of the AC* algorithm(s) (see Details). The function returns this information via summary message(s) along with a dataframe of the overlapping detections.
+#'
+#' @param acoustics A dataframe of passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. This must contain an integer vector of receiver IDs, named `receiver_id' and a POSIXct vector of time stamps when detections were made, named `timestamp'.
+#' @param overlaps (optional) A named list, from \code{\link[flapper]{get_detection_centroids_overlap}}, that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers.
+#' @param clock_drift A number that defines the time (s) between sequential detections at which they are considered to have occurred at `effectively the same time'.
+#' @param ... Additional arguments (none implemented).
+#'
+#' @details Detections at different receivers that occur at effectively the same time have important implications for inferences of animal movement patterns, especially via the AC* algorithm(s) in \code{\link[flapper]{flapper}} (e.g. \code{\link[flapper]{acdc}}). Within the AC* algorithm(s), when an individual is detected at the same time at two different receivers, detection probability kernels dictate that these receivers must have overlapping detection centroids. If the detection kernels do not overlap, this suggests that either (a) receiver clocks are not well-aligned; (b) the definition of `effectively the same time' is be overly large (such that the individual could move from within the detection centroid of one receiver into the detection centroid of another); (c) detection centroids are too small and detection probability is higher than realised; and/or (d) one or more of the detections are false. The most likely cause may be guided by knowledge of the array design, detection probability and false detection algorithms. For example, if it is plausible that detection centroids are too small, repeating the implementation of this function with larger centroids may indicate whether or not this is likely to have been the case: if so, all detections that occurred at effectively the same time at receivers with non-overlapping detection centroids should be captured by the large centroids (though this does not rule out other explanations). The purpose of this function is to flag any such detections so that they can be investigated and addressed prior to the implementation of the AC* algorithm(s).
+#'
+#' @return The function returns a message that defines the number of detections at different receivers that occurred at effectively the same time (within \code{clock_drift}) and, if \code{overlaps} is supplied, the subset of these that occurred at non-overlapping receivers. A dataframe is also invisibly returned that records the details of overlapping detections. This includes the following columns:
+#' \itemize{
+#'    \item \code{timestamp_1}, a POSIXct vector of time stamps at which detections were made;
+#'    \item \code{receiver_id_1}, an integer identifier of the receivers at which detections were made;
+#'    \item \code{timestamp_2}, a POSIXct vector of the time stamps at which immediately subsequent detections were made;
+#'    \item \code{receiver_id_2}, an integer identifier of the receivers at which the immediately subsequent detections were made;
+#'    \item \code{diff_time}, a numeric vector that defines the time (s) between consecutive detections (\code{timestamp_1} and \code{timestamp_2});
+#'    \item \code{detection_in_overlapping_centroid}, a binary vector that defines whether (1) or not (0) the detection centroids of \code{receiver_id_1} and \code{receiver_id_2} overlapped at the time of the detection (this is only included if \code{overlaps} is provided);
+#' }
+#'
+#' @examples
+#' #### Example (1): Implement function using detection data for an example individual
+#' dat_acoustics_25 <- dat_acoustics[dat_acoustics$individual_id == 25, ]
+#' dat <- get_detection_overlaps(acoustics = dat_acoustics_25)
+#' utils::head(dat)
+#'
+#' #### Example (2): Implement function, including information on detection centroids
+#'
+#' ## Get detection centroid overlaps to include in function
+#' ## (see ?flapper::get_detection_centroid_overlaps)
+#' # Define receiver locations
+#' proj_wgs84 <- sp::CRS("+init=epsg:4326")
+#' proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
+#'                           "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#' rownames(dat_moorings) <- dat_moorings$receiver_id
+#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
+#'                         proj_wgs84)
+#' xy <- sp::spTransform(xy, proj_utm)
+#' # Get receiver-specific detection centroids
+#' centroids <- get_detection_centroids(xy, byid = TRUE)
+#' centroids_df <- dat_moorings[, c("receiver_id",
+#'                                  "receiver_start_date",
+#'                                  "receiver_end_date")]
+#' row.names(centroids_df) <- names(centroids)
+#' centroids <- sp::SpatialPolygonsDataFrame(centroids, centroids_df)
+#' # Define detection centroid overlaps
+#' overlaps <- get_detection_centroids_overlap(centroids = centroids)
+#'
+#' ## Implement function with detection centroid overlaps included
+#' dat <- get_detection_overlaps(acoustics = dat_acoustics_25, overlaps = overlaps)
+#' utils::head(dat)
+#'
+#' #### Implement function across all individuals
+#' # For some individuals, there are simultaneous detections at receivers with
+#' # ... non overlapping detection centroids, suggesting these are probably too small.
+#' dat_by_id <-
+#'   lapply(split(dat_acoustics, dat_acoustics$individual_id),
+#'          function(acc_for_id){
+#'            print(paste("individual_id", acc_for_id$individual_id[1], "-------"))
+#'            get_detection_overlaps(acoustics = acc_for_id, overlaps = overlaps)
+#'          })
+#' ## Test this hypothesis by re-implementing approach with larger centroids
+#' # Re-define centroids and receiver overlap
+#' centroids <- get_detection_centroids(xy, detection_range = 750, byid = TRUE)
+#' centroids <- sp::SpatialPolygonsDataFrame(centroids, centroids_df)
+#' overlaps <- get_detection_centroids_overlap(centroids = centroids)
+#' # Re-implement algorithm
+#' dat_by_id <-
+#'   lapply(split(dat_acoustics, dat_acoustics$individual_id),
+#'          function(acc_for_id){
+#'            print(paste("individual_id", acc_for_id$individual_id[1], "-------"))
+#'            get_detection_overlaps(acoustics = acc_for_id, overlaps = overlaps)
+#'          })
+#' # There are now no observations within clock_drift at receivers with
+#' # ... non-overlapping centroids.
+#'
+#' @author Edward Lavender
+#' @export
+#'
+
+get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5,...){
+
+  #### Checks
+  check_names(input = acoustics, req = c("timestamp", "receiver_id"), type = all)
+  if(!is.null(overlaps)) {
+    check_names(input = overlaps, req = "list_by_receiver", type = all)
+    overlaps <- overlaps$list_by_receiver
+  }
+
+  #### Process acoustics
+  # Select columns
+  acoustics$timestamp_1 <- acoustics$timestamp
+  acoustics$timestamp <- NULL
+  acoustics$receiver_id_1 <- acoustics$receiver_id
+  acoustics <- acoustics[, c("timestamp_1", "receiver_id_1")]
+  # Get original order
+  acoustics$index <- 1:nrow(acoustics)
+  if(is.unsorted(acoustics$timestamp_1)) {
+    message("'acoustics' is not sorted by timestamp: are there detections for multiple individuals (there shouldn't be)? Sorting 'acoustics' by timestamp...")
+    acoustics <- acoustics[order(acoustics$timestamp_1), ]
+  }
+  # Calculate the duration between sequential detections
+  acoustics$receiver_id_2 <- dplyr::lead(acoustics$receiver_id_1)
+  acoustics$timestamp_2 <- dplyr::lead(acoustics$timestamp_1)
+  acoustics <- acoustics[1:(nrow(acoustics) - 1), ]
+  acoustics$diff_time <- as.numeric(difftime(acoustics$timestamp_2, acoustics$timestamp_1, units = "secs"))
+  # Filter observations that occurred within 'clock_drift'
+  acoustics <- acoustics[acoustics$receiver_id_1 != acoustics$receiver_id_2 &
+                           acoustics$diff_time <= clock_drift, ]
+
+  #### Determine the number of observations that occurred within the clock drift
+  n <- nrow(acoustics)
+  message(n, " observation(s) identified at another receiver within ", clock_drift, " secs.")
+
+  #### Examine which of these occurred at receivers with overlapping detection centroids
+  # For each receiver, for each date, we will identify whether detections within the clock drift
+  # ... occurred at a spatially overlapping receiver.
+  if(n > 0 & !is.null(overlaps)) {
+    # receiver_id_2 as a character
+    acoustics$receiver_id_2_char <- as.character(acoustics$receiver_id_2)
+    # Define a column to distinguish detection dates
+    acoustics$timestamp_date <- as.Date(acoustics$timestamp_1)
+    # Define blank column to store whether or not detections occurred at an overlapping receiver
+    acoustics$detection_in_overlapping_centroid <- 0
+    # Update acoustics with information on whether or not detections occurred at an overlapping receiver
+    acc_by_receiver <-
+      # For each receiver...
+      lapply(split(acoustics, acoustics$receiver_id_1), function(acc_by_receiver){
+        # Get  receiver-specific overlaps matrix
+        # acc_by_receiver <- split(acoustics, acoustics$receiver_id_1)[[1]]
+        overlap_for_receiver <- overlaps[[acc_by_receiver$receiver_id_1[1]]]
+        stopifnot(acc_by_receiver$receiver_id[1] == overlap_for_receiver$receiver_id[1])
+        # For each date...
+        acc_by_receiver_by_date <-
+          lapply(split(acc_by_receiver, acc_by_receiver$timestamp_date), function(acc_by_receiver_on_date){
+            # Get date-specific overlaps matrix
+            # acc_by_receiver_on_date <- split(acc_by_receiver, acc_by_receiver$timestamp_date)[[1]]
+            overlap_for_receiver_on_date <-
+              overlap_for_receiver[which(overlap_for_receiver$timestamp %in% acc_by_receiver_on_date$timestamp_date[1]),
+                                   , drop = FALSE]
+            # For each detection...
+            for(i in 1:nrow(acc_by_receiver_on_date)){
+              # Work out whether or not that detection occurred at an overlapping receiver
+              acc_by_receiver_on_date$detection_in_overlapping_centroid[i] <-
+                overlap_for_receiver_on_date[, acc_by_receiver_on_date$receiver_id_2_char[i]] == 1
+            }
+            return(acc_by_receiver_on_date)
+          })
+        acc_by_receiver <- do.call(rbind, acc_by_receiver_by_date)
+        return(acc_by_receiver)
+      })
+    acoustics <- do.call(rbind, acc_by_receiver)
+    acoustics$timestamp_date <- NULL
+
+    #### Determine the number of detections at non-overlapping receivers
+    n_at_non_overlapping_receivers <- length(which(acoustics$detection_in_overlapping_centroid == 0))
+    message("Of these, there are ", n_at_non_overlapping_receivers, " observation(s) within ", clock_drift, " secs that are not in overlapping centroids.")
+    # Examine the receiver combinations at which simultaneous detections at non-overlapping receivers occurred:
+    if(n_at_non_overlapping_receivers > 0){
+      acoustics$key <- paste0(acoustics$receiver_id_1, "-", acoustics$receiver_id_2)
+      keys <- do.call(rbind, strsplit(unique(acoustics$key), split = "-", fixed = TRUE))
+      keys <- data.frame(keys)
+      keys$key <- NA
+      for(i in 1:nrow(keys)){
+        keys$key[i] <- paste0(sort(c(keys[i, 1], keys[i, 2])), collapse = "-")
+      }
+      keys <- keys[!duplicated(keys$key), ]
+      message("These simulataneous detections at non-overlapping receivers occurred at ", nrow(keys), " unique receiver pair(s): ", paste0(keys$key, collapse = ", "), ".")
+      acoustics$key <- NULL
+    }
+  }
+
+  #### Return acoustics
+  acoustics <- acoustics[order(acoustics$index), ]
+  acoustics$index <- NULL
+  acoustics$receiver_id_2_char <- NULL
+  rownames(acoustics) <- NULL
+  return(invisible(acoustics))
+}
 
 
 ######################################

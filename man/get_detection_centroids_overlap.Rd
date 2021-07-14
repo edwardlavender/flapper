@@ -24,7 +24,7 @@ The function returns a list with two elements:
 This functions identifies receivers with overlapping detection centroids in space and time.
 }
 \details{
-This function requires the \code{\link[tidyr]{tidyr-package}} (specifically \code{\link[tidyr]{pivot_longer}}.
+This function requires the \code{\link[tidyr]{tidyr-package}} (specifically \code{\link[tidyr]{pivot_longer}}).
 }
 \examples{
 #### Define receiver centroids
