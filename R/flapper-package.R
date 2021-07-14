@@ -66,6 +66,7 @@
 #' \itemize{
 #'   \item \link{get_detection_pr} calculates detection probability given a model for detection probability with distance;
 #'   \item \link{get_detection_centroids} defines detection centroids (areas within the maximum detection range) around receivers;
+#'   \item \link{get_detection_centroids_overlap} identifies receivers with overlapping detection centroids in space and time;
 #'   \item \link{get_detection_centroids_envir} extracts environmental conditions from within receiver detection ranges, accounting for detection probability;
 #'   \item \link{get_detection_area_sum} calculates the total area surveyed by receivers;
 #'   \item \link{get_detection_area_ts} defines a time series of the area surveyed by receivers;

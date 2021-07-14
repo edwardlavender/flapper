@@ -278,6 +278,8 @@ of individuals:
     for detection probability with distance;
   - `get_detection_centroids()` defines detection centroids (areas
     within the maximum detection range) around receivers;
+  - `get_detection_centroids_overlap` identifies receivers with
+    overlapping detection centroids in space and time;
   - `get_detection_centroids_envir()` extracts environmental conditions
     from within receiver detection ranges, accounting for detection
     probability;

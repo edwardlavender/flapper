@@ -177,6 +177,237 @@ get_detection_centroids <- function(xy,
 }
 
 
+########################################
+########################################
+#### get_detection_centroids_overlap()
+
+#' @title Get detection centroid overlaps
+#' @importFrom lubridate `%within%`
+#' @description This functions identifies receivers with overlapping detection centroids in space and time.
+#'
+#' @param centroids A \code{\link[sp]{SpatialPolygonsDataFrame}} that defines detection centroids (see \code{\link[flapper]{get_detection_centroids}}). The \code{data} slot must include a dataframe with the following columns: an unique, integer identifier for each receiver (`receiver_id') and receiver deployment \code{\link[base]{Dates}} (`receiver_start_date' and `receiver_end_date').
+#' @param services (optional) A dataframe that defines receiver IDs and servicing \code{\link[base]{Dates}} (times during the deployment period of a receiver when it was not active due to servicing). If provided, this must contain the following columns: an integer identifier for serviced receivers (named ‘receiver_id’) and two columns that define the time of the service(s) (‘service_start_date’ and ‘service_end_date’) (see \code{\link[flapper]{make_matrix_receivers}}).
+#' @param ... Additional arguments (none implemented).
+#'
+#' @details This function requires the \code{\link[tidyr]{tidyr-package}} (specifically \code{\link[tidyr]{pivot_longer}}.
+#'
+#' @return The function returns a list with two elements:
+#' \itemize{
+#'   \item \strong{overlap_by_receiver} is list, with one element for all integers from \code{1:max(centroids$receiver_id)}. Any elements that do not correspond to receivers contain a NULL element. List elements that correspond to receivers contain a dataframe that defines, for each day over the deployment period (defined in `timestamp') of that receiver (defined in `receiver_id'), whether (1) or not (0) that receiver overlapped in space with every other receiver (defined in the remaining columns by their receiver IDs).
+#'   \item \strong{overlap_by_date} is a named list, with one element for each date from the start until the end of the study (\code{min(centroids$receiver_start_date):max(centroids$receiver_end_date)}), that records an integer vector of all receivers with overlapping centroids on that date. In this vector, each receiver overlaps with at least one other receiver (but not every receiver will necessarily overlap with every other receiver).
+#' }
+#'
+#' @examples
+#' #### Define receiver centroids
+#' ## Define receiver locations as a SpatialPoints object with a UTM CRS
+#' proj_wgs84 <- sp::CRS("+init=epsg:4326")
+#' proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
+#'                           "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#' rownames(dat_moorings) <- dat_moorings$receiver_id
+#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
+#'                         proj_wgs84)
+#' xy <- sp::spTransform(xy, proj_utm)
+#' ## Get receiver-specific detection centroids
+#' # ... via get_detection_centroids with byid = TRUE
+#' centroids <- get_detection_centroids(xy, byid = TRUE)
+#' ## Link detection centroids with receiver IDs and deployment dates
+#' # ... in a SpatialPointsDataFrame, as required for this function.
+#' centroids_df <- dat_moorings[, c("receiver_id",
+#'                                  "receiver_start_date",
+#'                                  "receiver_end_date")]
+#' row.names(centroids_df) <- names(centroids)
+#' centroids <- sp::SpatialPolygonsDataFrame(centroids, centroids_df)
+#'
+#' ## Simulate some receiver 'servicing' dates for demonstration purposes
+#' set.seed(1)
+#' # Loop over each receiver...
+#' services_by_receiver <- lapply(split(dat_moorings, 1:nrow(dat_moorings)), function(din){
+#'   # For the receiver, simulate the number of servicing events
+#'   n <- sample(0:3, 1)
+#'   dout <- NULL
+#'   if(n > 0){
+#'     # simulate the timing of servicing events
+#'     dates <- sample(seq(min(din$receiver_start_date), max(din$receiver_end_date), "days"), n)
+#'     dout <- data.frame(receiver_id = rep(din$receiver_id, length(dates)),
+#'                        service_start_date = dates,
+#'                        service_end_date = dates)
+#'   }
+#'   return(dout)
+#' })
+#' services <- do.call(rbind, services_by_receiver)
+#' rownames(services) <- NULL
+#' if(nrow(services) == 0) services <- NULL
+#'
+#' #### Example (1): Implement function using centroids alone
+#' overlaps_1 <- get_detection_centroids_overlap(centroids = centroids)
+#' summary(overlaps_1)
+#'
+#' #### Example (2): Account for servicing dates
+#' overlaps_2 <- get_detection_centroids_overlap(centroids = centroids,
+#'                                               services = services)
+#' # Examine the first few simulated servicing events
+#' services[1:3, ]
+#' # Show that the list_by_date element for the first servicing event
+#' # ... includes the first receiver in services$receiver_id
+#' # ... for overlaps_1 but not overlaps_2,
+#' # ... which accounts for that fact that the receiver was serviced then:
+#' overlaps_1$list_by_date[[as.character(services$service_start_date[1])]]
+#' overlaps_2$list_by_date[[as.character(services$service_start_date[1])]]
+#' # Likewise, show that the list_by_receiver element for that receiver
+#' # ... includes overlapping receivers in overlaps_1 but not overlaps_2:
+#' r_id <- services$receiver_id[1]
+#' overlaps_1$list_by_receiver[[r_id]][overlaps_1$list_by_receiver[[r_id]]$timestamp %in%
+#'                                       services$service_start_date[services$receiver_id == r_id], ]
+#' overlaps_2$list_by_receiver[[r_id]][overlaps_2$list_by_receiver[[r_id]]$timestamp %in%
+#'                                       services$service_start_date[services$receiver_id == r_id], ]
+#'
+#' @seealso \code{\link[flapper]{get_detection_centroids}} creates detection centroids.
+#' @author Edward Lavender
+#' @export
+
+
+get_detection_centroids_overlap <- function(centroids, services = NULL,...){
+
+  #### Checks
+  ## packages
+  if(!requireNamespace("tidyr", quietly = TRUE)) stop("Please install 'tidyr': this function requires the tidyr::pivot_longer() routine.")
+  ## centroids
+  if(!inherits(centroids, "SpatialPolygonsDataFrame")) stop("'centroids' must be a SpatialPolygonsDataFrame.")
+  ## moorings
+  moorings <- data.frame(centroids)
+  check_names(input = moorings, req = c("receiver_id", "receiver_start_date", "receiver_end_date"),
+              extract_names = colnames, type = all)
+  if(is.numeric(moorings$receiver_id)) moorings$receiver_id <- as.integer(moorings$receiver_id)
+  if(!is.integer(moorings$receiver_id))
+    stop(paste("Argument 'xy$receiver_id' must be of class 'integer', not class(es):"), class(moorings$receiver_id))
+  if(any(moorings$receiver_id <= 0))
+    stop("Argument 'xy$receiver_id' cannot contain receiver IDs <= 0.")
+  if(any(duplicated(moorings$receiver_id )))
+    stop("Argument 'xy$receiver_id' contains duplicate elements.")
+  ## services
+  if(!is.null(services)){
+    check_names(input = services, req = c("receiver_id", "service_start_date", "service_end_date"),
+                extract_names = colnames, type = all)
+    if(is.numeric(services$receiver_id)) services$receiver_id <- as.integer(services$receiver_id)
+    if(!is.integer(services$receiver_id))
+      stop(paste("Argument 'services$receiver_id' must be of class 'integer', not class(es):"), class(services$receiver_id))
+    if(!all(unique(services$receiver_id) %in% unique(moorings$receiver_id))){
+      message("Not all receivers in services$receiver_id are in moorings$receiver_id.")
+    }
+    services$interval <- lubridate::interval(services$service_start_date,
+                                             services$service_end_date)
+  }
+  ## dots
+  if(!is.null(names(list(...)))){
+    warning(paste0("The following argument(s) passed via ... are not supported: ",
+                   paste(names(list(...)), collapse = ", "), "."),
+            call. = FALSE, immediate. = TRUE)
+  }
+
+  #### Define receiver activity status matrix
+  # This defines whether or not each receiver was active on each date (0, 1)
+  # We'll start from this point because it accounts for receiver activity status (including servicing).
+  # We'll then update this, for each receiver, to define whether or not, if that receiver was active on a given date
+  # ... which other receivers (if any) it overlapped in space (and time) with.
+  rs_active_mat <- make_matrix_receivers(moorings = moorings,
+                                         services = services,
+                                         delta_t = "days",
+                                         as_POSIXct = NULL)
+
+  #### Define a list, with one dataframe element per receiver, that defines, for each time step, the overlapping receivers (0, 1)
+  # Loop over each centroid...
+  centroids_ls <- lapply(1:length(centroids), function(i) centroids[i, ])
+  list_by_receiver <- pbapply::pblapply(centroids_ls, function(centroid) {
+
+    #### Collect centroid and receiver status information
+    # centroid <- centroids_ls[[2]]
+    # Copy receiver activity status matrix
+    info <- rs_active_mat
+    # Focus on receiver's deployment window
+    info <- info[as.Date(rownames(info)) %within% lubridate::interval(centroid$receiver_start_date, centroid$receiver_end_date), ]
+
+    #### Convert receiver 'active' index (0, 1) to 'overlapping' index
+    # ... A) Check for overlapping receivers
+    # ... B) If there are overlapping receivers,
+    # ... ... then we force all dates when the receiver of interest was not active to take 0 (no receivers could overlap with it then)
+    # ... ... and we force all receivers that didn't overlap in space to 0
+    # ... C) If there are no overlapping receivers, the whole matrix just gets forced to 0
+
+    ## (A) Get an index of the receivers that intersected with the current receiver
+    centroids_sbt <- centroids[!(centroids$receiver_id %in% centroid$receiver_id), ]
+    int_1 <- rgeos::gIntersects(centroid, centroids_sbt, byid = TRUE)
+
+    ## (B) If there are any overlapping receivers,
+    if(any(int_1)){
+
+      ## Process 'overlap' when the receiver was not active
+      # ... Any time there is a '0' for activity status of the current receiver (e.g., due to servicing),
+      # ... there can be no overlap with that receiver
+      # ... so we will set a '0' to all other receivers
+      # ... some of which may have been active on that date
+      # ... Note the implementation of this step before the step below, when all rows for the receiver
+      # ... of interest are (inadvertently) set to 0.
+      info[which(info[, as.character(centroid$receiver_id)] == 0), ] <- 0
+
+      ## Process 'overlap' for overlapping/non-overlapping receivers
+      # For overlapping receivers, we'll leave these as defined in the activity matrix
+      # ... (if active, then they overlap;
+      # ... if not active, e.g., due to a servicing event for that receiver, then they can't overlap).
+      # ... For the non-overlapping receivers, we'll force '0' for the overlap (even if they were active).
+      # Get receiver IDs
+      centroids_that_overlapped <- data.frame(centroids_sbt[which(int_1), ])
+      # For all non-overlapping receivers, set '0' for overlap
+      # ... Note that this will include the receiver of interest
+      # ... But that doesn't matter because we'll drop that column anyway
+      info[, !(colnames(info) %in% centroids_that_overlapped$receiver_id)] <- 0
+
+      ## (C) If there aren't any spatially overlapping receivers, then the whole matrix just takes on 0
+    } else  info[] <- 0
+
+    #### Process dataframe
+    rnms <- rownames(info)
+    info <- data.frame(info)
+    colnames(info) <- colnames(rs_active_mat)
+    info[, as.character(centroid$receiver_id)] <- NULL
+    cnms <- colnames(info)
+    info$timestamp <- as.Date(rnms)
+    info$receiver_id <- centroid$receiver_id
+    info <- info[, c("timestamp", "receiver_id", cnms)]
+    return(info)
+  })
+  names(list_by_receiver) <- as.character(centroids$receiver_id)
+
+  #### On each date, get the vector of overlapping receivers
+  # Note that not every receiver in this list will necessarily overlap with every other receiver though.
+  lbd <- lapply(list_by_receiver, function(d){
+    tidyr::pivot_longer(data = d,
+                        cols = 3:ncol(d),
+                        names_to = "receiver_id_2",
+                        names_transform = list(receiver_id_2 = as.integer))
+  })
+  lbd <- dplyr::bind_rows(lbd) %>% dplyr::filter(.data$value == 1)
+  lbd <- lapply(split(lbd, lbd$timestamp), function(d) unique(c(d$receiver_id[1], d$receiver_id_2)))
+
+  ##### Process outputs
+  # For the list_by_receiver, we will have one element for each receiver from 1:max(moorings$receiver_id)
+  # ... (for each indexing)
+  list_by_receiver <- lapply(as.integer(1:max(moorings$receiver_id)), function(i){
+    if(i %in% moorings$receiver_id) return(list_by_receiver[[as.character(i)]]) else return(NULL)
+  })
+  # For the list_by_date (lbd), we will have one element for each date from the start to the end of the array
+  list_by_date <- list()
+  for(day in as.character(seq(min(moorings$receiver_start_date), max(moorings$receiver_end_date), "days"))){
+    if(is.null(lbd[[day]])) list_by_date[[day]] <- NULL else list_by_date[[day]] <- lbd[[day]]
+  }
+
+  #### Return outputs
+  out <- list()
+  out$list_by_receiver <- list_by_receiver
+  out$list_by_date     <- list_by_date
+  return(out)
+}
+
+
 ######################################
 ######################################
 #### get_detection_area_sum()
