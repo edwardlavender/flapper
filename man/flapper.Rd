@@ -124,6 +124,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
     \item \link{acdc_setup_mobility} examines the assumption of a constant `mobility' parameter;
     \item \link{acdc_setup_n_centroids} suggests the number of acoustic centroids for the algorithm;
     \item \link{acdc_setup_centroids} defines the acoustic centroids for the algorithm;
+    \item \link{acdc_setup_detection_kernels} defines detection probability kernels for the algorithm;
     \item \link{acdc} implements the algorithm, via the back-end function \link{.acdc};
     \item \link{acdc_simplify} simplifies the results of the algorithm;
     \item \link{acdc_plot} plots the results of the algorithm;

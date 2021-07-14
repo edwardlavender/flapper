@@ -378,6 +378,8 @@ the `acdc*()` family of functions:
     for the algorithm;
   - `acdc_setup_centroids()` defines the acoustic centroids for the
     algorithm;
+  - `acdc_setup_detection_kernels()` defines detection probability
+    kernels for the algorithm;
   - `acdc()` implements the algorithm, via the back-end function
     `.acdc()`;
   - `acdc_simplify()` simplifies the results of the algorithm;
