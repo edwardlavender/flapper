@@ -5,7 +5,6 @@
 \title{Setup the acoustic centroids required for the ACDC algorithm}
 \usage{
 acdc_setup_centroids(
-  rs,
   xy,
   detection_range,
   mobility,
@@ -18,9 +17,7 @@ acdc_setup_centroids(
 )
 }
 \arguments{
-\item{rs}{A integer vector of receiver IDs.}
-
-\item{xy}{A \code{\link[sp]{SpatialPoints}} object that defines the locations of each receiver. The order of points in this object should match the order of receivers defined in \code{rs}. The coordinate reference system should be the Universal Transverse Mercator system with distances in metres (to match \code{detection_range}, see below).}
+\item{xy}{A \code{\link[sp]{SpatialPointsDataFrame}} object that defines receiver IDs and locations. The \code{data} slot must include a dataframe with a column that provides a unique, integer identifier for each receiver (`receiver_id'). The coordinate reference system should be the Universal Transverse Mercator system with distances in metres (to match \code{detection_range}, see below).}
 
 \item{detection_range}{A number that defines the maximum detection range (m) at which an individual could be detected from a receiver.}
 
@@ -39,7 +36,7 @@ acdc_setup_centroids(
 \item{verbose}{A logical input that defines whether or not to print messages to the console to relay function progress.}
 }
 \value{
-The function returns a list of \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects, with one element for all numbers from 1 to the maximum receiver number (\code{rx}). Any list elements that do not correspond to receivers contain a \code{NULL} element. List elements that correspond to receivers contain a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object containing all the centroids for that receiver.
+The function returns a list of \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects, with one element for all numbers from 1 to the maximum receiver number (\code{xy$receiver_id}). Any list elements that do not correspond to receivers contain a \code{NULL} element. List elements that correspond to receivers contain a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object containing all the centroids for that receiver.
 }
 \description{
 This function produces the acoustic centroids required by the acoustic-centroid depth-contour (ACDC) algorithm.
@@ -49,7 +46,7 @@ Given only a detection at a particular receiver at a particular time, the detect
 }
 \examples{
 #### Define data for acdc_setup_centroids()
-## Define coordinates of receivers as SpatialPoints with UTM CRS
+## Define coordinates of receivers as SpatialPointsDataFrame with UTM CRS
 # CRS of receiver locations as recorded in dat_moorings
 proj_wgs84 <- sp::CRS("+init=epsg:4326")
 # CRS of receiver locations required
@@ -58,38 +55,40 @@ proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
 # Define SpatialPoints object
 xy_wgs84 <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 xy_utm <- sp::spTransform(xy_wgs84, proj_utm)
+# Link with receiver IDs to define a SpatialPointsDataFrame
+xy_utm <-
+ sp::SpatialPointsDataFrame(xy_utm,
+                            dat_moorings[, "receiver_id", drop = FALSE])
 
 #### Example (1): Define a list of centroids with specified parameters
 # ... (Argument values are small to reduce computation time for examples)
-centroids <- acdc_setup_centroids(rs = dat_moorings$receiver_id,
-                        xy = xy_utm,
-                        detection_range = 500,
-                        mobility = 250,
-                        n_timesteps = 3
-                        )
-# A list of SpatialPolygonsDataFrames is returned with elements from 1:max(rs)
+centroids <- acdc_setup_centroids(xy = xy_utm,
+                                  detection_range = 500,
+                                  mobility = 250,
+                                  n_timesteps = 3
+                                 )
+# A list of SpatialPolygonsDataFrames is returned
+# with elements from 1:max(xy_utm$receiver_id)
 # NULL elements correspond to numbers in this sequence that do not refer to receivers
 # Otherwise a SpatialPolygonsDataFrame is returned with all the centroids for that receiver
 centroids
 
 #### Example (2): Visualise the acoustic centroids produced via plot = TRUE
-centroids <- acdc_setup_centroids(rs = dat_moorings$receiver_id,
-                        xy = xy_utm,
-                        detection_range = 500,
-                        mobility = 250,
-                        n_timesteps = 3,
-                        plot = TRUE
-                        )
+centroids <- acdc_setup_centroids(xy = xy_utm,
+                                  detection_range = 500,
+                                  mobility = 250,
+                                  n_timesteps = 3,
+                                  plot = TRUE
+                                  )
 
 #### Example (3): Remove areas of the centroids that overlap with coastline
-centroids <- acdc_setup_centroids(rs = dat_moorings$receiver_id,
-                        xy = xy_utm,
-                        detection_range = 500,
-                        mobility = 250,
-                        n_timesteps = 3,
-                        plot = TRUE,
-                        coastline = dat_coast
-                        )
+centroids <- acdc_setup_centroids(xy = xy_utm,
+                                  detection_range = 500,
+                                  mobility = 250,
+                                  n_timesteps = 3,
+                                  plot = TRUE,
+                                  coastline = dat_coast
+                                  )
 
 #### Example (4): Remove areas of the centroids beyond a boundary
 xy_utm_coords <- sp::coordinates(xy_utm)
@@ -98,27 +97,25 @@ boundaries <- raster::extent(min(xy_utm_coords[, 1]),
                              min(xy_utm_coords[, 2]),
                              max(xy_utm_coords[, 2])
                         )
-centroids <- acdc_setup_centroids(rs = dat_moorings$receiver_id,
-                        xy = xy_utm,
-                        detection_range = 500,
-                        mobility = 250,
-                        n_timesteps = 3,
-                        plot = TRUE,
-                        coastline = dat_coast,
-                        boundaries = boundaries
-                        )
+centroids <- acdc_setup_centroids(xy = xy_utm,
+                                  detection_range = 500,
+                                  mobility = 250,
+                                  n_timesteps = 3,
+                                  plot = TRUE,
+                                  coastline = dat_coast,
+                                  boundaries = boundaries
+                                  )
 
 #### Example (5): Implement the algorithm in parallel
-centroids <- acdc_setup_centroids(rs = dat_moorings$receiver_id,
-                        xy = xy_utm,
-                        detection_range = 500,
-                        mobility = 250,
-                        n_timesteps = 3,
-                        plot = TRUE,
-                        coastline = dat_coast,
-                        boundaries = boundaries,
-                        cl = parallel::makeCluster(2L)
-                        )
+centroids <- acdc_setup_centroids(xy = xy_utm,
+                                  detection_range = 500,
+                                  mobility = 250,
+                                  n_timesteps = 3,
+                                  plot = TRUE,
+                                  coastline = dat_coast,
+                                  boundaries = boundaries,
+                                  cl = parallel::makeCluster(2L)
+                                  )
 
 #### Example (6): Acoustic centroids can be saved to file using rlist::list.save()
 # rlist::list.save(centroids, paste0(tempdir(), "/centroids.RData"))
