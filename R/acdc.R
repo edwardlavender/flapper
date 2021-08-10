@@ -460,7 +460,7 @@ acdc_setup_centroids <- function(
 #'
 #' By way of illustration, consider a simple array comprising three equidistant receivers with equally overlapping detection centroids. An individual is detected at two receivers but not the third. In this scenario, the individual must be located in the intersection between the centroids of the two receivers at which it was detected, but it is more likely to be located in the part of this region that does not intersect with the third receiver (call this area A and the intersecting area for all three receivers B). To assign some numbers to this example, consider the overlap of a single detection probability, say the contour \eqn{Pr(det) = 0.2}. In this case, the probability of the individual being located in area A is the probability of being detected at receiver 1 (0.2) and receiver 2 (0.2) but not receiver (3) (\eqn{1 - 0}), which equals 0.04. In comparison, the probability of the individual being located in area B is the probability of being detected at receiver 1 (0.2) and receiver 2 (0.2), but not receiver 3 (\eqn{1 - 0.2}), which equals 0.032. (In the AC* algorithms(s), these probabilities are re-scaled, but the point is detection probability kernels up-weight some areas and down-weight others, using the rules of probability, in line with intuitive expectations.)
 #'
-#' When an individual is not detected, the detection centroid grows into a set of ‘acoustic centroids’ that describe our increasing uncertainty in the location of the individual. As they grow, they may encompass other detection centroids before they shrink towards the receiver at which the individual is next detected. During this time, the AC* algorithm(s) identify the possible locations of the individual within these areas. Under the most conservative approach, at each time step all positions are treated as equally likely (although normalisation within the algorithm(s) can be implemented to down-weight time steps in which the location of the individual is more uncertain). This includes any positions within the detection centroids of other receivers since, under realistic conditions, there is usually a non-zero probability that an individual can be near a receiver and yet remain undetected. However, this is typically unlikely and when the goal of the analysis is to create more precise estimates of space use, the incorporation of detection probability kernel(s) around receivers effectively reduces the probability that the individual is within their detection centroids during this time. Again, to incorporate detection probability kernels in this way, it is necessary to account for overlapping detection ranges, where the probability of detection is higher and, therefore, the probability of a possible location in such an area is lower given the absence of a detection. As above, this process follows the laws of probability. In any given location, the expected number of detections following a single transmission is given by the sum of the detection probabilities in that location, minus their product if multiple kernels span the location, and the inverse of this is used to down-weight possible locations near receivers, especially in areas with overlapping kernels, effectively up-weighting possible locations further away, when an individual is not detected.
+#' When an individual is not detected, the detection centroid grows into a set of ‘acoustic centroids’ that describe our increasing uncertainty in the location of the individual. As they grow, they may encompass other detection centroids before they shrink towards the receiver at which the individual is next detected. During this time, the AC* algorithm(s) identify the possible locations of the individual within these areas. Under the most conservative approach, at each time step all positions are treated as equally likely (although normalisation within the algorithm(s) can be implemented to down-weight time steps in which the location of the individual is more uncertain). This includes any positions within the detection centroids of other receivers since, under realistic conditions, there is usually a non-zero probability that an individual can be near a receiver and yet remain undetected. However, this is typically unlikely and when the goal of the analysis is to create more precise estimates of space use, the incorporation of detection probability kernel(s) around receivers effectively reduces the probability that the individual is within their detection centroids during this time. Again, to incorporate detection probability kernels in this way, it is necessary to account for overlapping detection ranges, where the probability of detection is higher and, therefore, the probability of a possible location in such an area is lower given the absence of a detection. As above, this process follows the laws of probability. In any given location, the probability of no detection(s) is given by the product of receivers' inverse detection probability kernels. This is used to down-weight possible locations near receivers, especially in areas with overlapping kernels, effectively up-weighting possible locations further away, when an individual is not detected.
 #'
 #' In summary, in the AC* algorithm(s), detection and acoustic centroids describe the spatial extent of our uncertainty when an individual is detected and in the time between detections respectively. The purpose of this function is to pre-process and package the information provided by detection probability kernels in such a way as to facilitate its incorporation into the AC* algorithm(s). This improves the precision of simulated patterns of space use by down- or up-weighting areas according to a model of detection probability. This provides a reasonable overall assessment of the places in which an individual could have spend more or less time over a period of study.
 #'
@@ -795,83 +795,21 @@ acdc_setup_detection_kernels <-
 
         #### Pull out necessary kernels for active receivers from detection_kernels_by_xy into a list
         cat_to_console("... ... ... ... Extract detection probability kernels for active receivers...")
-        detection_kernels_by_xy_1 <-
-          lapply(rs_active, function(ra) detection_kernels_by_xy[[ra]]$det_pr_around_xyi)
-        detection_kernels_by_xy_2 <-
-          lapply(rs_active, function(ra) detection_kernels_by_xy[[ra]]$det_pr_around_xyi_only)
+        detection_kernels_inv_by_rs_active <-
+          lapply(rs_active, function(ra) receiver_specific_inv_kernels[[ra]])
 
-        #### Define background inverse detection probability surface, accounting for receiver overlap
-        # ... where there is only one receiver, the inverse detection probability kernel is used
-        # ... where there are overlapping receivers, we account for receiver overlap, since there is a higher
-        # ... probability of detection there (and thus a lower probability of being in an overlapping location, if not located)
-
-        ## Add up detection probability kernels
-        cat_to_console("... ... ... ... Sum detection probability kernels for active receivers...")
-        st_1 <- raster::stack(detection_kernels_by_xy_1)
-        bkg_1 <- sum(st_1, na.rm = TRUE)
-
-        ## Work out whether or not we need to account for overlapping kernels
-        if(!is.logical(overlaps)) cat_to_console("... ... ... ... Account for overlapping regions (this can be a slow step)...")
-        # By default, we implement this step, but we can suppress it, if overlaps has been supplied, under some circumstances
-        account_for_overlap <- TRUE
-        # If overlaps has been supplied, then we check for rs_active within this
-        # ... and if none of the active receivers overlap, we can suppress this
-        if(!is.null(overlaps)){
-          if(!is.logical(overlaps)){
-            overlaps_for_array <- overlaps$list_by_date[[as.character(array_design_intervals$array_start_date[icp])]]
-            if(!any(rs_active %in% as.character(overlaps_for_array))) {
-              account_for_overlap <- FALSE
-              cat_to_console("... ... ... ... ... There are no receivers in this array design with overlapping kernels according to 'overlaps'.")
-            }
-          } else account_for_overlap <- FALSE
-        }
-
-        ## In areas with more than one receiver, we need to minus the product of the overlapping kernels
-        if(account_for_overlap){
-
-          # Take product of detection probability kernels
-          # ... This is a slow step, so we only implement it for overlapping receivers.
-          # ... There is a risk that taking the product of too many probabilities will generate 0s, but in practice
-          # ... relatively few receivers should have overlapping kernels at any one time. Note the use of st_2 here,
-          # ... in which areas beyond each kernel have been set to NA so that they are excluded from calculations.
-          if(is.null(overlaps)) {
-            st_2 <- raster::stack(detection_kernels_by_xy_2)
-          } else {
-            st_2 <- raster::stack(detection_kernels_by_xy_2[which(rs_active %in% overlaps_for_array)])
-          }
-          n_layers <- raster::nlayers(st_2)
-          cat_to_console(paste("... ... ... ... ... ", n_layers, "layers included in calculations."))
-          bkg_2 <- prod(st_2, na.rm = TRUE)
-
-          # Mask areas with no overlapping kernels
-          msk <- sum(st_1)
-          msk[msk <= 1] <- NA
-          bkg_2[bkg_2 == 1] <- 0
-          bkg_2[is.na(bkg_2)] <- 0
-          bkg_2 <- raster::mask(bkg_2, msk, updatevalue = 0)
-
+        #### Calculate the probability of not being detected in each cell
+        cat_to_console("... ... ... ... Combining detection kernels to calculate the background detection probability surfaces (this is a slow step)...")
+        if(length(rs_active) == 1){
+          bkg_inv <- detection_kernels_inv_by_rs_active[[1]]
         } else {
-          bkg_2 <- raster::setValues(bkg_1, 0)
+          detection_kernels_inv_for_rs_active <- raster::stack(detection_kernels_inv_by_rs_active)
+          bkg_inv <- prod(detection_kernels_inv_for_rs_active)
         }
+        # Get the probability of at least one detection in each grid cell:
+        bkg <- 1 - bkg_inv
 
-        ## Create background detection probability
-        cat_to_console("... ... ... ... Create background detection probability and inverse detection probability surfaces ...")
-        bkg <- bkg_1 - bkg_2
-        bkg <- bkg/raster::maxValue(bkg)
-
-        #### Calculate a single  inverse detection pr surface, accounting for receiver overlap
-        bkg_inv <- 1 - bkg
-
-        #### Process surfaces to account for coastline and boundaries
-        cat_to_console("... ... ... ... Process surfaces ...")
-        if(!is.null(boundaries)) {
-          bkg     <- raster::crop(bkg, boundaries)
-          bkg_inv <- raster::crop(bkg_inv, boundaries)
-        }
-        if(!is.null(coastline)){
-          bkg     <- raster::mask(bkg, coastline)
-          bkg_inv <- raster::mask(bkg_inv, coastline)
-        }
+        #### Return surfaces
         return(list(bkg = bkg, bkg_inv = bkg_inv))
       })
     bkg_by_design     <- lapply(bkgs_by_design, function(elm) elm$bkg)
