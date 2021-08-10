@@ -11,7 +11,7 @@ acdc(
   map = NULL,
   detection_range,
   mobility,
-  depth_error = 2.5,
+  calc_depth_error = function(...) c(-2.5, 2.5),
   acc_centroids,
   plot = 1L,
   plot_ts = TRUE,
@@ -36,7 +36,7 @@ acdc(
 
 \item{mobility}{A number that defines the distance (m) that an individual could move in the time period between archival observations (see also \code{\link[flapper]{acdc_setup_centroids}}).}
 
-\item{depth_error}{A number that defines the interval around each depth (m) observation that defines the range of depths on the bathymetry raster (see \code{bathy}) that the individual could plausibly have occupied at that time. For example, \code{depth_error = 2.5} m implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth (m) +/- 2.5 m. The appropriate value for \code{depth_error} depends on measurement error for the archival and bathymetry data, as well as the tidal range (m) across the area.}
+\item{calc_depth_error}{A function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.}
 
 \item{acc_centroids}{A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acdc_setup_centroids}}.}
 
@@ -107,7 +107,7 @@ out_acdc <- acdc(acoustics = acc,
                  bathy = dat_gebco,
                  detection_range = 425,
                  mobility = 200,
-                 depth_error = 2.5,
+                 calc_depth_error = function(...) c(-2.5, 2.5),
                  acc_centroids = dat_centroids
                  )
 # The function returns a list with four elements
@@ -122,7 +122,7 @@ out_acdc <- acdc(acoustics = acc,
                  bathy = dat_gebco,
                  detection_range = 425,
                  mobility = 200,
-                 depth_error = 2.5,
+                 calc_depth_error = function(...) c(-2.5, 2.5),
                  acc_centroids = dat_centroids,
                  con = tempdir()
                  )
@@ -138,7 +138,7 @@ out_acdc <- acdc(acoustics = acc,
                  bathy = dat_gebco,
                  detection_range = 425,
                  mobility = 200,
-                 depth_error = 2.5,
+                 calc_depth_error = function(...) c(-2.5, 2.5),
                  acc_centroids = dat_centroids,
                  plot = NULL
                  )
@@ -152,7 +152,7 @@ out_acdc <- acdc(acoustics = acc,
                  bathy = dat_gebco,
                  detection_range = 425,
                  mobility = 200,
-                 depth_error = 2.5,
+                 calc_depth_error = function(...) c(-2.5, 2.5),
                  acc_centroids = dat_centroids,
                  con = tempdir(),
                  cl = parallel::makeCluster(2L)
@@ -185,7 +185,7 @@ out_acdc <- acdc(acoustics = acc,
                  bathy = dat_gebco,
                  detection_range = 425,
                  mobility = 200,
-                 depth_error = 2.5,
+                 calc_depth_error = function(...) c(-2.5, 2.5),
                  acc_centroids = dat_centroids,
                  con = tempdir(),
                  cl = parallel::makeCluster(2L),
@@ -203,7 +203,7 @@ out_acdc <- acdc(acoustics = acc_ls,
                  bathy = dat_gebco,
                  detection_range = 425,
                  mobility = 200,
-                 depth_error = 2.5,
+                 calc_depth_error = function(...) c(-2.5, 2.5),
                  acc_centroids = dat_centroids,
                  con = tempdir(),
                  cl = parallel::makeCluster(2L)
@@ -246,7 +246,7 @@ acdc_out_by_id <-
                      map = map,
                      detection_range = 425,
                      mobility = 200,
-                     depth_error = 2.5,
+                     calc_depth_error = function(...) c(-2.5, 2.5),
                      acc_centroids = dat_centroids,
                      plot = 1:10L,
                      con = dir_id

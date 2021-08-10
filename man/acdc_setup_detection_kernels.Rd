@@ -51,7 +51,7 @@ The function returns a named list with five elements:
       \item \code{array_interval} An \code{\link[lubridate]{Interval-class}} vector that defines the deployment period of each array design.
     }
   \item \strong{bkg_surface_by_design.} A list, with one element for each array design, that defines the detection probability surface across all receivers deployed in that phase of the study. In areas that are covered by the detection probability kernel of a single receiver, the detection probability depends only on distance to that receiver (via \code{calc_detection_pr}). In areas covered by multiple, overlapping kernels, detection probability represents the combined detection probability across all overlapping kernels (see Details).
-  \item \strong{bkg_surface_inv_by_design.} A list, as above for \code{bkg_surface_by_design}, but which contains the inverse detection probability surface (i.e., 1 - \code{bkg_surface_by_design}). In the AC* algorithm(s), this is used to up-weight areas away from receivers (or, equivalently, down-weight areas near to receivers) in the time steps between detections.
+  \item \strong{bkg_inv_surface_by_design.} A list, as above for \code{bkg_surface_by_design}, but which contains the inverse detection probability surface (i.e., 1 - \code{bkg_surface_by_design}). In the AC* algorithm(s), this is used to up-weight areas away from receivers (or, equivalently, down-weight areas near to receivers) in the time steps between detections.
 }
 }
 \description{
@@ -100,10 +100,11 @@ xy <- sp::SpatialPointsDataFrame(xy, moorings[, c("receiver_id",
                                                   "receiver_end_date")])
 
 ## Define blank map of area for which AC* algorithm(s) will be implemented
-# Note that the resolution must be sufficiently high such that there are
-# ... areas with non zero detection probability. However, function speed will fall
-# ... with large, high resolution rasters.
-map_blank <- raster::raster(raster::extent(dat_gebco), res = c(5, 5))
+# ... The resolution must be sufficiently high
+# ... such that there are areas with non zero detection probability.
+# ... However, function speed will fall with large, high resolution rasters.
+# ... Here, we set a low resolution for example speed.
+map_blank <- raster::raster(raster::extent(dat_gebco), res = c(50, 50))
 map_blank <- raster::setValues(map_blank, 0)
 
 ## Define detection probability function
@@ -170,8 +171,6 @@ graphics::par(pp)
 
 #### Example (2): Incorporate spatial information (coastline, area boundaries)
 
-\dontrun{
-
 # Define spatial mask for the land and check this via a plot
 sea <- invert_poly(dat_coast)
 area <- raster::setValues(map_blank, 1)
@@ -218,7 +217,6 @@ lapply(kernels$bkg_inv_surface_by_design, function(bkg) {
   graphics::box()
 })
 graphics::par(pp)
-}
 
 }
 \author{
