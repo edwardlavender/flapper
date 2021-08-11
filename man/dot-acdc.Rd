@@ -24,6 +24,7 @@
   con = "",
   progress = 1L,
   keep_args = TRUE,
+  write_history = NULL,
   check = TRUE,
   ...
 )
@@ -66,6 +67,8 @@
 \item{progress}{An integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the archival time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar.}
 
 \item{keep_args}{A logical input that defines whether or not to include a list of function arguments in the outputs. This can be switched off if the function is applied iteratively.}
+
+\item{write_history}{(optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by acoustic and internal (archival) time steps. For example, file for the first acoustic time step and the first archival time step is named acc_1_arc_1.}
 
 \item{check}{A logical input that defines whether or not to check function inputs. This can be switched off to improve computation time when the function is applied iteratively.}
 

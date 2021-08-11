@@ -22,8 +22,9 @@
 #' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console; otherwise, they are written to file (see below).
 #' @param con If \code{verbose = TRUE}, \code{con} is character string that defines the full pathway to a .txt file into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging.
 #' @param progress An integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the archival time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar.
-#' @param check A logical input that defines whether or not to check function inputs. This can be switched off to improve computation time when the function is applied iteratively.
 #' @param keep_args A logical input that defines whether or not to include a list of function arguments in the outputs. This can be switched off if the function is applied iteratively.
+#' @param write_history (optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by acoustic and internal (archival) time steps. For example, file for the first acoustic time step and the first archival time step is named acc_1_arc_1.
+#' @param check A logical input that defines whether or not to check function inputs. This can be switched off to improve computation time when the function is applied iteratively.
 #' @param ... Additional arguments (none implemented).
 #'
 #' @return The function returns a \code{\link[flapper]{.acdc-class}} object with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific information on the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{plot}). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{keep_args = TRUE}, otherwise the `args' element is \code{NULL}).
@@ -186,7 +187,9 @@
     con = "",
     progress = 1L,
     keep_args = TRUE,
-    check = TRUE,...
+    write_history = NULL,
+    check = TRUE,
+    ...
   ){
 
 
@@ -220,6 +223,7 @@
                        progress = progress,
                        keep_args = keep_args,
                        check = check,
+                       write_history = write_history,
                        dots = list(...))
     }
     out$record <- list()
@@ -338,6 +342,13 @@
         if(de_1[1] > 0 | de_1[2] < 0){
           stop("'calc_depth_error' should return a negative and a postive adjustment (in that order).")
         }
+      }
+      # Check write opts
+      if(!is.null(write_history)){
+        check_named_list(input = write_history)
+        check_names(input = write_history, req = "filename")
+        write_history$filename <- check_dir(input = write_history$filename, check_slash = TRUE)
+        write_history_dir <- write_history$filename
       }
     }
 
@@ -775,6 +786,13 @@
 
         # Add plot options to the spatial list:
         spatial[[timestep_archival]] <- po
+
+        # Write to file
+        if(!is.null(write_history)){
+          write_history$x <- map_timestep
+          write_history$filename <- paste0(write_history_dir, "acc_", timestep_detection, "_arc_", timestep_archival)
+          do.call(raster::writeRaster, write_history)
+        }
 
         # Update progress bar describing moment over archival time steps
         # only define title on the first archival time step out of the sequence
