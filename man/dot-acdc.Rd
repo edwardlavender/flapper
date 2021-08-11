@@ -2,7 +2,7 @@
 % Please edit documentation in R/acdc-backend.R
 \name{.acdc}
 \alias{.acdc}
-\title{Back-end implementation of the AC* algorithms}
+\title{Back-end implementation of the AC and ACDC algorithms}
 \usage{
 .acdc(
   acoustics,
@@ -30,15 +30,15 @@
 )
 }
 \arguments{
-\item{acoustics}{A dataframe that contains passive acoustic telemetry detection time series for a specific individual (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named `receiver_id' (that must match that inputted to the \code{rs} argument of \code{\link[flapper]{acdc_setup_centroids}}); a POSIXct vector of time stamps when detections were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'.}
+\item{acoustics}{A dataframe that contains passive acoustic telemetry detection time series for a specific individual (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named `receiver_id' (that must match that inputted to \code{\link[flapper]{acdc_setup_centroids}}); a POSIXct vector of time stamps when detections were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'.}
 
-\item{archival}{A dataframe that contains depth time series for the same individual (see \code{\link[flapper]{dat_archival}} for an example). This is required for the ACDC* algorithm(s). This should contain the following columns: a numeric vector of observed depths, named `depth'; a POSIXct vector of time stamps when observations were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.}
+\item{archival}{For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series for the same individual (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; a POSIXct vector of time stamps when observations were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.}
 
 \item{step}{A number that defines the time step length (s) between consecutive detections. If \code{archival} is supplied, this is the resolution of the archival data (e.g., 120 s).}
 
-\item{bathy}{A \code{\link[raster]{raster}} that defines the area (for the AC algorithm(s)) or bathymetry (for the ACDC* algorithm(s)) across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).}
+\item{bathy}{A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC* algorithm) across the area within which the individual could have moved. For the ACDC algorithm, this must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).}
 
-\item{map}{(optional) A blank \code{\link[raster]{raster}}, with the same properties (i.e., dimensions, resolution, extent and coordinate reference system) as the bathymetry raster (see \code{bathy}), but in which all values are 0. If \code{NULL}, this is computed internally, but supplying a pre-defined raster can be more computationally efficient if the function is applied iteratively (e.g., over different time windows).}
+\item{map}{(optional) A blank \code{\link[raster]{raster}}, with the same properties (i.e., dimensions, resolution, extent and coordinate reference system) as the area/bathymetry raster (see \code{bathy}), but in which all values are 0. If \code{NULL}, this is computed internally, but supplying a pre-defined raster can be more computationally efficient if the function is applied iteratively (e.g., over different time windows).}
 
 \item{detection_range}{A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see also \code{\link[flapper]{acdc_setup_centroids}}).}
 
@@ -50,27 +50,27 @@
 
 \item{acc_centroids}{A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acdc_setup_centroids}}.}
 
-\item{mobility}{A number that defines the distance (m) that an individual could move in the time period between archival observations (see also \code{\link[flapper]{acdc_setup_centroids}}).}
+\item{mobility}{A number that defines the distance (m) that an individual could move in the time steps between acoustic detections (see also \code{\link[flapper]{acdc_setup_centroids}}).}
 
-\item{calc_depth_error}{In the ACDC* algorithm(s), \code{calc_depth_error} is function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.}
+\item{calc_depth_error}{In the ACDC algorithm, \code{calc_depth_error} is function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.}
 
-\item{normalise}{A logical variable that defines whether or not to normalise the map of possible locations at each time step. In both cases, at each time step the possible locations of the individual are scaled so that the most probable locations have a score of 1 and other scores vary between 0--1. If \code{normalise = FALSE}, these scores are simply summed at each time step, in which case scores on the final map can be interpreted as the number of time steps when the individual could have been in any given location. In contrast, if \code{normalise = TRUE}, at each time step scores are normalised so that they sum to one; the consequence is that time steps with detections, when uncertainty in the individual's location concentrates in the detection centroid around a receiver, are weighted more strongly than time steps between detections, when the uncertainty in the individual's location is spread across a larger area. At the end of the summation process, in the front-end function (e.g., \code{\link[flapper]{acdc}}), the final surface is also normalised, with the scores in each cell (0--1) providing a measure of the relative potential use of each location.}
+\item{normalise}{A logical variable that defines whether or not to normalise the map of possible locations at each time step. In both cases, at each time step the possible locations of the individual are scaled so that the most probable locations have a score of 1 and other scores vary between 0--1. If \code{normalise = FALSE}, these scores are simply summed at each time step, in which case scores on the final map can be interpreted as the number of time steps when the individual could have been in any given location. In contrast, if \code{normalise = TRUE}, at each time step scores are normalised so that they sum to one; the consequence is that time steps with detections, when uncertainty in the individual's location concentrates in the detection centroid around a receiver, are weighted more strongly than time steps between detections, when the uncertainty in the individual's location is spread across a larger area. The final surface can be normalised within \code{\link[flapper]{acdc_simplify}}, with in each cell (0--1) providing a measure of the relative potential use of each location.}
 
-\item{plot}{An integer vector that defines the time steps for which to return the necessary spatial information required to plot the plausible locations of the individual, given detection and depth time series. \code{plot = 0} suppresses the return of this information and \code{plot = NULL} returns this information for all time steps. This spatial information can be used to plot time-specific results of the algorithm using \code{\link[flapper]{acdc_plot}}.}
+\item{plot}{An integer vector that defines the time steps for which to return the necessary spatial information required to plot the plausible locations of the individual, given detection and depth time series. \code{plot = 0} suppresses the return of this information and \code{plot = NULL} returns this information for all time steps.}
 
-\item{plot_ts}{A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.}
+\item{plot_ts}{A logical input that defines whether or not to the plot movement series before the algorithm is initiated.}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console; otherwise, they are written to file (see below).}
 
 \item{con}{If \code{verbose = TRUE}, \code{con} is character string that defines the full pathway to a .txt file into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging.}
 
-\item{progress}{An integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the archival time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar.}
+\item{progress}{(optional) If the algorithm is implemented step-wise, \code{progress} is an integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the `archival' time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar. If the algorithm is implemented for chunks, inputs to \code{progress} are ignored and a single progress bar is shown of the progress across acoustic chunks.}
 
 \item{keep_args}{A logical input that defines whether or not to include a list of function arguments in the outputs. This can be switched off if the function is applied iteratively.}
 
 \item{write_history}{(optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by acoustic and internal (archival) time steps. For example, the file for the first acoustic time step and the first archival time step is named acc_1_arc_1.}
 
-\item{check}{A logical input that defines whether or not to check function inputs. This can be switched off to improve computation time when the function is applied iteratively.}
+\item{check}{A logical input that defines whether or not to check function inputs. This can be switched off to improve computation time when the function is applied iteratively or via a front-end function (e.g., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).}
 
 \item{...}{Additional arguments (none implemented).}
 }
@@ -78,9 +78,11 @@
 The function returns a \code{\link[flapper]{.acdc-class}} object with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific information on the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{plot}). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{keep_args = TRUE}, otherwise the `args' element is \code{NULL}).
 }
 \description{
-This function is the back-end of the AC, ACDC, ACPF and ACDCPF algorithms.
+This function is the back-end of the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms.
 }
 \examples{
+\dontrun{
+
 #### Step (1) Prepare study site grid
 # Grid resolution needs to be sufficiently high to capture detection probability/movement
 # And sufficiently low to minimise computational costs
@@ -180,7 +182,6 @@ out_acdc <- .acdc(acoustics = acc,
                   )
 
 #### Example (4): Implement AC or ACDC algorithm and write messages to file via 'con'
-\dontrun{
 out_acdc <- .acdc(acoustics = acc,
                   archival = arc,
                   bathy = gebco,
@@ -194,12 +195,11 @@ out_acdc <- .acdc(acoustics = acc,
 # Check log
 utils::head(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
 utils::tail(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
-}
+
 
 #### Example (5): Implement AC or ACDC algorithm and return plotting information
 # Specify plot = NULL to include plotting information for all time steps
 # ... or a vector to include this information for specific time steps
-\dontrun{
 out_acdc <- .acdc(acoustics = acc,
                   archival = arc,
                   bathy = gebco,
@@ -216,8 +216,9 @@ out_acdc <- .acdc(acoustics = acc,
 
 }
 \seealso{
-\code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter.\code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc}} is the front-end of the ACDC algorithm. \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
+The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call \code{\link[flapper]{.acdc_pl}} which in turn calls this function. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
 }
 \author{
 Edward Lavender
 }
+\keyword{internal}

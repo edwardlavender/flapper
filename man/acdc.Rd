@@ -8,81 +8,83 @@ acdc(
   acoustics,
   archival,
   bathy,
-  map = NULL,
   detection_range,
+  detection_kernels = NULL,
+  detection_kernels_overlap = NULL,
+  detection_time_window = 5,
+  acc_centroids,
   mobility,
   calc_depth_error = function(...) c(-2.5, 2.5),
-  acc_centroids,
+  normalise = FALSE,
   plot = 1L,
   plot_ts = TRUE,
+  write_history = NULL,
   verbose = TRUE,
   con = "",
   progress = 1L,
   split = NULL,
-  cl = NULL,
-  ...
+  cl = NULL
 )
 }
 \arguments{
-\item{acoustics}{A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. Each dataframe should contain the following columns: an integer vector of receiver IDs, named `receiver_id'; a POSIXct vector of time stamps when detections were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'. If a list of dataframes is supplied, dataframes must be refer to the detections of a single individual and be ordered by time (e.g., in hourly chunks). The algorithm will be implemented on each dataframe, termed `chunk', either in sequence or parallel. Any empty or NULL elements will be removed automatically.}
+\item{acoustics}{A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{ac}}).}
 
-\item{archival}{A dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; a POSIXct vector of time stamps when observations were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.}
+\item{archival}{A dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; and a POSIXct vector of time stamps when observations were made, named `timestamp'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.}
 
 \item{bathy}{A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).}
 
-\item{map}{(optional) A blank \code{\link[raster]{raster}}, with the same properties (i.e., dimensions, resolution, extent and coordinate reference system) as the bathymetry raster (see \code{bathy}), but in which all values are 0. If \code{NULL}, this is computed internally, but supplying a pre-defined raster can be more computationally efficient if the function is applied iteratively (e.g., over multiple individuals).}
+\item{detection_range}{A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see \code{\link[flapper]{ac}}).}
 
-\item{detection_range}{A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see also \code{\link[flapper]{acdc_setup_centroids}}).}
+\item{detection_kernels}{A named list of detection probability kernels (see \code{\link[flapper]{ac}}).}
 
-\item{mobility}{A number that defines the distance (m) that an individual could move in the time period between archival observations (see also \code{\link[flapper]{acdc_setup_centroids}}).}
+\item{detection_kernels_overlap}{(optional) A named list of detection probability kernel overlaps (see \code{\link[flapper]{ac}}).}
 
-\item{calc_depth_error}{A function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.}
+\item{detection_time_window}{A number that defines the detection time window (see \code{\link[flapper]{ac}}).}
 
 \item{acc_centroids}{A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acdc_setup_centroids}}.}
 
-\item{plot}{An integer vector that defines the time steps for which to return the necessary spatial information required to plot the plausible locations of the individual, given detection and depth time series. \code{plot = 0L} suppresses the return of this information and \code{plot = NULL} returns this information for all time steps. If the algorithm is applied chunk-wise, this spatial information must be returned for at least the first time step (the default) to aggregate maps across chunks (see \code{\link[flapper]{acdc_simplify}}). This information can also be used to plot time-specific results of the algorithm using \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}}.}
+\item{mobility}{The mobility parameter (see \code{\link[flapper]{ac}}).}
+
+\item{calc_depth_error}{A function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.}
+
+\item{normalise}{A logical input that defines whether or not to normalise maps (see \code{\link[flapper]{ac}}).}
+
+\item{plot}{An integer of the spatial layers to save (see \code{\link[flapper]{ac}}).}
 
 \item{plot_ts}{A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.}
 
-\item{verbose}{A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console (which is only supported if the algorithm is not implemented in parallel: see below); otherwise, they are written to file (see below).}
+\item{write_history}{A named list used to write time step-specific maps to file (see \code{\link[flapper]{ac}}).}
 
-\item{con}{If \code{verbose = TRUE}, \code{con} is character string defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}), an approach that is only implemented if the function is not implemented in parallel. Otherwise, \code{con} defines the directory into which to write .txt files, into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging. If the algorithm is implemented step-wise, then a single file is written to the specified directory named acdc_log.txt. If the algorithm is implemented chunk-wise, then an additional file is written for each chunk (named dot_acdc_log_1.txt, dot_acdc_log_2.txt and so on), with the details for each chunk.}
+\item{verbose}{A logical variable that defines whether or not to print messages to the console or to file to relay function progress (see \code{\link[flapper]{ac}}).}
 
-\item{progress}{(optional) If the algorithm is implemented step-wise, \code{progress} is an integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the archival time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar. If the algorithm is implemented for chunks, inputs to \code{progress} are ignored and a single progress bar is shown of the progress across acoustic chunks.}
+\item{con}{If \code{verbose = TRUE}, \code{con} is character string defines how messages relaying function progress are returned (see \code{\link[flapper]{ac}}).}
 
-\item{split}{A character string that defines the time unit used to split acoustic time series into chunks (e.g., \code{"12 hours"}). If provided, this must be supported by \code{\link[lubridate]{floor_date}} (otherwise, a pre-defined list of acoustic time series can be passed to \code{acoustics}, e.g., specifying seasonal chunks). If \code{split = NULL} and a cluster has been specified (see \code{cl}) (and \code{acoustics} is a dataframe), then the acoustic time series is automatically split into chunks and the algorithm implemented for each chunk in parallel.}
+\item{progress}{An integer controlling the progress bar (see \code{\link[flapper]{ac}}).}
 
-\item{cl}{A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the algorithm is implemented for each chunk in a list of acoustic time series as supplied by the user (if \code{acoustics} is a list) or of the time units specified via \code{split} by the user or defined automatically based on the number of nodes in the cluster if \code{split = NULL}.}
+\item{split}{A character string that defines the time unit used to split acoustic time series into chunks (see \code{\link[flapper]{ac}}).}
 
-\item{...}{Additional arguments (none implemented).}
+\item{cl}{A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel (see \code{\link[flapper]{ac}}).}
 }
 \value{
 The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acdc}}, if applicable, are written to file.
 }
 \description{
-This function implements the acoustic-centroid depth-contour (ACDC) algorithm. This is an approach that integrates acoustic detections and depth observations to infer where benthic/demersal animals could have spent more or less time over the period of observations.
-
-To implement the function, a dataframe (or list) of passive acoustic telemetry detections is required (\code{acoustics}), alongside a dataframe of depth observations (\code{archival}). At each time step, the algorithm integrates information from past and future acoustic detections in the form of acoustic centroids and information from depth observations in the form of depth contours to determine the possible locations of an individual in an area (see Details).
-
-Under the default options, the approach is implemented step-wise (i.e., step-by-step across the whole time series). The result is a named list of outputs, including a record of the results for each time step, as well as a cumulative map of where the individual could have spent more or less time summed across the whole time series. Alternatively, the approach can be implemented chunk-wise, in which case the acoustic time series is split into chunks (e.g., hourly, daily, monthly segments) and the algorithm is implemented within each chunk step-by-step. The main benefits of this approach are that it can be used to reconstruct putative patterns in space use over biologically meaningful periods separately and/or the chunk-wise implementation can be parallelised, improving computation time. (Chunk-wise results results are easily combined across the duration of the original time series without the loss of information via \code{\link[flapper]{acdc_simplify}}.). This option is implemented if (a) a list, rather than a dataframe, of acoustic detections is provided (via \code{acoustics}); (b) the user specifies that the time series should be split into chunks of a particular duration before the algorithm is initiated (via the \code{split} argument); and/or (c) the algorithm is implemented on a cluster via \code{cl}, in which case the acoustic time series is split (if necessary) into user-defined or automatically defined chunks prior to computation. In this case, the result is a named list of outputs, as described above, but in which the results for each chunk are returned separately. If the chunks have been implemented simply to improve computation time via parallelisation, then the maps of space use for each chunk can be combined easily to generate a single, overall map of space use via \code{\link[flapper]{acdc_simplify}}.
+This function implements the acoustic-centroid depth-contour (ACDC) algorithm. This is an extension of the AC algorithm implemented by \code{\link[flapper]{ac}} that that integrates acoustic detections and depth observations to infer where benthic/demersal animals could have spent more or less time over the period of observations. To implement the function, a dataframe (or list) of passive acoustic telemetry detections is required (\code{acoustics}), alongside a dataframe of depth observations (\code{archival}). At each time step, the algorithm integrates information from past and future acoustic detections in the form of acoustic centroids and information from depth observations in the form of depth contours to determine the possible locations of an individual in an area (see Details). As for the AC algorithm (\code{\link[flapper]{ac}}), the function can be implemented step-wise or chunk-wise and the outputs can be processed via \code{\link[flapper]{acdc_simplify}}.
 }
 \details{
-The acoustic-centroid depth-contour (ACDC) algorithm is an approach which integrates acoustic detections and depth observations to infer the possible locations of benthic or demersal animals within an area over some time interval. The locational information provided by acoustic detections is represented by acoustic centroids, which are areas around receivers that define where an individual could have been at each timepoint given the spatiotemporal pattern of detections at receivers, a model of detection probability and a movement parameter. The locational information provided by depth observations is represented by depth contours, which are areas that define where an individual could have been at each time point given its depth and the local bathymetry.
+The acoustic-centroid depth-contour (ACDC) algorithm is an approach which integrates acoustic detections and depth observations to infer the possible locations of benthic or demersal animals within an area over some time interval. The locational information provided by acoustic detections is represented by acoustic centroids, which are areas around receivers that define where an individual could have been at each time point given the spatiotemporal pattern of detections at receivers, a model of detection probability and a movement parameter. The locational information provided by depth observations is represented by depth contours, which are areas that define where an individual could have been at each time point given its depth and the local bathymetry.
 
 In outline, the crux of the approach is the recognition that acoustic detections typically occur irregularly, while archival observations occur at regular intervals. Each detection anchors our knowledge of the location of an individual around a particular receiver (assuming that all detections are true detections). As time passes between acoustic detections, our uncertainty about the geographical location of an individual expands around the receiver at which it was detected before shrinking towards the receiver at which it was next detected. During this time, regular depth observations restrict the number of possible locations in which the individual could have been located at each time step.
 
-More specifically, when an individual is detected, it must be within some radius---say 800 m---of that receiver. This is the starting acoustic centroid. With a more-refined model of detection probability, it may be possible to predict more precisely where the individual is likely to have been within this centroid (but this approach is not yet implemented). The observed depth at this time further restricts the positions in which the individual could have been, assuming a benthic/demersal lifestyle and a non-homogeneous bathymetric landscape. Moving forward in time, a number of depth records may be made before another acoustic detection. During this time, our uncertainty about where the individual could have been gets larger, because it could have moved further away from the receiver, so the acoustic centroids that define this uncertainty expand to a maximum size at the halfway point between acoustic detections. After that, the individual must have started to move towards the receiver at which it was next detected, so these acoustic centroids start to shrink towards that receiver. If the individual was detected by different receivers, the overlap between the centroids of these two receivers at the halfway point defines the set of positions in which the individual could have been at this time. Thereafter, our uncertainty in the individual's location is given by the overlap between the expansion of this centroid region and the contraction of the centroid around the receiver at which it was next detected. Thus, when the individual is detected again, our uncertainty about where it could have been collapses to the detection radius around the next receiver, possibly weighted by a model of detection probability around this receiver (although that is not yet implemented). The rate of change in centroid size depends a movement parameter that describes an average swimming speed, which will depend on some underlying estimated behavioural state (although that is not yet implemented).
+More specifically, when an individual is detected, it must be within some radius---say 800 m---of that receiver. This is the starting acoustic centroid. With a more-refined model of detection probability, it may be possible to predict more precisely where the individual is likely to have been within this centroid (but this approach is not yet implemented). This is the AC algorithm. The observed depth at this time in the ACDC algorithm further restricts the positions in which the individual could have been, assuming a benthic/demersal lifestyle and a non-homogeneous bathymetric landscape. Moving forward in time, a number of depth records may be made before another acoustic detection. During this time, our uncertainty about where the individual could have been gets larger, because it could have moved further away from the receiver, so the acoustic centroids that define this uncertainty expand to a maximum size at the halfway point between acoustic detections. After that, the individual must have started to move towards the receiver at which it was next detected, so these acoustic centroids start to shrink towards that receiver. If the individual was detected by different receivers, the overlap between the centroids of these two receivers at the halfway point defines the set of positions in which the individual could have been at this time. Thereafter, our uncertainty in the individual's location is given by the overlap between the expansion of this centroid region and the contraction of the centroid around the receiver at which it was next detected. Thus, when the individual is detected again, our uncertainty about where it could have been collapses to the detection radius around the next receiver, possibly weighted by a model of detection probability around this receiver (although that is not yet implemented). The rate of change in centroid size depends a movement parameter that describes an average swimming speed, which will depend on some underlying estimated behavioural state (although that is not yet implemented).
 
-The result is a map that shows where the individual could have spent more or less (or no) time over the time interval under construction. The main limitation of this approach is that reconstructs where the individual could have been, but not where it was. In reality, the individual's current position constrains where it can go next. The ACDCPF/MP algorithms are extensions of this approach that incorporate a movement model for this reason.
+The result is a map that shows where the individual could have spent more or less (or no) time over the time interval under construction. The main limitation of this approach is that reconstructs where the individual could have been, but not where it was. In reality, the individual's current position constrains where it can go next. However, particle filtering can be used to extent this approach via the incorporate a movement model.
 }
 \examples{
 #### Step (1) Implement setup_acdc_*() steps
 # ... Define acoustic centroids required for ACDC algorithm (see setup_acdc_centroids())
 
 #### Step (2) Prepare movement time series for algorithm
-# Add required columns to dataframes:
-dat_acoustics$timestamp_num <- as.numeric(dat_acoustics$timestamp)
-dat_archival$timestamp_num  <- as.numeric(dat_archival$timestamp)
 # Focus on an example individual
 id <- 25
 acc <- dat_acoustics[dat_acoustics$individual_id == id, ]
@@ -214,9 +216,6 @@ out_acdc <- acdc(acoustics = acc_ls,
 # ... to each individual.
 # Pre-processing to define computation time
 # ... E.g., careful definition of time series
-# ... E.g., define 'map' argument
-map <- dat_gebco
-map <- raster::setValues(map, 0)
 # Define cluster
 cluster <- FALSE
 if(cluster){
@@ -224,10 +223,9 @@ if(cluster){
   parallel::clusterExport(cl = cl, varlist = c("acdc",
                                                "dat_archival",
                                                "dat_gebco",
-                                               "map",
                                                "dat_centroids"
                                                 ))
-} else cl<- NULL
+} else cl <- NULL
 # Implement algorithm for each individual
 acdc_out_by_id <-
   pbapply::pblapply(split(dat_acoustics, dat_acoustics$individual_id), cl = cl, function(acc){
@@ -243,7 +241,6 @@ acdc_out_by_id <-
     acdc_out <- acdc(acoustics = acc,
                      archival = dat_archival,
                      bathy = dat_gebco,
-                     map = map,
                      detection_range = 425,
                      mobility = 200,
                      calc_depth_error = function(...) c(-2.5, 2.5),
@@ -273,7 +270,7 @@ summary(acdc_out_by_id)
 
 }
 \seealso{
-The `depth-contour' component of the algorithm can be implemented via \code{\link[flapper]{dc}}. For more information on the ACDC algorithm, see \code{\link[flapper]{acdc_setup_n_centroids}} and \code{\link[flapper]{acdc_setup_centroids}} which defined the acoustic centroids required by this function and \code{\link[flapper]{acdc_setup_mobility}} which examines the assumption of a constant `mobility' parameter; \code{\link[flapper]{.acdc}}, the back-end workhorse of this function; \code{\link[flapper]{acdc_simplify}} which simplifies the outputs of the \code{\link[flapper]{acdc}} function; and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}}, which visualise the results.
+This function calls \code{\link[flapper]{.acdc_pl}} and \code{\link[flapper]{.acdc}} to implement the ACDC algorithm. The AC component can be implemented via  \code{\link[flapper]{ac}} and the DC component via \code{\link[flapper]{dc}}. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results. Particle filtering can be used to reconstruct movement paths.
 }
 \author{
 Edward Lavender

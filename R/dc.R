@@ -81,6 +81,7 @@ dc <- function(archival,
 
   #### Define storage container
   out <- list(args = NULL, archival = NULL, spatial = NULL, dc = NULL)
+  # out <- list(map, record, time, args, chunks, simplify)
   out$args <- list(archival = archival,
                    bathy = bathy,
                    calc_depth_error = calc_depth_error,

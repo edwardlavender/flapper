@@ -1,0 +1,441 @@
+######################################
+######################################
+#### .acdc_pl()
+
+#' @title Intermediate wrapper for \code{\link[flapper]{.acdc}} that supports parallelisation
+#' @description This function implements the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms. This is called via a front-end function (i.e. \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}). It checks and processes inputs and implements the selected algorithm via calls to \code{\link[flapper]{.acdc}}. Outputs are returned in a named list.
+#'
+#' @param acoustics A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. Each dataframe should contain the following columns: an integer vector of receiver IDs, named `receiver_id'; and a POSIXct vector of time stamps when detections were made, named `timestamp'. If a list of dataframes is supplied, dataframes must be refer to the detections of a single individual and be ordered by time (e.g., in hourly chunks). The algorithm will be implemented on each dataframe, termed `chunk', either in sequence or parallel. Any empty or \code{NULL} elements will be removed automatically.
+#' @param archival For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series (see \code{\link[flapper]{.acdc}}).
+#' @param step A number that defines the time step length (s) between consecutive detections (see \code{\link[flapper]{.acdc}}).
+#' @param bathy A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC algorithm) across the area within which the individual could have moved (see \code{\link[flapper]{.acdc}}).
+#' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see \code{\link[flapper]{.acdc}})
+#' @param detection_kernels A named list of detection probability kernels (see \code{\link[flapper]{.acdc}}).
+#' @param detection_kernels_overlap A named list of detection probability kernel overlaps (see \code{\link[flapper]{.acdc}}).
+#' @param detection_time_window A number that defines the detection time window (see \code{\link[flapper]{.acdc}})
+#' @param acc_centroids A list of acoustic centroids (see \code{\link[flapper]{.acdc}}).
+#' @param mobility The mobility parameter (see \code{\link[flapper]{.acdc}}).
+#' @param calc_depth_error The depth error function (see \code{\link[flapper]{.acdc}}).
+#' @param normalise A logical input that defines whether or not to normalise maps (see \code{\link[flapper]{.acdc}}).
+#' @param plot An integer of the spatial layers to save (see \code{\link[flapper]{.acdc}}).
+#' @param plot_ts A logical input that defines whether or not to plot movement time series (see \code{\link[flapper]{.acdc}}).
+#' @param write_history A named list used to write time step-specific maps to file (see \code{\link[flapper]{.acdc}}).
+#' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console (which is only supported if the algorithm is not implemented in parallel: see below); otherwise, they are written to file (see below).
+#' @param con If \code{verbose = TRUE}, \code{con} is character string defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}), an approach that is only implemented if the function is not implemented in parallel. Otherwise, \code{con} defines the directory into which to write .txt files, into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging. If the algorithm is implemented step-wise, then a single file is written to the specified directory named acdc_log.txt. If the algorithm is implemented chunk-wise, then an additional file is written for each chunk (named dot_acdc_log_1.txt, dot_acdc_log_2.txt and so on), with the details for each chunk.
+#' @param progress (optional) If the algorithm is implemented step-wise, \code{progress} is an integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the `archival' time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar. If the algorithm is implemented for chunks, inputs to \code{progress} are ignored and a single progress bar is shown of the progress across acoustic chunks.
+#' @param split A character string that defines the time unit used to split acoustic time series into chunks (e.g., \code{"12 hours"}). If provided, this must be supported by \code{\link[lubridate]{floor_date}} (otherwise, a pre-defined list of acoustic time series can be passed to \code{acoustics}, e.g., specifying seasonal chunks). If \code{split = NULL} and a cluster has been specified (see \code{cl}) (and \code{acoustics} is a dataframe), then the acoustic time series is automatically split into chunks and the algorithm implemented for each chunk in parallel.
+#' @param cl A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the algorithm is implemented for each chunk in a list of acoustic time series as supplied by the user (if \code{acoustics} is a list) or of the time units specified via \code{split} by the user or defined automatically based on the number of nodes in the cluster if \code{split = NULL}.
+#' @param ... Additional arguments (none implemented).
+#'
+#' @return The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acdc}}, if applicable, are written to file.
+#'
+#' @seealso The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call this function, which in turn calls \code{\link[flapper]{.acdc}}. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
+#'
+#' @examples
+#' # For examples, see ?ac and ?acdc which call this function directly.
+#'
+#' @author Edward Lavender
+#' @keywords internal
+#'
+
+.acdc_pl <- function(
+  acoustics,
+  archival = NULL,
+  step = 120,
+  bathy,
+  detection_range,
+  detection_kernels = NULL, detection_kernels_overlap = NULL, detection_time_window = 5,
+  acc_centroids,
+  mobility,
+  calc_depth_error = function(...) c(-2.5, 2.5),
+  normalise = FALSE,
+  plot = 1L,
+  plot_ts = TRUE,
+  write_history = NULL,
+  verbose = TRUE,
+  con = "",
+  progress = 1L,
+  split = NULL,
+  cl = NULL,...
+){
+
+
+  ######################################
+  #### Set up
+
+  #### A list to store overall outputs
+  t_onset <- Sys.time()
+  out <- list(.acdc = NULL, ts_by_chunk = NULL, time = NULL, args = NULL)
+
+  #### Check parallelisation options
+  if(is.null(cl)) n_cores <- 1 else n_cores <- length(cl)
+  # if(n_cores == 1 & !is.null(split)) {
+  #  message("Input to 'split' is ignored since cl = NULL.")
+  #  split <- NULL
+  # }
+  if(inherits(acoustics, "list") & !is.null(split)) message("Input to 'split' ignored since inherits(acoustics, 'list') == TRUE.")
+
+  #### Define function for printing messages to file or console
+  ## Check the connection for writing files, if applicable
+
+  if(con != ""){
+    if(!verbose) {
+      message("Input to 'con' ignored since verbose = FALSE.")
+    } else {
+      # Check directory
+      con <- check_dir(input = con, check_slash = TRUE)
+      con_dir <- con
+      # Define file
+      con <- paste0(con_dir, "acdc_log.txt")
+      if(!file.exists(con)){
+        message(paste0(con, " does not exist: attempting to write file in specified directory..."))
+        file.create(file1 = con)
+        message("... Blank file successfully written to file.")
+      }
+    }
+  } else{
+    if(n_cores > 1) stop("con = '' is not implemented in parallel (!is.null(cl)). Please supply a directory.")
+  }
+  ## Define function
+  append_messages <- ifelse(con == "", FALSE, TRUE)
+  cat_to_cf <- function(..., message = verbose, file = con, append = append_messages){
+    if(message) cat(paste(..., "\n"), file = con, append = append)
+  }
+
+  #### Checks
+  ## Formally initiate function and implement remaining checks
+  cat_to_cf(paste0("flapper::.acdc_pl() called (@ ", t_onset, ")..."))
+  out$time <- data.frame(event = "onset", time = t_onset)
+  cat_to_cf("... Checking user inputs...")
+  # Check acoustics contains required column names and correct variable types
+  if(!inherits(acoustics, "list")) acoustics_tmp <- list(acoustics) else acoustics_tmp <- acoustics
+  length_acoustics_tmp <- length(acoustics_tmp)
+  lapply(acoustics_tmp, function(acc) {
+    check_names(arg = "acoustics",
+                input = acc,
+                req = c("timestamp", "receiver_id"),
+                extract_names = colnames,
+                type = all)
+    check_class(input = acc$timestamp, to_class = "POSIXct", type = "stop")
+    check_class(input = acc$receiver_id, to_class = "integer", type = "stop")
+  })
+  # Check archival contains required column names and correct variable types
+  if(!is.null(archival)){
+    check_names(input = archival,
+                req = c("timestamp", "depth"),
+                extract_names = colnames,
+                type = all)
+    check_class(input = archival$timestamp, to_class = "POSIXct", type = "stop")
+    archival$timestamp_num <- as.numeric(archival$timestamp)
+    check_class(input = archival$depth, to_class = "numeric", type = "stop")
+    # Check data volume
+    if(nrow(archival) <= 1) stop("'archival' dataframe only contains one or fewer rows.")
+    # Check archival step length
+    step_est <- as.numeric(difftime(archival$timestamp[2], archival$timestamp[1], units = "s"))
+    if(!all.equal(step, step_est)){
+      stop("'step' does not equal difftime(archival$timestamp[2], archival$timestamp[1], units = 's'.)")
+    }
+  }
+  # Check acoustic centroids have been supplied as a list
+  check_class(input = acc_centroids, to_class = "list", type = "stop")
+  out$time <- rbind(out$time, data.frame(event = "initial_checks_passed", time = Sys.time()))
+  # Check depth error
+  if(!is.null(archival)){
+    de_1 <- calc_depth_error(archival$depth[1])
+    if(length(de_1) != 2){
+      stop("'calc_depth_error' should be a function that returns a numeric vector of length two (i.e., a lower and upper depth adjustment).")
+    }
+    if(de_1[1] > 0 | de_1[2] < 0){
+      stop("'calc_depth_error' should return a negative and a postive adjustment (in that order).")
+    }
+  }
+  # Check write opts
+  if(!is.null(write_history)){
+    check_named_list(input = write_history)
+    check_names(input = write_history, req = "filename")
+    write_history$filename <- check_dir(input = write_history$filename, check_slash = TRUE)
+    write_history_dir <- write_history$filename
+  }
+
+  #### Study site rasters
+  ## Blank map for space use over the study area
+  map <- raster::setValues(bathy, 0)
+  map <- raster::mask(map, bathy)
+
+
+  ######################################
+  #### Implement splitting (if necessary)
+
+  #### Define a list of dataframes
+  # .. If the algorithm is to be implemented in parallel
+  if(inherits(acoustics, "list") | n_cores > 1 | !is.null(split)){
+
+    #### Implement splitting
+    if(length_acoustics_tmp == 1){
+
+      ## Define split if not provided
+      # If the split hasn't been specified, then the user doesn't care
+      # ... about splitting the outputs into biologically interpretable time intervals
+      # ... However, we"ll still define a split factor, to be based on computational perspectives
+      if(is.null(split)) {
+        cat_to_cf("... Splitting 'acoustics' into chunks...")
+        chunks <- seq(min(acoustics$timestamp), max(acoustics$timestamp), length.out = n_cores+1)
+        dft <- difftime(chunks[2], chunks[1])
+        dft_num <- as.numeric(dft)
+        dft_num <- floor(dft_num)
+        dft_units <- attr(dft, "units")
+        message(paste("'acoustics' dataframe split into chunks of ~", dft_num, dft_units, "across", n_cores, "core(s)."))
+        split <- paste(dft_num, dft_units)
+      }
+
+      ## Split dataframe
+      acoustics$split <- lubridate::floor_date(acoustics$timestamp, unit = split)
+      acoustics_ls <- split(acoustics, f = acoustics$split)
+    } else{
+      acoustics_ls <- acoustics
+    }
+
+    #### Process split dataframes
+    cat_to_cf("... Processing acoustics chunks...")
+
+    ## Remove NULL/length 0 elements
+    cat_to_cf("... ... Checking for NULL/empty chunks...")
+    empty_elms <- sapply(acoustics_ls, function(x) is.null(x) | nrow(x) == 0)
+    if(any(empty_elms)) {
+      msg <- paste0("acoustics_ls[c(", paste0(which(empty_elms), collapse = ","), ")] chunks are empty/NULL and will be removed...")
+      message(msg)
+      cat_to_cf(paste("... ... ...", msg))
+      acoustics_ls <- acoustics_ls[which(!empty_elms)]
+    }
+
+    ## Force overlapping time series
+    # If we naively split the dataframe into number of different windows,
+    # ... on every run, we have to stop before the last acoustic reading
+    # ... (because we can't identify the next receiver - their isn't one in the split dataframe)
+    # ...which means we're not including some information when we estimate space use.
+    # To get around this, in the list dataframes, we need to add the first line of every dataframe
+    # ... to the previous dataframe. Then, when we split the dataframe, we won't be loosing information
+    # ...because we've copied the last line.
+    cat_to_cf("... ... Overlapping chunks...")
+    acoustics_ls_wth_overlap <-
+      lapply(2:(length(acoustics_ls)), function(i){
+        # define an adjusted dataframe, binds the previous dataframe
+        # ... with the first row of the dataframe in question:
+        adj <- rbind(acoustics_ls[[i-1]], acoustics_ls[[i]][1, ])
+        return(adj)
+      })
+    # Add back the final element:
+    acoustics_ls_wth_overlap[[length(acoustics_ls)]] <- acoustics_ls[[length(acoustics_ls)]]
+    names(acoustics_ls_wth_overlap) <- names(acoustics_ls)
+
+    #### Additional checks
+    # Check the number of rows in acoustics_ls_wth_overlap. This cannot be less than two.
+    # ... If there are no rows or only one row,
+    # ... then we can't calculate where the individual was
+    # ... next detected, which will cause problems.
+    l <- length(acoustics_ls_wth_overlap)
+    lapply(1:l, function(i){
+      nrw <- nrow(acoustics_ls_wth_overlap[[i]])
+      if(nrw < 2){
+        stop(paste("acoustics_ls_wth_overlap[[", i, "]] has less than two rows. This is not allowed."))
+      }
+    })
+
+    out$time <- rbind(out$time, data.frame(event = "acoustics_chunks_defined", time = Sys.time()))
+
+  } else {
+    acoustics_ls_wth_overlap <- acoustics_tmp
+  }
+
+
+  ######################################
+  #### Visualise time series
+
+  #### Focus on the data for which we have both acoustic and archival observations
+
+    cat_to_cf("... Processing movement time series...")
+    movement_ts <- lapply(1:length(acoustics_ls_wth_overlap), function(i){
+
+      # Isolate acoustics time series
+      acc <- acoustics_ls_wth_overlap[[i]]
+      acc$timestamp_num <- as.numeric(acc$timestamp)
+
+      ## AC algorithm implementation
+      if(is.null(archival)){
+        ls <- list(acoustics = acc, archival = NULL)
+
+      ## ACDC algorithm implementation
+      } else {
+        nrw_acc_pre <- nrow(acc)
+        nrw_arc_pre <- nrow(archival)
+        acc <- acc[acc$timestamp >= min(archival$timestamp) - 2*60 &
+                     acc$timestamp <= max(archival$timestamp) + 2*60, ]
+        arc <- archival[archival$timestamp >= min(acc$timestamp) - 2*60, ]
+        if(i < length(acoustics_ls_wth_overlap)){
+          arc <- arc[arc$timestamp <= max(acc$timestamp) + 2*60, ]
+        }
+        nrw_acc_post <- nrow(acc)
+        nrw_arc_post <- nrow(arc)
+        nrw_acc_delta <- nrw_acc_pre - nrw_acc_post
+        nrw_arc_delta <- nrw_arc_pre - nrw_arc_post
+        if(nrw_acc_post == 0 | nrw_arc_post == 0) stop("No overlapping acoustic/archival observations to implement algorithm.")
+        if(nrw_acc_delta != 0) {
+          cat_to_cf(paste("... ...  Chunk", i, ":", nrw_acc_delta, "acoustic observation(s) beyond the ranges of archival observations ignored."))
+          message(paste("Chunk", i, ":", nrw_acc_delta, "acoustic observation(s) beyond the ranges of archival observations ignored."))
+        }
+        if(nrw_arc_delta != 0) {
+          cat_to_cf(paste("... ... Chunk", i, ":", nrw_arc_delta, "archival observation(s) beyond the ranges of (processed) acoustic detections ignored."))
+          message(paste("Chunk", i, ":", nrw_arc_delta, "archival observation(s) beyond the ranges of (processed) acoustic detections ignored."))
+        }
+
+        ## Return processed time series
+        ls <- list(acoustics = acc, archival = arc)
+      }
+      return(ls)
+    })
+  out$ts_by_chunk <- movement_ts
+  out$time <- rbind(out$time, data.frame(event = "movement_time_series_processed", time = Sys.time()))
+
+  #### Visualise processed time series
+  if(plot_ts) {
+    cat_to_cf("... Plotting movement time series (for each chunk)...")
+    if(length(movement_ts) < 25) pp <- graphics::par(mfrow = prettyGraphics::par_mf(length(movement_ts)))
+    lapply(movement_ts, function(move){
+      ## Get acoustics time series
+      acoustics <- move$acoustics
+      ## AC algorithm implementation
+      if(is.null(archival)){
+        prettyGraphics::pretty_line(acoustics$timestamp,
+                                    pch = 21, col = "royalblue", bg = "royalblue")
+      ## ACDC algorithm implementation
+      } else {
+        archival  <- move$archival
+        axis_ls <- prettyGraphics::pretty_plot(archival$timestamp, abs(archival$depth)*-1,
+                                               pretty_axis_args = list(side = 3:2,
+                                                                       axis = list(list(format = "%H:%M:%S %d-%m-%y"),
+                                                                                   list()
+                                                                       )
+                                               ),
+                                               xlab = "Time stamp", ylab = "Depth (m)",
+                                               type = "l")
+        prettyGraphics::pretty_line(acoustics$timestamp,
+                                    pretty_axis_args = list(axis_ls = axis_ls),
+                                    inherit = TRUE,
+                                    replace_axis = list(side = 1, pos = axis_ls[[2]]$lim[1]),
+                                    add = TRUE,
+                                    pch = 21, col = "royalblue", bg = "royalblue")
+      }
+    })
+
+    if(length(movement_ts) < 25) graphics::par(pp)
+    out$time <- rbind(out$time, data.frame(event = "time_series_plotted", time = Sys.time()))
+  }
+
+
+  ######################################
+  #### Implement ACDC algorithm
+
+  #### Checks
+  n_chunks <- length(acoustics_ls_wth_overlap)
+  # Define a list of files, one for each chunk
+  if(verbose & con != "") {
+    con_ls <- lapply(1:n_chunks, function(i) {
+      file <- paste0(con_dir, "dot_acdc_log_", i, ".txt")
+      return(file)
+    })
+  } else {
+    con_ls <- lapply(1:n_chunks, function(i) {
+      return("")
+    })
+  }
+
+  # Write blank files to directory if required
+  if(verbose & con != "" & n_chunks > 1) {
+    cat_to_cf("... Defining chunk-specific log files as dot_acdc_log_1.txt, dot_acdc_log_2.txt etc...")
+    lapply(con_ls, function(file) {
+      if(!file.exists(file)){
+        msg1 <- paste(file, "does not exist: attempting to write file in specified directory...")
+        cat_to_cf(paste("... ...", msg1))
+        message(msg1)
+        file.create(file1 = file)
+        cat_to_cf("... ... ... Blank file successfully written to file.")
+        message("... Blank file successfully written to file.")
+      }
+    })
+  }
+
+  #### Implement ACDC algorithm directly via .acdc back-end
+  if(length(acoustics_ls_wth_overlap) == 1) {
+
+    #### Implement algorithm
+    cat_to_cf("... Calling .acdc() to implement ACDC algorithm on one chunk...")
+    out$time <- rbind(out$time, data.frame(event = "calling_.acdc", time = Sys.time()))
+    .out <- .acdc(acoustics = movement_ts[[1]]$acoustics,
+                  archival = movement_ts[[1]]$archival,
+                  step = step,
+                  bathy = bathy,
+                  map = map,
+                  detection_range = detection_range,
+                  detection_kernels = detection_kernels,
+                  detection_kernels_overlap = detection_kernels_overlap,
+                  detection_time_window = detection_time_window,
+                  acc_centroids = acc_centroids,
+                  mobility = mobility,
+                  calc_depth_error = calc_depth_error,
+                  normalise = normalise,
+                  plot = plot,
+                  plot_ts = FALSE,
+                  verbose = verbose,
+                  con = con,
+                  progress = progress,
+                  keep_args = FALSE,
+                  write_history = write_history,
+                  check = FALSE)
+
+  } else {
+
+    #### Implement algorithm in parallel
+    cat_to_cf(paste("... Calling .acdc() to implement ACDC algorithm on", length(acoustics_ls_wth_overlap), "chunks, using", n_cores, "cores..."))
+    out$time <- rbind(out$time, data.frame(event = "calling_.acdc", time = Sys.time()))
+    .out <- pbapply::pblapply(1:length(acoustics_ls_wth_overlap), cl = cl, function(i){
+
+      #### Implement algorithm
+      .out <- .acdc(acoustics = movement_ts[[i]]$acoustics,
+                    archival = movement_ts[[i]]$archival,
+                    step = step,
+                    bathy = bathy,
+                    map = map,
+                    detection_range = detection_range,
+                    detection_kernels = detection_kernels,
+                    detection_kernels_overlap = detection_kernels_overlap,
+                    detection_time_window = detection_time_window,
+                    acc_centroids = acc_centroids,
+                    mobility = mobility,
+                    calc_depth_error = calc_depth_error,
+                    normalise = normalise,
+                    plot = plot,
+                    plot_ts = FALSE,
+                    verbose = verbose,
+                    con = con_ls[[i]],
+                    progress = 0L,
+                    keep_args = FALSE,
+                    write_history = write_history,
+                    check = FALSE)
+      return(.out)
+    })
+    if(!is.null(cl)) parallel::stopCluster(cl = cl)
+  }
+
+  #### Return outputs
+  out$.acdc <- .out
+  t_end <- Sys.time()
+  out$time <- rbind(out$time, data.frame(event = "algorithm_competion", time = t_end))
+  out$time$serial_duration <- Tools4ETS::serial_difference(out$time$time, units = "mins")
+  out$time$total_duration <- NA
+  total_duration <- sum(as.numeric(out$time$serial_duration), na.rm = TRUE)
+  out$time$total_duration[nrow(out$time)] <- total_duration
+  cat_to_cf(paste0("... flapper::.acdc_pl() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+  class(out) <- c(class(out), "acdc")
+  return(out)
+
+}
