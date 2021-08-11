@@ -9,6 +9,8 @@ dc(
   bathy,
   calc_depth_error = function(...) c(-2.5, 2.5),
   check_availability = TRUE,
+  plot = 1L,
+  write_history = NULL,
   split = NULL,
   cl = NULL,
   varlist = NULL,
@@ -25,6 +27,10 @@ dc(
 
 \item{check_availability}{A logical input that defines whether or not to record explicitly, for each time step, whether or not there were any cells on \code{bathy} that matched the observed depth.}
 
+\item{plot}{An integer vector that defines the time steps for which to return time step-specific and cumulative maps of the individual's possible locations. \code{plot = 0} suppresses the return of this information and \code{plot = NULL} returns this information for all time steps.}
+
+\item{write_history}{(optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by archival time steps as 'arc_1', 'arc_2' and so on.}
+
 \item{split, cl, varlist}{(optional) Parallelisation arguments. \code{split} is an integer which, if supplied, splits the \code{archival} dataframe every \code{n}th row into chunks*. The algorithm is applied sequentially within each chunk (if applicable) and chunk-wise maps are summed afterwards to create a single map of space use. The advantage of this approach is that chunks can be analysed in parallel, via \code{cl} and \code{varlist}, while memory use is minimised. \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. \code{varlist} is a character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console to relay function progress.}
@@ -32,7 +38,7 @@ dc(
 \item{...}{Additional arguments (none implemented).}
 }
 \value{
-The function returns a named list with the following elements. `args' is a named list of the arguments used to call the function. `archival' is the \code{archival} dataframe. This includes two new columns that define the lower and upper bounds for the possible depth of the individual on \code{bathy} at each time step (`depth_lwr' and `depth_upper') derived from \code{calc_depth_error} and, if \code{calc_availability = TRUE}, a logical vector that defines whether or not there are any cells on \code{bathy} of the required depth range at each time step. `dc' is a \code{\link[raster]{raster}}, with the same properties as \code{bathy}, in which the value of each cell is the number of times that the depth in that cell overlapped with the individual's depth.
+The function returns a named list with the following elements. `args' is a named list of the arguments used to call the function. `archival' is the \code{archival} dataframe. This includes two new columns that define the lower and upper bounds for the possible depth of the individual on \code{bathy} at each time step (`depth_lwr' and `depth_upper') derived from \code{calc_depth_error} and, if \code{calc_availability = TRUE}, a logical vector that defines whether or not there are any cells on \code{bathy} of the required depth range at each time step. `spatial' is a named list, if \code{plot != 0}, which contains time step-specific (`map_timestep') and cumulative maps (`map_cumulative') of the individual's possible locations for each specified time step. `dc' is a \code{\link[raster]{raster}}, with the same properties as \code{bathy}, in which the value of each cell is the number of times that the depth in that cell overlapped with the individual's depth.
 }
 \description{
 This function implements the depth-contour (DC) algorithm. Under the assumption that individuals are benthic/demersal, this algorithm relates one-dimensional depth time series to a two-dimensional bathymetry surface to determine the extent to which different parts of an area might have (or have not) been used, or effectively represent occupied depths, over time. Given a sequence of depth observations (\code{archival}) from a benthic animal and a measurement error parameter (\code{calc_depth_error}), at each time step the function determines the cells on a bathymetry \code{\link[raster]{raster}} (\code{bathy}) that match the observed depth. Across all time steps, matches are summed to produce a single map representing the number of occasions when the depth in each cell matched the observed depth.
