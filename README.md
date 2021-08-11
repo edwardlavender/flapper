@@ -1,9 +1,9 @@
 
 # flapper
 
-***From passive acoustic telemetry to space use: an `R` package for
-integrating passive acoustic telemetry and archival tag data to estimate
-benthic movement pathways at high resolution***
+***From passive acoustic telemetry to space use: an `R` package of
+algorithms for reconstructing movement paths and patterns of space use
+from acoustic and archival time series.***
 
 [![Project Status: WIP – Initial development is in progress, but there
 has not yet been a stable, usable release suitable for the
@@ -39,9 +39,8 @@ the following themes:
     detection days and co-occurrence;
   - **Space use algorithms**, including a straightforward implementation
     of the mean-position algorithm for the estimation of centres of
-    activity and new algorithms designed for benthic/demersal species
-    which integrate PAT and archival data to improve estimates of space
-    use;
+    activity and new algorithms designed for improved estimates of space
+    use and the reconstruction of movement paths;
   - **Simulation tools**, including tools for the simulation of passive
     acoustic telemetry arrays, movement paths, detections and the
     comparison of simulated and inferred patterns of space use under
@@ -49,13 +48,12 @@ the following themes:
 
 <img src="vignettes/readme_context.png"/> *flapper: An `R` package
 designed to facilitate the integration of acoustic and archival datasets
-to improve estimates of space use for benthic/demersal species. Inserted
-sample depth and acoustic time series were collected as part of the
-Movement Ecology of Flapper Skate project by Marine Scotland Science and
-NatureScot. The insert of the flapper skate is also courtesy of this
-project. The bathymetry data are sourced from the Ireland, Northern
-Island and Scotland Hydrographic survey (Howe et al., 2015). Plots were
-produced using the
+to improve estimates of space use. Inserted sample depth and acoustic
+time series were collected as part of the Movement Ecology of Flapper
+Skate project by Marine Scotland Science and NatureScot. The insert of
+the flapper skate is also courtesy of this project. The bathymetry data
+are sourced from the Ireland, Northern Island and Scotland Hydrographic
+survey (Howe et al., 2015). Plots were produced using the
 [prettyGraphics](https://github.com/edwardlavender/prettyGraphics)
 package.*
 
@@ -78,24 +76,31 @@ discrete detections at receivers, especially:
     mean-position algorithm to estimate centres of activity (COAs) from
     discrete detections at receivers, given a detection matrix and the
     locations of receivers.
+  - **`ac()`.** The function implements the acoustic-centroid (AC)
+    algorithm to examine patterns of space use. This is a new approach
+    which utilises the information provided by acoustic detections in
+    the form of acoustic centroids to infer where animals could have
+    spent more or less time over the period of observations. Key
+    innovations of this approach include the natural incorporation of
+    barriers to movement (such as coastline), detection probability and
+    information provided by the gaps between detections.
   - **`dc()`.** This function implements the ‘depth-contour’ (DC)
     algorithm to examine patterns of space use of benthic/demersal
     animals. This relates one-dimensional depth time series to a
     two-dimensional bathymetry surface to determine the extent to which
     different parts of an area might have (or have not) been used, or
     effectively represent occupied depths, over time.
-  - **`dcpf()`.** This function implements the ‘depth-contour particle
-    filtering’ (DCPF) algorithm, an extension of the DC algorithm that
-    incorporates a movement model to reconstruct possible movement paths
-    over a surface from observed depth time series.
   - **`acdc()`.** This function implements the ‘acoustic-centroid
     depth-contour’ (ACDC) algorithm to examine patterns of space use.
-    This is a new approach that integrates the locational information
-    provided by acoustic detections and concurrent depth observations to
-    infer where benthic/demersal animals could have spent more or less
-    time over the period of observations.
-  - **`acdcpf()`** and **`acdcmp()`** are extensions of the ACDC
-    algorithm that will be added to the package in the near future.
+    This integrates the locational information provided by acoustic
+    detections and concurrent depth observations to infer where
+    benthic/demersal animals could have spent more or less time over the
+    period of observations.
+  - **`_pf()`** is a particle filtering routine that refines
+    time-specific maps of the possible locations of an animal (from
+    `ac()`, `dc()` or `acdc()`) via a particle simulation and filtering
+    process that permits the reconstruction of movement paths over
+    landscape. This will be added to the package in the near future.
   - **`sim_*()`.** These functions provide flexible, joined-up routines
     for the simulation of receiver arrays, movement paths and detections
     and can be used to evaluate alternative algorithms for inferences
@@ -307,6 +312,13 @@ designed to infer space use from PAT data and their evaluation under
 different circumstances (e.g., array designs, movement models and
 detection models).
 
+<img src="vignettes/readme_flapper_family_implementation.png"/> *The
+\`flapper’ family of algorithms. The acoustic-centroid depth-contour
+(ACDC) branch utilises acoustic and/or archival data to map the possible
+locations of an animal through time. The particle filtering (PF) branch
+refines these maps via the implementation of a particle simulation and
+filtering approach for the reconstruction of possible movement paths.*
+
 ### The centres of activity (COA) algorithm
 
 Centres of activity (COA) are one of the most widely used metrics for
@@ -340,57 +352,54 @@ defined area. This is implemented via `dc()`. The ‘quick’ depth-contour
 (DCQ) algorithm, implemented via `dcq()`, uses a modified version of
 this algorithm for quicker run times.
 
-### The depth-contour particle filtering (DCPF) algorithm
+### The acoustic-contour\* (AC\*) algorithm(s)
 
-The depth-contour particle filtering algorithm (DCPF) extends the DC
-algorithm through incorporation of a movement model to reconstruct
-movement paths over a surface that are consistent with the observations
-(and model assumptions). This is especially useful for small scale
-applications, such as reconstructing the movements of benthic animals
-tagged with archival tags for short periods of time post-release. This
-approach is implemented with the `dcpf*()` family of functions:
-
-  - `dcpf_setup_movement_pr` provides a simple movement model that
-    defines the probability of movement between locations given the
-    distance between them;
-  - `dcpf_setup_cells_by_time` defines the `cells_by_time` list for
-    `dcpf()`;
-  - `dcpf()` implements the DCPF algorithm;
-  - `dcpf_plot_history()` plot simulated particle histories;
-  - `dcpf_simplify()` assembles movement paths from particle histories;
-  - `dcpf_loglik()` calculates the log-likelihood of reconstructed
-    paths, given the movement model;
-  - `dcpf_plot_1d()` plots the depth time series from observed and
-    reconstructed paths;
-  - `dcpf_plot_2d()` maps the reconstructed paths in two-dimensions;
-  - `dcpf_plot_3d()` maps the reconstructed paths in three-dimensions;
-
-### The acoustic-centroid depth-contour (ACDC) algorithm
-
-The acoustic-centroid depth-contour (ACDC) algorithm extends the DC
-algorithm by using PAT data to inform the area within which depth
-contours are most likely to be found. This algorithm is implemented with
-the `acdc*()` family of functions:
+The `flapper` family-equivalent of the COA algorithm is the
+acoustic-contour (AC) algorithm. This approach represents the
+information from acoustic detections in the form of acoustic centroids,
+which contract and expand in line with the distribution of uncertainty
+in the individual’s location when it is detected and in the gaps between
+detections. The acoustic-centroid depth-contour (ACDC) algorithm
+combines the AC and DC algorithms, using PAT data to inform the area
+within which depth contours are most likely to be found. These
+algorithms are implemented with the `acdc*()` family of functions:
 
   - `acdc_setup_mobility()` examines the assumption of a constant
     ‘mobility’ parameter;
   - `acdc_setup_n_centroids()` suggests the number of acoustic centroids
-    for the algorithm;
+    for the algorithm(s);
   - `acdc_setup_centroids()` defines the acoustic centroids for the
-    algorithm;
+    algorithm(s);
   - `acdc_setup_detection_kernels()` defines detection probability
-    kernels for the algorithm;
-  - `acdc()` implements the algorithm, via the back-end function
-    `.acdc()`;
-  - `acdc_simplify()` simplifies the results of the algorithm;
-  - `acdc_plot()` plots the results of the algorithm;
-  - `acdc_animate()` creates html animations of the algorithm;
+    kernels for the algorithm(s);
+  - `ac()` and `acdc()` implement the algorithm(s), via the back-end
+    functions `.acdc_pl` and `.acdc()`;
+  - `acdc_simplify()` simplifies the results of the algorithm(s);
+  - `acdc_plot()` plots the results of the algorithm(s);
+  - `acdc_animate()` creates html animations of the algorithm(s);
 
-### The ACDC particle filtering and movement pathway (ACDCPF and ACDCMP) algorithms
+### Particle filtering routines
 
-The ACDCPF and ACDCMP algorithms incorporate movement pathways into the
-ACDC process to restrict further the inferred distribution of locations
-within which the individual must have been located at each time point.
+Each algorithm (AC, DC and ACDC) can be extended through incorporation
+of a movement model to reconstruct movement paths over a surface that
+are consistent with the observations (and model assumptions). The
+resultant algorithms are termed the ACPF, DCPF and ACDCPF algorithms.
+The approach is implemented via a particle simulation and filtering
+process provided by the `_pf*()` family of functions:
+
+  - `_pf_setup_movement_pr` provides a simple movement model that
+    defines the probability of movement between locations given the
+    distance between them;
+  - `_pf()` implements the DCPF algorithm;
+  - `_pf_plot_history()` plot simulated particle histories;
+  - `_pf_simplify()` assembles movement paths from particle histories;
+  - `_pf_loglik()` calculates the log-likelihood of reconstructed paths,
+    given the movement model;
+  - `_pf_plot_1d()` plots the depth time series from observed and
+    reconstructed paths;
+  - `_pf_plot_2d()` maps the reconstructed paths in two-dimensions;
+  - `_pf_plot_3d()` maps the reconstructed paths in three-dimensions;
+
 *These algorithms are not currently available in the public version of
 this package.*
 

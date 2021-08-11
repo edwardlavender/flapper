@@ -94,7 +94,18 @@
 #'     \item \link{dc} implements the DC algorithm;
 #'     \item \link{dcq} implements the quick DC (DCQ) algorithm;
 #'   }
-#'   \item The depth-contour particle filtering (DCPF) algorithm
+#'   \item The acoustic-centroid* (AC*) algorithms
+#'   \itemize{
+#'     \item \link{acdc_setup_mobility} examines the assumption of a constant `mobility' parameter;
+#'     \item \link{acdc_setup_n_centroids} suggests the number of acoustic centroids for the algorithm(s);
+#'     \item \link{acdc_setup_centroids} defines the acoustic centroids for the algorithm(s);
+#'     \item \link{acdc_setup_detection_kernels} defines detection probability kernels for the algorithm(s);
+#'     \item \link{ac} and \link{acdc} implement the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms, via \link{.acdc_pl} and \link{.acdc};
+#'     \item \link{acdc_simplify} simplifies the results of the algorithm(s);
+#'     \item \link{acdc_plot} plots the results of the algorithm(s);
+#'     \item \link{acdc_animate} creates html animations of the algorithm(s);
+#'   }
+#'   \item The AC, DC and ACDC particle filtering algorithms
 #'   \itemize{
 #'     \item \link{dcpf_setup_movement_pr} provides a simple movement model that defines the probability of movement between locations given the distance between them;
 #'     \item \link{dcpf_setup_cells_by_time} defines the \code{cells_by_time} list for \link{dcpf}
@@ -105,21 +116,6 @@
 #'     \item \link{dcpf_plot_1d} plots the depth time series from observed and reconstructed paths;
 #'     \item \link{dcpf_plot_2d} maps the reconstructed paths in two-dimensions;
 #'     \item \link{dcpf_plot_3d} maps the reconstructed paths in three-dimensions;
-#'   }
-#'   \item The acoustic-centroid depth-contour (ACDC) algorithm
-#'   \itemize{
-#'     \item \link{acdc_setup_mobility} examines the assumption of a constant `mobility' parameter;
-#'     \item \link{acdc_setup_n_centroids} suggests the number of acoustic centroids for the algorithm;
-#'     \item \link{acdc_setup_centroids} defines the acoustic centroids for the algorithm;
-#'     \item \link{acdc_setup_detection_kernels} defines detection probability kernels for the algorithm;
-#'     \item \link{acdc} implements the algorithm, via the back-end function \link{.acdc};
-#'     \item \link{acdc_simplify} simplifies the results of the algorithm;
-#'     \item \link{acdc_plot} plots the results of the algorithm;
-#'     \item \link{acdc_animate} creates html animations of the algorithm;
-#'   }
-#'   \item The ACDC particle filtering and movement pathway (ACDCPF and ACDCMP) algorithms
-#'   \itemize{
-#'     \item These algorithms will be added to the package in the near future.
 #'   }
 #' }
 #'
