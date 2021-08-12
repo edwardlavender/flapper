@@ -163,9 +163,9 @@ lcp_graph_surface <- function(surface, cost, verbose = TRUE,...){
 #'
 #' @param origin A matrix which defines the coordinates (x, y) of the point from which to calculate least-cost distances. Unlike \code{\link[raster]{distanceFromPoints}}, only a single point is expected.
 #' @param surface A \code{\link[raster]{raster}} across which to implement least-cost distance calculations. If the \code{cost} matrix is derived from \code{\link[flapper]{lcp_costs}} (see below), there are some constraints on the form of this \code{surface}; namely, equal resolution in x and y directions and a Universal Transverse Mercator coordinate reference system with units of metres. The \code{surface} defines the properties of the returned \code{\link[raster]{raster}} (see Value).
+#' @param destination (optional) An matrix of destination coordinates; an integer vector of cell IDs; or function that defines a subset of destination cells, given their \code{surface} value, for which to implement calculations. For example \code{destination = function(x) x > 0} would restrict least-cost distance calculations to cells of the \code{surface} that have a value of more than zero. Other cells are set to NA. This can improve computational efficiency.
 #' @param cost (optional) A sparse \code{\link[Matrix]{dsCMatrix-class}} matrix that defines the cost of movement between connected cells (see \code{\link[flapper]{lcp_costs}}). If un-supplied, if the \code{graph} is also un-supplied (see below), a matrix of distances from \code{\link[flapper]{lcp_costs}} is computed internally and taken to define the cost surface. For this to be appropriate, the \code{surface} should have a Universal Transverse Mercator projection, with equal resolution in the x and y directions and units of metres (see \code{surface}, above). If a \code{graph} is supplied, \code{cost} is unnecessary.
 #' @param graph (optional) A graph object that defines cell nodes and edge costs for connected cells within the \code{surface} (see \code{\link[flapper]{lcp_graph_surface}}). If supplied, the calculation of the cost surface and the construction of the graph stages in the computation of least-cost distances are skipped (see Details), which is desirable in iterative applications.
-#' @param destination (optional) A function that defines a subset of destination cells, given their \code{surface} value, for which to implement calculations. For example \code{destination = function(x) x > 0} would restrict least-cost distance calculations to cells of the \code{surface} that have a value of more than zero. Other cells are set to NA. This can improve computational efficiency.
 #' @param verbose A logical input that defines whether or not to print messages to the console to relay function progress.
 #' @param use_all_cores A logical input that defines whether or not to parallelise least-cost distance calculations across all cores. This is passed to \code{\link[cppRouting]{get_distance_matrix}} which implements calculations.
 #' @param ... Additional arguments (none implemented).
@@ -208,7 +208,14 @@ lcp_graph_surface <- function(surface, cost, verbose = TRUE,...){
 #' \dontrun{
 #'
 #' #### Example (2): Implement function across specific destinations
-#' # E.g. will consider distances to cells shallower than 125 m
+#' ## Supply destination cell coordinates/IDs directly
+#' # E.g., consider distances to cells shallower than 125 m
+#' destination_cells <- raster::Which(r < 125, cells = TRUE, na.rm = TRUE)
+#' lcp_dist <- lcp_from_point(origin = origin,
+#'                            surface = r,
+#'                            destination = destination_cells)
+#' raster::plot(lcp_dist)
+#' ## Use a function instead to consider distances to cells shallower than 125 m
 #' filter_destination_cells <- function(x) x < 125
 #' lcp_dist <- lcp_from_point(origin = origin,
 #'                            surface = r,
@@ -258,7 +265,15 @@ lcp_from_point <- function(origin,
   surface_df <- data.frame(cell = cells, value = as.vector(surface))
   origin_cell <- raster::cellFromXY(surface, origin)
   destination_cell <- surface_df$cell
-  if(!is.null(destination)) destination_cell <- destination_cell[destination(surface_df$value)]
+  if(!is.null(destination)){
+    if(inherits(destination, "matrix")){
+      destination_cell <- raster::cellFromXY(surface, destination)
+    } else if(inherits(destination, c("numeric", "integer"))) {
+      destination_cell <- destination
+    } else if(inherits(destination, "function")){
+      destination_cell <- destination_cell[destination(surface_df$value)]
+    } else stop("class(destination) is un-supported. Only matrix (coordinates), integer (cell IDs) or functions are supported as inputs.")
+  }
 
   #### Get cost surface (once), if un-supplied
   if(is.null(cost) & is.null(graph)) {

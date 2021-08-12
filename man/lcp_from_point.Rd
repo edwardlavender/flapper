@@ -20,7 +20,7 @@ lcp_from_point(
 
 \item{surface}{A \code{\link[raster]{raster}} across which to implement least-cost distance calculations. If the \code{cost} matrix is derived from \code{\link[flapper]{lcp_costs}} (see below), there are some constraints on the form of this \code{surface}; namely, equal resolution in x and y directions and a Universal Transverse Mercator coordinate reference system with units of metres. The \code{surface} defines the properties of the returned \code{\link[raster]{raster}} (see Value).}
 
-\item{destination}{(optional) A function that defines a subset of destination cells, given their \code{surface} value, for which to implement calculations. For example \code{destination = function(x) x > 0} would restrict least-cost distance calculations to cells of the \code{surface} that have a value of more than zero. Other cells are set to NA. This can improve computational efficiency.}
+\item{destination}{(optional) An matrix of destination coordinates; an integer vector of cell IDs; or function that defines a subset of destination cells, given their \code{surface} value, for which to implement calculations. For example \code{destination = function(x) x > 0} would restrict least-cost distance calculations to cells of the \code{surface} that have a value of more than zero. Other cells are set to NA. This can improve computational efficiency.}
 
 \item{cost}{(optional) A sparse \code{\link[Matrix]{dsCMatrix-class}} matrix that defines the cost of movement between connected cells (see \code{\link[flapper]{lcp_costs}}). If un-supplied, if the \code{graph} is also un-supplied (see below), a matrix of distances from \code{\link[flapper]{lcp_costs}} is computed internally and taken to define the cost surface. For this to be appropriate, the \code{surface} should have a Universal Transverse Mercator projection, with equal resolution in the x and y directions and units of metres (see \code{surface}, above). If a \code{graph} is supplied, \code{cost} is unnecessary.}
 
@@ -76,7 +76,14 @@ par(pp)
 \dontrun{
 
 #### Example (2): Implement function across specific destinations
-# E.g. will consider distances to cells shallower than 125 m
+## Supply destination cell coordinates/IDs directly
+# E.g., consider distances to cells shallower than 125 m
+destination_cells <- raster::Which(r < 125, cells = TRUE, na.rm = TRUE)
+lcp_dist <- lcp_from_point(origin = origin,
+                           surface = r,
+                           destination = destination_cells)
+raster::plot(lcp_dist)
+## Use a function instead to consider distances to cells shallower than 125 m
 filter_destination_cells <- function(x) x < 125
 lcp_dist <- lcp_from_point(origin = origin,
                            surface = r,
