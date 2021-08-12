@@ -96,11 +96,11 @@ discrete detections at receivers, especially:
     detections and concurrent depth observations to infer where
     benthic/demersal animals could have spent more or less time over the
     period of observations.
-  - **`_pf()`** is a particle filtering routine that refines
+  - **`pf()`** is a particle filtering routine that refines
     time-specific maps of the possible locations of an animal (from
     `ac()`, `dc()` or `acdc()`) via a particle simulation and filtering
     process that permits the reconstruction of movement paths over
-    landscape. This will be added to the package in the near future.
+    landscape.
   - **`sim_*()`.** These functions provide flexible, joined-up routines
     for the simulation of receiver arrays, movement paths and detections
     and can be used to evaluate alternative algorithms for inferences
@@ -172,8 +172,8 @@ data collected from flapper skate off the west coast of Scotland:
     series;
   - `dat_archival` is a dataset containing some sample depth time
     series;
-  - `dat_sentinel` is a dataset containing some sample transmission –
-    detection time series assembled from sentinel tags;
+  - `dat_sentinel` is a dataset containing some sample
+    transmission–detection time series assembled from sentinel tags;
 
 These example datasets were collected by Marine Scotland Science and
 NatureScot as part of the Movement Ecology of Flapper Skate project and
@@ -373,7 +373,7 @@ algorithms are implemented with the `acdc*()` family of functions:
   - `acdc_setup_detection_kernels()` defines detection probability
     kernels for the algorithm(s);
   - `ac()` and `acdc()` implement the algorithm(s), via the back-end
-    functions `.acdc_pl` and `.acdc()`;
+    functions `.acdc_pl()` and `.acdc()`;
   - `acdc_simplify()` simplifies the results of the algorithm(s);
   - `acdc_plot()` plots the results of the algorithm(s);
   - `acdc_animate()` creates html animations of the algorithm(s);
@@ -385,23 +385,20 @@ of a movement model to reconstruct movement paths over a surface that
 are consistent with the observations (and model assumptions). The
 resultant algorithms are termed the ACPF, DCPF and ACDCPF algorithms.
 The approach is implemented via a particle simulation and filtering
-process provided by the `_pf*()` family of functions:
+process provided by the `pf*()` family of functions:
 
-  - `_pf_setup_movement_pr` provides a simple movement model that
-    defines the probability of movement between locations given the
-    distance between them;
-  - `_pf()` implements the DCPF algorithm;
-  - `_pf_plot_history()` plot simulated particle histories;
-  - `_pf_simplify()` assembles movement paths from particle histories;
-  - `_pf_loglik()` calculates the log-likelihood of reconstructed paths,
+  - `pf_setup_movement_pr` provides a simple movement model that defines
+    the probability of movement between locations given the distance
+    between them;
+  - `pf()` implements the particle filtering routine;
+  - `pf_plot_history()` plot simulated particle histories;
+  - `pf_simplify()` assembles movement paths from particle histories;
+  - `pf_loglik()` calculates the log-likelihood of reconstructed paths,
     given the movement model;
-  - `_pf_plot_1d()` plots the depth time series from observed and
+  - `pf_plot_1d()` plots the depth time series from observed and
     reconstructed paths;
-  - `_pf_plot_2d()` maps the reconstructed paths in two-dimensions;
-  - `_pf_plot_3d()` maps the reconstructed paths in three-dimensions;
-
-*These algorithms are not currently available in the public version of
-this package.*
+  - `pf_plot_2d()` maps the reconstructed paths in two-dimensions;
+  - `pf_plot_3d()` maps the reconstructed paths in three-dimensions;
 
 ## Simulation tools
 

@@ -37,7 +37,7 @@ The main highlights of the package are the provision of routines for the rapid c
   * **`ac()`.** The function implements the acoustic-centroid (AC) algorithm to examine patterns of space use. This is a new approach which utilises the information provided by acoustic detections in the form of acoustic centroids to infer where animals could have spent more or less time over the period of observations. Key innovations of this approach include the natural incorporation of barriers to movement (such as coastline), detection probability and information provided by the gaps between detections. 
   * **`dc()`.** This function implements the 'depth-contour' (DC) algorithm to examine patterns of space use of benthic/demersal animals. This relates one-dimensional depth time series to a two-dimensional bathymetry surface to determine the extent to which different parts of an area might have (or have not) been used, or effectively represent occupied depths, over time. 
   * **`acdc()`.** This function implements the 'acoustic-centroid depth-contour' (ACDC) algorithm to examine patterns of space use. This integrates the locational information provided by acoustic detections and concurrent depth observations to infer where benthic/demersal animals could have spent more or less time over the period of observations.
-  * **`_pf()`** is a particle filtering routine that refines time-specific maps of the possible locations of an animal (from `ac()`, `dc()` or `acdc()`) via a particle simulation and filtering process that permits the reconstruction of movement paths over landscape. This will be added to the package in the near future. 
+  * **`pf()`** is a particle filtering routine that refines time-specific maps of the possible locations of an animal (from `ac()`, `dc()` or `acdc()`) via a particle simulation and filtering process that permits the reconstruction of movement paths over landscape. 
   * **`sim_*()`.** These functions provide flexible, joined-up routines for the simulation of receiver arrays, movement paths and detections and can be used to evaluate alternative algorithms for inferences about patterns of space use under different conditions. 
 
 ## Installation
@@ -71,7 +71,7 @@ Functions are illustrated using simulated data and the following sample data col
 * `dat_moorings` is a dataset containing some sample passive acoustic telemetry receiver locations and associated information;
 * `dat_acoustics` is a dataset containing some sample detection time series;
 * `dat_archival` is a dataset containing some sample depth time series;
-* `dat_sentinel` is a dataset containing some sample transmission -- detection time series assembled from sentinel tags;
+* `dat_sentinel` is a dataset containing some sample transmission--detection time series assembled from sentinel tags;
 
 These example datasets were collected by Marine Scotland Science and NatureScot as part of the Movement Ecology of Flapper Skate project and belong to these organisations. If you wish to use these data, please contact Marine Scotland Science and NatureScot for further information. 
 
@@ -173,25 +173,23 @@ The `flapper` family-equivalent of the COA algorithm is the acoustic-contour (AC
 * `acdc_setup_n_centroids()` suggests the number of acoustic centroids for the algorithm(s); 
 * `acdc_setup_centroids()` defines the acoustic centroids for the algorithm(s);
 * `acdc_setup_detection_kernels()` defines detection probability kernels for the algorithm(s);
-* `ac()` and `acdc()` implement the algorithm(s), via the back-end functions `.acdc_pl` and `.acdc()`;
+* `ac()` and `acdc()` implement the algorithm(s), via the back-end functions `.acdc_pl()` and `.acdc()`;
 * `acdc_simplify()` simplifies the results of the algorithm(s); 
 * `acdc_plot()` plots the results of the algorithm(s); 
 * `acdc_animate()` creates html animations of the algorithm(s); 
 
 ### Particle filtering routines
 
-Each algorithm (AC, DC and ACDC) can be extended through incorporation of a movement model to reconstruct movement paths over a surface that are consistent with the observations (and model assumptions). The resultant algorithms are termed the ACPF, DCPF and ACDCPF algorithms. The approach is implemented via a particle simulation and filtering process provided by the `_pf*()` family of functions: 
+Each algorithm (AC, DC and ACDC) can be extended through incorporation of a movement model to reconstruct movement paths over a surface that are consistent with the observations (and model assumptions). The resultant algorithms are termed the ACPF, DCPF and ACDCPF algorithms. The approach is implemented via a particle simulation and filtering process provided by the `pf*()` family of functions: 
 
-* `_pf_setup_movement_pr` provides a simple movement model that defines the probability of movement between locations given the distance between them; 
-* `_pf()` implements the DCPF algorithm; 
-* `_pf_plot_history()` plot simulated particle histories; 
-* `_pf_simplify()` assembles movement paths from particle histories;
-* `_pf_loglik()` calculates the log-likelihood of reconstructed paths, given the movement model;
-* `_pf_plot_1d()` plots the depth time series from observed and reconstructed paths;
-* `_pf_plot_2d()` maps the reconstructed paths in two-dimensions;
-* `_pf_plot_3d()` maps the reconstructed paths in three-dimensions; 
-
-_These algorithms are not currently available in the public version of this package._
+* `pf_setup_movement_pr` provides a simple movement model that defines the probability of movement between locations given the distance between them; 
+* `pf()` implements the particle filtering routine; 
+* `pf_plot_history()` plot simulated particle histories; 
+* `pf_simplify()` assembles movement paths from particle histories;
+* `pf_loglik()` calculates the log-likelihood of reconstructed paths, given the movement model;
+* `pf_plot_1d()` plots the depth time series from observed and reconstructed paths;
+* `pf_plot_2d()` maps the reconstructed paths in two-dimensions;
+* `pf_plot_3d()` maps the reconstructed paths in three-dimensions; 
 
 ## Simulation tools 
 
