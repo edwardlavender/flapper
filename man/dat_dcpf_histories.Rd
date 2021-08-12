@@ -5,7 +5,7 @@
 \alias{dat_dcpf_histories}
 \title{Example DCPF algorithm output: particle histories}
 \format{
-A named list, with two elements, which records the parameters used in the call to \code{\link[flapper]{dcpf}} and the particles sampled at each time step:
+A named list, with two elements, which records the parameters used in the call to \code{\link[flapper]{pf}} and the particles sampled at each time step:
 \describe{
   \item{args}{A named list that records the function arguments used to generate outputs.}
   \item{history}{A list of dataframes, one for each time step, that record particle samples. Each dataframe comprises \code{n = 10} rows and the following three columns:}
@@ -20,6 +20,6 @@ A named list, with two elements, which records the parameters used in the call t
 dat_dcpf_histories
 }
 \description{
-An example \code{\link[flapper]{.dcpf-class}} object. This comprises a named list of results from an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dcpf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The outputs include algorithm parameters and a list of dataframes that record the particles sampled at each time step. This is included principally to streamline function examples.
+An example \code{\link[flapper]{.pf-class}} object. This comprises a named list of results from an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dc}} and \code{\link[flapper]{pf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The outputs include algorithm parameters and a list of dataframes that record the particles sampled at each time step. This is included principally to streamline function examples.
 }
 \keyword{datasets}

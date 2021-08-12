@@ -13,7 +13,7 @@
 #'
 #' @details *Under the default options (\code{split = NULL}), the function starts with a blank map of the area and iterates over each time step, adding the `possible positions' of the individual to the map at each step. By continuously updating a single map, this approach is slow but minimises memory requirements. An alternative approach is to split the time series into chunks, implement an iterative approach within each chunk, and then maps for each chunk. This is implemented by \code{split}.
 #'
-#' @return The function returns a named list with the following elements. `args' is a named list of the arguments used to call the function. `archival' is the \code{archival} dataframe. This includes two new columns that define the lower and upper bounds for the possible depth of the individual on \code{bathy} at each time step (`depth_lwr' and `depth_upper') derived from \code{calc_depth_error} and, if \code{calc_availability = TRUE}, a logical vector that defines whether or not there are any cells on \code{bathy} of the required depth range at each time step. `spatial' is a named list, if \code{plot != 0}, which contains time step-specific (`map_timestep') and cumulative maps (`map_cumulative') of the individual's possible locations for each specified time step. `dc' is a \code{\link[raster]{raster}}, with the same properties as \code{bathy}, in which the value of each cell is the number of times that the depth in that cell overlapped with the individual's depth.
+#' @return The function returns a named list with the following elements. `args' is a named list of the arguments used to call the function. `archival' is the \code{archival} dataframe. This includes two new columns that define the lower and upper bounds for the possible depth of the individual on \code{bathy} at each time step (`depth_lwr' and `depth_upper') derived from \code{calc_depth_error} and, if \code{calc_availability = TRUE}, a logical vector that defines whether or not there are any cells on \code{bathy} of the required depth range at each time step. `spatial' is a named list, if \code{plot != 0}, which contains time step-specific (`map_timestep') and cumulative maps (`map_cumulative') of the individual's possible locations for each specified time step. `dc' is a \code{\link[raster]{raster}}, with the same properties as \code{bathy}, in which the value of each cell is the number of times that the depth in that cell overlapped with the individual's depth. (Location probability could be weighted by the proximity between the observed depth and the depths of cells within the range defined by the observed depth and the measurement error (i.e., \code{archival$depth[1] + calc_depth_error(archival$depth[1])[1], archival$depth[1] + calc_depth_error(archival$depth[1])[2]}), but this is not currently implemented.)
 #'
 #' @examples
 #' #### Define depth time series for examples
@@ -55,7 +55,7 @@
 #'   )
 #' )
 #'
-#' @seealso \code{\link[flapper]{dcq}} implements a faster version of this algorithm termed the `quick depth-contour' (DCQ) algorithm. Rather than considering the depth interval that the individual could have occupied at each time step, the DCQ algorithm considers a sequence of depth bins (e.g., 10 m bins), isolates these on the bathymetry \code{\link[raster]{raster}} (\code{bathy}) and counts the number of matches in each cell. The DCPF algorithm (see \code{\link[flapper]{dcpf}}) extends the DC algorithm via particle filtering to reconstruct possible movement paths over \code{bathy}. The ACDC algorithm (see \code{\link[flapper]{acdc}}) extends the depth-contour algorithm by integrating information from acoustic detections of individuals at each time step to restrict the locations in which depth contours are identified.
+#' @seealso \code{\link[flapper]{dcq}} implements a faster version of this algorithm termed the `quick depth-contour' (DCQ) algorithm. Rather than considering the depth interval that the individual could have occupied at each time step, the DCQ algorithm considers a sequence of depth bins (e.g., 10 m bins), isolates these on the bathymetry \code{\link[raster]{raster}} (\code{bathy}) and counts the number of matches in each cell. The DCPF algorithm (see \code{\link[flapper]{pf}}) extends the DC algorithm via particle filtering to reconstruct possible movement paths over \code{bathy}. The ACDC algorithm (see \code{\link[flapper]{acdc}}) extends the depth-contour algorithm by integrating information from acoustic detections of individuals at each time step to restrict the locations in which depth contours are identified.
 #'
 #' @author Edward Lavender
 #' @export
@@ -165,7 +165,7 @@ dc <- function(archival,
       }
       if(check_availability) archival$availability[i] <- raster::maxValue(avail) == 1
       use <- use + avail
-      if(plot != 0) {
+      if(plot[1] != 0) {
         if(archival$index[i] %in% plot){
           out$spatial[[i]] <- list(map_timestep = avail, map_cumulative = use)
         }
@@ -191,7 +191,7 @@ dc <- function(archival,
         }
         if(check_availability) d$availability[i] <- raster::maxValue(avail) == 1
         use <- use + avail
-        if(plot != 0) {
+        if(plot[1] != 0) {
           if(d$index[i] %in% plot){
             ret$spatial[[i]] <- list(map_timestep = avail, map_cumulative = use)
           }
@@ -204,7 +204,7 @@ dc <- function(archival,
     if(!is.null(cl)) parallel::stopCluster(cl)
     use_by_chunk     <- lapply(use_and_avail_by_chunk, function(elm) elm$use)
     avail_by_chunk   <- lapply(use_and_avail_by_chunk, function(elm) elm$avail)
-    if(plot != 0) {
+    if(plot[1] != 0) {
       spatial_by_chunk <- lapply(use_and_avail_by_chunk, function(elm) elm$spatial)
       out$spatial      <- purrr::flatten(spatial_by_chunk)
       names(out$spatial) <- as.character(plot)

@@ -37,15 +37,15 @@ This function is a wrapper for \code{\link[flapper]{lcp_over_surface}} designed 
 \details{
 If \code{calc_distances = TRUE}, distances are calculated with movement from the previous location to the `current' location (see Value).
 
-A useful application of this function in \code{\link[flapper]{flapper}} is the post-hoc evaluation of particle filtering movement algorithms (e.g., \code{\link[flapper]{dcpf}}). These can be implemented using movement models based on Euclidean or shortest distances. Since the former is typically much faster, a useful starting point is to implement the chosen algorithm using Euclidean distances and then, for the sample of paths reconstructed by the algorithm, use \code{\link[flapper]{lcp_interp}} to examine the similarity between Euclidean and shortest distances and the effects of updated distance values on movement probabilities. If a Euclidean distances implementation of an algorithm is acceptable (i.e., minimum swimming distances are not too large under the movement model), shortest distances from \code{\link[flapper]{lcp_interp}} can be used to adjust the movement probabilities to more realistic values. Alternatively,a shortest distances implementation of the movement path algorithm may be necessary.
+A useful application of this function in \code{\link[flapper]{flapper}} is the post-hoc evaluation of particle filtering movement algorithms (see \code{\link[flapper]{pf}}). These can be implemented using movement models based on Euclidean or shortest distances. Since the former is typically much faster, a useful starting point is to implement the chosen algorithm using Euclidean distances and then, for the sample of paths reconstructed by the algorithm, use \code{\link[flapper]{lcp_interp}} to examine the similarity between Euclidean and shortest distances and the effects of updated distance values on movement probabilities. If a Euclidean distances implementation of an algorithm is acceptable (i.e., minimum swimming distances are not too large under the movement model), shortest distances from \code{\link[flapper]{lcp_interp}} can be used to adjust the movement probabilities to more realistic values. Alternatively,a shortest distances implementation of the movement path algorithm may be necessary.
 
-This function can also be useful for visualising movement paths (e.g., via \code{\link[flapper]{dcpf_plot_3d}}).
+This function can also be useful for visualising movement paths (e.g., via \code{\link[flapper]{pf_plot_3d}}).
 }
 \examples{
 #### Define movement paths
 # We will interpolate LCPs between sequential locations
 # ... of a skate on the seabed
-# ... reconstructed by the DCPF algorithm (dcpf()), using the
+# ... reconstructed by the DCPF algorithm (dc() & pf()), using the
 # ... example dat_dcpf_* datasets. We extract the paths
 # ... and the surface over which movement occurred from this object:
 paths   <- dat_dcpf_paths
@@ -119,7 +119,7 @@ graphics::abline(0, 1, lty = 3)
 dcpf_args <- dat_dcpf_histories$args
 dcpf_args$calc_distance <- "lcp"
 dcpf_history <- do.call(dcpf, dcpf_args)
-paths <- dcpf_simplify(dcpf_history)
+paths <- pf_simplify(dcpf_history)
 # Interpolate paths
 paths_interp_4 <- lcp_interp(paths, surface)
 # Show the probabilities reported by the DCPF algorithm are the same as those

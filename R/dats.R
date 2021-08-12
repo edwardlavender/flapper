@@ -152,48 +152,6 @@
 
 #####################################
 #####################################
-#### dat_dcpf_histories
-
-#' @title Example DCPF algorithm output: particle histories
-#' @description An example \code{\link[flapper]{.dcpf-class}} object. This comprises a named list of results from an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dcpf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The outputs include algorithm parameters and a list of dataframes that record the particles sampled at each time step. This is included principally to streamline function examples.
-#'
-#' @format A named list, with two elements, which records the parameters used in the call to \code{\link[flapper]{dcpf}} and the particles sampled at each time step:
-#' \describe{
-#'   \item{args}{A named list that records the function arguments used to generate outputs.}
-#'   \item{history}{A list of dataframes, one for each time step, that record particle samples. Each dataframe comprises \code{n = 10} rows and the following three columns:}
-#'   \itemize{
-#'     \item{id_current}{ An integer that uniquely defines each location on the bathymetry \code{\link[raster]{raster}} (\code{bathy}).}
-#'     \item{pr_current} A double that defines the probability of movement into each cell.
-#'     \item{timestep}{ An integer that defines each time step.}
-#'   }
-#' }
-#'
-"dat_dcpf_histories"
-
-
-#####################################
-#####################################
-#### dat_dcpf_paths
-
-#' @title Example DCPF algorithm output: reconstructed paths
-#' @description An example \code{\link[flapper]{dcpf-class}} object. This comprises a dataframe of movement paths reconstructed by an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dcpf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The resultant particle histories (\code{\link[flapper]{dat_dcpf_histories}}) were processed into this set of movement paths by \code{\link[flapper]{dcpf_simplify}}. This dataset is included principally to streamline function examples.
-#'
-#' @format A dataframe with seven columns and 180 observations that records the reconstructed paths. This contains the following columns:
-#' \describe{
-#'     \item{path_id}{ An integer that uniquely defines each path.}
-#'     \item{timestep}{ An integer that defines each time step.}
-#'     \item{cell_id}{ An integer that defines the cells ID of the surface raster (over which paths were reconstructed) retained by the algorithm.}
-#'     \item{cell_x}{ A double that defines the cell x coordinate.}
-#'     \item{cell_y}{ A double that defines the cell y coordinate.}
-#'     \item{cell_z}{ A double that defines the value of the surface raster in each cell.}
-#'     \item{cell_pr}{ A double that defines the probability of movement into each cell, given immediately preceding sampled locations (or the origin).}
-#'   }
-#'
-"dat_dcpf_paths"
-
-
-#####################################
-#####################################
 #### dat_centroids
 
 #' @title Example acoustic centroids from \code{\link[flapper]{acdc_setup_centroids}}
@@ -201,6 +159,26 @@
 #'
 #' @format A list with 57 elements, one for each receiver from 1:max(\code{\link[flapper]{dat_moorings}$receiver_id}). Each element contains a SpatialPolygonsDataFrame with the acoustic centroids for that receiver, under a detection range of 425 m, a mobility parameter of 200 m, 25 time steps and within the boundaries defined by \code{\link[flapper]{dat_coast}} and \code{\link[flapper]{dat_gebco}}.
 "dat_centroids"
+
+
+#####################################
+#####################################
+#### dat_dc
+
+#' @title Example DC algorithm output
+#' @description A named list of outputs from \code{\link[flapper]{dc}}. This is included principally to streamline function examples.
+#'
+#' @format A named list with 4 elements:
+#' \describe{
+#'   \item{dc}{A \code{\link[raster]{raster}} that defines the number of times that the depth in each cell overlapped with the depth recorded in the individual's \code{archival} time series.}
+#'   \item{archival}{The \code{archival} dataframe inputted to \code{\link[flapper]{dc}}. This includes two new columns that define the lower and upper bounds for the possible depth of the individual on the bathymetry raster (\code{bathy}) at each time step (`depth_lwr' and `depth_upper') derived from \code{calc_depth_error} and, if \code{calc_availability = TRUE}, a logical vector that defines whether or not there are any cells on \code{bathy} of the required depth range at each time step.}
+#'   \item{args}{A named list of user inputs that record the parameters used to generate the outputs.}
+#' }
+#'
+#' @note \code{\link[flapper]{dc}} outputs may also contain a `spatial' element. This has not been retained for \code{\link[flapper]{dat_dc}} to minimise dataset size.
+#'
+#' @seealso See \code{\link[flapper]{dc}} for further information.
+"dat_dc"
 
 
 #####################################
@@ -220,6 +198,48 @@
 #'
 #' @seealso See \code{\link[flapper]{acdc-class}} for further information on this S3 class.
 "dat_acdc"
+
+
+#####################################
+#####################################
+#### dat_dcpf_histories
+
+#' @title Example DCPF algorithm output: particle histories
+#' @description An example \code{\link[flapper]{.pf-class}} object. This comprises a named list of results from an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dc}} and \code{\link[flapper]{pf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The outputs include algorithm parameters and a list of dataframes that record the particles sampled at each time step. This is included principally to streamline function examples.
+#'
+#' @format A named list, with two elements, which records the parameters used in the call to \code{\link[flapper]{pf}} and the particles sampled at each time step:
+#' \describe{
+#'   \item{args}{A named list that records the function arguments used to generate outputs.}
+#'   \item{history}{A list of dataframes, one for each time step, that record particle samples. Each dataframe comprises \code{n = 10} rows and the following three columns:}
+#'   \itemize{
+#'     \item{id_current}{ An integer that uniquely defines each location on the bathymetry \code{\link[raster]{raster}} (\code{bathy}).}
+#'     \item{pr_current} A double that defines the probability of movement into each cell.
+#'     \item{timestep}{ An integer that defines each time step.}
+#'   }
+#' }
+#'
+"dat_dcpf_histories"
+
+
+#####################################
+#####################################
+#### dat_dcpf_paths
+
+#' @title Example DCPF algorithm output: reconstructed paths
+#' @description An example \code{\link[flapper]{pf-class}} object. This comprises a dataframe of movement paths reconstructed by an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dc}} and \code{\link[flapper]{pf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The resultant particle histories (\code{\link[flapper]{dat_dcpf_histories}}) were processed into this set of movement paths by \code{\link[flapper]{pf_simplify}}. This dataset is included principally to streamline function examples.
+#'
+#' @format A dataframe with seven columns and 180 observations that records the reconstructed paths. This contains the following columns:
+#' \describe{
+#'     \item{path_id}{ An integer that uniquely defines each path.}
+#'     \item{timestep}{ An integer that defines each time step.}
+#'     \item{cell_id}{ An integer that defines the cells ID of the surface raster (over which paths were reconstructed) retained by the algorithm.}
+#'     \item{cell_x}{ A double that defines the cell x coordinate.}
+#'     \item{cell_y}{ A double that defines the cell y coordinate.}
+#'     \item{cell_z}{ A double that defines the value of the surface raster in each cell.}
+#'     \item{cell_pr}{ A double that defines the probability of movement into each cell, given immediately preceding sampled locations (or the origin).}
+#'   }
+#'
+"dat_dcpf_paths"
 
 
 #### End of code.

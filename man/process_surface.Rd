@@ -16,7 +16,7 @@ process_surface(
 )
 }
 \arguments{
-\item{x}{A \code{\link[raster]{raster}} to be processed. For implementations preceding a call to of one of \code{\link[flapper]{flapper}}'s particle filtering algorithms, \code{x} should be planar (i.e., Universal Transverse Mercator projection) with equal resolution in the x, y directions and identical units in the x, y and z directions (e.g., see \code{\link[flapper]{dcpf}}).}
+\item{x}{A \code{\link[raster]{raster}} to be processed. For implementations preceding a call to of one of \code{\link[flapper]{flapper}}'s particle filtering algorithms, \code{x} should be planar (i.e., Universal Transverse Mercator projection) with equal resolution in the x, y directions and identical units in the x, y and z directions (see \code{\link[flapper]{pf}}).}
 
 \item{fact}{A positive integer that defines by how much \code{x} should be aggregated (see \code{\link[raster]{aggregate}}).}
 
@@ -39,7 +39,7 @@ The function returns a plot of the differences between the original and aggregat
 This function reduces the resolution of a \code{\link[raster]{raster}} by multiple aggregation methods and then quantifies the relative error induced by each method from the differences between the original values and the aggregated values. To implement the function, a \code{\link[raster]{raster}} (\code{x}) must be supplied as well as an aggregation factor (\code{fact}) and a named list of functions (\code{stat}) used to aggregate the \code{\link[raster]{raster}}. The \code{\link[raster]{raster}} is aggregated using each method (function) and mapped back onto the original resolution for calculation of the differences between the original \code{\link[raster]{raster}} and the aggregated \code{\link[raster]{raster}}(s). The function returns a visual statistical summary of the differences (if \code{plot = TRUE}) and a named list comprising the aggregated \code{\link[raster]{raster}}(s) and the re-sampled version(s) of those mapped back onto the original resolution.
 }
 \details{
-This function was motivated by the particle filtering algorithms in \code{\link[flapper]{flapper}} (e.g., \code{\link[flapper]{dcpf}}). For these algorithms, it is computationally beneficial to reduce \code{\link[raster]{raster}} resolution, where possible, by aggregation. To facilitate this process, this function quantifies the relative error induced by different aggregation functions. If appropriate, the particle filtering algorithm(s) can then be implemented using the aggregated \code{\link[raster]{raster}} that minimises the error, with the magnitude of that error propagated via the \code{depth_error} parameter.
+This function was motivated by the particle filtering algorithms in \code{\link[flapper]{flapper}} (e.g., \code{\link[flapper]{pf}}). For these algorithms, it is computationally beneficial to reduce \code{\link[raster]{raster}} resolution, where possible, by aggregation. To facilitate this process, this function quantifies the relative error induced by different aggregation functions. If appropriate, the particle filtering algorithm(s) can then be implemented using the aggregated \code{\link[raster]{raster}} that minimises the error, with the magnitude of that error propagated via the \code{depth_error} parameter.
 }
 \examples{
 # Define the raster for which to implement the function

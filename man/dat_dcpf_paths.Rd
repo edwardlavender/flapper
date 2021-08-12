@@ -20,6 +20,6 @@ A dataframe with seven columns and 180 observations that records the reconstruct
 dat_dcpf_paths
 }
 \description{
-An example \code{\link[flapper]{dcpf-class}} object. This comprises a dataframe of movement paths reconstructed by an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dcpf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The resultant particle histories (\code{\link[flapper]{dat_dcpf_histories}}) were processed into this set of movement paths by \code{\link[flapper]{dcpf_simplify}}. This dataset is included principally to streamline function examples.
+An example \code{\link[flapper]{pf-class}} object. This comprises a dataframe of movement paths reconstructed by an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dc}} and \code{\link[flapper]{pf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The resultant particle histories (\code{\link[flapper]{dat_dcpf_histories}}) were processed into this set of movement paths by \code{\link[flapper]{pf_simplify}}. This dataset is included principally to streamline function examples.
 }
 \keyword{datasets}

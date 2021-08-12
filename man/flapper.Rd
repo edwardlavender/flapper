@@ -120,15 +120,14 @@ The main thrust of flapper is the implementation of existing and new algorithms 
   }
   \item The AC, DC and ACDC particle filtering algorithms
   \itemize{
-    \item \link{dcpf_setup_movement_pr} provides a simple movement model that defines the probability of movement between locations given the distance between them;
-    \item \link{dcpf_setup_cells_by_time} defines the \code{cells_by_time} list for \link{dcpf}
-    \item \link{dcpf} implements the DCPF algorithm;
-    \item \link{dcpf_plot_history} plots simulated particle histories;
-    \item \link{dcpf_simplify} assembles movement paths from particle histories;
-    \item \link{dcpf_loglik} calculates the log-likelihood of reconstructed paths, given the movement model;
-    \item \link{dcpf_plot_1d} plots the depth time series from observed and reconstructed paths;
-    \item \link{dcpf_plot_2d} maps the reconstructed paths in two-dimensions;
-    \item \link{dcpf_plot_3d} maps the reconstructed paths in three-dimensions;
+    \item \link{pf_setup_movement_pr} provides a simple movement model that defines the probability of movement between locations given the distance between them;
+    \item \link{pf} implements the PF routine, building on the AC, DC and ACDC algorithms to form the ACPF, DCPF and ACDCPF algorithms;
+    \item \link{pf_plot_history} plots simulated particle histories;
+    \item \link{pf_simplify} assembles movement paths from particle histories;
+    \item \link{pf_loglik} calculates the log-likelihood of reconstructed paths, given the movement model;
+    \item \link{pf_plot_1d} plots the depth time series from observed and reconstructed paths;
+    \item \link{pf_plot_2d} maps the reconstructed paths in two-dimensions;
+    \item \link{pf_plot_3d} maps the reconstructed paths in three-dimensions;
   }
 }
 }

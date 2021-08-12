@@ -98,13 +98,14 @@ depth <- data.frame(depth = depth)
 # This is relatively coarse in resolution, so we need to re-sample
 # ... the raster to generate a finer-resolution raster such that
 # ... our animal (e.g., a skate) can transition between cells
-# ... in the two-minutes between depth observations. For speed,
+# ... in the two-minutes between depth observations. We'll still restrict
+# ... raster resolution to minimise package dataset sizes though. For speed,
 # ... we will focus on a small area around the origin. We could
 # ... also process the raster in other ways (e.g., mask any areas of land)
 # ... to improve efficiency.
 surface    <- dat_gebco
 boundaries <- raster::extent(707884.6, 709884.6, 6253404, 6255404)
-blank      <- raster::raster(boundaries, res = c(5, 5))
+blank      <- raster::raster(boundaries, res = c(25, 25))
 surface    <- raster::resample(surface, blank)
 
 ## Define movement model
@@ -116,29 +117,38 @@ prettyGraphics::pretty_map(add_rasters = list(x = surface),
                            add_points = list(x = xy),
                            verbose = FALSE)
 
+#### (A) Implement DC algorithm
+dc_1 <- dc(archival = depth,
+           bathy = surface,
+           calc_depth_error = function(...) c(-30, 30),
+           plot = NULL
+           )
+dat_dc <- dc_1
+dat_dc$spatial <- NULL
+
 #### Example (1): Implement algorithm using default options
 # Note that because the bathymetry data is very coarse, we have to
 # ... force the depth_error to be high in this example.
-dcpf_1 <- dcpf(archival = depth,
-              bathy = surface,
-              origin  = xy,
-              calc_depth_error = function(...) c(-30, 30),
-              calc_distance = "euclid",
-              calc_distance_euclid_fast = FALSE,
-              calc_movement_pr =
-                function(distance,...) {
-                  pr <- stats::plogis(10 + distance * -0.05)
-                  pr[distance > 500] <- 0
-                  return(pr)
-                },
-              n = 10L,
-              seed = 2)
+dcpf_1 <- pf(record = lapply(dc_1$spatial, function(elm) elm$map_timestep),
+             origin  = xy,
+             calc_distance = "euclid",
+             calc_distance_euclid_fast = FALSE,
+             bathy = surface, # not needed, but retained for example ease
+             calc_movement_pr =
+               function(distance,...) {
+                 pr <- stats::plogis(10 + distance * -0.05)
+                 pr[distance > 500] <- 0
+                 return(pr)
+               },
+             n = 10L,
+             seed = 2)
 # The function returns a list with particle histories and arguments
+summary(dcpf_1)
 utils::str(dcpf_1)
-# Blank cells_by_time optional element in args to reduce dataset size
-dcpf_1$args$cells_by_time <- NULL
 dat_dcpf_histories <- dcpf_1
-dat_dcpf_paths     <- dcpf_simplify(dat_dcpf_histories)
+dat_dcpf_paths     <- pf_simplify(dat_dcpf_histories)
+saveRDS(dat_centroids, paste0(tempdir(), "/dat_dcpf_histories.rds"))
+file.size(paste0(tempdir(), "/dat_dcpf_histories.rds"))/1e6
 
 
 #####################################
@@ -179,9 +189,6 @@ file.size(paste0(tempdir(), "/dat_centroids.rds"))/1e6
 # ... useful for demonstrating plotting functions
 
 ## Prepare movement time series
-# Add required columns to dataframes:
-dat_acoustics$timestamp_num <- as.numeric(dat_acoustics$timestamp)
-dat_archival$timestamp_num  <- as.numeric(dat_archival$timestamp)
 # Focus on an example individual
 id <- 25
 acc <- dat_acoustics[dat_acoustics$individual_id == id, ]
@@ -204,13 +211,11 @@ prettyGraphics::pretty_line(acc$timestamp, add = TRUE)
 dat_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
-                 space_use = NULL,
                  detection_range = 425,
                  mobility = 200,
-                 depth_error = 2.5,
+                 calc_depth_error = function(...) c(-2.5, 2.5),
                  acc_centroids = dat_centroids,
                  plot = 1:50,
-                 png_param = list(),
                  progress = 3L,
                  verbose = TRUE,
                  con = "",
@@ -237,10 +242,12 @@ usethis::use_data(dat_archival, overwrite = TRUE)
 usethis::use_data(dat_coast, overwrite = TRUE)
 usethis::use_data(dat_gebco, overwrite = TRUE)
 # function example data
+usethis::use_data(dat_centroids, overwrite = TRUE)
+usethis::use_data(dat_dc, overwrite = TRUE)
+usethis::use_data(dat_acdc, overwrite = TRUE)
 usethis::use_data(dat_dcpf_histories, overwrite = TRUE)
 usethis::use_data(dat_dcpf_paths, overwrite = TRUE)
-usethis::use_data(dat_centroids, overwrite = TRUE)
-usethis::use_data(dat_acdc, overwrite = TRUE)
+
 
 #### End of code.
 #####################################

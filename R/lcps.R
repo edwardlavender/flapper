@@ -242,7 +242,7 @@ lcp_graph_surface <- function(surface, cost, verbose = TRUE,...){
 #'
 #' }
 #'
-#' @seealso This function is similar to \code{\link[raster]{distanceFromPoints}}, which returns a Raster* of Euclidean distances. For iterative applications across the same surface, \code{\link[flapper]{lcp_costs}} and \code{\link[flapper]{lcp_graph_surface}} can be implemented to define the cost matrix and the graph object outside of this function. These can be passed to \code{\link[flapper]{lcp_from_point}}, skipping the need to recompute these objects. For shortest-distances and/or paths between specific origin and destination coordinates, the \code{\link[flapper]{lcp_over_surface}} can be used. The particle filtering movement algorithms in \code{\link[flapper]{flapper}} (i.e., \code{\link[flapper]{dcpf}}, \code{acdcpf}) can implement this approach to ensure that movement paths are biologically realistic.
+#' @seealso This function is similar to \code{\link[raster]{distanceFromPoints}}, which returns a Raster* of Euclidean distances. For iterative applications across the same surface, \code{\link[flapper]{lcp_costs}} and \code{\link[flapper]{lcp_graph_surface}} can be implemented to define the cost matrix and the graph object outside of this function. These can be passed to \code{\link[flapper]{lcp_from_point}}, skipping the need to recompute these objects. For shortest-distances and/or paths between specific origin and destination coordinates, the \code{\link[flapper]{lcp_over_surface}} can be used. The particle filtering movement algorithms in \code{\link[flapper]{flapper}} (i.e., \code{\link[flapper]{pf}}) can implement this approach to ensure that movement paths are biologically realistic.
 #'
 #' @author Edward Lavender
 #' @export
@@ -1377,9 +1377,9 @@ lcp_over_surface <-
 #'
 #' @details If \code{calc_distances = TRUE}, distances are calculated with movement from the previous location to the `current' location (see Value).
 #'
-#' A useful application of this function in \code{\link[flapper]{flapper}} is the post-hoc evaluation of particle filtering movement algorithms (e.g., \code{\link[flapper]{dcpf}}). These can be implemented using movement models based on Euclidean or shortest distances. Since the former is typically much faster, a useful starting point is to implement the chosen algorithm using Euclidean distances and then, for the sample of paths reconstructed by the algorithm, use \code{\link[flapper]{lcp_interp}} to examine the similarity between Euclidean and shortest distances and the effects of updated distance values on movement probabilities. If a Euclidean distances implementation of an algorithm is acceptable (i.e., minimum swimming distances are not too large under the movement model), shortest distances from \code{\link[flapper]{lcp_interp}} can be used to adjust the movement probabilities to more realistic values. Alternatively,a shortest distances implementation of the movement path algorithm may be necessary.
+#' A useful application of this function in \code{\link[flapper]{flapper}} is the post-hoc evaluation of particle filtering movement algorithms (see \code{\link[flapper]{pf}}). These can be implemented using movement models based on Euclidean or shortest distances. Since the former is typically much faster, a useful starting point is to implement the chosen algorithm using Euclidean distances and then, for the sample of paths reconstructed by the algorithm, use \code{\link[flapper]{lcp_interp}} to examine the similarity between Euclidean and shortest distances and the effects of updated distance values on movement probabilities. If a Euclidean distances implementation of an algorithm is acceptable (i.e., minimum swimming distances are not too large under the movement model), shortest distances from \code{\link[flapper]{lcp_interp}} can be used to adjust the movement probabilities to more realistic values. Alternatively,a shortest distances implementation of the movement path algorithm may be necessary.
 #'
-#' This function can also be useful for visualising movement paths (e.g., via \code{\link[flapper]{dcpf_plot_3d}}).
+#' This function can also be useful for visualising movement paths (e.g., via \code{\link[flapper]{pf_plot_3d}}).
 #'
 #' @return The function returns a dataframe or a list depending on the input to \code{calc_distance}. If \code{calc_distance = FALSE}, the function returns a dataframe that defines, for each path (`path_id'), for each time step (`timestep'), a vector of the cell coordinates (`cell_x', `cell_y', `cell_z') on the \code{surface} that define the shortest path from the location at the previous time step to the location at the current time step. Thus, the first row contains the individual's initial location and subsequent rows for that time step (\code{timestep = 2}, since movement is considered from the location at the `previous' time step to the location at the `current' time step) include the sequential locations of an individual, were it to have moved along the shortest path, to the location at the next time step.  If \code{keep_cols = TRUE}, coordinate columns are suffixed by `.x' and the coordinates for each time step (as inputted) are included (with the `.y' suffix) along with any other columns in the inputted dataframe (\code{paths}).
 #'
@@ -1389,7 +1389,7 @@ lcp_over_surface <-
 #' #### Define movement paths
 #' # We will interpolate LCPs between sequential locations
 #' # ... of a skate on the seabed
-#' # ... reconstructed by the DCPF algorithm (dcpf()), using the
+#' # ... reconstructed by the DCPF algorithm (dc() & pf()), using the
 #' # ... example dat_dcpf_* datasets. We extract the paths
 #' # ... and the surface over which movement occurred from this object:
 #' paths   <- dat_dcpf_paths
@@ -1463,7 +1463,7 @@ lcp_over_surface <-
 #' dcpf_args <- dat_dcpf_histories$args
 #' dcpf_args$calc_distance <- "lcp"
 #' dcpf_history <- do.call(dcpf, dcpf_args)
-#' paths <- dcpf_simplify(dcpf_history)
+#' paths <- pf_simplify(dcpf_history)
 #' # Interpolate paths
 #' paths_interp_4 <- lcp_interp(paths, surface)
 #' # Show the probabilities reported by the DCPF algorithm are the same as those

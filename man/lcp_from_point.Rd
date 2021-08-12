@@ -112,7 +112,7 @@ lcp_dist <- lcp_from_point(origin = origin, surface = r, use_all_cores = TRUE)
 
 }
 \seealso{
-This function is similar to \code{\link[raster]{distanceFromPoints}}, which returns a Raster* of Euclidean distances. For iterative applications across the same surface, \code{\link[flapper]{lcp_costs}} and \code{\link[flapper]{lcp_graph_surface}} can be implemented to define the cost matrix and the graph object outside of this function. These can be passed to \code{\link[flapper]{lcp_from_point}}, skipping the need to recompute these objects. For shortest-distances and/or paths between specific origin and destination coordinates, the \code{\link[flapper]{lcp_over_surface}} can be used. The particle filtering movement algorithms in \code{\link[flapper]{flapper}} (i.e., \code{\link[flapper]{dcpf}}, \code{acdcpf}) can implement this approach to ensure that movement paths are biologically realistic.
+This function is similar to \code{\link[raster]{distanceFromPoints}}, which returns a Raster* of Euclidean distances. For iterative applications across the same surface, \code{\link[flapper]{lcp_costs}} and \code{\link[flapper]{lcp_graph_surface}} can be implemented to define the cost matrix and the graph object outside of this function. These can be passed to \code{\link[flapper]{lcp_from_point}}, skipping the need to recompute these objects. For shortest-distances and/or paths between specific origin and destination coordinates, the \code{\link[flapper]{lcp_over_surface}} can be used. The particle filtering movement algorithms in \code{\link[flapper]{flapper}} (i.e., \code{\link[flapper]{pf}}) can implement this approach to ensure that movement paths are biologically realistic.
 }
 \author{
 Edward Lavender
