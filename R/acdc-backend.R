@@ -32,8 +32,6 @@
 #' @seealso The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call \code{\link[flapper]{.acdc_pl}} which in turn calls this function. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
 #'
 #' @examples
-#' \dontrun{
-#'
 #' #### Step (1) Prepare study site grid
 #' # Grid resolution needs to be sufficiently high to capture detection probability/movement
 #' # And sufficiently low to minimise computational costs
@@ -64,21 +62,22 @@
 #'              arc$timestamp <= max(acc$timestamp) + 2*60, ]
 #'
 #' #### Example (1) Implement AC algorithm with default arguments
-#' out_acdc <- .acdc(acoustics = acc,
-#'                   bathy = gebco,
-#'                   detection_range = 425,
-#'                   mobility = 200,
-#'                   acc_centroids = dat_centroids)
+#' out_acdc_1 <- flapper:::.acdc(acoustics = acc,
+#'                               bathy = gebco,
+#'                               detection_range = 425,
+#'                               mobility = 200,
+#'                               acc_centroids = dat_centroids
+#'                               )
 #'
 #' #### Example (2) Implement ACDC algorithm with default arguments
-#' out_acdc <- .acdc(acoustics = acc,
-#'                   archival = arc,
-#'                   bathy = gebco,
-#'                   detection_range = 425,
-#'                   mobility = 200,
-#'                   calc_depth_error = function(...) c(-2.5, 2.5),
-#'                   acc_centroids = dat_centroids,
-#'                   )
+#' out_acdc_2 <- flapper:::.acdc(acoustics = acc,
+#'                               archival = arc,
+#'                               bathy = gebco,
+#'                               detection_range = 425,
+#'                               mobility = 200,
+#'                               calc_depth_error = function(...) c(-2.5, 2.5),
+#'                               acc_centroids = dat_centroids
+#'                               )
 #'
 #' #### Example (3) Implement AC or ACDC algorithm with detection probability kernels
 #'
@@ -120,50 +119,94 @@
 #'                                         map = gebco,
 #'                                         coastline = invert_poly(dat_coast))
 #' ## (D) Implement algorithm
-#' out_acdc <- .acdc(acoustics = acc,
-#'                   archival = arc,
-#'                   bathy = gebco,
-#'                   detection_range = 425,
-#'                   detection_kernels = kernels,
-#'                   detection_kernels_ovelaps = overlaps,
-#'                   detection_time_window = 10,
-#'                   mobility = 200,
-#'                   calc_depth_error = function(...) c(-2.5, 2.5),
-#'                   acc_centroids = dat_centroids,
-#'                   )
+#' out_acdc_3 <- flapper:::.acdc(acoustics = acc,
+#'                               archival = arc,
+#'                               bathy = gebco,
+#'                               detection_range = 425,
+#'                               detection_kernels = kernels,
+#'                               detection_kernels_ovelaps = overlaps,
+#'                               detection_time_window = 10,
+#'                               mobility = 200,
+#'                               calc_depth_error = function(...) c(-2.5, 2.5),
+#'                               acc_centroids = dat_centroids
+#'                               )
 #'
-#' #### Example (4): Implement AC or ACDC algorithm and write messages to file via 'con'
-#' out_acdc <- .acdc(acoustics = acc,
-#'                   archival = arc,
-#'                   bathy = gebco,
-#'                   detection_range = 425,
-#'                   mobility = 200,
-#'                   calc_depth_error = function(...) c(-2.5, 2.5),
-#'                   acc_centroids = dat_centroids,
-#'                   verbose = TRUE,
-#'                   con = paste0(tempdir(), "/", "acdc_log.txt")
-#'                  )
+#' #### Example (4): Compare outputs with/without detection probability and normalisation
+#' ## Without detection kernels
+#' out_acdc_4a <- flapper:::.acdc(acoustics = acc,
+#'                                archival = arc,
+#'                                bathy = gebco,
+#'                                detection_range = 425,
+#'                                mobility = 200,
+#'                                calc_depth_error = function(...) c(-2.5, 2.5),
+#'                                acc_centroids = dat_centroids
+#'                                )
+#' out_acdc_4b <- flapper:::.acdc(acoustics = acc,
+#'                                archival = arc,
+#'                                bathy = gebco,
+#'                                detection_range = 425, normalise = TRUE,
+#'                                mobility = 200,
+#'                                calc_depth_error = function(...) c(-2.5, 2.5),
+#'                                acc_centroids = dat_centroids
+#'                                )
+#' ## With detection kernels
+#' out_acdc_4c <- flapper:::.acdc(acoustics = acc,
+#'                                archival = arc,
+#'                                bathy = gebco,
+#'                                detection_range = 425,
+#'                                detection_kernels = kernels,
+#'                                mobility = 200,
+#'                                calc_depth_error = function(...) c(-2.5, 2.5),
+#'                                acc_centroids = dat_centroids
+#'                                )
+#' out_acdc_4d <- flapper:::.acdc(acoustics = acc,
+#'                                archival = arc,
+#'                                bathy = gebco,
+#'                                detection_range = 425,
+#'                                detection_kernels = kernels, normalise = TRUE,
+#'                                mobility = 200,
+#'                                calc_depth_error = function(...) c(-2.5, 2.5),
+#'                                acc_centroids = dat_centroids
+#'                                )
+#' ## Comparison of final maps
+#' pp <- par(mfrow = c(2, 2))
+#' raster::plot(out_acdc_4a$map, main = "4a")
+#' raster::plot(out_acdc_4b$map, main = "4b")
+#' raster::plot(out_acdc_4c$map, main = "4c")
+#' raster::plot(out_acdc_4d$map, main = "4d")
+#' par(pp)
+#'
+#' #### Example (5): Implement AC or ACDC algorithm and write messages to file via 'con'
+#' out_acdc_5 <- flapper:::.acdc(acoustics = acc,
+#'                               archival = arc,
+#'                               bathy = gebco,
+#'                               detection_range = 425,
+#'                               mobility = 200,
+#'                               calc_depth_error = function(...) c(-2.5, 2.5),
+#'                               acc_centroids = dat_centroids,
+#'                               verbose = TRUE,
+#'                               con = paste0(tempdir(), "/", "acdc_log.txt")
+#'                               )
 #' # Check log
 #' utils::head(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
 #' utils::tail(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
 #'
-#'
-#' #### Example (5): Implement AC or ACDC algorithm and return plotting information
+#' #### Example (6): Implement AC or ACDC algorithm and return plotting information
 #' # Specify plot = NULL to include plotting information for all time steps
 #' # ... or a vector to include this information for specific time steps
-#' out_acdc <- .acdc(acoustics = acc,
-#'                   archival = arc,
-#'                   bathy = gebco,
-#'                   space_use = NULL,
-#'                   detection_range = 425,
-#'                   mobility = 200,
-#'                   calc_depth_error = function(...) c(-2.5, 2.5),
-#'                   acc_centroids = dat_centroids,
-#'                   plot = NULL,
-#'                   verbose = TRUE,
-#'                   con = paste0(tempdir(), "/", "acdc_log.txt")
-#'                   )
-#' }
+#' out_acdc_6 <- flapper:::.acdc(acoustics = acc,
+#'                               archival = arc,
+#'                               bathy = gebco,
+#'                               space_use = NULL,
+#'                               detection_range = 425,
+#'                               mobility = 200,
+#'                               calc_depth_error = function(...) c(-2.5, 2.5),
+#'                               acc_centroids = dat_centroids,
+#'                               plot = NULL,
+#'                               verbose = TRUE,
+#'                               con = paste0(tempdir(), "/", "acdc_log.txt")
+#'                               )
+#'
 #'
 #' @author Edward Lavender
 #' @keywords internal
