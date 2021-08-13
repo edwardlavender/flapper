@@ -23,7 +23,8 @@ acdc(
   con = "",
   progress = 1L,
   split = NULL,
-  cl = NULL
+  cl = NULL,
+  varlist = NULL
 )
 }
 \arguments{
@@ -63,7 +64,7 @@ acdc(
 
 \item{split}{A character string that defines the time unit used to split acoustic time series into chunks (see \code{\link[flapper]{ac}}).}
 
-\item{cl}{A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel (see \code{\link[flapper]{ac}}).}
+\item{cl, varlist}{Parallelisation arguments to implement the algorithm in parallel (see \code{\link[flapper]{ac}}).}
 }
 \value{
 The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acdc}}, if applicable, are written to file.

@@ -20,7 +20,7 @@
 #' @param con If \code{verbose = TRUE}, \code{con} is character string defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}), an approach that is only implemented if the function is not implemented in parallel. Otherwise, \code{con} defines the directory into which to write .txt files, into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging. If the algorithm is implemented step-wise, then a single file is written to the specified directory named acdc_log.txt. If the algorithm is implemented chunk-wise, then an additional file is written for each chunk (named dot_acdc_log_1.txt, dot_acdc_log_2.txt and so on), with the details for each chunk.
 #' @param progress (optional) If the algorithm is implemented step-wise, \code{progress} is an integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the archival time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar. If the algorithm is implemented for chunks, inputs to \code{progress} are ignored and a single progress bar is shown of the progress across acoustic chunks.
 #' @param split A character string that defines the time unit used to split acoustic time series into chunks (e.g., \code{"12 hours"}). If provided, this must be supported by \code{\link[lubridate]{floor_date}} (otherwise, a pre-defined list of acoustic time series can be passed to \code{acoustics}, e.g., specifying seasonal chunks). If \code{split = NULL} and a cluster has been specified (see \code{cl}) (and \code{acoustics} is a dataframe), then the acoustic time series is automatically split into chunks and the algorithm implemented for each chunk in parallel.
-#' @param cl A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the algorithm is implemented for each chunk in a list of acoustic time series as supplied by the user (if \code{acoustics} is a list) or of the time units specified via \code{split} by the user or defined automatically based on the number of nodes in the cluster if \code{split = NULL}.
+#' @param cl,varlist Parallelisation arguments. \code{cl} is cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the algorithm is implemented for each chunk in a list of acoustic time series, either (a) as supplied by the user (if \code{acoustics} is a list), (b) as defined by the input to \code{split}, or (c) as defined automatically from the number of nodes in the cluster if \code{split = NULL}. If \code{cl} is supplied, \code{varlist} may also be required. This is a character vector of objects to export. \code{varlist} is passed to the \code{varlist} of \code{\link[parallel]{clusterExport}}. Exported objects must be located in the global environment.
 #'
 #' @details The acoustic-centroid (AC) algorithm is an approach which uses acoustic detections to infer the possible locations of tagged animals within an area over some time interval. The locational information provided by acoustic detections is represented by acoustic centroids, which are areas around receivers that define where an individual could have been at each time point given the spatiotemporal pattern of detections at receivers, a model of detection probability and a movement parameter.
 #'
@@ -46,13 +46,13 @@
 #' #### Example (1) Implement AC algorithm with default arguments
 #' # This implements the algorithm on a single core, printing messages
 #' # ... to the console to monitor function progress.
-#' out_acdc <- ac(acoustics = acc,
-#'                step = 120,
-#'                bathy = dat_gebco,
-#'                detection_range = 425,
-#'                mobility = 200,
-#'                acc_centroids = dat_centroids
-#'                )
+#' out_ac <- ac(acoustics = acc,
+#'              step = 120,
+#'              bathy = dat_gebco,
+#'              detection_range = 425,
+#'              mobility = 200,
+#'              acc_centroids = dat_centroids
+#'              )
 #'
 #' #### Subsequent examples follow the implementation given in acdc().
 #'
@@ -76,7 +76,7 @@ ac <- function(acoustics,
                con = "",
                progress = 1L,
                split = NULL,
-               cl = NULL){
+               cl = NULL, varlist = NULL){
   # Initiate function
   t_onset <- Sys.time()
   message(paste0("flapper::ac() called (@ ", t_onset, ")..."))
@@ -104,8 +104,9 @@ ac <- function(acoustics,
         con = con,
         progress = progress,
         split = split,
-        cl = cl
-      )
+        cl = cl,
+        varlist = varlist
+        )
     t_end <- Sys.time()
     message(paste0("flapper::ac() finished (@ ", t_end, ")..."))
     return(out)

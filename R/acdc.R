@@ -23,7 +23,7 @@
 #' @param con If \code{verbose = TRUE}, \code{con} is character string defines how messages relaying function progress are returned (see \code{\link[flapper]{ac}}).
 #' @param progress An integer controlling the progress bar (see \code{\link[flapper]{ac}}).
 #' @param split A character string that defines the time unit used to split acoustic time series into chunks (see \code{\link[flapper]{ac}}).
-#' @param cl A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel (see \code{\link[flapper]{ac}}).
+#' @param cl,varlist Parallelisation arguments to implement the algorithm in parallel (see \code{\link[flapper]{ac}}).
 #'
 #' @details The acoustic-centroid depth-contour (ACDC) algorithm is an approach which integrates acoustic detections and depth observations to infer the possible locations of benthic or demersal animals within an area over some time interval. The locational information provided by acoustic detections is represented by acoustic centroids, which are areas around receivers that define where an individual could have been at each time point given the spatiotemporal pattern of detections at receivers, a model of detection probability and a movement parameter. The locational information provided by depth observations is represented by depth contours, which are areas that define where an individual could have been at each time point given its depth and the local bathymetry.
 #'
@@ -245,7 +245,7 @@ acdc <- function(acoustics,
                  con = "",
                  progress = 1L,
                  split = NULL,
-                 cl = NULL){
+                 cl = NULL, varlist = NULL){
   # Initiate function
   t_onset <- Sys.time()
   message(paste0("flapper::acdc() called (@ ", t_onset, ")..."))
@@ -274,7 +274,8 @@ acdc <- function(acoustics,
       con = con,
       progress = progress,
       split = split,
-      cl = cl
+      cl = cl,
+      varlist = varlist
     )
   t_end <- Sys.time()
   message(paste0("flapper::acdc() finished (@ ", t_end, ")..."))

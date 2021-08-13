@@ -22,7 +22,8 @@ ac(
   con = "",
   progress = 1L,
   split = NULL,
-  cl = NULL
+  cl = NULL,
+  varlist = NULL
 )
 }
 \arguments{
@@ -60,7 +61,7 @@ ac(
 
 \item{split}{A character string that defines the time unit used to split acoustic time series into chunks (e.g., \code{"12 hours"}). If provided, this must be supported by \code{\link[lubridate]{floor_date}} (otherwise, a pre-defined list of acoustic time series can be passed to \code{acoustics}, e.g., specifying seasonal chunks). If \code{split = NULL} and a cluster has been specified (see \code{cl}) (and \code{acoustics} is a dataframe), then the acoustic time series is automatically split into chunks and the algorithm implemented for each chunk in parallel.}
 
-\item{cl}{A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the algorithm is implemented for each chunk in a list of acoustic time series as supplied by the user (if \code{acoustics} is a list) or of the time units specified via \code{split} by the user or defined automatically based on the number of nodes in the cluster if \code{split = NULL}.}
+\item{cl, varlist}{Parallelisation arguments. \code{cl} is cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the algorithm is implemented for each chunk in a list of acoustic time series, either (a) as supplied by the user (if \code{acoustics} is a list), (b) as defined by the input to \code{split}, or (c) as defined automatically from the number of nodes in the cluster if \code{split = NULL}. If \code{cl} is supplied, \code{varlist} may also be required. This is a character vector of objects to export. \code{varlist} is passed to the \code{varlist} of \code{\link[parallel]{clusterExport}}. Exported objects must be located in the global environment.}
 }
 \value{
 The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acdc}}, if applicable, are written to file.
@@ -91,13 +92,13 @@ acc <- dat_acoustics[dat_acoustics$individual_id == id, ]
 #### Example (1) Implement AC algorithm with default arguments
 # This implements the algorithm on a single core, printing messages
 # ... to the console to monitor function progress.
-out_acdc <- ac(acoustics = acc,
-               step = 120,
-               bathy = dat_gebco,
-               detection_range = 425,
-               mobility = 200,
-               acc_centroids = dat_centroids
-               )
+out_ac <- ac(acoustics = acc,
+             step = 120,
+             bathy = dat_gebco,
+             detection_range = 425,
+             mobility = 200,
+             acc_centroids = dat_centroids
+             )
 
 #### Subsequent examples follow the implementation given in acdc().
 

@@ -11,7 +11,7 @@
 #' @param map (optional) A blank \code{\link[raster]{raster}}, with the same properties (i.e., dimensions, resolution, extent and coordinate reference system) as the area/bathymetry raster (see \code{bathy}), but in which all values are 0. If \code{NULL}, this is computed internally, but supplying a pre-defined raster can be more computationally efficient if the function is applied iteratively (e.g., over different time windows).
 #' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see also \code{\link[flapper]{acdc_setup_centroids}}).
 #' @param detection_kernels A named list of detection probability kernels, from \code{\link[flapper]{acdc_setup_detection_kernels}} and created using consistent parameters as specified for other \code{acdc_setup_*} functions and here (i.e., see the \code{overlaps}, \code{calc_detection_pr} and \code{map} arguments in \code{\link[flapper]{acdc_setup_detection_kernels}}).
-#' @param detection_kernels_overlap (optional) A named list, from \code{\link[flapper]{get_detection_centroids_overlap}}, that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers. If \code{detection_kernels_overlap} and \code{detection_time_window} (below) are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids; if unsupplied, receiver detection probability kernels are assumed not to overlap.
+#' @param detection_kernels_overlap (optional) A named list (the `list_by_receiver' element from \code{\link[flapper]{get_detection_centroids_overlap}}), that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers. If \code{detection_kernels_overlap} and \code{detection_time_window} (below) are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids; if unsupplied, receiver detection probability kernels are assumed not to overlap.
 #' @param detection_time_window (optional) A number that defines the maximum duration (s) between consecutive detections at different receivers such that they can be said to have occurred at `effectively the same time'. This indicates that the same transmission was detected by multiple receivers. If \code{detection_kernels_overlap} (above) and \code{detection_time_window} are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids, by up-weighting overlapping areas between receivers that detected the transmission and down-weighting overlapping areas between receivers that did not detect the transmission (see Details in \code{\link[flapper]{acdc_setup_detection_kernels}}).
 #' @param mobility A number that defines the distance (m) that an individual could move in the time steps between acoustic detections (see also \code{\link[flapper]{acdc_setup_centroids}}).
 #' @param calc_depth_error In the ACDC algorithm, \code{calc_depth_error} is function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.
@@ -367,11 +367,6 @@
           }
         }
       }
-      # Check detection_kernels_overlap
-      if(!is.null(detection_kernels_overlap)) {
-        if(!("list_by_receiver" %in% names(detection_kernels_overlap))) stop("'detection_kernels_overlap' must contain a 'list_by_receiver' element.")
-        detection_kernels_overlap <- detection_kernels_overlap$list_by_receiver
-      }
       # Check depth error
       if(!is.null(archival)){
         de_1 <- calc_depth_error(archival$depth[1])
@@ -387,7 +382,6 @@
         check_named_list(input = write_history)
         check_names(input = write_history, req = "filename")
         write_history$filename <- check_dir(input = write_history$filename, check_slash = TRUE)
-        write_history_dir <- write_history$filename
       }
     }
 
@@ -422,6 +416,8 @@
       map <- raster::mask(map, bathy)
     }
     map_cumulative <- map
+    # Directory in which to save files
+    write_history_dir <- write_history$filename
 
     ##### Define 'uniform' detection probability across study area if detection kernels unsupplied
     if(is.null(detection_kernels)){
@@ -690,13 +686,13 @@
                 receiver_id_at_time_all[receiver_id_at_time_all$timestamp == as.Date(receiver_1_timestamp), ]
               receiver_id_at_time_all$timestamp <- NULL
               receiver_id_at_time_all$receiver_id <- NULL
-              receiver_id_at_time_all <- as.integer(colnames(receiver_id_at_time_all)[receiver_id_at_time_all == 1])
-              receiver_id_at_time_all <- data.frame(receiver_id = receiver_id_at_time_all) # does not include receiver_1_id
 
               ## If there are overlapping receivers, we need to account for the overlap
-              if(nrow(receiver_id_at_time_all) > 0){
+              if(any(receiver_id_at_time_all == 1)){
                 use_detection_kernel_option_1 <- FALSE
-
+                receiver_id_at_time_all <- as.integer(colnames(receiver_id_at_time_all)[receiver_id_at_time_all == 1])
+                receiver_id_at_time_all <- data.frame(receiver_id = receiver_id_at_time_all,
+                                                      detection = 0)
                 # Check whether any overlapping receivers made a detection
                 # Only do this if the current and next detection are effectively at the same time (for speed)
                 if(time_btw_dets <= detection_time_window){
@@ -704,11 +700,10 @@
                   acc_at_time <- acoustics %>% dplyr::filter(.data$timestamp >= receiver_1_timestamp - detection_time_window &
                                                                .data$timestamp <= receiver_1_timestamp + detection_time_window)
                   # Identify unique receivers at which detections occurred within the clock drift
-                  receiver_id_at_time_acc <- data.frame(receiver_id = unique(acc_at_time$receiver_id),
-                                                        detection = 1)
-                  receiver_id_at_time_all$detection <- receiver_id_at_time_acc$detection[match(receiver_id_at_time_all$receiver_id,
-                                                                                               receiver_id_at_time_acc$receiver_id)]
-                  receiver_id_at_time_all$detection[is.na(receiver_id_at_time_all$detection)] <- 0
+                  if(nrow(acc_at_time) > 0){
+                    receiver_id_at_time_all$detection[which(receiver_id_at_time_all$receiver_id %in%
+                                                        unique(acc_at_time$receiver_id))] <- 1
+                  }
                 }
               }
             }
