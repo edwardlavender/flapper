@@ -112,40 +112,55 @@ acdc_setup_mobility <- function(depth,
 #### acdc_setup_n_centroids()
 
 #' @title Suggest the number of centroids for the AC* algorithm(s)
-#' @description The acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms require a list of acoustic centroids from \code{\link[flapper]{acdc_setup_centroids}}. The number of centroids that is required depends on (a) the duration between detections; (b) the distances among receivers; (c) the area of interest; and (d) other considerations such as the spatial extent and resolution of the bathymetry data that is required by the AC* algorithm(s) and presence or absence of a long tail of archival observations after the final acoustic detection. This function implements two approaches to facilitate a sensible choice of the number of centroids for the AC* algorithm(s) (see Details). This ensures that the number of centroids is sufficient to cover requirements but not so large that the centroids become slow to compute and unwieldy. The function requires a time series of detections, the deployment details of passive acoustic telemetry receivers and a mobility parameter. Given these inputs, the function returns a suggested upper and lower bound for the number of centroids.
+#' @description The acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms require a list of acoustic centroids from \code{\link[flapper]{acdc_setup_centroids}}. The number of centroids that is required depends on (a) the duration between detections; (b) the distances among receivers; (c) the area of interest; and (d) other considerations such as the spatial extent of the study area. This function implements three methods to facilitate a sensible choice of the number of centroids for the AC* algorithm(s) (see Details). This ensures that the number of centroids is sufficient to cover requirements but not so large that the centroids become slow to compute and unwieldy. The function requires a time series of detections, the time step length, the deployment details of passive acoustic telemetry receivers, a mobility parameter and a Spatial* or Raster* layer that defines the boundaries of the study site. Given these inputs, the function returns suggested bounds for the number of centroids.
 #'
-#' @param detections A POSIXct vector of time stamps when detections were made (for a particular individual).
-#' @param moorings A dataframe that defines passive acoustic telemetry receiver locations and deployment periods. This must contain the following columns: `receiver_id', a unique identifier of each receiver; `receiver_lat' and `receiver_long', the latitude and longitude of each receiver in decimal degrees; and `receiver_start_date' and `receiver_end_date', the start and end time of each receiver's deployment period (see \code{\link[flapper]{dat_moorings}} for an example).
-#' @param mobility A number that defines the distance (m) that an individual could move in the time period between archival observations (see also \code{\link[flapper]{acdc_setup_centroids}}).
-#' @param double A logical variable that defines whether or not to double the minimum number of centroids given by approach two (see Details).
-#' @param hist A logical value that defines whether or not to plot the distribution of gaps across the detection time series as a histogram.
-#' @param ... Additional arguments passed to \code{\link[prettyGraphics]{pretty_hist}}.
+#' @param detections For Method One, \code{detections} is a POSIXct vector of time stamps when detections were made (for a particular individual).
+#' @param step For Method One, \code{step} is the duration (s) between sequential time steps inbetween acoustic detections. For the ACDC algorithm, this is the duration between sequential archival observations.
+#' @param hist,... For Method One, \code{hist} is a logical value that defines whether or not to plot the distribution of gaps across the detection time series as a histogram and \code{...} includes any additional arguments passed to \code{\link[prettyGraphics]{pretty_hist}}.
+#' @param moorings For Method Two, \code{moorings} is a dataframe that defines passive acoustic telemetry receiver locations and deployment periods. This must contain the following columns: `receiver_id', a unique identifier of each receiver; `receiver_lat' and `receiver_long', the latitude and longitude of each receiver in decimal degrees; and `receiver_start_date' and `receiver_end_date', the start and end time of each receiver's deployment period (see \code{\link[flapper]{dat_moorings}} for an example).
+#' @param mobility For Methods Two and Three, \code{mobility} is a number that defines the distance (m) that an individual could move in the time period in the time steps between acoustic observations (see also \code{\link[flapper]{acdc_setup_centroids}}).
+#' @param double For Method Two, \code{double} is a logical variable that defines whether or not to double the minimum number of centroids (see Details).
+#' @param boundaries For Method Three, a Spatial* or Raster* object that defines the study site, from which area boundaries can be extracted (via \code{\link[raster]{extent}}).
 #'
 #' @details
-#' \subsection{Method (1)}{The first approach provides a reasonable upper bound for the number of centroids. This approach is based on the gaps between detections. During this time, acoustic centroids increase in size, reflecting the increasing uncertainty in the location of an individual, until the half way point between detections. At this point, uncertainty in the individual's location is maximised and the acoustic centroids reach their maximum size. Thereafter, uncertainty in the individual's location and the size of the acoustic centroids decrease towards the receiver at which the individual was next detected. Under this perspective, the minimum number of centroids is the number required such that the centroids continue to increase in size until the halfway point between the two most temporally distance detections. More specifically, assuming that archival time steps are two-minutes in duration, the minimum number of centroids is one quarter of the duration (minutes) of the longest gap between acoustic detections. To implement this approach, a time series of \code{detections} (for the individual and time period for which the AC* algorithm(s) will be implemented) needs to be provided. This approach provides a sensible upper bound for the number of centroids, since it allows centroids to continue to expand to their maximum possible size, given the data and the assumptions of the algorithm. However, even with modest gaps between detections and a modest movement capacity, this may suggest a very large area, and it may take a long time to compute the requisite number of centroids using \code{\link[flapper]{acdc_setup_centroids}}. Moreover, in practice, the area of interest may be smaller.}
+#' \subsection{Method (1)}{The first method provides a reasonable upper bound for the number of centroids. This method is based on the gaps between detections. During this time, acoustic centroids increase in size, reflecting the increasing uncertainty in the location of an individual, until the half way point between detections. At this point, uncertainty in the individual's location is maximised and the acoustic centroids reach their maximum size. Thereafter, uncertainty in the individual's location and the size of the acoustic centroids decrease towards the receiver at which the individual was next detected. Under this perspective, the minimum number of centroids is the number required such that the centroids continue to increase in size until the halfway point between the two most temporally distance detections. For example, if the time steps between acoustic detections are two-minutes in duration, the minimum number of centroids is one quarter of the duration (minutes) of the longest gap between acoustic detections. To implement this method, a time series of \code{detections} (for the individual and time period for which the AC* algorithm(s) will be implemented) and the time \code{step} length need to be provided. This method provides a sensible upper bound for the number of centroids, since it allows centroids to continue to expand to their maximum possible size, given the data and the assumptions of the algorithm. However, even with modest gaps between detections and a modest movement capacity, this may suggest a very large area, and it may take a long time to compute the requisite number of centroids using \code{\link[flapper]{acdc_setup_centroids}}. Moreover, in practice, the area of interest may be smaller.}
 #'
-#' \subsection{Method (2)}{The second approach provides a reasonable lower bound for the number of centroids. This approach is based on the locations of receivers and the assumption that, when an individual is detected by two different receivers, at the halfway point between detections, its potential location is described by the intersection of the acoustic centroid around the receiver at which it was previously detected and the centroid around the receiver at which it is next detected (evaluated at the halfway point between detections). Under this perspective, the minimum centroid size is half of the distance between the furthest two receivers that were operational at the same time. (This could be restricted to the subset of receivers at which the individual was detected sequentially but this is not implemented.) In practice, it is advisable to double this minimum number to ensure a reasonable degree of overlap between the centroids of the two receivers. To implement this approach, a dataframe that contains receiver locations and deployment periods (\code{moorings}) must be supplied, along with the \code{mobility} parameter that describes how far an individual could move in any archival time step. This approach provides a sensible lower bound for the number of centroids that is array-specific. However, it does not account for the full span of movements that are possible under the AC* algorithm(s).}
+#' \subsection{Method (2)}{The second method provides a reasonable lower bound for the number of centroids. This method is based on the locations of receivers and the assumption that, when an individual is detected by two different receivers, at the halfway point between detections, its potential location is described by the intersection of the acoustic centroid around the receiver at which it was previously detected and the centroid around the receiver at which it is next detected (evaluated at the halfway point between detections). Under this perspective, the minimum centroid size is half of the distance between the furthest two receivers that were operational at the same time. (This could be restricted to the subset of receivers at which the individual was detected sequentially but this is not implemented.) In practice, it is advisable to double this minimum number to ensure a reasonable degree of overlap between the centroids of the two receivers. To implement this method, a dataframe that contains receiver locations and deployment periods (\code{moorings}) must be supplied, along with the \code{mobility} parameter that describes how far an individual could move in any archival time step. This method provides a sensible lower bound for the number of centroids that is array-specific. However, it does not account for the full span of movements that are possible under the AC* algorithm(s).}
 #'
-#' \subsection{Other considerations}{In practice, the most appropriate number of centroids is likely to be a compromise between these minimum and maximum values that depends on other considerations, particularly the spatial scale of the study, the effect of boundaries on the final centroid size and, perhaps in some cases, the geographical range of the species. For acoustic time series that are followed by a long tail of archival observations after final acoustic detection, both approaches may underestimate the number of centroids required to capture the increasing uncertainty in the individual's location over this time. However, in this case, it is advisable to use the depth-contour (DC) algorithm (see \code{\link[flapper]{dc}}) at some point after the last acoustic detection since the influence of that observation on putative patterns of space use will decay through time and the DC algorithm is more computationally efficient.}
+#' \subsection{Method (3)}{The final method provides an alternative suggestion for the number of centroids based on the minimum number that is required for the largest centroid around each receiver to fill the study area. This method requires the locations of receivers and a Spatial* or Raster* layer that defines the study area, the bounndaries of which are approximated as a bounding box with four vertices and transformed to degrees latitude/longitude. For each receiver, the function calculates the distance to each of the four boundary coordinates. The longest distance between a receiver and a boundary of the study area is used to define the number of centroids required for the largest centroid to fill the study area. In many settings, this method may be most suitable because it accounts for the full span of movements that are possible under the AC* algorithm(s) while focusing on a specific area.}
 #'
-#' @return The function returns an integer vector with the upper and lower suggested value for the number of centroids from methods (1) and (2). The parameters used to generate these suggestions (i.e., \code{detections}, \code{moorings}, \code{mobility} and \code{double}) are also included in a `param' attribute.
+#' \subsection{Other considerations}{In practice, the most appropriate number of centroids is likely to be a compromise between these minimum and maximum values that depends on other considerations, particularly the spatial scale of the study, the effect of boundaries on the final centroid size and, perhaps in some cases, the geographical range of the species. For acoustic time series that are followed by a long tail of archival observations after final acoustic detection, both methodes may underestimate the number of centroids required to capture the increasing uncertainty in the individual's location over this time. However, in this case, it is advisable to use the depth-contour (DC) algorithm (see \code{\link[flapper]{dc}}) at some point after the last acoustic detection since the influence of that observation on putative patterns of space use will decay through time and the DC algorithm is more computationally efficient. If in doubt, opt to make more, rather than fewer centroids: if there are too few centroids, the AC* algorithm(s) can fail to converge if centroids around receivers with sequential detections do not overlap.}
+#'
+#' @return The function prints a table with the suggested number of centroids and the maximum radius size from each method. Invisibly, the function returns an integer vector with three suggested values for the number of centroids from methods (1), (2) and (3). The parameters used to generate these suggestions (i.e., \code{detections}, \code{moorings}, \code{mobility}, \code{double} and \code{boundaries}) are also included in a `param' attribute.
 #'
 #' @seealso This function is designed to facilitate an informed choice for the `n_timesteps' argument in \code{\link[flapper]{acdc_setup_centroids}}. \code{\link[flapper]{acdc_setup_mobility}} can also guide the implementation of this function. This underpins the AC and ACDC algorithms, which are implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}.
 #'
 #' @examples
 #' n_timesteps <-
-#'   acdc_setup_n_centroids(dat_acoustics$timestamp[dat_acoustics$individual_id == 25],
-#'                          dat_moorings,
+#'   acdc_setup_n_centroids(detections = dat_acoustics$timestamp[dat_acoustics$individual_id == 25],
+#'                          step = 120,
+#'                          moorings = dat_moorings,
 #'                          mobility = 200,
-#'                          double = TRUE)
+#'                          double = TRUE,
+#'                          boundaries = dat_gebco)
 #' utils::str(n_timesteps)
 #'
 #' @author Edward Lavender
 #' @export
 
-acdc_setup_n_centroids <- function(detections, moorings, mobility, double = TRUE, hist = TRUE,...){
+acdc_setup_n_centroids <- function(detections,
+                                   step,
+                                   hist = TRUE,...,
+                                   moorings,
+                                   mobility,
+                                   double = TRUE,
+                                   boundaries){
 
   #### Checks
+  # verbose = TRUE
+  # t_onset <- Sys.time()
+  # cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+  # cat_to_console(paste0("flapper::acdc_setup_n_centroids() called (@ ", t_onset, ")..."))
   # Check moorings contains required information
   check_names(input = moorings,
               req = c("receiver_id",
@@ -154,9 +169,10 @@ acdc_setup_n_centroids <- function(detections, moorings, mobility, double = TRUE
               extract_names = colnames,
               type = all)
 
-  #### Approach (1): Determine the maximum gap between detections
+  #### Method (1): Determine the maximum gap between detections
+  # cat_to_console("... Implementing Mpproach (1)...")
   # Calculate the duration of gaps
-  gaps <- Tools4ETS::serial_difference(detections, units = "mins")
+  gaps <- Tools4ETS::serial_difference(detections, units = "s")
   gaps <- as.numeric(gaps)
   max_gap <- max(gaps, na.rm = TRUE)
   # Visualise the distribution of gaps
@@ -164,12 +180,11 @@ acdc_setup_n_centroids <- function(detections, moorings, mobility, double = TRUE
     prettyGraphics::pretty_hist(gaps,...)
     graphics::abline(v = max_gap, col = "red", lty = 3)
   }
-  # The minimum number of time steps under this approach is max_gap/2/2
-  # ... assuming two minute time stamps
-  # ... and since after half way the centroid will start to shrink
-  minimum_n_timesteps_1 <- max_gap/2/2
+  # The minimum number of time steps under this method is max_gap/2/step
+  minimum_n_timesteps_1 <- ceiling(max_gap/2/step)
 
-  #### Approach (2): Determine the number of timesteps to overlap centroids between receivers
+  #### Method (2): Determine the number of timesteps to overlap centroids between receivers
+  # cat_to_console("... Implementing Method (2)...")
 
   ## Identify time intervals over which receivers were deployed
   moorings$interval <- lubridate::interval(moorings$receiver_start_date, moorings$receiver_end_date)
@@ -177,7 +192,7 @@ acdc_setup_n_centroids <- function(detections, moorings, mobility, double = TRUE
   ## Define the minimum number of timesteps for each combination of receivers
   # ... that was deployed for an overlapping interval
   minimum_n_timesteps_2 <-
-    pbapply::pbsapply(unique(moorings$interval), function(interval){
+    sapply(unique(moorings$interval), function(interval){
       # Identify receivers whose deployment periods overlapped with this interval
       moorings_tmp <- moorings
       moorings_tmp$overlap <- lubridate::int_overlaps(interval, moorings_tmp$interval)
@@ -193,15 +208,37 @@ acdc_setup_n_centroids <- function(detections, moorings, mobility, double = TRUE
   # ... which the the maximum of the minimum overlaps across all receivers
   minimum_n_timesteps_2 <- max(minimum_n_timesteps_2)
 
+  #### Method (3): The number of time steps for the centroids to fill the area
+  # cat_to_console("... Implementing Method (3)...")
+  rxy <- as.matrix(moorings[, c("receiver_long", "receiver_lat")])
+  ext <- raster::extent(boundaries)
+  ext <- sp::SpatialPoints(ext, proj4string = raster::crs(boundaries))
+  ext <- sp::spTransform(ext, sp::CRS("+proj=longlat +datum=WGS84 +no_defs"))
+  dist_from_rxy_to_boundaries <- raster::pointDistance(ext, rxy, lonlat = TRUE)
+  minimum_n_timesteps_3 <- ceiling(max(dist_from_rxy_to_boundaries)/mobility)
+
   #### Return suggestions
-  minimum_n_timesteps <- c(minimum_n_timesteps_1, minimum_n_timesteps_2)
+  # Collect suggestions
+  minimum_n_timesteps <- c(minimum_n_timesteps_1, minimum_n_timesteps_2, minimum_n_timesteps_3)
   minimum_n_timesteps <- as.integer(ceiling(minimum_n_timesteps))
-  attributes(minimum_n_timesteps)$method <- 1:2
+  attributes(minimum_n_timesteps)$method <- 1:3
   attributes(minimum_n_timesteps)$param <- list(detections = detections,
                                                 moorings = moorings,
                                                 mobility = mobility,
                                                 double = double)
-  return(minimum_n_timesteps)
+  # Print results
+  cat("Results -------------------------------\n")
+  results <- data.frame(method = c(1, 2, 3),
+                        n_centroids = minimum_n_timesteps,
+                        radius = minimum_n_timesteps * mobility)
+  rownames(results) <- NULL
+  print(results)
+  cat("---------------------------------------\n")
+  # Close function and return outputs
+  t_end <- Sys.time()
+  # duration <- difftime(t_end, t_onset, units = "mins")
+  # cat_to_console(paste0("... flapper::acdc_setup_n_centroids() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
+  return(invisible(minimum_n_timesteps))
 }
 
 
