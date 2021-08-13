@@ -212,6 +212,7 @@ acdc_setup_n_centroids <- function(detections,
   # cat_to_console("... Implementing Method (3)...")
   rxy <- as.matrix(moorings[, c("receiver_long", "receiver_lat")])
   ext <- raster::extent(boundaries)
+  if(is.na(raster::crs(boundaries))) stop("The 'boundaries' CRS is NA.")
   ext <- sp::SpatialPoints(ext, proj4string = raster::crs(boundaries))
   ext <- sp::spTransform(ext, sp::CRS("+proj=longlat +datum=WGS84 +no_defs"))
   dist_from_rxy_to_boundaries <- raster::pointDistance(ext, rxy, lonlat = TRUE)
