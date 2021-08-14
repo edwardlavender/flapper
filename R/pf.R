@@ -549,7 +549,8 @@ pf <- function(record,
   }
 
   ## Check and set up distance calculations and associated cluster options
-  calc_distance <- match.arg(calc_distance)
+  calc_distance             <- match.arg(calc_distance)
+  out_pf$args$calc_distance <- calc_distance
   if(calc_distance == "lcp") {
     if(is.null(bathy)) stop("'bathy' must be supplied if calc_distance = 'lcp'. ")
     if(!all.equal(raster::res(bathy)[1], raster::res(bathy)[2])){
