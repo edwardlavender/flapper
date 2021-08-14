@@ -26,7 +26,8 @@
 #' @param update_history_from_time_step If \code{update_history} is provided, \code{update_history_from_time_step} is an integer that defines the time step (i.e., element in \code{update_history}) from which to restart the algorithm. If provided, the algorithm continues from this point, by taking the starting positions for \code{n} particles from \code{update_history[[update_history_from_time_step]]$id_current}.
 #' @param cl,use_all_cores Parallelisation options. These can be implemented for the approaches that consider particles iteratively (i.e., \code{calc_distance = "euclid"} with \code{calc_distance_euclid_fast = FALSE}, or \code{calc_distance = "lcp"}). The algorithm can be parallelised within time steps over (1) particles via \code{cl} (an integer defining the number of child processes (ignored on Windows) or a cluster object created by \code{\link[parallel]{makeCluster}} (see \code{\link[pbapply]{pblapply}})) or (2) within particles for the calculation of shortest distances (if \code{calc_distance = "lcp"}) via a logical input (\code{TRUE}) to \code{use_all_cores}. For \code{calc_distance = "euclid"}, parallelisation is typically only beneficial for relatively large numbers of particles, because the substantial computation overhead associated with parallelisation across paths at each time step is substantial. For \code{calc_distance = "lcp"}, \code{use_all_cores = TRUE} is typically a better option for parallelisation; however, this may only be beneficial if \code{mobility} relatively large. At present, parallelisation is not very effective, especially if a cluster is supplied, and may be slower.
 #' @param seed (optional) An integer to define the seed for reproducible simulations (see \code{\link[base]{set.seed}}).
-#' @param verbose A logical variable that defines whether or not to print messages to the console to relay function progress.
+#' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console; otherwise, they are written to file (see below).
+#' @param con If \code{verbose = TRUE}, \code{con} is character string that defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}). Otherwise, \code{con} defines the full pathway to a .txt file (which can be created on-the-fly) into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging.
 #' @param ... Additional arguments (none implemented).
 #'
 #' @details
@@ -458,16 +459,31 @@ pf <- function(record,
                update_history_from_time_step = 1L,
                cl = NULL, use_all_cores = FALSE,
                seed = NULL,
-               verbose = TRUE,...){
+               verbose = TRUE, con = "",...){
 
   #### Set up function
-  # Function onset
-  cat_to_console <- function(..., show = verbose){
-    if(show) cat(paste(..., "\n"))
-  }
   t_onset <- Sys.time()
-  cat_to_console(paste0("flapper::pf() called (@ ", t_onset, ")..."))
-  cat_to_console("... Setting up function...")
+  if(con != ""){
+    if(!verbose) {
+      message("Input to 'con' ignored since verbose = FALSE.")
+    } else {
+      # Check directory
+      check_dir(input = dirname(con))
+      # Write black file to directory if required
+      if(!file.exists(con)){
+        message(paste0(con, " does not exist: attempting to write file in specified directory..."))
+        file.create(file1 = con)
+        message("... Blank file successfully written to file.")
+      }
+    }
+  }
+  ## Define function
+  append_messages <- ifelse(con == "", FALSE, TRUE)
+  cat_to_cf <- function(..., message = verbose, file = con, append = append_messages){
+    if(message) cat(paste(..., "\n"), file = con, append = append)
+  }
+  cat_to_cf(paste0("flapper::pf() called (@ ", t_onset, ")..."))
+  cat_to_cf("... Setting up function...")
 
   #### Define storage container for outputs
   if(!is.null(seed)) set.seed(seed)
@@ -546,7 +562,7 @@ pf <- function(record,
       stop(raster_comparison)
     }
     if(is.null(calc_distance_graph)){
-      cat_to_console("... Setting up cost-surface for calc_distance = 'lcp'...")
+      cat_to_cf("... Setting up cost-surface for calc_distance = 'lcp'...")
       costs <- lcp_costs(bathy, verbose = verbose)
       cost  <- costs$dist_total
       calc_distance_graph <- lcp_graph_surface(surface = bathy, cost = cost, verbose = verbose)
@@ -584,7 +600,7 @@ pf <- function(record,
 
   #### For first time step define set of cells that the individual could have occupied
   if(is.null(update_history)) {
-    cat_to_console("... Determining the set of possible starting locations (t = 1)...")
+    cat_to_cf("... Determining the set of possible starting locations (t = 1)...")
     cells_at_time_current <- raster::Which(x = record_1 > 0, cells = TRUE, na.rm = TRUE)
     cells_at_time_current <- data.frame(id_current = cells_at_time_current,
                                         pr_current = raster::extract(record_1, cells_at_time_current))
@@ -625,22 +641,22 @@ pf <- function(record,
       cells_at_time_current$pr_current  <- raster::extract(pr_1, cells_at_time_current$id)
     }
   } else {
-    cat_to_console("... Using update_history...")
-    cat_to_console(paste0("... Determining the set of possible starting locations for update (t = ",
+    cat_to_cf("... Using update_history...")
+    cat_to_cf(paste0("... Determining the set of possible starting locations for update (t = ",
                           update_history_from_time_step, ")..."))
     cells_at_time_current <- history[[update_history_from_time_step]]
   }
 
 
   #### Implement algorithm iteratively
-  cat_to_console("... Implementing algorithm iteratively over time steps...")
+  cat_to_cf("... Implementing algorithm iteratively over time steps...")
   for(t in update_history_from_time_step:length(record)){
 
     #### For the current time step, select likely cells
     ## Check there are available cells at the current time step; if not
     # ... movement model is insufficient
     # ... algorithm 'unlucky' in that all n paths up to this point are 'dead ends'
-    cat_to_console(paste0("... ... Time = ", t, "..."))
+    cat_to_cf(paste0("... ... Time = ", t, "..."))
     if(all(cells_at_time_current$pr_current == 0)) {
       message("The probability of all cells at time ", t, " is 0. Either (1) the algorithm has been 'unlucky' and all n = ", n, " particles up to this point have led to 'dead ends', (2) the mobility model ('mobility') is too limiting and/or (3) other model assumptions have been violated. The function will now stop, returning outputs up until this point.")
       out_pf$history <- history
@@ -649,7 +665,7 @@ pf <- function(record,
     }
     ## Select cells
     # Initial selection
-    cat_to_console("... ... ... Selecting candidate starting positions for the current time step...")
+    cat_to_cf("... ... ... Selecting candidate starting positions for the current time step...")
     cells_at_time_current_sbt <- cells_at_time_current[sample(x = 1:length(cells_at_time_current$id_current),
                                                               size = n,
                                                               prob = cells_at_time_current$pr_current,
@@ -657,7 +673,7 @@ pf <- function(record,
     # Re-implement selection, equally across all cells with non 0 Pr, if fewer than a threshold number of cells have been selected
     if(!is.null(resample)) {
       if(length(unique(cells_at_time_current_sbt$id_current)) < resample){
-        cat_to_console("... ... ... ... Resampling candidate starting positions for the current time step...")
+        cat_to_cf("... ... ... ... Resampling candidate starting positions for the current time step...")
         cells_at_time_current$pr_current_adj <- cells_at_time_current$pr_current
         cells_at_time_current$pr_current_adj[cells_at_time_current$pr_current_adj != 0] <- 1
         cells_at_time_current_sbt <- cells_at_time_current[sample(x = 1:length(cells_at_time_current$id_current),
@@ -675,7 +691,7 @@ pf <- function(record,
     if(t <= (length(record) - 1)) {
 
       ## Set up
-      cat_to_console("... ... ... For each particle, getting the possible positions for the next time step...")
+      cat_to_cf("... ... ... For each particle, getting the possible positions for the next time step...")
 
       # Get record for next time step
       record_at_time_next <- record[[t + 1]]
@@ -771,7 +787,7 @@ pf <- function(record,
   if(!is.null(seed)) set.seed(NULL)
   t_end <- Sys.time()
   total_duration <- difftime(t_end, t_onset, units = "mins")
-  cat_to_console(paste0("... flapper::pf() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+  cat_to_cf(paste0("... flapper::pf() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
   return(out_pf)
 
 }

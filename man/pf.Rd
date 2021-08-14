@@ -24,6 +24,7 @@ pf(
   use_all_cores = FALSE,
   seed = NULL,
   verbose = TRUE,
+  con = "",
   ...
 )
 }
@@ -62,7 +63,9 @@ pf(
 
 \item{seed}{(optional) An integer to define the seed for reproducible simulations (see \code{\link[base]{set.seed}}).}
 
-\item{verbose}{A logical variable that defines whether or not to print messages to the console to relay function progress.}
+\item{verbose}{A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console; otherwise, they are written to file (see below).}
+
+\item{con}{If \code{verbose = TRUE}, \code{con} is character string that defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}). Otherwise, \code{con} defines the full pathway to a .txt file (which can be created on-the-fly) into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging.}
 
 \item{...}{Additional arguments (none implemented).}
 }
