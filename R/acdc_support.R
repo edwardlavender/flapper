@@ -941,7 +941,7 @@ acdc_simplify <- function(acdc, mask = NULL, normalise = FALSE, keep_chunks = FA
     })
     # Sum the adjusted maps across chunks
     out$map <- raster::brick(maps)
-    out$map <- raster::calc(out$map, sum)
+    out$map <- raster::calc(out$map, sum, na.rm = TRUE)
 
     #### Simplify records
     ## Add chunk-specific records
