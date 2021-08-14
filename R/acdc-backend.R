@@ -724,6 +724,8 @@
                 }
               }
             }
+            # Re-scale kernels so that the most probable areas have a score of one
+            kernel <- kernel/raster::cellStats(kernel, "max")
 
             #### At other time steps (timestep_archival != 1 ) (in between detections),
             # ... we simply upweight areas away from receivers relative to those within detection centroids
