@@ -94,7 +94,6 @@ A number of functions facilitate the acquisition, assembly, processing and check
     * `process_receiver_id()` adds unique receiver IDs to a dataframe (i.e., if the same receiver has been deployed more than once);
     * `process_false_detections_sf()` passes putative false detections through a spatial filter which incorporates information on receiver locations and animal swimming speeds to interrogate their plausibility;
     * `process_quality_check()` passes acoustic data through some basic quality checks prior to analysis; 
-    * `process_behav_rest()` identifies 'resting' behaviour within depth time series;
     * `process_surface()` determines an 'optimum' raster aggregation method and error induced by this process;
 
 ## Spatial tools 
@@ -145,6 +144,15 @@ A number of functions facilitate the calculation of detection statistics, includ
 * `get_residents()` identifies 'resident' individuals;
 * `make_matrix_cooccurence()` computes a detection history similarity matrix across individuals;
 
+## Movement metrics
+
+Building on the analysis of detection time series, some functions (`get_mvt_*()`) provide movement metrics: 
+
+* `get_mvt_mobility_*()` functions estimate swimming speeds: 
+    * `get_mvt_mobility_from_acoustics()` estimates swimming speeds from acoustic detections; 
+    * `get_mvt_mobility_from_archival()` estimates swimming speeds from archival time series;
+* `get_mvt_resting_*()` identifies 'resting' behaviour from archival time series;
+    
 ## Space use algorithms
 
 The main thrust of `flapper` is the implementation of algorithms designed to infer space use from PAT data and their evaluation under different circumstances (e.g., array designs, movement models and detection models).

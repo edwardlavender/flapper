@@ -211,8 +211,6 @@ and checking of passive acoustic telemetry time series:
         their plausibility;
       - `process_quality_check()` passes acoustic data through some
         basic quality checks prior to analysis;
-      - `process_behav_rest()` identifies ‘resting’ behaviour within
-        depth time series;
       - `process_surface()` determines an ‘optimum’ raster aggregation
         method and error induced by this process;
 
@@ -304,6 +302,19 @@ of individuals:
   - `get_residents()` identifies ‘resident’ individuals;
   - `make_matrix_cooccurence()` computes a detection history similarity
     matrix across individuals;
+
+## Movement metrics
+
+Building on the analysis of detection time series, some functions
+(`get_mvt_*()`) provide movement metrics:
+
+  - `get_mvt_mobility_*()` functions estimate swimming speeds:
+      - `get_mvt_mobility_from_acoustics()` estimates swimming speeds
+        from acoustic detections;
+      - `get_mvt_mobility_from_archival()` estimates swimming speeds
+        from archival time series;
+  - `get_mvt_resting_*()` identifies ‘resting’ behaviour from archival
+    time series;
 
 ## Space use algorithms
 

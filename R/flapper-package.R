@@ -23,7 +23,6 @@
 #'     \item \link{process_receiver_id} adds unique receiver IDs to a dataframe (e.g., if the same receiver has been deployed more than once);
 #'     \item \link{process_false_detections_sf} passes putative false detections through a spatial filter which incorporates ancillary information on receiver locations and animal swimming speeds to interrogate their plausibility;
 #'     \item \link{process_quality_check} passes acoustic data through some basic quality checks prior to analysis;
-#'     \item \link{process_behav_rest} identifies `resting' behaviour within depth time series;
 #'     \item \link{process_surface} determines an 'optimum' \code{\link[raster]{raster}} aggregation method and error induced by this process;
 #'    }
 #' }
@@ -77,6 +76,17 @@
 #'   \item \link{get_detection_overlaps} identifies `overlapping' detections;
 #'   \item \link{get_residents} identifies `resident' individuals;
 #'   \item \link{make_matrix_cooccurence} computes a detection history similarity matrix across individuals;
+#' }
+#'
+#' @section Movement metrics:
+#' Building on the analysis of detection time series, some functions provide movement metrics:
+#' \itemize{
+#'   \item \link{get_mvt_mobility} functions estimate swimming speeds:
+#'   \itemize{
+#'     \item \link{get_mvt_mobility_from_acoustics} estimates swimming speeds from acoustic detections;
+#'     \item \link{get_mvt_mobility_from_archival} estimates swimming speeds from archival time series;
+#'   }
+#'   \item \link{get_mvt_resting} identifies `resting' behaviour from archival time series;
 #' }
 #'
 #' @section Space use algorithms:
