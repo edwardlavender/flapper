@@ -428,6 +428,7 @@
                     progress = 0L,
                     keep_args = FALSE,
                     write_history = write_history,
+                    chunk = i,
                     check = FALSE)
       return(.out)
     })

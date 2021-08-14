@@ -23,7 +23,8 @@
 #' @param con If \code{verbose = TRUE}, \code{con} is character string that defines the full pathway to a .txt file (which can be created on-the-fly) into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging.
 #' @param progress (optional) If the algorithm is implemented step-wise, \code{progress} is an integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the `archival' time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar. If the algorithm is implemented for chunks, inputs to \code{progress} are ignored and a single progress bar is shown of the progress across acoustic chunks.
 #' @param keep_args A logical input that defines whether or not to include a list of function arguments in the outputs. This can be switched off if the function is applied iteratively.
-#' @param write_history (optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by acoustic and internal (archival) time steps. For example, the file for the first acoustic time step and the first archival time step is named acc_1_arc_1.
+#' @param chunk An integer that defines the chunk ID (from \code{\link[flapper]{.acdc_pl}}).
+#' @param write_history (optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by chunk ID, acoustic and internal (archival) time steps. For example, the file for the first chunk, the first acoustic time step and the first archival time step is named `chu_1_acc_1_arc_1'.
 #' @param check A logical input that defines whether or not to check function inputs. This can be switched off to improve computation time when the function is applied iteratively or via a front-end function (e.g., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).
 #' @param ... Additional arguments (none implemented).
 #'
@@ -230,6 +231,7 @@
     con = "",
     progress = 1L,
     keep_args = TRUE,
+    chunk = 1L,
     write_history = NULL,
     check = TRUE,
     ...
@@ -266,6 +268,7 @@
                        progress = progress,
                        keep_args = keep_args,
                        check = check,
+                       chunk = chunk,
                        write_history = write_history,
                        dots = list(...))
     }
@@ -834,7 +837,7 @@
         # Write to file
         if(!is.null(write_history)){
           write_history$x <- map_timestep
-          write_history$filename <- paste0(write_history_dir, "acc_", timestep_detection, "_arc_", timestep_archival)
+          write_history$filename <- paste0(write_history_dir, "chu_", chunk, "_acc_", timestep_detection, "_arc_", timestep_archival)
           do.call(raster::writeRaster, write_history)
         }
 

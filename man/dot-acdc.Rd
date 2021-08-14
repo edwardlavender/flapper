@@ -24,6 +24,7 @@
   con = "",
   progress = 1L,
   keep_args = TRUE,
+  chunk = 1L,
   write_history = NULL,
   check = TRUE,
   ...
@@ -68,7 +69,9 @@
 
 \item{keep_args}{A logical input that defines whether or not to include a list of function arguments in the outputs. This can be switched off if the function is applied iteratively.}
 
-\item{write_history}{(optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by acoustic and internal (archival) time steps. For example, the file for the first acoustic time step and the first archival time step is named acc_1_arc_1.}
+\item{chunk}{An integer that defines the chunk ID (from \code{\link[flapper]{.acdc_pl}}).}
+
+\item{write_history}{(optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by chunk ID, acoustic and internal (archival) time steps. For example, the file for the first chunk, the first acoustic time step and the first archival time step is named `chu_1_acc_1_arc_1'.}
 
 \item{check}{A logical input that defines whether or not to check function inputs. This can be switched off to improve computation time when the function is applied iteratively or via a front-end function (e.g., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).}
 
