@@ -222,16 +222,18 @@
     # ... to the previous dataframe. Then, when we split the dataframe, we won't be loosing information
     # ...because we've copied the last line.
     cat_to_cf("... ... Overlapping chunks...")
-    acoustics_ls_wth_overlap <-
-      lapply(2:(length(acoustics_ls)), function(i){
-        # define an adjusted dataframe, binds the previous dataframe
-        # ... with the first row of the dataframe in question:
-        adj <- rbind(acoustics_ls[[i-1]], acoustics_ls[[i]][1, ])
-        return(adj)
-      })
-    # Add back the final element:
-    acoustics_ls_wth_overlap[[length(acoustics_ls)]] <- acoustics_ls[[length(acoustics_ls)]]
-    names(acoustics_ls_wth_overlap) <- names(acoustics_ls)
+    if(length(acoustics_ls) > 1){
+      acoustics_ls_wth_overlap <-
+        lapply(2:(length(acoustics_ls)), function(i){
+          # define an adjusted dataframe, binds the previous dataframe
+          # ... with the first row of the dataframe in question:
+          adj <- rbind(acoustics_ls[[i-1]], acoustics_ls[[i]][1, ])
+          return(adj)
+        })
+      # Add back the final element:
+      acoustics_ls_wth_overlap[[length(acoustics_ls)]] <- acoustics_ls[[length(acoustics_ls)]]
+      names(acoustics_ls_wth_overlap) <- names(acoustics_ls)
+    } else acoustics_ls_wth_overlap <- acoustics_ls
 
     #### Additional checks
     # Check the number of rows in acoustics_ls_wth_overlap. This cannot be less than two.
