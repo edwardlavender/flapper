@@ -1,0 +1,287 @@
+#######################################
+#######################################
+#### get_mvt_mobility_*()
+
+#' @title Estimate individual swimming speeds from acoustic and archival data
+#' @description These functions are designed to provide `ballpark' estimates of individual swimming speeds from (a) acoustic detections at passive acoustic telemetry receivers (\code{\link[flapper]{get_mvt_mobility_from_acoustics}}) and archival (depth) time series (\code{\link[flapper]{get_mvt_mobility_from_archival}}).
+#'
+#' @param data A dataframe of animal movement time series used to estimate swimming speeds. For \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, \code{data} should contain passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). This must contain a vector of receiver IDs, named `receiver_id', and a POSIXct vector of time stamps when detections were made, named `timestamp'. For \code{\link[flapper]{get_mvt_mobility_from_archival}}, \code{data} is a dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This must contain a numeric vector of observed depths (m), named `depth', and a POSIXct vector of regular time stamps when observations were made, named `timestamp'. In either case, an additional column can be included to distinguish time series for different individuals (see \code{fct}).
+#' @param fct (optional) A character variable that defines the name of a column in \code{data} that distinguishes levels of a grouping variable (e.g., individuals).
+#' @param moorings In \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, \code{moorings} is \code{\link[sp]{SpatialPointsDataFrame}} that defines receiver locations (in the Universe Transverse Mercator coordinate reference system) and receiver IDs (in a column named `receiver_id').
+#' @param detection_range In \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, \code{detection_range} is a number that defines the detection range (m) of receivers.
+#' @param calc_distance In \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, \code{calc_distance} is a character that defines the method used to calculate distances between receivers. Currently supported options are Euclidean distances (\code{"euclid"}) or least-cost (shortest) path distances ("lcp") over a surface (see \code{bathy}).
+#' @param bathy In \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, if \code{calc_distance = "lcp"}, \code{bathy} is \code{\link[raster]{raster}} that defines the surface over which individual(s) moved. \code{bathy} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in x, y and z directions (m). The surface's resolution is taken to define the distance between horizontally and vertically connected cells and must be the same in both x and y directions. Any cells with NA values (e.g., due to missing data) are treated as `impossible' to move though by the algorithm (see \code{\link[flapper]{lcp_over_surface}}).
+#' @param transmission_interval (optional) In \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, \code{transmission_interval} is the (maximum) time delay between sequential acoustic transmissions.
+#' @param step (optional) In \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, \code{step} is a number that defines the time (s) interval over which to represent speeds. By default, speeds are calculated in m/s. If \code{step} is supplied, speeds are also calculated in m/step s, which can be easier to interpret. For \code{\link[flapper]{get_mvt_mobility_from_archival}}, `step' is set automatically as the duration (s) between sequential depth observations, which is assumed to remain constant through time.
+#'
+#' @details
+#'
+#' \subsection{Acoustic estimates}{Speed estimates from passive acoustic telemetry time series are derived from examination of detection patterns via \code{\link[flapper]{get_mvt_mobility_from_acoustics}}. For each \code{fct} group (e.g., individual), the function identifies sequential detections, which exceeded the maximum transmission interval, at receivers with non-overlapping detection centroids (areas within the detection range of each receiver). Assuming that all detections are true, these can only result from movement between receivers. For these movements, transition distances are calculated as Euclidean distances, via \code{\link[raster]{pointDistance}}, or shortest swimming distances, assuming movement over a surface, via \code{\link[flapper]{lcp_over_surface}}. Given that detections can arise from movement anywhere within the detection range of a receiver, three distances are calculated: an average distance, from receiver to receiver; a lower-bound distance, between the closest edges of receiver detection centroids (i.e., the average distance minus two times the detection range); and an upper-bound distance from the furthest edges of receiver detection ranges (i.e., the average distance plus two times the detection range). These estimates assume a uniform detection ranges over space. For each transition, distances are converted into an average, lower and upper speed (m/s) estimate (termed `speed_avg_ms`, `speed_min_ms` and `speed_max_ms` respectively). If \code{step} is supplied, speeds are also expressed per step. On many occasions, individuals will take indirect routes between receivers, resulting in inappropriately low speed estimates. However, if receivers are sufficiently close together such that individuals sometimes effectively transition directly between receivers, the faster speed estimates derived via this method may be quite informative about actual swimming speeds.}
+#'
+#' \subsection{Archival estimates}{Speed estimates from \code{archival} time series are derived from examination of changes in depth through time (vertical activity) via \code{\link[flapper]{get_mvt_mobility_from_archival}}. For each individual, speed is calculated from the vertical distances (m) between sequential, regular depth (m) observations over time (s). Speeds are also expressed per step, where `step' is the duration (s) between sequential observations.}
+#'
+#' @return Both functions print a statistical summary of the speed estimates to the console and return a dataframe with observations and the corresponding speed estimates invisibly.
+#'
+#' For \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, for each speed estimate, the minimum, mean and maximum speeds are printed, in units of m/s and, if specified, m/step. The returned dataframe defines all transitions between receivers and includes the following columns:
+#' \itemize{
+#'   \item \code{fct} is the grouping factor (if specified);
+#'   \item \code{receiver_id_1} and \code{receiver_id_2} are the receiver IDs for each transition between receivers;
+#'   \item \code{timestamp_1} and \code{timestamp_2} are the time stamps of detections for each transition between receivers;
+#'   \item \code{time} is the duration (s) between \code{timestamp_1} and \code{timestamp_2};
+#'   \item \code{dist_min}, \code{dist_avg} and \code{dist_max} are the estimates for the distance (m) travelled to transition between receivers;
+#'   \item \code{speed_min_ms}, \code{speed_avg_ms} and \code{speed_min_ms} are the corresponding speed (m/s) estimates;
+#'   \item \code{speed_min_mstep}, \code{speed_avg_mstep} and \code{speed_max_mstep} are the corresponding speed estimates, in m per step (if specified);
+#' }
+#'
+#' For \code{\link[flapper]{get_mvt_mobility_from_archival}}, the function prints a statistical summary of estimated speeds in m/s and m per `step', where `step' is the duration (s) between sequential depth observations. The function also invisibly returns dataframe of the estimates. This is as inputted, without any \code{fct} levels with fewer than two observations and with the following additional columns:
+#' \itemize{
+#'   \item \code{dist} is the distance (m) between sequential depth observations;
+#'   \item \code{speed_ms} is the speed (m/s) of vertical movement between sequential depth observations;
+#'   \item \code{speed_m_per_step} is the speed of vertical movement between sequential depth observations in units of m per step, where `step' is the duration (s) between sequential depth observations;
+#' }
+#'
+#' @examples
+#' #### Estimate mobility from acoustic data using Euclidean distances
+#' ## (A) Define receiver coordinates as SPDF in UTM CRS
+#' proj <- sp::CRS("+init=epsg:4326")
+#' proj_utm <- sp::CRS("+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
+#' moorings <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj)
+#' moorings <- sp::spTransform(moorings, proj_utm)
+#' moorings <- sp::SpatialPointsDataFrame(moorings, data.frame(receiver_id = dat_moorings$receiver_id))
+#' ## (B) Implement algorithm using Euclidean distances
+#' mob_1 <- get_mvt_mobility_from_acoustics(data = dat_acoustics,
+#'                                          fct = "individual_id",
+#'                                          moorings = moorings,
+#'                                          detection_range = 750,
+#'                                          transmission_interval = 120,
+#'                                          step = 120)
+#'
+#' #### Estimate mobility from acoustic data using LCP distances
+#' ## (A) Define receiver coordinates
+#' # ... (as above)
+#' ## (B) Define bathymetry surface for LCP calculations
+#' # Requirements: mask land; planar UTM projection; equal resolution;
+#' bathy <- raster::raster(ext = raster::extent(dat_gebco), resolution = 50)
+#' bathy <- raster::resample(dat_gebco, bathy, method = "bilinear")
+#' ## (C) Implement algorithm using LCP distances
+#' mob_2 <- get_mvt_mobility_from_acoustics(data = dat_acoustics,
+#'                                          fct = "individual_id",
+#'                                          moorings = moorings,
+#'                                          detection_range = 750,
+#'                                          calc_distance = "lcp",
+#'                                          bathy = bathy,
+#'                                          transmission_interval = 120,
+#'                                          step = 120)
+#'
+#' #### Estimate mobility from archival data
+#' # Note the use of 'individual_id' for 'fct' here is only appropriate
+#' # ... when there are no breaks in the time series.
+#' mob_3 <- get_mvt_mobility_from_archival(dat_archival, fct = "individual_id")
+#'
+#' @author Edward Lavender
+#' @name get_mvt_mobility
+NULL
+
+
+#### get_mvt_mobility_from_acoustics()
+#' @rdname get_mvt_mobility
+#' @export
+
+get_mvt_mobility_from_acoustics <- function(data,
+                                            fct = NULL,
+                                            moorings,
+                                            detection_range,
+                                            calc_distance = c("euclid", "lcp"),
+                                            bathy = NULL,
+                                            transmission_interval,
+                                            step = NULL){
+
+  #### Checks
+  check_names(input = data, req = c("receiver_id", "timestamp", fct), type = all)
+  if(!is.null(fct)) data$fct <- data[, fct] else data$fct <- 1L
+  moorings_data <- data.frame(moorings)
+  check_names(input = moorings_data, req = "receiver_id", type = all)
+  if(!all(unique(data$receiver_id) %in% moorings_data$receiver_id)) stop("Not all unique data$receiver_id are in moorings$receiver_id.")
+  calc_distance <- match.arg(calc_distance)
+  if(calc_distance == "lcp" & is.null(bathy)) stop("'bathy' is required for calc_distance = 'lcp'.")
+
+  #### Add receiver coordinates to data
+  coords <- sp::coordinates(moorings)
+  colnames(coords)   <- c("easting", "northing")
+  match_index        <- match(data$receiver_id, moorings$receiver_id)
+  data$easting  <- coords[match_index, "easting"]
+  data$northing <- coords[match_index, "northing"]
+
+  #### Define a dataframe of transitions between receivers
+  # These are the observations we will use to calculate speeds
+  # Note that we will only use detections separated by more than transmission_interval
+  # ... because some detections very close together in time tend to occur
+  # ... at receivers with overlapping detection ranges
+  # ... which causes issues for distance calculations, given we do not know
+  # ... the exact speed of the animals.
+  transitions <-
+    data %>%
+    dplyr::select(.data$fct, .data$timestamp, .data$receiver_id, .data$easting, .data$northing) %>%
+    dplyr::group_by(.data$fct) %>%
+    dplyr::arrange(.data$timestamp) %>%
+    dplyr::mutate(r_1 = .data$receiver_id,
+                  r_2 = dplyr::lead(.data$receiver_id),
+                  r_key = paste0(.data$r_1, "-", .data$r_2),
+                  t_1 = .data$timestamp,
+                  t_2 = dplyr::lead(.data$timestamp),
+                  time = as.numeric(difftime(.data$t_2, .data$t_1, units = "s")),
+                  easting_1 = .data$easting,
+                  northing_1 = .data$northing,
+                  easting_2 = dplyr::lead(.data$easting),
+                  northing_2 = dplyr::lead(.data$northing)) %>%
+    dplyr::select(-c(.data$timestamp, .data$receiver_id, .data$easting, .data$northing)) %>%
+    dplyr::filter(.data$r_1 != .data$r_2) %>%
+    dplyr::filter(.data$time >= transmission_interval) %>%
+    dplyr::filter(!is.na(.data$r_2))
+
+  #### Define unique receiver transitions
+  # We will use these to calculate distances
+  receiver_pairwise_dists <- transitions %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by(.data$r_key) %>%
+    dplyr::slice(1L) %>%
+    dplyr::select(.data$r_1, .data$r_2, .data$r_key, .data$easting_1, .data$northing_1, .data$easting_2, .data$northing_2)
+
+  #### Get distances between receivers
+  # Calculate distances between receivers using Euclidean/LCP distances
+  # Then process distances to account for detection radii
+  # ... Minus detection_range * 2 m from the distance between receivers to get a adjusted distance
+  # ... Then drop any detections at receivers that are within each other's distance
+  ## Define coordinates
+  origins      <- receiver_pairwise_dists[, c("easting_1", "northing_1")] %>% as.matrix()
+  destinations <- receiver_pairwise_dists[, c("easting_2", "northing_2")] %>% as.matrix()
+  ## Get distances
+  if(calc_distance == "euclid"){
+    receiver_pairwise_dists$dist_avg <- raster::pointDistance(origins, destinations, lonlat = FALSE)
+  } else {
+    receiver_pairwise_dists_lcps <- lcp_over_surface(origin = origins,
+                                                     destination = destinations,
+                                                     surface = bathy,
+                                                     goal = 3,
+                                                     combination = "pair",
+                                                     verbose = FALSE)
+    receiver_pairwise_dists$dist_avg <- receiver_pairwise_dists_lcps$dist_lcp
+  }
+
+  ## Adjust distances and drop spatially overlapping receivers
+  receiver_pairwise_dists <-
+    receiver_pairwise_dists %>%
+    dplyr::mutate(dist_min = .data$dist_avg - detection_range * 2,
+                  dist_max = .data$dist_avg + detection_range * 2) %>%
+    dplyr::filter(.data$dist_min > 0)
+
+  #### Update transitions
+  ## Filter transitions to include transitions between appropriate receivers
+  # ... (whose adjusted distance is more than 0 m!)
+  transitions <-
+    transitions %>% dplyr::filter(.data$r_key %in% receiver_pairwise_dists$r_key)
+  ## Add distances
+  match_index <- match(transitions$r_key, receiver_pairwise_dists$r_key)
+  transitions$dist_min <- receiver_pairwise_dists$dist_min[match_index]
+  transitions$dist_avg <- receiver_pairwise_dists$dist_avg[match_index]
+  transitions$dist_max <- receiver_pairwise_dists$dist_max[match_index]
+
+  #### Tidy transitions
+  transitions <- transitions %>%
+    dplyr::rename(receiver_id_1 = .data$r_1,
+                  receiver_id_2 = .data$r_2,
+                  timestamp_1 = .data$t_1,
+                  timestamp_2 = .data$t_2) %>%
+    dplyr::select(.data$fct,
+                  .data$receiver_id_1, .data$receiver_id_2,
+                  .data$timestamp_1, .data$timestamp_2,
+                  .data$time, .data$dist_min, .data$dist_avg, .data$dist_max
+                  )
+  if(is.null(fct)){
+    transitions$fct <- NULL
+  } else {
+    cnms <- colnames(transitions)
+    cnms[which(colnames(transitions) == "fct")] <- fct
+    colnames(transitions) <- cnms
+  }
+
+  #### Calculate speeds
+  ## Speeds (m/s)
+  transitions$speed_min_ms <- transitions$dist_min/transitions$time
+  transitions$speed_avg_ms <- transitions$dist_avg/transitions$time
+  transitions$speed_max_ms <- transitions$dist_max/transitions$time
+  cat("--------------------------------------\n")
+  cat("Estimates (m/s)-----------------------\n")
+  stats <- data.frame(variable = c("speed_min_ms", "speed_avg_ms", "speed_max_ms"),
+                      min = c(min(transitions$speed_min_ms), min(transitions$speed_avg_ms), min(transitions$speed_max_ms)),
+                      mean = c(mean(transitions$speed_min_ms), mean(transitions$speed_avg_ms), mean(transitions$speed_max_ms)),
+                      max = max(c(transitions$speed_min_ms), max(transitions$speed_avg_ms), max(transitions$speed_max_ms))
+                      )
+  stats$min  <- round(stats$min, 2)
+  stats$mean <- round(stats$mean, 2)
+  stats$max <- round(stats$max, 2)
+  print(stats)
+  cat("--------------------------------------\n")
+  ## Speeds (m per step)
+  if(!is.null(step)) {
+    transitions$speed_min_mstep <- transitions$speed_min_ms * step
+    transitions$speed_avg_mstep <- transitions$speed_avg_ms * step
+    transitions$speed_max_mstep <- transitions$speed_max_ms * step
+    cat("Estimates (m/step)--------------------\n")
+    stats <- data.frame(variable = c("speed_min_mstep", "speed_avg_mstep", "speed_max_mstep"),
+                        min = c(min(transitions$speed_min_mstep), min(transitions$speed_avg_mstep), min(transitions$speed_max_mstep)),
+                        mean = c(mean(transitions$speed_min_mstep), mean(transitions$speed_avg_mstep), mean(transitions$speed_max_mstep)),
+                        max = max(c(transitions$speed_min_mstep), min(transitions$speed_avg_mstep), min(transitions$speed_max_mstep))
+                        )
+    stats$min  <- round(stats$min, 2)
+    stats$mean <- round(stats$mean, 2)
+    stats$max <- round(stats$max, 2)
+    print(stats)
+    cat("--------------------------------------\n")
+  }
+
+  #### Return outputs
+  return(invisible(transitions))
+}
+
+
+#### get_mvt_mobility_from_archival()
+#' @rdname get_mvt_mobility
+#' @export
+
+get_mvt_mobility_from_archival <- function(data, fct = NULL){
+  check_names(input = data, req = c("timestamp", "depth", fct), type = all)
+  if(!is.null(fct)) data$fct <- data[, fct] else data$fct <- 1L
+  id_n_obs <-
+    data %>%
+    dplyr::group_by(.data$fct) %>%
+    dplyr::summarise(n = dplyr::n(), .groups = "drop_last")
+  if(any(id_n_obs$n <= 2)){
+    id_to_drop <- id_n_obs$fct[which(id_n_obs$n <= 2)]
+    warning(paste0("Too few observations for the following individual(s) for analysis: ", paste0("'", id_to_drop, collapse = "', "), "'."))
+    data <- data %>% dplyr::filter(.data$fct != id_to_drop)
+    if(nrow(data) <= 2) stop("Insufficient data data remaining for analysis.")
+  }
+  data_1 <- data %>% dplyr::filter(fct == unique(data$fct)[1])
+  step   <- as.numeric(difftime(data_1$timestamp[2], data_1$timestamp[1]), units = "secs")
+  data <-
+    data %>%
+    dplyr::group_by(.data$fct) %>%
+    dplyr::mutate(dist = abs(Tools4ETS::serial_difference(.data$depth)),
+                  speed_ms = .data$dist/step,
+                  speed_mstep = .data$dist) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(!is.na(.data$dist)) %>%
+    dplyr::select(-.data$fct)
+  cat("--------------------------------------\n")
+  cat("Estimates (m/s)-----------------------\n")
+  stats <- data.frame(variable = "speed", min = min(data$speed_ms), mean = mean(data$speed_ms), max = max(data$speed_ms))
+  stats[, 2:ncol(stats)] <- round(stats[, 2:ncol(stats)], 2)
+  print(stats)
+  cat("Estimates (m/step)--------------------\n")
+  stats <- data.frame(variable = "speed", min = min(data$speed_mstep), mean = mean(data$speed_mstep), max = max(data$speed_mstep))
+  stats[, 2:ncol(stats)] <- round(stats[, 2:ncol(stats)], 2)
+  print(stats)
+  cat("--------------------------------------\n")
+  return(invisible(data))
+}
