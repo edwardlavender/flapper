@@ -8,6 +8,7 @@
   acoustics,
   archival = NULL,
   step = 120,
+  plot_ts = TRUE,
   bathy,
   map = NULL,
   detection_range,
@@ -18,14 +19,13 @@
   mobility,
   calc_depth_error = function(...) c(-2.5, 2.5),
   normalise = FALSE,
-  plot = 1L,
-  plot_ts = TRUE,
+  chunk = 1L,
+  save_record_spatial = 1L,
+  write_record_spatial_for_pf = NULL,
+  save_args = TRUE,
   verbose = TRUE,
   con = "",
   progress = 1L,
-  keep_args = TRUE,
-  chunk = 1L,
-  write_history = NULL,
   check = TRUE,
   ...
 )
@@ -36,6 +36,8 @@
 \item{archival}{For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series for the same individual (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; a POSIXct vector of time stamps when observations were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.}
 
 \item{step}{A number that defines the time step length (s) between consecutive detections. If \code{archival} is supplied, this is the resolution of the archival data (e.g., 120 s).}
+
+\item{plot_ts}{A logical input that defines whether or not to the plot movement series before the algorithm is initiated.}
 
 \item{bathy}{A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC* algorithm) across the area within which the individual could have moved. For the ACDC algorithm, this must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).}
 
@@ -57,9 +59,13 @@
 
 \item{normalise}{A logical variable that defines whether or not to normalise the map of possible locations at each time step. In both cases, at each time step the possible locations of the individual are scaled so that the most probable locations have a score of 1 and other scores vary between 0--1. If \code{normalise = FALSE}, these scores are simply summed at each time step, in which case scores on the final map can be interpreted as the number of time steps when the individual could have been in any given location. In contrast, if \code{normalise = TRUE}, at each time step scores are normalised so that they sum to one; the consequence is that time steps with detections, when uncertainty in the individual's location concentrates in the detection centroid around a receiver, are weighted more strongly than time steps between detections, when the uncertainty in the individual's location is spread across a larger area. The final surface can be normalised within \code{\link[flapper]{acdc_simplify}}, with in each cell (0--1) providing a measure of the relative potential use of each location.}
 
-\item{plot}{An integer vector that defines the time steps for which to return the necessary spatial information required to plot the plausible locations of the individual, given detection and depth time series. \code{plot = 0} suppresses the return of this information and \code{plot = NULL} returns this information for all time steps.}
+\item{chunk}{An integer that defines the chunk ID (from \code{\link[flapper]{.acdc_pl}}).}
 
-\item{plot_ts}{A logical input that defines whether or not to the plot movement series before the algorithm is initiated.}
+\item{save_record_spatial}{An integer vector that defines the time steps for which to save a record of the spatial information from each time step. \code{save_record_spatial = 0} suppresses the return of this information and \code{save_record_spatial = NULL} returns this information for all time steps.}
+
+\item{write_record_spatial_for_pf}{(optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save a subset of the spatial record (specifically the \code{\link[raster]{raster}} of the individual's possible positions at each time step) to file. This forms the basis for extending maps of space use via particle filtering (see \code{\link[flapper]{pf}}.) The `filename' argument should be the directory in which to save files. Files are named by chunk ID, acoustic and internal (archival) time steps. For example, the file for the first chunk, the first acoustic time step and the first archival time step is named `chu_1_acc_1_arc_1'.}
+
+\item{save_args}{A logical input that defines whether or not to include a list of function arguments in the outputs. This can be switched off if the function is applied iteratively.}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console; otherwise, they are written to file (see below).}
 
@@ -67,18 +73,12 @@
 
 \item{progress}{(optional) If the algorithm is implemented step-wise, \code{progress} is an integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the `archival' time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar. If the algorithm is implemented for chunks, inputs to \code{progress} are ignored and a single progress bar is shown of the progress across acoustic chunks.}
 
-\item{keep_args}{A logical input that defines whether or not to include a list of function arguments in the outputs. This can be switched off if the function is applied iteratively.}
-
-\item{chunk}{An integer that defines the chunk ID (from \code{\link[flapper]{.acdc_pl}}).}
-
-\item{write_history}{(optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by chunk ID, acoustic and internal (archival) time steps. For example, the file for the first chunk, the first acoustic time step and the first archival time step is named `chu_1_acc_1_arc_1'.}
-
 \item{check}{A logical input that defines whether or not to check function inputs. This can be switched off to improve computation time when the function is applied iteratively or via a front-end function (e.g., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).}
 
 \item{...}{Additional arguments (none implemented).}
 }
 \value{
-The function returns a \code{\link[flapper]{.acdc-class}} object with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific information on the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{plot}). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{keep_args = TRUE}, otherwise the `args' element is \code{NULL}).
+The function returns a \code{\link[flapper]{.acdc-class}} object with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific information on the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{save_record_spatial}). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{save_args = TRUE}, otherwise the `args' element is \code{NULL}).
 }
 \description{
 This function is the back-end of the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms.
@@ -243,9 +243,9 @@ out_acdc_5 <- flapper:::.acdc(acoustics = acc,
 utils::head(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
 utils::tail(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
 
-#### Example (6): Implement AC or ACDC algorithm and return plotting information
-# Specify plot = NULL to include plotting information for all time steps
-# ... or a vector to include this information for specific time steps
+#### Example (6): Implement AC or ACDC algorithm and return spatial information
+# Specify save_record_spatial = NULL to include spatial information for all time steps
+# ... (used for plotting) or a vector to include this information for specific time steps
 out_acdc_6 <- flapper:::.acdc(acoustics = acc,
                               archival = arc,
                               bathy = gebco,
@@ -254,7 +254,7 @@ out_acdc_6 <- flapper:::.acdc(acoustics = acc,
                               mobility = 200,
                               calc_depth_error = function(...) c(-2.5, 2.5),
                               acc_centroids = dat_centroids,
-                              plot = NULL,
+                              save_record_spatial = NULL,
                               verbose = TRUE,
                               con = paste0(tempdir(), "/", "acdc_log.txt")
                               )

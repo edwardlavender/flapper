@@ -930,7 +930,7 @@ acdc_simplify <- function(acdc, mask = NULL, normalise = FALSE, keep_chunks = FA
     maps_first <- lapply(acdc$.acdc, function(chunk) {
       map_1 <- chunk$record[[1]]$spatial[[1]]$map_timestep
       if(is.null(map_1)) {
-        stop("chunk$record[[1]]$spatial[[1]]$map_timestep is NULL. In flapper::acdc(), plot = 1L (or greater/NULL) is required to return the necessary spatial information to correct for overlapping detection time series across chunks in the summation of chunk-specific maps.")
+        stop("chunk$record[[1]]$spatial[[1]]$map_timestep is NULL. In flapper::acdc(), save_spatial_record = 1L (or greater/NULL) is required to return the necessary spatial information to correct for overlapping detection time series across chunks in the summation of chunk-specific maps.")
       }
       return(map_1)
     })

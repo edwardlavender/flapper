@@ -7,6 +7,7 @@
 #'
 #' @param acoustics A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{ac}}).
 #' @param archival A dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; and a POSIXct vector of time stamps when observations were made, named `timestamp'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.
+#' @param plot_ts A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.
 #' @param bathy A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).
 #' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see \code{\link[flapper]{ac}}).
 #' @param detection_kernels A named list of detection probability kernels (see \code{\link[flapper]{ac}}).
@@ -16,9 +17,9 @@
 #' @param mobility The mobility parameter (see \code{\link[flapper]{ac}}).
 #' @param calc_depth_error A function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.
 #' @param normalise A logical input that defines whether or not to normalise maps (see \code{\link[flapper]{ac}}).
-#' @param plot An integer of the spatial layers to save (see \code{\link[flapper]{ac}}).
-#' @param plot_ts A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.
-#' @param write_history A named list used to write time step-specific maps to file (see \code{\link[flapper]{ac}}).
+#' @param save_record_spatial An integer of the spatial layers to save (see \code{\link[flapper]{ac}}).
+
+#' @param write_record_spatial_for_pf A named list used to write time step-specific maps to file (see \code{\link[flapper]{ac}}).
 #' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress (see \code{\link[flapper]{ac}}).
 #' @param con If \code{verbose = TRUE}, \code{con} is character string defines how messages relaying function progress are returned (see \code{\link[flapper]{ac}}).
 #' @param progress An integer controlling the progress bar (see \code{\link[flapper]{ac}}).
@@ -89,8 +90,8 @@
 #' utils::head(acdc_log, 10)
 #' file.remove(paste0(tempdir(), "/acdc_log.txt"))
 #'
-#' #### Example (3): Implement the algorithm and return plotting information
-#' # Specify plot = NULL to include plotting information for all time steps
+#' #### Example (3): Implement the algorithm and return spatial information
+#' # Specify save_record_spatial = NULL to include spatial information for all time steps
 #' # ... or a vector to include this information for specific time steps
 #' out_acdc <- acdc(acoustics = acc,
 #'                  archival = arc,
@@ -99,7 +100,7 @@
 #'                  mobility = 200,
 #'                  calc_depth_error = function(...) c(-2.5, 2.5),
 #'                  acc_centroids = dat_centroids,
-#'                  plot = NULL
+#'                  save_record_spatial = NULL
 #'                  )
 #'
 #' #### Example (4): Implement the algorithm in parallel by supplying a cluster
@@ -202,7 +203,7 @@
 #'                      mobility = 200,
 #'                      calc_depth_error = function(...) c(-2.5, 2.5),
 #'                      acc_centroids = dat_centroids,
-#'                      plot = 1:10L,
+#'                      save_record_spatial = 1:10L,
 #'                      con = dir_id
 #'                      )
 #'     # Include logs in output
@@ -231,6 +232,7 @@
 
 acdc <- function(acoustics,
                  archival,
+                 plot_ts = TRUE,
                  bathy,
                  detection_range,
                  detection_kernels = NULL, detection_kernels_overlap = NULL, detection_time_window = 5,
@@ -238,14 +240,14 @@ acdc <- function(acoustics,
                  mobility,
                  calc_depth_error = function(...) c(-2.5, 2.5),
                  normalise = FALSE,
-                 plot = 1L,
-                 plot_ts = TRUE,
-                 write_history = NULL,
+                 save_record_spatial = 1L,
+                 write_record_spatial_for_pf = NULL,
                  verbose = TRUE,
                  con = "",
                  progress = 1L,
                  split = NULL,
-                 cl = NULL, varlist = NULL){
+                 cl = NULL,
+                 varlist = NULL){
   # Initiate function
   t_onset <- Sys.time()
   message(paste0("flapper::acdc() called (@ ", t_onset, ")..."))
@@ -258,18 +260,18 @@ acdc <- function(acoustics,
       acoustics = acoustics,
       archival = archival,
       step = as.numeric(difftime(archival$timestamp[2], archival$timestamp[1], units = "s")),
+      plot_ts = plot_ts,
       bathy = bathy,
       detection_range = detection_range,
       detection_kernels = detection_kernels,
       detection_kernels_overlap = detection_kernels_overlap,
       detection_time_window = detection_time_window,
+      acc_centroids= acc_centroids,
       mobility = mobility,
       calc_depth_error = calc_depth_error,
       normalise = normalise,
-      acc_centroids= acc_centroids,
-      plot = plot,
-      plot_ts = plot_ts,
-      write_history = write_history,
+      save_record_spatial = save_record_spatial,
+      write_record_spatial_for_pf = write_record_spatial_for_pf,
       verbose = verbose,
       con = con,
       progress = progress,

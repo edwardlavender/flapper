@@ -8,6 +8,7 @@ ac(
   acoustics,
   step,
   bathy,
+  plot_ts = TRUE,
   detection_range,
   detection_kernels = NULL,
   detection_kernels_overlap = NULL,
@@ -15,9 +16,8 @@ ac(
   acc_centroids,
   mobility,
   normalise = FALSE,
-  plot = 1L,
-  plot_ts = TRUE,
-  write_history = NULL,
+  save_record_spatial = 1L,
+  write_record_spatial_for_pf = NULL,
   verbose = TRUE,
   con = "",
   progress = 1L,
@@ -33,6 +33,8 @@ ac(
 
 \item{bathy}{A \code{\link[raster]{raster}} that defines a grid across the area within which the individual could have moved. The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).}
 
+\item{plot_ts}{A logical input that defines whether or not to the plot detection  time series before the algorithm is initiated.}
+
 \item{detection_range}{A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see also \code{\link[flapper]{acdc_setup_centroids}}).}
 
 \item{detection_kernels}{A named list of detection probability kernels, from \code{\link[flapper]{acdc_setup_detection_kernels}} and created using consistent parameters as specified for other \code{acdc_setup_*} functions and here (i.e., see the \code{overlaps}, \code{calc_detection_pr} and \code{map} arguments in \code{\link[flapper]{acdc_setup_detection_kernels}}).}
@@ -47,11 +49,9 @@ ac(
 
 \item{normalise}{A logical variable that defines whether or not to normalise the map of possible locations at each time step. In both cases, at each time step the possible locations of the individual are scaled so that the most probable locations have a score of 1 and other scores vary between 0--1. If \code{normalise = FALSE}, these scores are simply summed at each time step, in which case scores on the final map can be interpreted as the number of time steps when the individual could have been in any given location. In contrast, if \code{normalise = TRUE}, at each time step scores are normalised so that they sum to one; the consequence is that time steps with detections, when uncertainty in the individual's location concentrates in the detection centroid around a receiver, are weighted more strongly than time steps between detections, when the uncertainty in the individual's location is spread across a larger area. The final surface can be normalised within \code{\link[flapper]{acdc_simplify}}, with in each cell (0--1) providing a measure of the relative potential use of each location.}
 
-\item{plot}{An integer vector that defines the time steps for which to return the necessary spatial information required to plot the plausible locations of the individual, given detection and depth time series. \code{plot = 0L} suppresses the return of this information and \code{plot = NULL} returns this information for all time steps. If the algorithm is applied chunk-wise, this spatial information must be returned for at least the first time step (the default) to aggregate maps across chunks (see \code{\link[flapper]{acdc_simplify}}). This information can also be used to plot time-specific results of the algorithm using \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}}.}
+\item{save_record_spatial}{An integer vector that defines the time steps for which to save a record of the spatial information from each time step. \code{save_record_spatial = 0L} suppresses the return of this information and \code{save_record_spatial = NULL} returns this information for all time steps. If the algorithm is applied chunk-wise, this spatial information must be returned for at least the first time step (the default) to aggregate maps across chunks (see \code{\link[flapper]{acdc_simplify}}). This information can also be used to plot time-specific results of the algorithm using \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}}.}
 
-\item{plot_ts}{A logical input that defines whether or not to the plot detection  time series before the algorithm is initiated.}
-
-\item{write_history}{(optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by acoustic and internal (archival) time steps. For example, the file for the first acoustic time step and the first archival time step is named acc_1_arc_1.}
+\item{write_record_spatial_for_pf}{(optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by acoustic and internal (archival) time steps. For example, the file for the first acoustic time step and the first archival time step is named acc_1_arc_1.}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console (which is only supported if the algorithm is not implemented in parallel: see below); otherwise, they are written to file (see below).}
 

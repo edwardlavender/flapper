@@ -7,28 +7,29 @@
 #' @param acoustics A dataframe that contains passive acoustic telemetry detection time series for a specific individual (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named `receiver_id' (that must match that inputted to \code{\link[flapper]{acdc_setup_centroids}}); a POSIXct vector of time stamps when detections were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'.
 #' @param archival For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series for the same individual (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; a POSIXct vector of time stamps when observations were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.
 #' @param step A number that defines the time step length (s) between consecutive detections. If \code{archival} is supplied, this is the resolution of the archival data (e.g., 120 s).
+#' @param plot_ts A logical input that defines whether or not to the plot movement series before the algorithm is initiated.
 #' @param bathy A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC* algorithm) across the area within which the individual could have moved. For the ACDC algorithm, this must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).
 #' @param map (optional) A blank \code{\link[raster]{raster}}, with the same properties (i.e., dimensions, resolution, extent and coordinate reference system) as the area/bathymetry raster (see \code{bathy}), but in which all values are 0. If \code{NULL}, this is computed internally, but supplying a pre-defined raster can be more computationally efficient if the function is applied iteratively (e.g., over different time windows).
 #' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see also \code{\link[flapper]{acdc_setup_centroids}}).
 #' @param detection_kernels A named list of detection probability kernels, from \code{\link[flapper]{acdc_setup_detection_kernels}} and created using consistent parameters as specified for other \code{acdc_setup_*} functions and here (i.e., see the \code{overlaps}, \code{calc_detection_pr} and \code{map} arguments in \code{\link[flapper]{acdc_setup_detection_kernels}}).
 #' @param detection_kernels_overlap (optional) A named list (the `list_by_receiver' element from \code{\link[flapper]{get_detection_centroids_overlap}}), that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers. If \code{detection_kernels_overlap} and \code{detection_time_window} (below) are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids; if unsupplied, receiver detection probability kernels are assumed not to overlap.
 #' @param detection_time_window (optional) A number that defines the maximum duration (s) between consecutive detections at different receivers such that they can be said to have occurred at `effectively the same time'. This indicates that the same transmission was detected by multiple receivers. If \code{detection_kernels_overlap} (above) and \code{detection_time_window} are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids, by up-weighting overlapping areas between receivers that detected the transmission and down-weighting overlapping areas between receivers that did not detect the transmission (see Details in \code{\link[flapper]{acdc_setup_detection_kernels}}).
+#' @param acc_centroids A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acdc_setup_centroids}}.
 #' @param mobility A number that defines the distance (m) that an individual could move in the time steps between acoustic detections (see also \code{\link[flapper]{acdc_setup_centroids}}).
 #' @param calc_depth_error In the ACDC algorithm, \code{calc_depth_error} is function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.
-#' @param acc_centroids A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acdc_setup_centroids}}.
 #' @param normalise A logical variable that defines whether or not to normalise the map of possible locations at each time step. In both cases, at each time step the possible locations of the individual are scaled so that the most probable locations have a score of 1 and other scores vary between 0--1. If \code{normalise = FALSE}, these scores are simply summed at each time step, in which case scores on the final map can be interpreted as the number of time steps when the individual could have been in any given location. In contrast, if \code{normalise = TRUE}, at each time step scores are normalised so that they sum to one; the consequence is that time steps with detections, when uncertainty in the individual's location concentrates in the detection centroid around a receiver, are weighted more strongly than time steps between detections, when the uncertainty in the individual's location is spread across a larger area. The final surface can be normalised within \code{\link[flapper]{acdc_simplify}}, with in each cell (0--1) providing a measure of the relative potential use of each location.
-#' @param plot An integer vector that defines the time steps for which to return the necessary spatial information required to plot the plausible locations of the individual, given detection and depth time series. \code{plot = 0} suppresses the return of this information and \code{plot = NULL} returns this information for all time steps.
-#' @param plot_ts A logical input that defines whether or not to the plot movement series before the algorithm is initiated.
+#' @param chunk An integer that defines the chunk ID (from \code{\link[flapper]{.acdc_pl}}).
+#' @param save_record_spatial An integer vector that defines the time steps for which to save a record of the spatial information from each time step. \code{save_record_spatial = 0} suppresses the return of this information and \code{save_record_spatial = NULL} returns this information for all time steps.
+#' @param write_record_spatial_for_pf (optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save a subset of the spatial record (specifically the \code{\link[raster]{raster}} of the individual's possible positions at each time step) to file. This forms the basis for extending maps of space use via particle filtering (see \code{\link[flapper]{pf}}.) The `filename' argument should be the directory in which to save files. Files are named by chunk ID, acoustic and internal (archival) time steps. For example, the file for the first chunk, the first acoustic time step and the first archival time step is named `chu_1_acc_1_arc_1'.
+#' @param save_args A logical input that defines whether or not to include a list of function arguments in the outputs. This can be switched off if the function is applied iteratively.
 #' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console; otherwise, they are written to file (see below).
 #' @param con If \code{verbose = TRUE}, \code{con} is character string that defines the full pathway to a .txt file (which can be created on-the-fly) into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging.
 #' @param progress (optional) If the algorithm is implemented step-wise, \code{progress} is an integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the `archival' time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar. If the algorithm is implemented for chunks, inputs to \code{progress} are ignored and a single progress bar is shown of the progress across acoustic chunks.
-#' @param keep_args A logical input that defines whether or not to include a list of function arguments in the outputs. This can be switched off if the function is applied iteratively.
-#' @param chunk An integer that defines the chunk ID (from \code{\link[flapper]{.acdc_pl}}).
-#' @param write_history (optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by chunk ID, acoustic and internal (archival) time steps. For example, the file for the first chunk, the first acoustic time step and the first archival time step is named `chu_1_acc_1_arc_1'.
+
 #' @param check A logical input that defines whether or not to check function inputs. This can be switched off to improve computation time when the function is applied iteratively or via a front-end function (e.g., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).
 #' @param ... Additional arguments (none implemented).
 #'
-#' @return The function returns a \code{\link[flapper]{.acdc-class}} object with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific information on the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{plot}). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{keep_args = TRUE}, otherwise the `args' element is \code{NULL}).
+#' @return The function returns a \code{\link[flapper]{.acdc-class}} object with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific information on the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{save_record_spatial}). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{save_args = TRUE}, otherwise the `args' element is \code{NULL}).
 #'
 #' @seealso The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call \code{\link[flapper]{.acdc_pl}} which in turn calls this function. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
 #'
@@ -192,9 +193,9 @@
 #' utils::head(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
 #' utils::tail(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
 #'
-#' #### Example (6): Implement AC or ACDC algorithm and return plotting information
-#' # Specify plot = NULL to include plotting information for all time steps
-#' # ... or a vector to include this information for specific time steps
+#' #### Example (6): Implement AC or ACDC algorithm and return spatial information
+#' # Specify save_record_spatial = NULL to include spatial information for all time steps
+#' # ... (used for plotting) or a vector to include this information for specific time steps
 #' out_acdc_6 <- flapper:::.acdc(acoustics = acc,
 #'                               archival = arc,
 #'                               bathy = gebco,
@@ -203,7 +204,7 @@
 #'                               mobility = 200,
 #'                               calc_depth_error = function(...) c(-2.5, 2.5),
 #'                               acc_centroids = dat_centroids,
-#'                               plot = NULL,
+#'                               save_record_spatial = NULL,
 #'                               verbose = TRUE,
 #'                               con = paste0(tempdir(), "/", "acdc_log.txt")
 #'                               )
@@ -217,6 +218,7 @@
     acoustics,
     archival = NULL,
     step = 120,
+    plot_ts = TRUE,
     bathy,
     map = NULL,
     detection_range,
@@ -225,14 +227,13 @@
     mobility,
     calc_depth_error = function(...) c(-2.5, 2.5),
     normalise = FALSE,
-    plot = 1L,
-    plot_ts = TRUE,
+    chunk = 1L,
+    save_record_spatial = 1L,
+    write_record_spatial_for_pf = NULL,
+    save_args = TRUE,
     verbose = TRUE,
     con = "",
     progress = 1L,
-    keep_args = TRUE,
-    chunk = 1L,
-    write_history = NULL,
     check = TRUE,
     ...
   ){
@@ -248,9 +249,11 @@
     # ... any saved spatial data
     # ... the final space use raster
     out <- list(map = NULL, record = NULL, time = NULL, args = NULL, chunks = NULL, simplify = FALSE)
-    if(keep_args) {
+    if(save_args) {
       out$args <- list(acoustics = acoustics,
                        archival = archival,
+                       step = step,
+                       plot_ts = plot_ts,
                        bathy = bathy,
                        map = map,
                        detection_range = detection_range,
@@ -261,15 +264,14 @@
                        mobility = mobility,
                        calc_depth_error = calc_depth_error,
                        normalise = normalise,
-                       plot = plot,
-                       plot_ts = plot_ts,
+                       chunk = chunk,
+                       save_record_spatial = save_record_spatial,
+                       write_record_spatial_for_pf = write_record_spatial_for_pf,
+                       save_args = save_args,
                        verbose = verbose,
                        con = con,
                        progress = progress,
-                       keep_args = keep_args,
                        check = check,
-                       chunk = chunk,
-                       write_history = write_history,
                        dots = list(...))
     }
     out$record <- list()
@@ -381,10 +383,10 @@
         }
       }
       # Check write opts
-      if(!is.null(write_history)){
-        check_named_list(input = write_history)
-        check_names(input = write_history, req = "filename")
-        write_history$filename <- check_dir(input = write_history$filename, check_slash = TRUE)
+      if(!is.null(write_record_spatial_for_pf)){
+        check_named_list(input = write_record_spatial_for_pf)
+        check_names(input = write_record_spatial_for_pf, req = "filename")
+        write_record_spatial_for_pf$filename <- check_dir(input = write_record_spatial_for_pf$filename, check_slash = TRUE)
       }
     }
 
@@ -420,7 +422,7 @@
     }
     map_cumulative <- map
     # Directory in which to save files
-    write_history_dir <- write_history$filename
+    write_record_spatial_for_pf_dir <- write_record_spatial_for_pf$filename
 
     ##### Define 'uniform' detection probability across study area if detection kernels unsupplied
     if(is.null(detection_kernels)){
@@ -514,14 +516,12 @@
       #### Loop over archival time steps
 
       # Define a blank list in which we'll store the outputs of
-      # ... looping over every archival time step.
+      # ... looping over every archival time step
       als <- list()
 
-      # Define another blank list in which we'll store the any saved
-      # ... spatial objects.
+      # Define another blank list in which we'll store the any saved spatial objects.
       # For each archival value, we'll add an element to this list which contains
-      # ... the spatial objects at the value (if we've selected plot = TRUE)
-      # plot options list... :
+      # ... the spatial objects at the value (if we've specified save_record_spatial)
       spatial <- list()
 
       # Define progress bar for looping over archival time steps
@@ -781,7 +781,7 @@
 
         # If the user has specified spatial information to be recorded along the way...
         # ... (e.g. for illustrative plots and/or error checking):
-        if(is.null(plot) | timestep_cumulative %in% plot){
+        if(is.null(save_record_spatial) | timestep_cumulative %in% save_record_spatial){
           # Create a list, plot options (po), which contains relevant spatial information:
           po <- list(centroid = centroid,
                      map_timestep = map_timestep,
@@ -803,7 +803,7 @@
             )
           }
 
-          # If the user hasn't selected to produce plots, simply define po = NULL,
+          # If the user hasn't selected to save the spatial record, simply define po = NULL,
           # ... so we can proceed to add plot options to the list() below without errors:
         } else po <- NULL
 
@@ -835,10 +835,10 @@
         spatial[[timestep_archival]] <- po
 
         # Write to file
-        if(!is.null(write_history)){
-          write_history$x <- map_timestep
-          write_history$filename <- paste0(write_history_dir, "chu_", chunk, "_acc_", timestep_detection, "_arc_", timestep_archival)
-          do.call(raster::writeRaster, write_history)
+        if(!is.null(write_record_spatial_for_pf)){
+          write_record_spatial_for_pf$x <- map_timestep
+          write_record_spatial_for_pf$filename <- paste0(write_record_spatial_for_pf_dir, "chu_", chunk, "_acc_", timestep_detection, "_arc_", timestep_archival)
+          do.call(raster::writeRaster, write_record_spatial_for_pf)
         }
 
         # Update progress bar describing moment over archival time steps

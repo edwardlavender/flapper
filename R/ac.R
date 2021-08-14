@@ -5,6 +5,7 @@
 #'
 #' @param acoustics A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. Each dataframe should contain the following columns: an integer vector of receiver IDs, named `receiver_id'; and a POSIXct vector of time stamps when detections were made, named `timestamp'. If a list of dataframes is supplied, dataframes must be refer to the detections of a single individual and be ordered by time (e.g., in hourly chunks). The algorithm will be implemented on each dataframe, termed `chunk', either in sequence or parallel. Any empty or NULL elements will be removed automatically.
 #' @param step A number that defines the time step length (s) between consecutive detections.
+#' @param plot_ts A logical input that defines whether or not to the plot detection  time series before the algorithm is initiated.
 #' @param bathy A \code{\link[raster]{raster}} that defines a grid across the area within which the individual could have moved. The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).
 #' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see also \code{\link[flapper]{acdc_setup_centroids}}).
 #' @param detection_kernels A named list of detection probability kernels, from \code{\link[flapper]{acdc_setup_detection_kernels}} and created using consistent parameters as specified for other \code{acdc_setup_*} functions and here (i.e., see the \code{overlaps}, \code{calc_detection_pr} and \code{map} arguments in \code{\link[flapper]{acdc_setup_detection_kernels}}).
@@ -13,9 +14,8 @@
 #' @param acc_centroids A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acdc_setup_centroids}}.
 #' @param mobility A number that defines the distance (m) that an individual could move in the time steps between sequential detections (see also \code{\link[flapper]{acdc_setup_centroids}}).
 #' @param normalise A logical variable that defines whether or not to normalise the map of possible locations at each time step. In both cases, at each time step the possible locations of the individual are scaled so that the most probable locations have a score of 1 and other scores vary between 0--1. If \code{normalise = FALSE}, these scores are simply summed at each time step, in which case scores on the final map can be interpreted as the number of time steps when the individual could have been in any given location. In contrast, if \code{normalise = TRUE}, at each time step scores are normalised so that they sum to one; the consequence is that time steps with detections, when uncertainty in the individual's location concentrates in the detection centroid around a receiver, are weighted more strongly than time steps between detections, when the uncertainty in the individual's location is spread across a larger area. The final surface can be normalised within \code{\link[flapper]{acdc_simplify}}, with in each cell (0--1) providing a measure of the relative potential use of each location.
-#' @param plot An integer vector that defines the time steps for which to return the necessary spatial information required to plot the plausible locations of the individual, given detection and depth time series. \code{plot = 0L} suppresses the return of this information and \code{plot = NULL} returns this information for all time steps. If the algorithm is applied chunk-wise, this spatial information must be returned for at least the first time step (the default) to aggregate maps across chunks (see \code{\link[flapper]{acdc_simplify}}). This information can also be used to plot time-specific results of the algorithm using \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}}.
-#' @param plot_ts A logical input that defines whether or not to the plot detection  time series before the algorithm is initiated.
-#' @param write_history (optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by acoustic and internal (archival) time steps. For example, the file for the first acoustic time step and the first archival time step is named acc_1_arc_1.
+#' @param save_record_spatial An integer vector that defines the time steps for which to save a record of the spatial information from each time step. \code{save_record_spatial = 0L} suppresses the return of this information and \code{save_record_spatial = NULL} returns this information for all time steps. If the algorithm is applied chunk-wise, this spatial information must be returned for at least the first time step (the default) to aggregate maps across chunks (see \code{\link[flapper]{acdc_simplify}}). This information can also be used to plot time-specific results of the algorithm using \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}}.
+#' @param write_record_spatial_for_pf (optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by acoustic and internal (archival) time steps. For example, the file for the first acoustic time step and the first archival time step is named acc_1_arc_1.
 #' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console (which is only supported if the algorithm is not implemented in parallel: see below); otherwise, they are written to file (see below).
 #' @param con If \code{verbose = TRUE}, \code{con} is character string that defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}), an approach that is only implemented if the function is not implemented in parallel. Otherwise, \code{con} defines the directory into which to write .txt files, into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging. If the algorithm is implemented step-wise, then a single file is written to the specified directory named acdc_log.txt. If the algorithm is implemented chunk-wise, then an additional file is written for each chunk (named dot_acdc_log_1.txt, dot_acdc_log_2.txt and so on), with the details for each chunk.
 #' @param progress (optional) If the algorithm is implemented step-wise, \code{progress} is an integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the archival time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar. If the algorithm is implemented for chunks, inputs to \code{progress} are ignored and a single progress bar is shown of the progress across acoustic chunks.
@@ -62,6 +62,7 @@
 ac <- function(acoustics,
                step,
                bathy,
+               plot_ts = TRUE,
                detection_range,
                detection_kernels = NULL,
                detection_kernels_overlap = NULL,
@@ -69,9 +70,8 @@ ac <- function(acoustics,
                acc_centroids,
                mobility,
                normalise = FALSE,
-               plot = 1L,
-               plot_ts = TRUE,
-               write_history = NULL,
+               save_record_spatial = 1L,
+               write_record_spatial_for_pf = NULL,
                verbose = TRUE,
                con = "",
                progress = 1L,
@@ -88,6 +88,7 @@ ac <- function(acoustics,
         acoustics = acoustics,
         archival = NULL,
         step = step,
+        plot_ts = plot_ts,
         bathy = bathy,
         detection_range = detection_range,
         detection_kernels = detection_kernels,
@@ -97,9 +98,8 @@ ac <- function(acoustics,
         calc_depth_error = NULL,
         normalise = normalise,
         acc_centroids = acc_centroids,
-        plot = plot,
-        plot_ts = plot_ts,
-        write_history = write_history,
+        save_record_spatial = save_record_spatial,
+        write_record_spatial_for_pf = write_record_spatial_for_pf,
         verbose = verbose,
         con = con,
         progress = progress,

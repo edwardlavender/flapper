@@ -8,6 +8,7 @@
   acoustics,
   archival = NULL,
   step = 120,
+  plot_ts = TRUE,
   bathy,
   detection_range,
   detection_kernels = NULL,
@@ -17,9 +18,8 @@
   mobility,
   calc_depth_error = function(...) c(-2.5, 2.5),
   normalise = FALSE,
-  plot = 1L,
-  plot_ts = TRUE,
-  write_history = NULL,
+  save_record_spatial = 1L,
+  write_record_spatial_for_pf = NULL,
   verbose = TRUE,
   con = "",
   progress = 1L,
@@ -35,6 +35,8 @@
 \item{archival}{For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series (see \code{\link[flapper]{.acdc}}).}
 
 \item{step}{A number that defines the time step length (s) between consecutive detections (see \code{\link[flapper]{.acdc}}).}
+
+\item{plot_ts}{A logical input that defines whether or not to plot movement time series (see \code{\link[flapper]{.acdc}}).}
 
 \item{bathy}{A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC algorithm) across the area within which the individual could have moved (see \code{\link[flapper]{.acdc}}).}
 
@@ -54,11 +56,9 @@
 
 \item{normalise}{A logical input that defines whether or not to normalise maps (see \code{\link[flapper]{.acdc}}).}
 
-\item{plot}{An integer of the spatial layers to save (see \code{\link[flapper]{.acdc}}).}
+\item{save_record_spatial}{An integer of the spatial layers to save (see \code{\link[flapper]{.acdc}}).}
 
-\item{plot_ts}{A logical input that defines whether or not to plot movement time series (see \code{\link[flapper]{.acdc}}).}
-
-\item{write_history}{A named list used to write time step-specific maps to file (see \code{\link[flapper]{.acdc}}).}
+\item{write_record_spatial_for_pf}{A named list used to write time step-specific maps to file (see \code{\link[flapper]{.acdc}}).}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console (which is only supported if the algorithm is not implemented in parallel: see below); otherwise, they are written to file (see below).}
 

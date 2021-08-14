@@ -8,6 +8,7 @@
 #' @param acoustics A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. Each dataframe should contain the following columns: an integer vector of receiver IDs, named `receiver_id'; and a POSIXct vector of time stamps when detections were made, named `timestamp'. If a list of dataframes is supplied, dataframes must be refer to the detections of a single individual and be ordered by time (e.g., in hourly chunks). The algorithm will be implemented on each dataframe, termed `chunk', either in sequence or parallel. Any empty or \code{NULL} elements will be removed automatically.
 #' @param archival For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series (see \code{\link[flapper]{.acdc}}).
 #' @param step A number that defines the time step length (s) between consecutive detections (see \code{\link[flapper]{.acdc}}).
+#' @param plot_ts A logical input that defines whether or not to plot movement time series (see \code{\link[flapper]{.acdc}}).
 #' @param bathy A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC algorithm) across the area within which the individual could have moved (see \code{\link[flapper]{.acdc}}).
 #' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see \code{\link[flapper]{.acdc}})
 #' @param detection_kernels A named list of detection probability kernels (see \code{\link[flapper]{.acdc}}).
@@ -17,9 +18,8 @@
 #' @param mobility The mobility parameter (see \code{\link[flapper]{.acdc}}).
 #' @param calc_depth_error The depth error function (see \code{\link[flapper]{.acdc}}).
 #' @param normalise A logical input that defines whether or not to normalise maps (see \code{\link[flapper]{.acdc}}).
-#' @param plot An integer of the spatial layers to save (see \code{\link[flapper]{.acdc}}).
-#' @param plot_ts A logical input that defines whether or not to plot movement time series (see \code{\link[flapper]{.acdc}}).
-#' @param write_history A named list used to write time step-specific maps to file (see \code{\link[flapper]{.acdc}}).
+#' @param save_record_spatial An integer of the spatial layers to save (see \code{\link[flapper]{.acdc}}).
+#' @param write_record_spatial_for_pf A named list used to write time step-specific maps to file (see \code{\link[flapper]{.acdc}}).
 #' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console (which is only supported if the algorithm is not implemented in parallel: see below); otherwise, they are written to file (see below).
 #' @param con If \code{verbose = TRUE}, \code{con} is character string defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}), an approach that is only implemented if the function is not implemented in parallel. Otherwise, \code{con} defines the directory into which to write .txt files, into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging. If the algorithm is implemented step-wise, then a single file is written to the specified directory named acdc_log.txt. If the algorithm is implemented chunk-wise, then an additional file is written for each chunk (named dot_acdc_log_1.txt, dot_acdc_log_2.txt and so on), with the details for each chunk.
 #' @param progress (optional) If the algorithm is implemented step-wise, \code{progress} is an integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the `archival' time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar. If the algorithm is implemented for chunks, inputs to \code{progress} are ignored and a single progress bar is shown of the progress across acoustic chunks.
@@ -42,6 +42,7 @@
   acoustics,
   archival = NULL,
   step = 120,
+  plot_ts = TRUE,
   bathy,
   detection_range,
   detection_kernels = NULL, detection_kernels_overlap = NULL, detection_time_window = 5,
@@ -49,9 +50,8 @@
   mobility,
   calc_depth_error = function(...) c(-2.5, 2.5),
   normalise = FALSE,
-  plot = 1L,
-  plot_ts = TRUE,
-  write_history = NULL,
+  save_record_spatial = 1L,
+  write_record_spatial_for_pf = NULL,
   verbose = TRUE,
   con = "",
   progress = 1L,
@@ -156,10 +156,10 @@
     }
   }
   # Check write opts
-  if(!is.null(write_history)){
-    check_named_list(input = write_history)
-    check_names(input = write_history, req = "filename")
-    write_history$filename <- check_dir(input = write_history$filename, check_slash = TRUE)
+  if(!is.null(write_record_spatial_for_pf)){
+    check_named_list(input = write_record_spatial_for_pf)
+    check_names(input = write_record_spatial_for_pf, req = "filename")
+    write_record_spatial_for_pf$filename <- check_dir(input = write_record_spatial_for_pf$filename, check_slash = TRUE)
   }
 
   #### Study site rasters
@@ -380,6 +380,7 @@
     .out <- .acdc(acoustics = movement_ts[[1]]$acoustics,
                   archival = movement_ts[[1]]$archival,
                   step = step,
+                  plot_ts = FALSE,
                   bathy = bathy,
                   map = map,
                   detection_range = detection_range,
@@ -390,13 +391,12 @@
                   mobility = mobility,
                   calc_depth_error = calc_depth_error,
                   normalise = normalise,
-                  plot = plot,
-                  plot_ts = FALSE,
+                  save_record_spatial = save_record_spatial,
+                  write_record_spatial_for_pf = write_record_spatial_for_pf,
+                  save_args = FALSE,
                   verbose = verbose,
                   con = con,
                   progress = progress,
-                  keep_args = FALSE,
-                  write_history = write_history,
                   check = FALSE)
 
   } else {
@@ -410,6 +410,7 @@
       #### Implement algorithm
       .out <- .acdc(acoustics = movement_ts[[i]]$acoustics,
                     archival = movement_ts[[i]]$archival,
+                    plot_ts = FALSE,
                     step = step,
                     bathy = bathy,
                     map = map,
@@ -421,14 +422,13 @@
                     mobility = mobility,
                     calc_depth_error = calc_depth_error,
                     normalise = normalise,
-                    plot = plot,
-                    plot_ts = FALSE,
+                    save_record_spatial = save_record_spatial,
+                    write_record_spatial_for_pf = write_record_spatial_for_pf,
+                    save_args = FALSE,
+                    chunk = i,
                     verbose = verbose,
                     con = con_ls[[i]],
                     progress = 0L,
-                    keep_args = FALSE,
-                    write_history = write_history,
-                    chunk = i,
                     check = FALSE)
       return(.out)
     })

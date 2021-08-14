@@ -7,6 +7,7 @@
 acdc(
   acoustics,
   archival,
+  plot_ts = TRUE,
   bathy,
   detection_range,
   detection_kernels = NULL,
@@ -16,9 +17,8 @@ acdc(
   mobility,
   calc_depth_error = function(...) c(-2.5, 2.5),
   normalise = FALSE,
-  plot = 1L,
-  plot_ts = TRUE,
-  write_history = NULL,
+  save_record_spatial = 1L,
+  write_record_spatial_for_pf = NULL,
   verbose = TRUE,
   con = "",
   progress = 1L,
@@ -31,6 +31,8 @@ acdc(
 \item{acoustics}{A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{ac}}).}
 
 \item{archival}{A dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; and a POSIXct vector of time stamps when observations were made, named `timestamp'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.}
+
+\item{plot_ts}{A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.}
 
 \item{bathy}{A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).}
 
@@ -50,11 +52,9 @@ acdc(
 
 \item{normalise}{A logical input that defines whether or not to normalise maps (see \code{\link[flapper]{ac}}).}
 
-\item{plot}{An integer of the spatial layers to save (see \code{\link[flapper]{ac}}).}
+\item{save_record_spatial}{An integer of the spatial layers to save (see \code{\link[flapper]{ac}}).}
 
-\item{plot_ts}{A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.}
-
-\item{write_history}{A named list used to write time step-specific maps to file (see \code{\link[flapper]{ac}}).}
+\item{write_record_spatial_for_pf}{A named list used to write time step-specific maps to file (see \code{\link[flapper]{ac}}).}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console or to file to relay function progress (see \code{\link[flapper]{ac}}).}
 
@@ -133,8 +133,8 @@ acdc_log <- readLines(paste0(tempdir(), "/acdc_log.txt"))
 utils::head(acdc_log, 10)
 file.remove(paste0(tempdir(), "/acdc_log.txt"))
 
-#### Example (3): Implement the algorithm and return plotting information
-# Specify plot = NULL to include plotting information for all time steps
+#### Example (3): Implement the algorithm and return spatial information
+# Specify save_record_spatial = NULL to include spatial information for all time steps
 # ... or a vector to include this information for specific time steps
 out_acdc <- acdc(acoustics = acc,
                  archival = arc,
@@ -143,7 +143,7 @@ out_acdc <- acdc(acoustics = acc,
                  mobility = 200,
                  calc_depth_error = function(...) c(-2.5, 2.5),
                  acc_centroids = dat_centroids,
-                 plot = NULL
+                 save_record_spatial = NULL
                  )
 
 #### Example (4): Implement the algorithm in parallel by supplying a cluster
@@ -246,7 +246,7 @@ acdc_out_by_id <-
                      mobility = 200,
                      calc_depth_error = function(...) c(-2.5, 2.5),
                      acc_centroids = dat_centroids,
-                     plot = 1:10L,
+                     save_record_spatial = 1:10L,
                      con = dir_id
                      )
     # Include logs in output
