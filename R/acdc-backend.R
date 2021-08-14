@@ -441,6 +441,7 @@
 
     #### Define progress bar
     # this will indicate how far along acoustic time steps we are.
+    pb1 <- pb2 <- NULL
     if(progress %in% c(1, 3)) {
       pb1 <- utils::txtProgressBar(min = 0, max = (nrow(acoustics)-1), style = 3)
     }
@@ -845,6 +846,7 @@
         }
 
       } # close for(j in 1:lpos){ (looping over archival time steps)
+      if(!is.null(pb2)) close(pb2)
 
       #### Update overall lists
       als_df <- dplyr::bind_rows(als)
@@ -856,7 +858,7 @@
       }
 
     } # close for(i in 1:nrow(acoustics)){ (looping over acoustic time steps)
-
+    if(!is.null(pb1)) close(pb1)
 
     #### Return function outputs
     cat_to_cf("... Movement over acoustic and internal ('archival') time steps has been completed.")
