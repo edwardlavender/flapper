@@ -889,21 +889,22 @@ acdc_setup_detection_kernels <-
 ######################################
 #### acdc_simplify()
 
-#' @title Simplify the outputs of the AC* algorithms
-#' @description This function simplifies the output of \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, by processing information from the '.acdc' elements of a \code{\link[flapper]{acdc-class}} object that hold the results of calls to the workhorse function \code{\link[flapper]{.acdc}}. This is especially useful if the AC* algorithm(s) have been applied chunk-wise, in which case the results for each acoustic chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series.
-#' @param acdc An \code{\link[flapper]{acdc-class}} object returned by \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}.
-#' @param mask (optional) A spatial mask (e.g., the argument passed to \code{bathy} in \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}) to mask areas (e.g., land) from the overall map. If implemented, cells in masked areas are assigned NAs rather than a score of 0.
+#' @title Simplify the outputs of the AC/DC algorithms
+#' @description This function simplifies the output of \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}, by processing information from the '.acdc' elements of a \code{\link[flapper]{acdc-class}} object that hold the results of calls to the workhorse routines. This is especially useful if the algorithm(s) have been applied chunk-wise, in which case the results for each chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series.
+#' @param acdc An \code{\link[flapper]{acdc-class}} object returned by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}.
+#' @param type A character that defines whether the function should be implemented for the outputs of a call to an AC* algorithm (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), in which case \code{type = "acs"}, or the DC algorithm, in which case \code{type = "dc"}.
+#' @param mask (optional) A spatial mask (e.g., the argument passed to \code{bathy} in \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}) to mask areas (e.g., land) from the overall map. If implemented, cells in masked areas are assigned NAs rather than a score of 0.
 #' @param normalise A logical input that defines whether or not to normalise the overall map so that cell scores sum to one.
 #' @param keep_chunks A logical variable that defines whether or not to retain all chunk-specific information.
 #' @param ... Additional arguments (none implemented).
 #' @return The function returns an object of class \code{\link[flapper]{.acdc-class}}.
-#' @details If the \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an \code{\link[flapper]{.acdc-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps, accounting for the overlap between chunks; (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series to (c) return a \code{\link[flapper]{.acdc-class}} object.
-#' @seealso The AC and ACDC algorithms are implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, via the \code{\link[flapper]{.acdc_pl}} and ultimately \code{\link[flapper]{.acdc}}. After simplification, \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} can be implemented to visualise time-specific results.
+#' @details If the \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an \code{\link[flapper]{.acdc-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps (accounting for the overlap between chunks for AC* algorithm(s)); (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series (for AC* algorithm(s)) to (c) return a \code{\link[flapper]{.acdc-class}} object.
+#' @seealso The AC, DC and ACDC algorithms are implemented by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}. After simplification, \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} can be implemented to visualise time-specific results.
 #' @author Edward Lavender
 #' @export
 #'
 
-acdc_simplify <- function(acdc, mask = NULL, normalise = FALSE, keep_chunks = FALSE,...) {
+acdc_simplify <- function(acdc, type = c("acs", "dc"), mask = NULL, normalise = FALSE, keep_chunks = FALSE,...) {
 
   #### Checks
   if(!(inherits(acdc, "acdc") | !inherits(acdc, ".acdc"))){
@@ -913,6 +914,8 @@ acdc_simplify <- function(acdc, mask = NULL, normalise = FALSE, keep_chunks = FA
     "class(acdc) == '.acdc': 'acdc' returned unchanged."
     return(acdc)
   }
+  type <- match.arg(type)
+  message("acdc_simplify() implemented for type = '", type, "'.")
 
   #### Set up
   out <- list(map = NULL, record = NULL, time = acdc$time, args = acdc$args, chunks = NULL, simplify = TRUE)
@@ -925,65 +928,78 @@ acdc_simplify <- function(acdc, mask = NULL, normalise = FALSE, keep_chunks = FA
     #### Otherwise aggregate information across chunks
   } else{
 
-    #### Compute final map from the sum of the maps for each chunk
-    # Get the first map of each chunk
-    maps_first <- lapply(acdc$.acdc, function(chunk) {
-      map_1 <- chunk$record[[1]]$spatial[[1]]$map_timestep
-      if(is.null(map_1)) {
-        stop("chunk$record[[1]]$spatial[[1]]$map_timestep is NULL. In flapper::acdc(), save_spatial_record = 1L (or greater/NULL) is required to return the necessary spatial information to correct for overlapping detection time series across chunks in the summation of chunk-specific maps.")
-      }
-      return(map_1)
-    })
-    # Get the last map of each chunk
-    maps_last <- lapply(acdc$.acdc, function(chunk) chunk$map)
-    # Correct for the repeated influence of the first map due to the overlapping detection time series
-    maps <- lapply(2:length(maps_last), function(i){
-      map <- maps_last[[i]] - maps_first[[i]]
-      return(map)
-    })
-    # Sum the adjusted maps across chunks
+    if(type == "dc"){
+
+      #### Get cumulative map from each chunk
+      maps <- lapply(acdc$.acdc, function(chunk) chunk$map)
+
+      #### Simplify records
+      out$record <- lapply(acdc$.acdc, function(chunk) chunk$record)
+
+    } else if(type == "acs"){
+
+      #### Get cumulative map from each chunk
+      # Get the first map of each chunk
+      maps_first <- lapply(acdc$.acdc, function(chunk) {
+        map_1 <- chunk$record[[1]]$spatial[[1]]$map_timestep
+        if(is.null(map_1)) {
+          stop("chunk$record[[1]]$spatial[[1]]$map_timestep is NULL. In flapper::acdc(), save_record_spatial = 1L (or greater/NULL) is required to return the necessary spatial information to correct for overlapping detection time series across chunks in the summation of chunk-specific maps.")
+        }
+        return(map_1)
+      })
+      # Get the last map of each chunk
+      maps_last <- lapply(acdc$.acdc, function(chunk) chunk$map)
+      # Correct for the repeated influence of the first map due to the overlapping detection time series
+      maps <- lapply(2:length(maps_last), function(i){
+        map <- maps_last[[i]] - maps_first[[i]]
+        return(map)
+      })
+
+      #### Simplify records
+      ## Add chunk-specific records
+      out$record <- lapply(acdc$.acdc, function(chunk) chunk$record)
+      ## Delete the last element of each chunk (except the last chunk) since chunks are overlapping
+      out$record <- lapply(out$record, function(chunk) chunk[1:(length(chunk)-1)])
+      ## Define a dataframe to adjust the time stamps recorded for each chunks
+      # For chunks 2:n_chunks, we will add the time stamps reached by the previous chunk
+      # ... up to the current chunk
+      adjust_timestep <- lapply(out$record, function(chunk_record){
+        # chunk_record <- out$record[[1]]
+        dat <- chunk_record[[length(chunk_record)]]$dat
+        adjustment <- dat[nrow(dat), c("timestep_cumulative", "timestep_detection")]
+        return(adjustment)
+      })
+      adjust_timestep <- do.call(rbind, adjust_timestep)
+      adjust_timestep$timestep_cumulative <- cumsum(adjust_timestep$timestep_cumulative)
+      adjust_timestep$timestep_detection <- cumsum(adjust_timestep$timestep_detection)
+      ## Adjust time stamps and add the chunk to the dataframe for each time stamp
+      out$record <- lapply(1:length(out$record), function(i) {
+        chunk_record <- out$record[[i]]
+        if(i == 1) {
+          adjustment <- data.frame(timestep_cumulative = 0, timestep_detection = 0)
+        } else{
+          adjustment <- adjust_timestep[i-1, ]
+        }
+        chunk_record <- lapply(chunk_record, function(t){
+          t$dat$timestep_cumulative <- t$dat$timestep_cumulative + adjustment$timestep_cumulative
+          t$dat$timestep_detection <- t$dat$timestep_detection + adjustment$timestep_detection
+          t$dat$chunk <- i
+          return(t)
+        })
+        return(chunk_record)
+      })
+    }
+
+    #### Sum the adjusted maps across chunks
     out$map <- raster::brick(maps)
     out$map <- raster::calc(out$map, sum, na.rm = TRUE)
 
-    #### Simplify records
-    ## Add chunk-specific records
-    out$record <- lapply(acdc$.acdc, function(chunk) chunk$record)
-    ## Delete the last element of each chunk (except the last chunk) since chunks are overlapping
-    out$record <- lapply(out$record, function(chunk) chunk[1:(length(chunk)-1)])
-    ## Define a dataframe to adjust the time stamps recorded for each chunks
-    # For chunks 2:n_chunks, we will add the time stamps reached by the previous chunk
-    # ... up to the current chunk
-    adjust_timestep <- lapply(out$record, function(chunk_record){
-      # chunk_record <- out$record[[1]]
-      dat <- chunk_record[[length(chunk_record)]]$dat
-      adjustment <- dat[nrow(dat), c("timestep_cumulative", "timestep_detection")]
-      return(adjustment)
-    })
-    adjust_timestep <- do.call(rbind, adjust_timestep)
-    adjust_timestep$timestep_cumulative <- cumsum(adjust_timestep$timestep_cumulative)
-    adjust_timestep$timestep_detection <- cumsum(adjust_timestep$timestep_detection)
-    ## Adjust time stamps and add the chunk to the dataframe for each time stamp
-    out$record <- lapply(1:length(out$record), function(i) {
-      chunk_record <- out$record[[i]]
-      if(i == 1) {
-        adjustment <- data.frame(timestep_cumulative = 0, timestep_detection = 0)
-      } else{
-        adjustment <- adjust_timestep[i-1, ]
-      }
-      chunk_record <- lapply(chunk_record, function(t){
-        t$dat$timestep_cumulative <- t$dat$timestep_cumulative + adjustment$timestep_cumulative
-        t$dat$timestep_detection <- t$dat$timestep_detection + adjustment$timestep_detection
-        t$dat$chunk <- i
-        return(t)
-      })
-      return(chunk_record)
-    })
-    ## Flatten record list across chunks
+    #### Flatten record list across chunks
     out$record <- purrr::flatten(out$record)
 
   }
 
-  #### Normalise the final map
+  #### Mask and normalise the final map
   if(!is.null(mask)) out$map <- raster::mask(out$map, mask)
   if(normalise) out$map <- out$map/raster::cellStats(out$map, "sum")
 
@@ -1000,14 +1016,14 @@ acdc_simplify <- function(acdc, mask = NULL, normalise = FALSE, keep_chunks = FA
 ######################################
 #### acdc_plot()
 
-#' @title Plot time-specific maps from the AC* algorithm(s)
-#' @description This function is used to plot time-specific maps from the AC* algorithm(s). To implement the function, a \code{\link[flapper]{.acdc-class}} list from \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}} and \code{\link[flapper]{acdc_simplify}} (or \code{\link[flapper]{.acdc}}) must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids can be added and customised and the finalised plots can be returned or saved to file.
+#' @title Plot time-specific maps from the AC/DC algorithm(s)
+#' @description This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, a \code{\link[flapper]{.acdc-class}} list from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids (if applicable) can be added and customised and the finalised plots can be returned or saved to file.
 #' @param acdc An \code{\link[flapper]{.acdc-class}} object.
 #' @param plot An integer vector that defines the time steps for which to make plots. If \code{plot = NULL}, the function will make a plot for all time steps for which the necessary information is available in \code{acdc}.
 #' @param add_coastline (optional) A named list of arguments, passed to \code{\link[raster]{plot}}, to add a polygon (i.e., of the coastline), to the plot. If provided, this must contain an `x' element that contains the coastline as a spatial object (e.g., a SpatialPolygonsDataFrame: see \code{\link[flapper]{dat_coast}} for an example).
 #' @param add_receivers (optional) A named list of arguments, passed to \code{\link[graphics]{points}}, to add points (i.e., receivers) to the plot. If provided, this must contain an `x' element that is a SpatialPoints object that specifies receiver locations (in the same coordinate reference system as other spatial data).
 #' @param add_raster (optional) A named list of arguments, passed to \code{\link[fields]{image.plot}}, to plot the RasterLayer of possible locations that is extracted from \code{acdc}.
-#' @param add_centroids (optional) A named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic centroid to the plot.
+#' @param add_centroids (optional) For outputs from the AC* algorithms (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), \code{centroids} is a named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic centroid to the plot.
 #' @param add_additional (optional) A stand-alone function, to be executed after the background plot has been made and any specified spatial layers have been added to this, to customise the result (see Examples).
 #' @param crop_spatial A logical variable that defines whether or not to crop spatial data to lie within the axis limits.
 #' @param xlim,ylim,fix_zlim,pretty_axis_args Axis control arguments. \code{xlim} and \code{ylim} control the axis limits, following the rules of the \code{lim} argument in \code{\link[prettyGraphics]{pretty_axis}}. \code{fix_zlim} is a logical input that defines whether or not to fix z axis limits across all plots (to facilitate comparisons), or a vector of two numbers that define a custom range for the z axis which is fixed across all plots. \code{fix_zlim = FALSE} produces plots in which the z axis is allowed to vary flexibly between time units. Other axis options supported by \code{\link[prettyGraphics]{pretty_axis}} are implemented by passing a named list of arguments to this function via \code{pretty_axis_args}.
@@ -1020,10 +1036,10 @@ acdc_simplify <- function(acdc, mask = NULL, normalise = FALSE, keep_chunks = FA
 #'
 #' @return The function plots the results of the AC* algorithm(s) at specified time steps, with one plot per time step. Plots are saved to file if \code{png_param} is supplied.
 #' @examples
-#' #### Step (1): Implement AC* algorithm(s)
-#' # ... see examples via ac() and acdc()
+#' #### Step (1): Implement AC/DC algorithm(s)
+#' # ... see examples via ac(), dc() and acdc()
 #'
-#' #### Step (2): Simplify outputs of the AC* algorithm(s)
+#' #### Step (2): Simplify outputs of the AC/DC algorithm(s)
 #' dat_acdc <- acdc_simplify(dat_acdc)
 #'
 #' #### Example (1): The default options simply plot the first surface
@@ -1104,7 +1120,7 @@ acdc_simplify <- function(acdc, mask = NULL, normalise = FALSE, keep_chunks = FA
 #'                            xlab = "Easting", ylab = "Northing"
 #'                            )
 #'
-#' @seealso This function is typically used following calls to \code{\link[flapper]{acdc}} and \code{\link[flapper]{acdc_simplify}}.
+#' @seealso This function is typically used following calls to \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} and \code{\link[flapper]{acdc_simplify}}.
 #' @author Edward Lavender
 #' @export
 #'
@@ -1196,6 +1212,12 @@ acdc_plot <- function(acdc,
   if(check) {
     if(length(acdc_plot) <= 0) stop("No plotting data available for selected plot(s).")
     if(any(plot > length(acdc_plot))) stop("Some inputs to 'plot' larger than the number of available plots.")
+    if(!is.null(add_centroids)){
+      if(!rlang::has_name(acdc_plot[[1]], "centroid")){
+        add_centroids <- NULL
+        message("add_centroids = NULL implemented: 'acdc' does not contain centroids.")
+      }
+    }
   }
 
   ## Extent of area
@@ -1304,10 +1326,10 @@ acdc_plot <- function(acdc,
     }
     # Add acoustic centroid
     if(!is.null(add_centroids)) {
-      add_centroids$x   <- map_info$centroid
-      if(crop_spatial) add_centroids$x <- raster::crop(add_centroids$x, ext)
-      add_centroids$add <- TRUE
-      do.call(raster::plot, add_centroids)
+        add_centroids$x   <- map_info$centroid
+        if(crop_spatial) add_centroids$x <- raster::crop(add_centroids$x, ext)
+        add_centroids$add <- TRUE
+        do.call(raster::plot, add_centroids)
     }
     # Add the coastline (note that the coastline has already been cropped, if necessary)
     if(!is.null(add_coastline)) {
@@ -1340,7 +1362,7 @@ acdc_plot <- function(acdc,
 ######################################
 #### acdc_animate()
 
-#' @title Create a html animation of the AC* algorithm(s)
+#' @title Create a html animation of the AC/DC algorithm(s)
 #' @description This function is a simple wrapper for \code{\link[flapper]{acdc_plot}} and \code{\link[animation]{saveHTML}} which creates an animation of the AC* algorithm(s) over time. To implement this function, a named list of arguments for \code{\link[flapper]{acdc_plot}}, which creates the plots, must be supplied. This is embedded within \code{\link[animation]{saveHTML}}, which creates a folder in the working directory named `images' that contains a .png file for each time step and an animation as a .html file.
 #' @param expr_param A named list of arguments, passed to \code{\link[flapper]{acdc_plot}}, to create plots.
 #' @param html_name A string that defines the name of the html file (see `htmlfile' argument in \code{\link[animation]{saveHTML}}).

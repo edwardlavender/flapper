@@ -81,13 +81,13 @@ More specifically, when an individual is detected, it must be within some radius
 The result is a map that shows where the individual could have spent more or less (or no) time over the time interval under construction. The main limitation of this approach is that reconstructs where the individual could have been, but not where it was. However, particle filtering can be used to extent this approach via the incorporate a movement model.
 }
 \examples{
-#' #### Step (1) Implement setup_acdc_*() steps
+#### Step (1) Implement setup_acdc_*() steps
 # ... Define acoustic centroids required for AC algorithm (see setup_acdc_centroids())
 
 #### Step (2) Prepare movement time series for algorithm
-# Focus on an example individual
+# Focus on an example individual for speed
 id <- 25
-acc <- dat_acoustics[dat_acoustics$individual_id == id, ]
+acc <- dat_acoustics[dat_acoustics$individual_id == id, ][1:25, ]
 
 #### Example (1) Implement AC algorithm with default arguments
 # This implements the algorithm on a single core, printing messages

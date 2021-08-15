@@ -78,7 +78,6 @@
 
   #### Define function for printing messages to file or console
   ## Check the connection for writing files, if applicable
-
   if(con != ""){
     if(!verbose) {
       message("Input to 'con' ignored since verbose = FALSE.")

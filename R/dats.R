@@ -166,18 +166,17 @@
 #### dat_dc
 
 #' @title Example DC algorithm output
-#' @description A named list of outputs from \code{\link[flapper]{dc}}. This is included principally to streamline function examples.
+#' @description An object of class \code{\link[flapper]{acdc-class}} from \code{\link[flapper]{dc}} created by a step-wise implementation of this function. This is included principally to streamline function examples.
 #'
 #' @format A named list with 4 elements:
 #' \describe{
-#'   \item{dc}{A \code{\link[raster]{raster}} that defines the number of times that the depth in each cell overlapped with the depth recorded in the individual's \code{archival} time series.}
-#'   \item{archival}{The \code{archival} dataframe inputted to \code{\link[flapper]{dc}}. This includes two new columns that define the lower and upper bounds for the possible depth of the individual on the bathymetry raster (\code{bathy}) at each time step (`depth_lwr' and `depth_upper') derived from \code{calc_depth_error} and, if \code{calc_availability = TRUE}, a logical vector that defines whether or not there are any cells on \code{bathy} of the required depth range at each time step.}
+#'   \item{.acdc}{A list of results from internal function calls that contain essential results, with one element per chunk.}
+#'   \item{ts_by_chunk}{A list of time series, with one element per chunk.}
+#'   \item{time}{A dataframe that defines the times of sequential stages in the algorithm's progression.}
 #'   \item{args}{A named list of user inputs that record the parameters used to generate the outputs.}
 #' }
 #'
-#' @note \code{\link[flapper]{dc}} outputs may also contain a `spatial' element. This has not been retained for \code{\link[flapper]{dat_dc}} to minimise dataset size.
-#'
-#' @seealso See \code{\link[flapper]{dc}} for further information.
+#' @seealso See \code{\link[flapper]{acdc-class}} for further information on this S3 class.
 "dat_dc"
 
 

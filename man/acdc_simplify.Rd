@@ -2,14 +2,23 @@
 % Please edit documentation in R/acdc_support.R
 \name{acdc_simplify}
 \alias{acdc_simplify}
-\title{Simplify the outputs of the AC* algorithms}
+\title{Simplify the outputs of the AC/DC algorithms}
 \usage{
-acdc_simplify(acdc, mask = NULL, normalise = FALSE, keep_chunks = FALSE, ...)
+acdc_simplify(
+  acdc,
+  type = c("acs", "dc"),
+  mask = NULL,
+  normalise = FALSE,
+  keep_chunks = FALSE,
+  ...
+)
 }
 \arguments{
-\item{acdc}{An \code{\link[flapper]{acdc-class}} object returned by \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}.}
+\item{acdc}{An \code{\link[flapper]{acdc-class}} object returned by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}.}
 
-\item{mask}{(optional) A spatial mask (e.g., the argument passed to \code{bathy} in \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}) to mask areas (e.g., land) from the overall map. If implemented, cells in masked areas are assigned NAs rather than a score of 0.}
+\item{type}{A character that defines whether the function should be implemented for the outputs of a call to an AC* algorithm (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), in which case \code{type = "acs"}, or the DC algorithm, in which case \code{type = "dc"}.}
+
+\item{mask}{(optional) A spatial mask (e.g., the argument passed to \code{bathy} in \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}) to mask areas (e.g., land) from the overall map. If implemented, cells in masked areas are assigned NAs rather than a score of 0.}
 
 \item{normalise}{A logical input that defines whether or not to normalise the overall map so that cell scores sum to one.}
 
@@ -21,13 +30,13 @@ acdc_simplify(acdc, mask = NULL, normalise = FALSE, keep_chunks = FALSE, ...)
 The function returns an object of class \code{\link[flapper]{.acdc-class}}.
 }
 \description{
-This function simplifies the output of \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, by processing information from the '.acdc' elements of a \code{\link[flapper]{acdc-class}} object that hold the results of calls to the workhorse function \code{\link[flapper]{.acdc}}. This is especially useful if the AC* algorithm(s) have been applied chunk-wise, in which case the results for each acoustic chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series.
+This function simplifies the output of \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}, by processing information from the '.acdc' elements of a \code{\link[flapper]{acdc-class}} object that hold the results of calls to the workhorse routines. This is especially useful if the algorithm(s) have been applied chunk-wise, in which case the results for each chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series.
 }
 \details{
-If the \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an \code{\link[flapper]{.acdc-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps, accounting for the overlap between chunks; (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series to (c) return a \code{\link[flapper]{.acdc-class}} object.
+If the \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an \code{\link[flapper]{.acdc-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps (accounting for the overlap between chunks for AC* algorithm(s)); (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series (for AC* algorithm(s)) to (c) return a \code{\link[flapper]{.acdc-class}} object.
 }
 \seealso{
-The AC and ACDC algorithms are implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, via the \code{\link[flapper]{.acdc_pl}} and ultimately \code{\link[flapper]{.acdc}}. After simplification, \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} can be implemented to visualise time-specific results.
+The AC, DC and ACDC algorithms are implemented by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}. After simplification, \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} can be implemented to visualise time-specific results.
 }
 \author{
 Edward Lavender

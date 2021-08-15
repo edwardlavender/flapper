@@ -121,10 +121,9 @@ prettyGraphics::pretty_map(add_rasters = list(x = surface),
 dc_1 <- dc(archival = depth,
            bathy = surface,
            calc_depth_error = function(...) c(-30, 30),
-           plot = NULL
+           save_record_spatial = 0L
            )
 dat_dc <- dc_1
-dat_dc$spatial <- NULL
 
 #### Example (1): Implement algorithm using default options
 # Note that because the bathymetry data is very coarse, we have to

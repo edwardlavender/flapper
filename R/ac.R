@@ -35,13 +35,13 @@
 #' @seealso This function calls \code{\link[flapper]{.acdc_pl}} and \code{\link[flapper]{.acdc}} to implement the AC algorithm. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results. The AC algorithm can be extended to incorporate depth contours via \code{\link[flapper]{acdc}}. Particle filtering can be used to reconstruct movement paths.
 #'
 #' @examples
-#' #' #### Step (1) Implement setup_acdc_*() steps
+#' #### Step (1) Implement setup_acdc_*() steps
 #' # ... Define acoustic centroids required for AC algorithm (see setup_acdc_centroids())
 #'
 #' #### Step (2) Prepare movement time series for algorithm
-#' # Focus on an example individual
+#' # Focus on an example individual for speed
 #' id <- 25
-#' acc <- dat_acoustics[dat_acoustics$individual_id == id, ]
+#' acc <- dat_acoustics[dat_acoustics$individual_id == id, ][1:25, ]
 #'
 #' #### Example (1) Implement AC algorithm with default arguments
 #' # This implements the algorithm on a single core, printing messages

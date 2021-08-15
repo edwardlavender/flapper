@@ -2,7 +2,7 @@
 % Please edit documentation in R/acdc_support.R
 \name{acdc_animate}
 \alias{acdc_animate}
-\title{Create a html animation of the AC* algorithm(s)}
+\title{Create a html animation of the AC/DC algorithm(s)}
 \usage{
 acdc_animate(
   expr_param,

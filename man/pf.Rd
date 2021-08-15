@@ -169,10 +169,14 @@ prettyGraphics::pretty_map(add_rasters = list(x = surface),
 dc_out <- dc(archival = depth,
              bathy = surface,
              calc_depth_error = cde,
-             plot = NULL)
+             save_record_spatial = NULL)
 # Extract time-specific maps
-record <- dc_out$spatial
-record <- lapply(record, function(r) r$map_timestep)
+# ... Either directly for single chunk implementations of dc()
+record <- dc_out$.acdc$record
+record <- lapply(record, function(r) r$spatial[[1]]$map_timestep)
+# ... Or indirectly via acdc_simplify() in general
+dc_out_summary <- acdc_simplify(dc_out, type = "dc")
+record <- lapply(dc_out_summary$record, function(r) r$spatial[[1]]$map_timestep)
 # Plot maps
 lapply(record, function(r) raster::plot(r))
 
@@ -420,16 +424,17 @@ pf_plot_1d(depth_obs, path_sim,
 dc_out <- dc(archival = depth_obs,
              bathy = dat_gebco_planar,
              calc_depth_error = cde,
-             plot = NULL)
+             save_record_spatial = NULL)
 
 ## Implement pf() on the results from dc()
 # We will assume that the origin was known.
 # ... We will mostly use the default options.
-history_dcpf <- pf(record = lapply(dc_out$spatial, function(r) r$map_timestep),
-                   origin = origin_sim,
-                   calc_distance = "euclid",
-                   mobility = 200,
-                   n = 10L)
+history_dcpf <-
+  pf(record = lapply(dc_out$.acdc$record, function(r) r$spatial[[1]]$map_timestep),
+     origin = origin_sim,
+     calc_distance = "euclid",
+     mobility = 200,
+     n = 10L)
 
 ## Visualise particle histories in relation to simulated paths
 # Here, each plot shows the particles sampled at a particular time step
