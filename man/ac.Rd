@@ -18,6 +18,7 @@ ac(
   normalise = FALSE,
   save_record_spatial = 1L,
   write_record_spatial_for_pf = NULL,
+  save_args = TRUE,
   verbose = TRUE,
   con = "",
   progress = 1L,
@@ -52,6 +53,8 @@ ac(
 \item{save_record_spatial}{An integer vector that defines the time steps for which to save a record of the spatial information from each time step. \code{save_record_spatial = 0L} suppresses the return of this information and \code{save_record_spatial = NULL} returns this information for all time steps. If the algorithm is applied chunk-wise, this spatial information must be returned for at least the first time step (the default) to aggregate maps across chunks (see \code{\link[flapper]{acdc_simplify}}). This information can also be used to plot time-specific results of the algorithm using \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}}.}
 
 \item{write_record_spatial_for_pf}{(optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by acoustic and internal (archival) time steps. For example, the file for the first acoustic time step and the first archival time step is named acc_1_arc_1.}
+
+\item{save_args}{A logical input that defines whether or not to save the list of function inputs in the returned object.}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console (which is only supported if the algorithm is not implemented in parallel: see below); otherwise, they are written to file (see below).}
 

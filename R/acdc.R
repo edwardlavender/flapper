@@ -20,6 +20,7 @@
 #' @param save_record_spatial An integer of the spatial layers to save (see \code{\link[flapper]{ac}}).
 
 #' @param write_record_spatial_for_pf A named list used to write time step-specific maps to file (see \code{\link[flapper]{ac}}).
+#' @param save_args A logical input that defines whether or not to save the list of function inputs (see \code{\link[flapper]{ac}}).
 #' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress (see \code{\link[flapper]{ac}}).
 #' @param con If \code{verbose = TRUE}, \code{con} is character string defines how messages relaying function progress are returned (see \code{\link[flapper]{ac}}).
 #' @param progress An integer controlling the progress bar (see \code{\link[flapper]{ac}}).
@@ -242,6 +243,7 @@ acdc <- function(acoustics,
                  normalise = FALSE,
                  save_record_spatial = 1L,
                  write_record_spatial_for_pf = NULL,
+                 save_args = TRUE,
                  verbose = TRUE,
                  con = "",
                  progress = 1L,
@@ -279,6 +281,28 @@ acdc <- function(acoustics,
       cl = cl,
       varlist = varlist
     )
+  if(save_args){
+    out$args <- list(acoustics = acoustics,
+                     archival = archival,
+                     plot_ts = plot_ts,
+                     bathy = bathy,
+                     detection_range = detection_range,
+                     detection_kernels = detection_kernels,
+                     detection_kernels_overlap = detection_kernels_overlap,
+                     detection_time_window = detection_time_window,
+                     acc_centroids = acc_centroids,
+                     mobility = mobility,
+                     calc_depth_error = calc_depth_error,
+                     normalise = normalise,
+                     save_record_spatial = save_record_spatial,
+                     write_record_spatial_for_pf = write_record_spatial_for_pf,
+                     verbose = verbose,
+                     con = con,
+                     progress = progress,
+                     split = split,
+                     cl = cl,
+                     varlist = varlist)
+  }
   t_end <- Sys.time()
   message(paste0("flapper::acdc() finished (@ ", t_end, ")..."))
   return(out)

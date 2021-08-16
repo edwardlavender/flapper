@@ -19,6 +19,7 @@ acdc(
   normalise = FALSE,
   save_record_spatial = 1L,
   write_record_spatial_for_pf = NULL,
+  save_args = TRUE,
   verbose = TRUE,
   con = "",
   progress = 1L,
@@ -55,6 +56,8 @@ acdc(
 \item{save_record_spatial}{An integer of the spatial layers to save (see \code{\link[flapper]{ac}}).}
 
 \item{write_record_spatial_for_pf}{A named list used to write time step-specific maps to file (see \code{\link[flapper]{ac}}).}
+
+\item{save_args}{A logical input that defines whether or not to save the list of function inputs (see \code{\link[flapper]{ac}}).}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console or to file to relay function progress (see \code{\link[flapper]{ac}}).}
 
