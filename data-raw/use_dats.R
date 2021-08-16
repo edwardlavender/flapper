@@ -118,21 +118,25 @@ prettyGraphics::pretty_map(add_rasters = list(x = surface),
                            verbose = FALSE)
 
 #### (A) Implement DC algorithm
-dc_1 <- dc(archival = depth,
+dat_dc <- dc(archival = depth,
            bathy = surface,
            calc_depth_error = function(...) c(-30, 30),
            save_record_spatial = 0L
            )
-dat_dc <- dc_1
 
 #### Example (1): Implement algorithm using default options
 # Note that because the bathymetry data is very coarse, we have to
 # ... force the depth_error to be high in this example.
-dcpf_1 <- pf(record = lapply(dc_1$spatial, function(elm) elm$map_timestep),
+dc_1 <- dc(archival = depth,
+           bathy = surface,
+           calc_depth_error = function(...) c(-30, 30),
+           save_record_spatial = NULL
+           )
+dcpf_1 <- pf(record = lapply(dc_1$.acdc$record, function(elm) elm$spatial[[1]]$map_timestep),
              origin  = xy,
              calc_distance = "euclid",
              calc_distance_euclid_fast = FALSE,
-             bathy = surface, # not needed, but retained for example ease
+             bathy = surface,
              calc_movement_pr =
                function(distance,...) {
                  pr <- stats::plogis(10 + distance * -0.05)
@@ -215,12 +219,12 @@ dat_acdc <- acdc(acoustics = acc,
                  mobility = 200,
                  calc_depth_error = function(...) c(-2.5, 2.5),
                  acc_centroids = dat_centroids,
-                 plot = 1:50,
+                 save_record_spatial = 1:50,
                  progress = 3L,
                  verbose = TRUE,
                  con = "",
                  split = "2 hours"
-)
+                 )
 
 # Check size of file prior to inclusion in package
 saveRDS(dat_acdc, paste0(tempdir(), "/dat_acdc.rds"))
