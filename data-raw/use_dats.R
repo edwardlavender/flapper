@@ -162,22 +162,23 @@ proj_wgs84 <- sp::CRS("+init=epsg:4326")
 # CRS of receiver locations required
 proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
                           "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
-# Define SpatialPoints object
+# Define SpatialPointsDataFrame object
 xy_wgs84 <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 xy_utm <- sp::spTransform(xy_wgs84, proj_utm)
+xy_utm <-
+  sp::SpatialPointsDataFrame(xy_utm,
+                             dat_moorings[, "receiver_id", drop = FALSE])
 
 ## Define a list of centroids with specified parameters
-dat_centroids <- acdc_setup(rs = dat_moorings$receiver_id,
-                            xy = xy_utm,
-                            detection_range = 425,
-                            mobility = 200,
-                            n_timesteps = 25,
-                            coastline = dat_coast,
-                            boundaries = raster::extent(dat_gebco),
-                            plot = TRUE,
-                            cl = parallel::makeCluster(11L),
-                            verbose = TRUE
-)
+dat_centroids <- acs_setup_centroids(xy = xy_utm,
+                                     detection_range = 425,
+                                     mobility = 200,
+                                     n_timesteps = 25,
+                                     coastline = dat_coast,
+                                     boundaries = raster::extent(dat_gebco),
+                                     plot = TRUE,
+                                     cl = parallel::makeCluster(11L),
+                                     verbose = TRUE)
 # Check size (Mb) of file prior to inclusion in package
 saveRDS(dat_centroids, paste0(tempdir(), "/dat_centroids.rds"))
 file.size(paste0(tempdir(), "/dat_centroids.rds"))/1e6

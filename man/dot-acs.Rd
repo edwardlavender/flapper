@@ -31,7 +31,7 @@
 )
 }
 \arguments{
-\item{acoustics}{A dataframe that contains passive acoustic telemetry detection time series for a specific individual (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named `receiver_id' (that must match that inputted to \code{\link[flapper]{acdc_setup_centroids}}); a POSIXct vector of time stamps when detections were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'.}
+\item{acoustics}{A dataframe that contains passive acoustic telemetry detection time series for a specific individual (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named `receiver_id' (that must match that inputted to \code{\link[flapper]{acs_setup_centroids}}); a POSIXct vector of time stamps when detections were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'.}
 
 \item{archival}{For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series for the same individual (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; a POSIXct vector of time stamps when observations were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.}
 
@@ -39,21 +39,21 @@
 
 \item{plot_ts}{A logical input that defines whether or not to the plot movement series before the algorithm is initiated.}
 
-\item{bathy}{A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC* algorithm) across the area within which the individual could have moved. For the ACDC algorithm, this must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).}
+\item{bathy}{A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC* algorithm) across the area within which the individual could have moved. For the ACDC algorithm, this must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acs_setup_centroids}}).}
 
 \item{map}{(optional) A blank \code{\link[raster]{raster}}, with the same properties (i.e., dimensions, resolution, extent and coordinate reference system) as the area/bathymetry raster (see \code{bathy}), but in which all values are 0. If \code{NULL}, this is computed internally, but supplying a pre-defined raster can be more computationally efficient if the function is applied iteratively (e.g., over different time windows).}
 
-\item{detection_range}{A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see also \code{\link[flapper]{acdc_setup_centroids}}).}
+\item{detection_range}{A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see also \code{\link[flapper]{acs_setup_centroids}}).}
 
-\item{detection_kernels}{A named list of detection probability kernels, from \code{\link[flapper]{acdc_setup_detection_kernels}} and created using consistent parameters as specified for other \code{acdc_setup_*} functions and here (i.e., see the \code{overlaps}, \code{calc_detection_pr} and \code{map} arguments in \code{\link[flapper]{acdc_setup_detection_kernels}}).}
+\item{detection_kernels}{A named list of detection probability kernels, from \code{\link[flapper]{acs_setup_detection_kernels}} and created using consistent parameters as specified for other \code{acs_setup_*} functions and here (i.e., see the \code{overlaps}, \code{calc_detection_pr} and \code{map} arguments in \code{\link[flapper]{acs_setup_detection_kernels}}).}
 
 \item{detection_kernels_overlap}{(optional) A named list (the `list_by_receiver' element from \code{\link[flapper]{get_detection_centroids_overlap}}), that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers. If \code{detection_kernels_overlap} and \code{detection_time_window} (below) are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids; if unsupplied, receiver detection probability kernels are assumed not to overlap.}
 
-\item{detection_time_window}{(optional) A number that defines the maximum duration (s) between consecutive detections at different receivers such that they can be said to have occurred at `effectively the same time'. This indicates that the same transmission was detected by multiple receivers. If \code{detection_kernels_overlap} (above) and \code{detection_time_window} are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids, by up-weighting overlapping areas between receivers that detected the transmission and down-weighting overlapping areas between receivers that did not detect the transmission (see Details in \code{\link[flapper]{acdc_setup_detection_kernels}}).}
+\item{detection_time_window}{(optional) A number that defines the maximum duration (s) between consecutive detections at different receivers such that they can be said to have occurred at `effectively the same time'. This indicates that the same transmission was detected by multiple receivers. If \code{detection_kernels_overlap} (above) and \code{detection_time_window} are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids, by up-weighting overlapping areas between receivers that detected the transmission and down-weighting overlapping areas between receivers that did not detect the transmission (see Details in \code{\link[flapper]{acs_setup_detection_kernels}}).}
 
-\item{acc_centroids}{A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acdc_setup_centroids}}.}
+\item{acc_centroids}{A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.}
 
-\item{mobility}{A number that defines the distance (m) that an individual could move in the time steps between acoustic detections (see also \code{\link[flapper]{acdc_setup_centroids}}).}
+\item{mobility}{A number that defines the distance (m) that an individual could move in the time steps between acoustic detections (see also \code{\link[flapper]{acs_setup_centroids}}).}
 
 \item{calc_depth_error}{In the ACDC algorithm, \code{calc_depth_error} is function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.}
 
@@ -91,7 +91,7 @@ blank <- raster::raster(raster::extent(dat_gebco), res = c(75, 75))
 gebco <- raster::resample(dat_gebco, blank)
 
 #### Step (2) Implement setup_acdc_*() steps
-# ... Define acoustic centroids required for algorithm(s) (see acdc_setup_centroids())
+# ... Define acoustic centroids required for algorithm(s) (see acs_setup_centroids())
 
 #### Step (3) Prepare movement time series for algorithm(s)
 # Add required columns to dataframes:
@@ -164,12 +164,12 @@ calc_dpr <-
   }
 
 ## (C) Get detection kernels (a slow step)
-kernels <- acdc_setup_detection_kernels(xy = xy,
-                                        centroids = dat_centroids,
-                                        overlaps = overlaps,
-                                        calc_detection_pr = calc_dpr,
-                                        map = gebco,
-                                        coastline = invert_poly(dat_coast))
+kernels <- acs_setup_detection_kernels(xy = xy,
+                                       centroids = dat_centroids,
+                                       overlaps = overlaps,
+                                       calc_detection_pr = calc_dpr,
+                                       map = gebco,
+                                       coastline = invert_poly(dat_coast))
 ## (D) Implement algorithm
 out_acdc_3 <- flapper:::.acs(acoustics = acc,
                              archival = arc,
@@ -262,7 +262,7 @@ out_acdc_6 <- flapper:::.acs(acoustics = acc,
 
 }
 \seealso{
-The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call \code{\link[flapper]{.acs_pl}} which in turn calls this function. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
+The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call \code{\link[flapper]{.acs_pl}} which in turn calls this function. \code{\link[flapper]{acs_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acs_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
 }
 \author{
 Edward Lavender

@@ -323,13 +323,6 @@ designed to infer space use from PAT data and their evaluation under
 different circumstances (e.g., array designs, movement models and
 detection models).
 
-<img src="vignettes/readme_flapper_family_implementation.png"/> *The
-\`flapper’ family of algorithms. The acoustic-centroid depth-contour
-(ACDC) branch utilises acoustic and/or archival data to map the possible
-locations of an animal through time. The particle filtering (PF) branch
-refines these maps via the implementation of a particle simulation and
-filtering approach for the reconstruction of possible movement paths.*
-
 ### The centres of activity (COA) algorithm
 
 Centres of activity (COA) are one of the most widely used metrics for
@@ -350,20 +343,32 @@ following functions:
   - `kud_around_coastline()` facilitates the estimation of home ranges
     (e.g., from estimated COAs) in areas of complex coastline;
 
-### The depth-contour (DC) algorithm
+### The `flapper` family of algorithms
 
-Alongside the COA algorithm, `flapper` introduces a number of new
-algorithms for the inferring patterns of space use. The depth-contour
-(DC) algorithm is the simplest. Whereas the COA approach only makes use
-of detections, the DC approach only uses depth observations.
-Specifically, under the assumption that individuals are
+Alongside the COA algorithm, this package introduces the `flapper` of
+algorithms for the inferring patterns of space use.
+
+<img src="vignettes/readme_flapper_family_implementation.png"/> *The
+\`flapper’ family of algorithms. The acoustic-centroid depth-contour
+(ACDC) branch utilises acoustic and/or archival data to map the possible
+locations of an animal through time. The particle filtering (PF) branch
+refines these maps via the implementation of a particle simulation and
+filtering approach for the reconstruction of possible movement paths.*
+
+#### AC/DC branch algorithms
+
+##### The depth-contour (DC) algorithm
+
+The depth-contour (DC) algorithm is the simplest. Whereas the COA
+approach only makes use of detections, the DC approach only uses depth
+observations. Specifically, under the assumption that individuals are
 benthic/demersal, this algorithm uses observed depths (± some error) to
 define the subset of possible locations of each individual within a
 defined area. This is implemented via `dc()`. The ‘quick’ depth-contour
 (DCQ) algorithm, implemented via `dcq()`, uses a modified version of
 this algorithm for quicker run times.
 
-### The acoustic-contour\* (AC\*) algorithm(s)
+##### The acoustic-contour\* (AC\*) algorithm(s)
 
 The `flapper` family-equivalent of the COA algorithm is the
 acoustic-contour (AC) algorithm. This approach represents the
@@ -375,21 +380,28 @@ combines the AC and DC algorithms, using PAT data to inform the area
 within which depth contours are most likely to be found. These
 algorithms are implemented with the `acdc*()` family of functions:
 
-  - `acdc_setup_mobility()` examines the assumption of a constant
+  - `acs_setup_mobility()` examines the assumption of a constant
     ‘mobility’ parameter;
-  - `acdc_setup_n_centroids()` suggests the number of acoustic centroids
+  - `acs_setup_n_centroids()` suggests the number of acoustic centroids
     for the algorithm(s);
-  - `acdc_setup_centroids()` defines the acoustic centroids for the
+  - `acs_setup_centroids()` defines the acoustic centroids for the
     algorithm(s);
-  - `acdc_setup_detection_kernels()` defines detection probability
+  - `acs_setup_detection_kernels()` defines detection probability
     kernels for the algorithm(s);
   - `ac()` and `acdc()` implement the algorithm(s), via the back-end
     functions `.acs_pl()` and `.acs()`;
-  - `acdc_simplify()` simplifies the results of the algorithm(s);
-  - `acdc_plot()` plots the results of the algorithm(s);
-  - `acdc_animate()` creates html animations of the algorithm(s);
 
-### Particle filtering routines
+##### AC/DC post-processing and analysis
+
+The AC/DC branch functions (`ac()`, `dc()` and `acdc()`) all return
+objects of class `acdc`. These can be processed and analysed using
+several key functions:
+
+  - `acdc_simplify()` simplifies the results of the AC/DC algorithm(s);
+  - `acdc_plot()` plots the results of the AC/DC algorithm(s);
+  - `acdc_animate()` creates html animations of the AC/DC algorithm(s);
+
+### Particle filtering branch algorithms
 
 Each algorithm (AC, DC and ACDC) can be extended through incorporation
 of a movement model to reconstruct movement paths over a surface that

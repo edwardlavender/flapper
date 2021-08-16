@@ -114,32 +114,41 @@ The main thrust of flapper is the implementation of existing and new algorithms 
     \item \link{coa} implements the arithmetic version of the mean-position algorithm to calculate COAs;
     \item \link{kud_around_coastline} facilitates the estimation of home ranges (e.g., from estimated COAs) in areas of complex coastline;
   }
-  \item The depth-contour (DC) algorithm
+  \item The `flapper` family of algorithms
   \itemize{
-    \item \link{dc} implements the DC algorithm;
-    \item \link{dcq} implements the quick DC (DCQ) algorithm;
-  }
-  \item The acoustic-centroid* (AC*) algorithms
-  \itemize{
-    \item \link{acdc_setup_mobility} examines the assumption of a constant `mobility' parameter;
-    \item \link{acdc_setup_n_centroids} suggests the number of acoustic centroids for the algorithm(s);
-    \item \link{acdc_setup_centroids} defines the acoustic centroids for the algorithm(s);
-    \item \link{acdc_setup_detection_kernels} defines detection probability kernels for the algorithm(s);
-    \item \link{ac} and \link{acdc} implement the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms, via \link{.acs_pl} and \link{.acs};
-    \item \link{acdc_simplify} simplifies the results of the algorithm(s);
-    \item \link{acdc_plot} plots the results of the algorithm(s);
-    \item \link{acdc_animate} creates html animations of the algorithm(s);
-  }
-  \item The AC, DC and ACDC particle filtering algorithms
-  \itemize{
-    \item \link{pf_setup_movement_pr} provides a simple movement model that defines the probability of movement between locations given the distance between them;
-    \item \link{pf} implements the PF routine, building on the AC, DC and ACDC algorithms to form the ACPF, DCPF and ACDCPF algorithms;
-    \item \link{pf_plot_history} plots simulated particle histories;
-    \item \link{pf_simplify} assembles movement paths from particle histories;
-    \item \link{pf_loglik} calculates the log-likelihood of reconstructed paths, given the movement model;
-    \item \link{pf_plot_1d} plots the depth time series from observed and reconstructed paths;
-    \item \link{pf_plot_2d} maps the reconstructed paths in two-dimensions;
-    \item \link{pf_plot_3d} maps the reconstructed paths in three-dimensions;
+    \item The AC/DC branch
+    \itemize{
+      \item The depth-contour (DC) algorithm
+      \itemize{
+         \item \link{dc} implements the DC algorithm;
+         \item \link{dcq} implements the quick DC (DCQ) algorithm;
+         }
+     \item The acoustic-centroid* (AC*) algorithms
+     \itemize{
+        \item \link{acs_setup_mobility} examines the assumption of a constant `mobility' parameter;
+        \item \link{acs_setup_n_centroids} suggests the number of acoustic centroids for the algorithm(s);
+        \item \link{acs_setup_centroids} defines the acoustic centroids for the algorithm(s);
+        \item \link{acs_setup_detection_kernels} defines detection probability kernels for the algorithm(s);
+        \item \link{ac} and \link{acdc} implement the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms, via \link{.acs_pl} and \link{.acs};
+         }
+     \item AC/DC processing
+     \itemize{
+        \item \link{acdc_simplify} simplifies the results of the algorithm(s);
+        \item \link{acdc_plot} plots the results of the algorithm(s);
+        \item \link{acdc_animate} creates html animations of the algorithm(s);
+        }
+     }
+    \item The particle filtering branch
+    \itemize{
+      \item \link{pf_setup_movement_pr} provides a simple movement model that defines the probability of movement between locations given the distance between them;
+      \item \link{pf} implements the PF routine, building on the AC, DC and ACDC algorithms to form the ACPF, DCPF and ACDCPF algorithms;
+      \item \link{pf_plot_history} plots simulated particle histories;
+      \item \link{pf_simplify} assembles movement paths from particle histories;
+      \item \link{pf_loglik} calculates the log-likelihood of reconstructed paths, given the movement model;
+      \item \link{pf_plot_1d} plots the depth time series from observed and reconstructed paths;
+      \item \link{pf_plot_2d} maps the reconstructed paths in two-dimensions;
+      \item \link{pf_plot_3d} maps the reconstructed paths in three-dimensions;
+      }
   }
 }
 }

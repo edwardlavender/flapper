@@ -34,7 +34,7 @@ acdc(
 
 \item{plot_ts}{A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.}
 
-\item{bathy}{A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acdc_setup_centroids}}).}
+\item{bathy}{A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acs_setup_centroids}}).}
 
 \item{detection_range}{A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see \code{\link[flapper]{ac}}).}
 
@@ -44,7 +44,7 @@ acdc(
 
 \item{detection_time_window}{A number that defines the detection time window (see \code{\link[flapper]{ac}}).}
 
-\item{acc_centroids}{A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acdc_setup_centroids}}.}
+\item{acc_centroids}{A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.}
 
 \item{mobility}{The mobility parameter (see \code{\link[flapper]{ac}}).}
 
@@ -271,7 +271,7 @@ summary(acdc_out_by_id)
 
 }
 \seealso{
-This function calls \code{\link[flapper]{.acs_pl}} and \code{\link[flapper]{.acs}} to implement the ACDC algorithm. The AC component can be implemented via  \code{\link[flapper]{ac}} and the DC component via \code{\link[flapper]{dc}}. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results. Particle filtering can be used to reconstruct movement paths.
+This function calls \code{\link[flapper]{.acs_pl}} and \code{\link[flapper]{.acs}} to implement the ACDC algorithm. The AC component can be implemented via  \code{\link[flapper]{ac}} and the DC component via \code{\link[flapper]{dc}}. \code{\link[flapper]{acs_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acs_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results. Particle filtering can be used to reconstruct movement paths.
 }
 \author{
 Edward Lavender
