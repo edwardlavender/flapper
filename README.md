@@ -355,9 +355,9 @@ locations of an animal through time. The particle filtering (PF) branch
 refines these maps via the implementation of a particle simulation and
 filtering approach for the reconstruction of possible movement paths.*
 
-#### AC/DC branch algorithms
+### AC/DC branch algorithms
 
-##### The depth-contour (DC) algorithm
+#### The depth-contour (DC) algorithm
 
 The depth-contour (DC) algorithm is the simplest. Whereas the COA
 approach only makes use of detections, the DC approach only uses depth
@@ -368,7 +368,7 @@ defined area. This is implemented via `dc()`. The ‘quick’ depth-contour
 (DCQ) algorithm, implemented via `dcq()`, uses a modified version of
 this algorithm for quicker run times.
 
-##### The acoustic-contour\* (AC\*) algorithm(s)
+#### The acoustic-contour\* (AC\*) algorithm(s)
 
 The `flapper` family-equivalent of the COA algorithm is the
 acoustic-contour (AC) algorithm. This approach represents the
@@ -391,7 +391,7 @@ algorithms are implemented with the `acdc*()` family of functions:
   - `ac()` and `acdc()` implement the algorithm(s), via the back-end
     functions `.acs_pl()` and `.acs()`;
 
-##### AC/DC post-processing and analysis
+#### AC/DC post-processing and analysis
 
 The AC/DC branch functions (`ac()`, `dc()` and `acdc()`) all return
 objects of class `acdc`. These can be processed and analysed using

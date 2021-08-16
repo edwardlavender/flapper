@@ -173,13 +173,13 @@ Alongside the COA algorithm, this package introduces the `flapper` of algorithms
 <img src="vignettes/readme_flapper_family_implementation.png"/>
 _The `flapper' family of algorithms. The acoustic-centroid depth-contour (ACDC) branch utilises acoustic and/or archival data to map the possible locations of an animal through time. The particle filtering (PF) branch refines these maps via the implementation of a particle simulation and filtering approach for the reconstruction of possible movement paths._
 
-#### AC/DC branch algorithms
+### AC/DC branch algorithms
 
-##### The depth-contour (DC) algorithm
+#### The depth-contour (DC) algorithm
 
 The depth-contour (DC) algorithm is the simplest. Whereas the COA approach only makes use of detections, the DC approach only uses depth observations. Specifically, under the assumption that individuals are benthic/demersal, this algorithm uses observed depths (± some error) to define the subset of possible locations of each individual within a defined area. This is implemented via `dc()`. The 'quick' depth-contour (DCQ) algorithm, implemented via `dcq()`, uses a modified version of this algorithm for quicker run times. 
 
-##### The acoustic-contour* (AC*) algorithm(s)
+#### The acoustic-contour* (AC*) algorithm(s)
 
 The `flapper` family-equivalent of the COA algorithm is the acoustic-contour (AC) algorithm. This approach represents the information from acoustic detections in the form of acoustic centroids, which contract and expand in line with the distribution of uncertainty in the individual's location when it is detected and in the gaps between detections. The acoustic-centroid depth-contour (ACDC) algorithm combines the AC and DC algorithms, using PAT data to inform the area within which depth contours are most likely to be found. These algorithms are implemented with the `acdc*()` family of functions: 
 
@@ -189,7 +189,7 @@ The `flapper` family-equivalent of the COA algorithm is the acoustic-contour (AC
 * `acs_setup_detection_kernels()` defines detection probability kernels for the algorithm(s);
 * `ac()` and `acdc()` implement the algorithm(s), via the back-end functions `.acs_pl()` and `.acs()`;
 
-##### AC/DC post-processing and analysis
+#### AC/DC post-processing and analysis
 
 The AC/DC branch functions (`ac()`, `dc()` and `acdc()`) all return objects of class `acdc`. These can be processed and analysed using several key functions: 
 
