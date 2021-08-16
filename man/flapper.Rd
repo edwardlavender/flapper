@@ -125,7 +125,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
     \item \link{acdc_setup_n_centroids} suggests the number of acoustic centroids for the algorithm(s);
     \item \link{acdc_setup_centroids} defines the acoustic centroids for the algorithm(s);
     \item \link{acdc_setup_detection_kernels} defines detection probability kernels for the algorithm(s);
-    \item \link{ac} and \link{acdc} implement the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms, via \link{.acdc_pl} and \link{.acdc};
+    \item \link{ac} and \link{acdc} implement the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms, via \link{.acs_pl} and \link{.acs};
     \item \link{acdc_simplify} simplifies the results of the algorithm(s);
     \item \link{acdc_plot} plots the results of the algorithm(s);
     \item \link{acdc_animate} creates html animations of the algorithm(s);

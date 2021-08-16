@@ -384,7 +384,7 @@ algorithms are implemented with the `acdc*()` family of functions:
   - `acdc_setup_detection_kernels()` defines detection probability
     kernels for the algorithm(s);
   - `ac()` and `acdc()` implement the algorithm(s), via the back-end
-    functions `.acdc_pl()` and `.acdc()`;
+    functions `.acs_pl()` and `.acs()`;
   - `acdc_simplify()` simplifies the results of the algorithm(s);
   - `acdc_plot()` plots the results of the algorithm(s);
   - `acdc_animate()` creates html animations of the algorithm(s);

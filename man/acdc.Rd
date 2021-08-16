@@ -67,7 +67,7 @@ acdc(
 \item{cl, varlist}{Parallelisation arguments to implement the algorithm in parallel (see \code{\link[flapper]{ac}}).}
 }
 \value{
-The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acdc}}, if applicable, are written to file.
+The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
 }
 \description{
 This function implements the acoustic-centroid depth-contour (ACDC) algorithm. This is an extension of the AC algorithm implemented by \code{\link[flapper]{ac}} that that integrates acoustic detections and depth observations to infer where benthic/demersal animals could have spent more or less time over the period of observations. To implement the function, a dataframe (or list) of passive acoustic telemetry detections is required (\code{acoustics}), alongside a dataframe of depth observations (\code{archival}). At each time step, the algorithm integrates information from past and future acoustic detections in the form of acoustic centroids and information from depth observations in the form of depth contours to determine the possible locations of an individual in an area (see Details). As for the AC algorithm (\code{\link[flapper]{ac}}), the function can be implemented step-wise or chunk-wise and the outputs can be processed via \code{\link[flapper]{acdc_simplify}}.
@@ -115,7 +115,7 @@ out_acdc <- acdc(acoustics = acc,
                  )
 # The function returns a list with four elements
 # ... .acdc contains the results of the algorithm, implemented by the back-end
-# ... function .acdc(). The other elements provide the time series
+# ... function .acs(). The other elements provide the time series
 # ... for each chunk, the time of the algorithm and a list of user inputs
 summary(out_acdc)
 
@@ -271,7 +271,7 @@ summary(acdc_out_by_id)
 
 }
 \seealso{
-This function calls \code{\link[flapper]{.acdc_pl}} and \code{\link[flapper]{.acdc}} to implement the ACDC algorithm. The AC component can be implemented via  \code{\link[flapper]{ac}} and the DC component via \code{\link[flapper]{dc}}. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results. Particle filtering can be used to reconstruct movement paths.
+This function calls \code{\link[flapper]{.acs_pl}} and \code{\link[flapper]{.acs}} to implement the ACDC algorithm. The AC component can be implemented via  \code{\link[flapper]{ac}} and the DC component via \code{\link[flapper]{dc}}. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results. Particle filtering can be used to reconstruct movement paths.
 }
 \author{
 Edward Lavender

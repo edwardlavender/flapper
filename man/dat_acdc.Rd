@@ -7,7 +7,7 @@
 \format{
 A named list with 4 elements:
 \describe{
-  \item{.acdc}{A list of results from calls to \code{\link[flapper]{.acdc}}, with one element per chunk.}
+  \item{.acdc}{A list of results from calls to \code{\link[flapper]{.acs}}, with one element per chunk.}
   \item{ts_by_chunk}{A list of time series, with one element per chunk.}
   \item{time}{A dataframe that defines the times of sequential stages in the algorithm's progression.}
   \item{args}{A named list of user inputs that record the parameters used to generate the outputs.}

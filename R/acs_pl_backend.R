@@ -1,25 +1,25 @@
 ######################################
 ######################################
-#### .acdc_pl()
+#### .acs_pl()
 
-#' @title Intermediate wrapper for \code{\link[flapper]{.acdc}} that supports parallelisation
-#' @description This function implements the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms. This is called via a front-end function (i.e. \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}). It checks and processes inputs and implements the selected algorithm via calls to \code{\link[flapper]{.acdc}}. Outputs are returned in a named list.
+#' @title Intermediate wrapper for \code{\link[flapper]{.acs}} that supports parallelisation
+#' @description This function implements the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms. This is called via a front-end function (i.e. \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}). It checks and processes inputs and implements the selected algorithm via calls to \code{\link[flapper]{.acs}}. Outputs are returned in a named list.
 #'
 #' @param acoustics A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. Each dataframe should contain the following columns: an integer vector of receiver IDs, named `receiver_id'; and a POSIXct vector of time stamps when detections were made, named `timestamp'. If a list of dataframes is supplied, dataframes must be refer to the detections of a single individual and be ordered by time (e.g., in hourly chunks). The algorithm will be implemented on each dataframe, termed `chunk', either in sequence or parallel. Any empty or \code{NULL} elements will be removed automatically.
-#' @param archival For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series (see \code{\link[flapper]{.acdc}}).
-#' @param step A number that defines the time step length (s) between consecutive detections (see \code{\link[flapper]{.acdc}}).
-#' @param plot_ts A logical input that defines whether or not to plot movement time series (see \code{\link[flapper]{.acdc}}).
-#' @param bathy A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC algorithm) across the area within which the individual could have moved (see \code{\link[flapper]{.acdc}}).
-#' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see \code{\link[flapper]{.acdc}})
-#' @param detection_kernels A named list of detection probability kernels (see \code{\link[flapper]{.acdc}}).
+#' @param archival For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series (see \code{\link[flapper]{.acs}}).
+#' @param step A number that defines the time step length (s) between consecutive detections (see \code{\link[flapper]{.acs}}).
+#' @param plot_ts A logical input that defines whether or not to plot movement time series (see \code{\link[flapper]{.acs}}).
+#' @param bathy A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC algorithm) across the area within which the individual could have moved (see \code{\link[flapper]{.acs}}).
+#' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see \code{\link[flapper]{.acs}})
+#' @param detection_kernels A named list of detection probability kernels (see \code{\link[flapper]{.acs}}).
 #' @param detection_kernels_overlap A named list of detection probability kernel overlaps, directly from \code{\link[flapper]{get_detection_centroids_overlap}}. This must contain an element named `list_by_receiver' with the data for each receiver.
-#' @param detection_time_window A number that defines the detection time window (see \code{\link[flapper]{.acdc}})
-#' @param acc_centroids A list of acoustic centroids (see \code{\link[flapper]{.acdc}}).
-#' @param mobility The mobility parameter (see \code{\link[flapper]{.acdc}}).
-#' @param calc_depth_error The depth error function (see \code{\link[flapper]{.acdc}}).
-#' @param normalise A logical input that defines whether or not to normalise maps (see \code{\link[flapper]{.acdc}}).
-#' @param save_record_spatial An integer of the spatial layers to save (see \code{\link[flapper]{.acdc}}).
-#' @param write_record_spatial_for_pf A named list used to write time step-specific maps to file (see \code{\link[flapper]{.acdc}}).
+#' @param detection_time_window A number that defines the detection time window (see \code{\link[flapper]{.acs}})
+#' @param acc_centroids A list of acoustic centroids (see \code{\link[flapper]{.acs}}).
+#' @param mobility The mobility parameter (see \code{\link[flapper]{.acs}}).
+#' @param calc_depth_error The depth error function (see \code{\link[flapper]{.acs}}).
+#' @param normalise A logical input that defines whether or not to normalise maps (see \code{\link[flapper]{.acs}}).
+#' @param save_record_spatial An integer of the spatial layers to save (see \code{\link[flapper]{.acs}}).
+#' @param write_record_spatial_for_pf A named list used to write time step-specific maps to file (see \code{\link[flapper]{.acs}}).
 #' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console (which is only supported if the algorithm is not implemented in parallel: see below); otherwise, they are written to file (see below).
 #' @param con If \code{verbose = TRUE}, \code{con} is character string defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}), an approach that is only implemented if the function is not implemented in parallel. Otherwise, \code{con} defines the directory into which to write .txt files, into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging. If the algorithm is implemented step-wise, then a single file is written to the specified directory named acdc_log.txt. If the algorithm is implemented chunk-wise, then an additional file is written for each chunk (named dot_acdc_log_1.txt, dot_acdc_log_2.txt and so on), with the details for each chunk.
 #' @param progress (optional) If the algorithm is implemented step-wise, \code{progress} is an integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the `archival' time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar. If the algorithm is implemented for chunks, inputs to \code{progress} are ignored and a single progress bar is shown of the progress across acoustic chunks.
@@ -27,9 +27,9 @@
 #' @param cl,varlist Parallelisation arguments. \code{cl} is cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the algorithm is implemented for each chunk in a list of acoustic time series, either (a) as supplied by the user (if \code{acoustics} is a list), (b) as defined by the input to \code{split}, or (c) as defined automatically from the number of nodes in the cluster if \code{split = NULL}. If \code{cl} is supplied, \code{varlist} may also be required. This is a character vector of objects to export. \code{varlist} is passed to the \code{varlist} of \code{\link[parallel]{clusterExport}}. Exported objects must be located in the global environment.
 #' @param ... Additional arguments (none implemented).
 #'
-#' @return The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acdc}}, if applicable, are written to file.
+#' @return The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
 #'
-#' @seealso The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call this function, which in turn calls \code{\link[flapper]{.acdc}}. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
+#' @seealso The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call this function, which in turn calls \code{\link[flapper]{.acs}}. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results.
 #'
 #' @examples
 #' # For examples, see ?ac and ?acdc which call this function directly.
@@ -38,7 +38,7 @@
 #' @keywords internal
 #'
 
-.acdc_pl <- function(
+.acs_pl <- function(
   acoustics,
   archival = NULL,
   step = 120,
@@ -104,7 +104,7 @@
 
   #### Checks
   ## Formally initiate function and implement remaining checks
-  cat_to_cf(paste0("flapper::.acdc_pl() called (@ ", t_onset, ")..."))
+  cat_to_cf(paste0("flapper::.acs_pl() called (@ ", t_onset, ")..."))
   out$time <- data.frame(event = "onset", time = t_onset)
   cat_to_cf("... Checking user inputs...")
   # Check acoustics contains required column names and correct variable types
@@ -370,13 +370,13 @@
     })
   }
 
-  #### Implement ACDC algorithm directly via .acdc back-end
+  #### Implement ACDC algorithm directly via .acs back-end
   if(length(acoustics_ls_wth_overlap) == 1) {
 
     #### Implement algorithm
-    cat_to_cf("... Calling .acdc() to implement ACDC algorithm on one chunk...")
-    out$time <- rbind(out$time, data.frame(event = "calling_.acdc", time = Sys.time()))
-    .out <- .acdc(acoustics = movement_ts[[1]]$acoustics,
+    cat_to_cf("... Calling .acs() to implement ACDC algorithm on one chunk...")
+    out$time <- rbind(out$time, data.frame(event = "calling_.acs", time = Sys.time()))
+    .out <- .acs(acoustics = movement_ts[[1]]$acoustics,
                   archival = movement_ts[[1]]$archival,
                   step = step,
                   plot_ts = FALSE,
@@ -401,13 +401,13 @@
   } else {
 
     #### Implement algorithm in parallel
-    cat_to_cf(paste("... Calling .acdc() to implement ACDC algorithm on", length(acoustics_ls_wth_overlap), "chunks, using", n_cores, "cores..."))
-    out$time <- rbind(out$time, data.frame(event = "calling_.acdc", time = Sys.time()))
+    cat_to_cf(paste("... Calling .acs() to implement ACDC algorithm on", length(acoustics_ls_wth_overlap), "chunks, using", n_cores, "cores..."))
+    out$time <- rbind(out$time, data.frame(event = "calling_.acs", time = Sys.time()))
     if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
     .out <- pbapply::pblapply(1:length(acoustics_ls_wth_overlap), cl = cl, function(i){
 
       #### Implement algorithm
-      .out <- .acdc(acoustics = movement_ts[[i]]$acoustics,
+      .out <- .acs(acoustics = movement_ts[[i]]$acoustics,
                     archival = movement_ts[[i]]$archival,
                     plot_ts = FALSE,
                     step = step,
@@ -442,7 +442,7 @@
   out$time$total_duration <- NA
   total_duration <- sum(as.numeric(out$time$serial_duration), na.rm = TRUE)
   out$time$total_duration[nrow(out$time)] <- total_duration
-  cat_to_cf(paste0("... flapper::.acdc_pl() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+  cat_to_cf(paste0("... flapper::.acs_pl() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
   class(out) <- c(class(out), "acdc")
   return(out)
 

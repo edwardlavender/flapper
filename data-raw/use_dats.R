@@ -184,7 +184,7 @@ file.size(paste0(tempdir(), "/dat_centroids.rds"))/1e6
 
 
 #####################################
-#### dat_acdc(): an example output from the .acdc() function
+#### dat_acdc(): an example output from the .acs() function
 # ... useful for demonstrating plotting functions
 
 ## Prepare movement time series

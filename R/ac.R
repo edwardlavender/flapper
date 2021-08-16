@@ -30,9 +30,9 @@
 #'
 #' The result is a map that shows where the individual could have spent more or less (or no) time over the time interval under construction. The main limitation of this approach is that reconstructs where the individual could have been, but not where it was. However, particle filtering can be used to extent this approach via the incorporate a movement model.
 #'
-#' @return The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acdc}}, if applicable, are written to file.
+#' @return The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
 #'
-#' @seealso This function calls \code{\link[flapper]{.acdc_pl}} and \code{\link[flapper]{.acdc}} to implement the AC algorithm. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results. The AC algorithm can be extended to incorporate depth contours via \code{\link[flapper]{acdc}}. Particle filtering can be used to reconstruct movement paths.
+#' @seealso This function calls \code{\link[flapper]{.acs_pl}} and \code{\link[flapper]{.acs}} to implement the AC algorithm. \code{\link[flapper]{acdc_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acdc_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acdc_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acdc_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} visualise the results. The AC algorithm can be extended to incorporate depth contours via \code{\link[flapper]{acdc}}. Particle filtering can be used to reconstruct movement paths.
 #'
 #' @examples
 #' #### Step (1) Implement setup_acdc_*() steps
@@ -82,9 +82,9 @@ ac <- function(acoustics,
   message(paste0("flapper::ac() called (@ ", t_onset, ")..."))
   # Check for missing inputs
   for(arg in c(acoustics, step, bathy, detection_range, acc_centroids, mobility)) 1L
-  # Pass inputs to .acdc_pl()
+  # Pass inputs to .acs_pl()
     out <-
-      .acdc_pl(
+      .acs_pl(
         acoustics = acoustics,
         archival = NULL,
         step = step,
