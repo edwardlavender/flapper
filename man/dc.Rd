@@ -30,7 +30,7 @@ dc(
 
 \item{calc_depth_error}{A function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.}
 
-\item{check_availability}{A logical input that defines whether or not to record explicitly, for each time step, whether or not there were any cells on \code{bathy} that matched the observed depth.}
+\item{check_availability}{A logical input that defines whether or not to record explicitly, for each time step, whether or not there were any cells on \code{bathy} that matched the observed depth (within the bounds defined by \code{calc_depth_error}).}
 
 \item{normalise}{A logical variable that defines whether or not to normalise the map of possible locations at each time step so that their scores sum to one.}
 
@@ -38,13 +38,13 @@ dc(
 
 \item{write_record_spatial_for_pf}{(optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save the \code{\link[raster]{raster}} of the individual's possible positions at each time step to file. The `filename' argument should be the directory in which to save files. Files are named by archival time steps as `arc_1', `arc_2' and so on.}
 
-\item{save_args}{A logical input that defines whether or not to include a list of function arguments in the outputs.}
+\item{save_args}{A logical input that defines whether or not to save the list of function inputs in the returned object.}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console; otherwise, they are written to file (see below).}
 
 \item{con}{If \code{verbose = TRUE}, \code{con} is character string that defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}). Otherwise, \code{con} defines the full pathway to a .txt file (which can be created on-the-fly) into which messages are written to relay function progress.}
 
-\item{split, cl, varlist}{(optional) Parallelisation arguments. \code{split} is an integer which, if supplied, splits the \code{archival} dataframe every \code{n}th row into chunks†. The algorithm is applied sequentially within each chunk (if applicable) and chunk-wise maps are summed afterwards to create a single map of space use. The advantage of this approach is that chunks can be analysed in parallel, via \code{cl} and \code{varlist}, while memory use is minimised. \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. \code{varlist} is a character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.}
+\item{split, cl, varlist}{(optional) Parallelisation arguments. \code{split} is an integer which, if supplied, splits the \code{archival} dataframe every \code{n}th row into chunks†. The algorithm is applied sequentially within each chunk (if applicable) and chunk-wise maps can be summed afterwards to create a single map of space use. The advantage of this approach is that chunks can be analysed in parallel, via \code{cl} and \code{varlist}, while memory use is minimised. \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. \code{varlist} is a character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.}
 
 \item{...}{Additional arguments (none implemented).}
 }
@@ -56,6 +56,7 @@ This function implements the depth-contour (DC) algorithm. Under the assumption 
 }
 \details{
 *Location probability could be weighted by the proximity between the observed depth and the depths of cells within the range defined by the observed depth and the measurement error (i.e., \code{archival$depth[1] + calc_depth_error(archival$depth[1])[1], archival$depth[1] + calc_depth_error(archival$depth[1])[2]}), but this is not currently implemented.
+
 †Under the default options (\code{split = NULL}), the function starts with a blank map of the area and iterates over each time step, adding the `possible positions' of the individual to the map at each step. By continuously updating a single map, this approach is slow but minimises memory requirements. An alternative approach is to split the time series into chunks, implement an iterative approach within each chunk, and then join the maps for each chunk. This is implemented by \code{split} (plus \code{\link[flapper]{acdc_simplify}}).
 }
 \examples{
@@ -170,7 +171,7 @@ par(pp)
 
 }
 \seealso{
-\code{\link[flapper]{acdc_simplify}} simplifies the outputs of the algorithm. \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} provide a plotting routine. \code{\link[flapper]{dcq}} implements a faster version of this algorithm termed the `quick depth-contour' (DCQ) algorithm. Rather than considering the depth interval that the individual could have occupied at each time step, the DCQ algorithm considers a sequence of depth bins (e.g., 10 m bins), isolates these on the bathymetry \code{\link[raster]{raster}} (\code{bathy}) and counts the number of matches in each cell. The DCPF algorithm (see \code{\link[flapper]{pf}}) extends the DC algorithm via particle filtering to reconstruct possible movement paths over \code{bathy}. The ACDC algorithm (see \code{\link[flapper]{acdc}}) extends the depth-contour algorithm by integrating information from acoustic detections of individuals at each time step to restrict the locations in which depth contours are identified.
+\code{\link[flapper]{acdc_simplify}} simplifies the outputs of the algorithm. \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} provide plotting routines. \code{\link[flapper]{dcq}} implements a faster version of this algorithm termed the `quick depth-contour' (DCQ) algorithm. Rather than considering the depth interval that the individual could have occupied at each time step, the DCQ algorithm considers a sequence of depth bins (e.g., 10 m bins), isolates these on the bathymetry \code{\link[raster]{raster}} (\code{bathy}) and counts the number of matches in each cell. The DCPF algorithm (see \code{\link[flapper]{pf}}) extends the DC algorithm via particle filtering to reconstruct possible movement paths over \code{bathy}. The ACDC algorithm (see \code{\link[flapper]{acdc}}) extends the depth-contour algorithm by integrating information from acoustic detections of individuals at each time step to restrict the locations in which depth contours are identified.
 }
 \author{
 Edward Lavender
