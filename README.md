@@ -407,8 +407,9 @@ several key functions:
       - `acdc_helper_list_record_for_pf()` creates an ordered list of
         output files (that can be passed to a particle filtering routine
         (see below);
-  - `acdc_plot()` plots the results of the AC/DC algorithm(s);
-  - `acdc_animate()` creates html animations of the AC/DC algorithm(s);
+  - `acdc_plot_record()` plots the results of the AC/DC algorithm(s);
+  - `acdc_animate_record()` creates html animations of the AC/DC
+    algorithm(s);
 
 ### Particle filtering branch algorithms
 

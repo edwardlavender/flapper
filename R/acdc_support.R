@@ -899,7 +899,7 @@ acs_setup_detection_kernels <-
 #' @param ... Additional arguments (none implemented).
 #' @return The function returns an object of class \code{\link[flapper]{.acdc-class}}.
 #' @details If the \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an \code{\link[flapper]{.acdc-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps (accounting for the overlap between chunks for AC* algorithm(s)); (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series (for AC* algorithm(s)) to (c) return a \code{\link[flapper]{.acdc-class}} object.
-#' @seealso The AC, DC and ACDC algorithms are implemented by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}. After simplification, \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} can be implemented to visualise time-specific results.
+#' @seealso The AC, DC and ACDC algorithms are implemented by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}. After simplification, \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} can be implemented to visualise time-specific results.
 #' @author Edward Lavender
 #' @export
 #'
@@ -1071,11 +1071,12 @@ acdc_helper_access_timesteps <- function(x){
 
 ######################################
 ######################################
-#### acdc_plot()
+#### acdc_plot_record()
 
 #' @title Plot time-specific maps from the AC/DC algorithm(s)
 #' @description This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, a \code{\link[flapper]{.acdc-class}} list from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids (if applicable) can be added and customised and the finalised plots can be returned or saved to file.
 #' @param acdc An \code{\link[flapper]{.acdc-class}} object.
+#' @param type A character that defines the plotted surface(s): \code{"map_cumulative"} plots the cumulative surface and \code{"map_timestep"} plots time step-specific surfaces.
 #' @param plot An integer vector that defines the time steps for which to make plots. If \code{plot = NULL}, the function will make a plot for all time steps for which the necessary information is available in \code{acdc}.
 #' @param add_coastline (optional) A named list of arguments, passed to \code{\link[raster]{plot}}, to add a polygon (i.e., of the coastline), to the plot. If provided, this must contain an `x' element that contains the coastline as a spatial object (e.g., a SpatialPolygonsDataFrame: see \code{\link[flapper]{dat_coast}} for an example).
 #' @param add_receivers (optional) A named list of arguments, passed to \code{\link[graphics]{points}}, to add points (i.e., receivers) to the plot. If provided, this must contain an `x' element that is a SpatialPoints object that specifies receiver locations (in the same coordinate reference system as other spatial data).
@@ -1100,12 +1101,12 @@ acdc_helper_access_timesteps <- function(x){
 #' dat_acdc <- acdc_simplify(dat_acdc)
 #'
 #' #### Example (1): The default options simply plot the first surface
-#' acdc_plot(acdc = dat_acdc)
+#' acdc_plot_record(acdc = dat_acdc)
 #'
 #' #### Example (2): Define the number of plots to be produced and control the plotting window
-#' acdc_plot(acdc = dat_acdc,
-#'           plot = 1:2,
-#'           par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)))
+#' acdc_plot_record(acdc = dat_acdc,
+#'                  plot = 1:2,
+#'                  par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)))
 #'
 #' #### Example (3): Add and customise spatial information via add_* args
 #' ## Define a SpatialPoints object of receiver locations
@@ -1115,28 +1116,29 @@ acdc_helper_access_timesteps <- function(x){
 #' rsp <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 #' rsp <- sp::spTransform(rsp, proj_utm)
 #' ## Plot with receiver locations and coastline, customise the centroids and the raster
-#' acdc_plot(acdc = dat_acdc,
-#'           add_coastline = list(x = dat_coast, col = "darkgreen"),
-#'           add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-#'           add_centroids = list(col = "red"),
-#'           add_raster = list(col = rev(topo.colors(100)))
-#'           )
+#' acdc_plot_record(acdc = dat_acdc,
+#'                  add_coastline = list(x = dat_coast, col = "darkgreen"),
+#'                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
+#'                  add_centroids = list(col = "red"),
+#'                  add_raster = list(col = rev(topo.colors(100)))
+#'                  )
 #'
 #' #### Example (4): Control axis properties
 #' # ... via smallplot argument for raster, pretty_axis_args, xlim, ylim and fix_zlim
 #' # ... set crop_spatial = TRUE to crop spatial data within adjusted limits
-#' acdc_plot(acdc = dat_acdc,
-#'           add_coastline = list(x = dat_coast, col = "darkgreen"),
-#'           add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-#'           add_centroids = list(col = "red"),
-#'           add_raster = list(smallplot= c(0.85, 0.9, 0.25, 0.75)),
-#'           crop_spatial = TRUE,
-#'           pretty_axis_args = list(side = 1:4,
-#'                                   control_sci_notation = list(magnitude = 16L, digits = 0)),
-#'           xlim = raster::extent(dat_coast)[1:2],
-#'           ylim = raster::extent(dat_coast)[3:4],
-#'           fix_zlim = c(0, 1)
-#'           )
+#' acdc_plot_record(acdc = dat_acdc,
+#'                  add_coastline = list(x = dat_coast, col = "darkgreen"),
+#'                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
+#'                  add_centroids = list(col = "red"),
+#'                  add_raster = list(smallplot= c(0.85, 0.9, 0.25, 0.75)),
+#'                  crop_spatial = TRUE,
+#'                  pretty_axis_args = list(side = 1:4,
+#'                                          control_sci_notation =
+#'                                            list(magnitude = 16L, digits = 0)),
+#'                  xlim = raster::extent(dat_coast)[1:2],
+#'                  ylim = raster::extent(dat_coast)[3:4],
+#'                  fix_zlim = c(0, 1)
+#'                  )
 #'
 #' #### Example (5): Modify each plot after it is produced via add_additional
 #' # Specify a function to add titles to a plot
@@ -1145,25 +1147,25 @@ acdc_helper_access_timesteps <- function(x){
 #'   mtext(side = 2, "y (UTM)", line = -8)
 #' }
 #' # Make plots with added titles
-#' acdc_plot(acdc = dat_acdc,
-#'           plot = 1:2,
-#'           par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)),
-#'           add_coastline = list(x = dat_coast, col = "darkgreen"),
-#'           add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-#'           add_centroids = list(col = "red"),
-#'           add_raster = list(),
-#'           crop_spatial = TRUE,
-#'           xlim = raster::extent(dat_coast)[1:2],
-#'           ylim = raster::extent(dat_coast)[3:4],
-#'           add_additional = add_titles
-#'           )
+#' acdc_plot_record(acdc = dat_acdc,
+#'                  plot = 1:2,
+#'                  par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)),
+#'                  add_coastline = list(x = dat_coast, col = "darkgreen"),
+#'                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
+#'                  add_centroids = list(col = "red"),
+#'                  add_raster = list(),
+#'                  crop_spatial = TRUE,
+#'                  xlim = raster::extent(dat_coast)[1:2],
+#'                  ylim = raster::extent(dat_coast)[3:4],
+#'                  add_additional = add_titles
+#'                  )
 #'
 #' #### Example (6) Save plots via png_param
 #' list.files(tempdir())
-#' acdc_plot(acdc = dat_acdc,
-#'           plot = 1:2,
-#'           png_param = list(filename = tempdir())
-#'           )
+#' acdc_plot_record(acdc = dat_acdc,
+#'                  plot = 1:2,
+#'                  png_param = list(filename = tempdir())
+#'                  )
 #' list.files(tempdir())
 #'
 #' #### Example (7) To plot the overall map, you can also just use a
@@ -1182,31 +1184,33 @@ acdc_helper_access_timesteps <- function(x){
 #' @export
 #'
 
-acdc_plot <- function(acdc,
-                      plot = 1,
-                      add_coastline = NULL,
-                      add_receivers = NULL,
-                      add_raster = list(col = rev(grDevices::terrain.colors(255))),
-                      add_centroids = list(),
-                      add_additional = NULL,
-                      crop_spatial = FALSE,
-                      xlim = NULL, ylim = NULL, fix_zlim = FALSE,
-                      pretty_axis_args = list(side = 1:4,
-                                              axis = list(list(),
-                                                          list(),
-                                                          list(labels = FALSE),
-                                                          list(labels = FALSE)),
-                                              control_axis = list(las = TRUE),
-                                              control_sci_notation = list(magnitude = 16L, digits = 0)),
-                      par_param = list(),
-                      png_param = list(),
-                      cl = NULL,
-                      verbose = TRUE,
-                      check = TRUE,...){
+acdc_plot_record <- function(acdc,
+                             type = c("map_cumulative", "map_timestep"),
+                             plot = 1,
+                             add_coastline = NULL,
+                             add_receivers = NULL,
+                             add_raster = list(col = rev(grDevices::terrain.colors(255))),
+                             add_centroids = list(),
+                             add_additional = NULL,
+                             crop_spatial = FALSE,
+                             xlim = NULL, ylim = NULL, fix_zlim = FALSE,
+                             pretty_axis_args = list(side = 1:4,
+                                                     axis = list(list(),
+                                                                 list(),
+                                                                 list(labels = FALSE),
+                                                                 list(labels = FALSE)),
+                                                     control_axis = list(las = TRUE),
+                                                     control_sci_notation = list(magnitude = 16L, digits = 0)),
+                             par_param = list(),
+                             png_param = list(),
+                             cl = NULL,
+                             verbose = TRUE,
+                             check = TRUE,...){
 
   #### Checks
   cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
-  cat_to_console("flapper::acdc_plot() called...")
+  cat_to_console("flapper::acdc_plot_record() called...")
+  type <- match.arg(type)
   if(check){
     cat_to_console("... Checking function inputs...")
     ## Check object class
@@ -1279,7 +1283,7 @@ acdc_plot <- function(acdc,
 
   ## Extent of area
   if(!is.null(add_raster)) {
-    first_raster <- acdc_plot[[1]]$map_cumulative
+    first_raster <- acdc_plot[[1]][[type]]
     ext_ras <- raster::extent(first_raster)
     x_ras   <- ext_ras[1:2]
     y_ras   <- ext_ras[3:4]
@@ -1325,8 +1329,8 @@ acdc_plot <- function(acdc,
     if(is.logical(fix_zlim)) {
       if(fix_zlim){
         range_use <- lapply(acdc_plot, function(map_info){
-          min_use <- raster::minValue(map_info$map_cumulative)
-          max_use <- raster::maxValue(map_info$map_cumulative)
+          min_use <- raster::minValue(map_info[[type]])
+          max_use <- raster::maxValue(map_info[[type]])
           return(c(min_use, max_use))
         })
         range_use <- do.call(rbind, range_use)
@@ -1355,7 +1359,7 @@ acdc_plot <- function(acdc,
 
     #### Define background plot
     map_info <- acdc_plot[[i]]
-    map      <- map_info$map_cumulative
+    map      <- map_info[[type]]
     area <- sp::SpatialPoints(raster::coordinates(ext), raster::crs(first_raster))
     raster::plot(x = area, xlim = xlim, ylim = ylim,...)
 
@@ -1383,10 +1387,10 @@ acdc_plot <- function(acdc,
     }
     # Add acoustic centroid
     if(!is.null(add_centroids)) {
-        add_centroids$x   <- map_info$centroid
-        if(crop_spatial) add_centroids$x <- raster::crop(add_centroids$x, ext)
-        add_centroids$add <- TRUE
-        do.call(raster::plot, add_centroids)
+      add_centroids$x   <- map_info$centroid
+      if(crop_spatial) add_centroids$x <- raster::crop(add_centroids$x, ext)
+      add_centroids$add <- TRUE
+      do.call(raster::plot, add_centroids)
     }
     # Add the coastline (note that the coastline has already been cropped, if necessary)
     if(!is.null(add_coastline)) {
@@ -1410,18 +1414,18 @@ acdc_plot <- function(acdc,
   })
   if(!is.null(cl)) parallel::stopCluster(cl)
 
-  invisible()
+  return(invisible())
 
 }
 
 
 ######################################
 ######################################
-#### acdc_animate()
+#### acdc_animate_record()
 
 #' @title Create a html animation of the AC/DC algorithm(s)
-#' @description This function is a simple wrapper for \code{\link[flapper]{acdc_plot}} and \code{\link[animation]{saveHTML}} which creates an animation of the AC* algorithm(s) over time. To implement this function, a named list of arguments for \code{\link[flapper]{acdc_plot}}, which creates the plots, must be supplied. This is embedded within \code{\link[animation]{saveHTML}}, which creates a folder in the working directory named `images' that contains a .png file for each time step and an animation as a .html file.
-#' @param expr_param A named list of arguments, passed to \code{\link[flapper]{acdc_plot}}, to create plots.
+#' @description This function is a simple wrapper for \code{\link[flapper]{acdc_plot_record}} and \code{\link[animation]{saveHTML}} which creates an animation of the AC* algorithm(s) over time. To implement this function, a named list of arguments for \code{\link[flapper]{acdc_plot_record}}, which creates the plots, must be supplied. This is embedded within \code{\link[animation]{saveHTML}}, which creates a folder in the working directory named `images' that contains a .png file for each time step and an animation as a .html file.
+#' @param expr_param A named list of arguments, passed to \code{\link[flapper]{acdc_plot_record}}, to create plots.
 #' @param html_name A string that defines the name of the html file (see `htmlfile' argument in \code{\link[animation]{saveHTML}}).
 #' @param image_name A string that defines the names of the individual .png files creates (see `img.name' argument in \code{\link[animation]{saveHTML}}).
 #' @param html_title,html_description Character strings that provide a title and a description that are displayed within the html animation (see `title' and `description' arguments in \code{\link[animation]{saveHTML}}).
@@ -1437,18 +1441,19 @@ acdc_plot <- function(acdc,
 #' dir_current <- getwd()
 #' setwd(tempdir())
 #' dat_acdc <- acdc_simplify(dat_acdc)
-#' acdc_animate(expr_param = list(acdc = dat_acdc,
-#'                                add_coastline = list(x = dat_coast, col = "darkgreen"),
-#'                                plot = 1:5,
-#'                                fix_zlim = FALSE)
-#'                                )
+#' acdc_animate_record(expr_param =
+#'                      list(acdc = dat_acdc,
+#'                           add_coastline = list(x = dat_coast, col = "darkgreen"),
+#'                           plot = 1:5,
+#'                           fix_zlim = FALSE)
+#'                     )
 #' setwd(dir_current)
 #' @details This function requires the \code{\link[animation]{animation}} package.
 #' @author Edward Lavender
 #' @export
 #'
 
-acdc_animate <-
+acdc_animate_record <-
   function(expr_param,
            html_name = "ACDC_algorithm_demo.html",
            image_name = "ACDC",
@@ -1467,7 +1472,7 @@ acdc_animate <-
       stop("This function requires the 'animation' package. Please install it before continuing with install.packages('animation').")
     }
     animation::saveHTML({
-      do.call(acdc_plot, expr_param)
+      do.call(acdc_plot_record, expr_param)
     },
     htmlfile = html_name,
     img.name = image_name,

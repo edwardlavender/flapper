@@ -43,8 +43,8 @@
 #' ## Simplify outputs via acdc_simplify()
 #' dc_summary <- acdc_simplify(out_dc, type = "dc")
 #' summary(dc_summary)
-#' ## Examine time-specific maps via acdc_plot()
-#' acdc_plot(dc_summary)
+#' ## Examine time-specific maps via acdc_plot_record()
+#' acdc_plot_record(dc_summary)
 #' ## Examine overall map via a raster* plotting function
 #' # Each cell shows the number of time steps when the bathymetry data
 #' # ... in each cell matches the archival data
@@ -150,7 +150,7 @@
 #' raster::plot(map_1 - map_2, main = "Difference")
 #' par(pp)
 #'
-#' @seealso \code{\link[flapper]{acdc_simplify}} simplifies the outputs of the algorithm. \code{\link[flapper]{acdc_plot}} and \code{\link[flapper]{acdc_animate}} provide plotting routines. \code{\link[flapper]{dcq}} implements a faster version of this algorithm termed the `quick depth-contour' (DCQ) algorithm. Rather than considering the depth interval that the individual could have occupied at each time step, the DCQ algorithm considers a sequence of depth bins (e.g., 10 m bins), isolates these on the bathymetry \code{\link[raster]{raster}} (\code{bathy}) and counts the number of matches in each cell. The DCPF algorithm (see \code{\link[flapper]{pf}}) extends the DC algorithm via particle filtering to reconstruct possible movement paths over \code{bathy}. The ACDC algorithm (see \code{\link[flapper]{acdc}}) extends the depth-contour algorithm by integrating information from acoustic detections of individuals at each time step to restrict the locations in which depth contours are identified.
+#' @seealso \code{\link[flapper]{acdc_simplify}} simplifies the outputs of the algorithm. \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} provide plotting routines. \code{\link[flapper]{dcq}} implements a faster version of this algorithm termed the `quick depth-contour' (DCQ) algorithm. Rather than considering the depth interval that the individual could have occupied at each time step, the DCQ algorithm considers a sequence of depth bins (e.g., 10 m bins), isolates these on the bathymetry \code{\link[raster]{raster}} (\code{bathy}) and counts the number of matches in each cell. The DCPF algorithm (see \code{\link[flapper]{pf}}) extends the DC algorithm via particle filtering to reconstruct possible movement paths over \code{bathy}. The ACDC algorithm (see \code{\link[flapper]{acdc}}) extends the depth-contour algorithm by integrating information from acoustic detections of individuals at each time step to restrict the locations in which depth contours are identified.
 #'
 #' @author Edward Lavender
 #' @export

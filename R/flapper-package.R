@@ -121,8 +121,8 @@
 #'         \item \link{acdc_simplify} simplifies the results of the algorithm(s);
 #'         \item \link{acdc_helper_access_timesteps} accesses the total number of time steps from an AC* algorithm implementation;
 #'         \item \link{acdc_helper_list_record_for_pf} creates an ordered list of output files;
-#'         \item \link{acdc_plot} plots the results of the algorithm(s);
-#'         \item \link{acdc_animate} creates html animations of the algorithm(s);
+#'         \item \link{acdc_plot_record} plots the results of the algorithm(s);
+#'         \item \link{acdc_animate_record} creates html animations of the algorithm(s);
 #'         }
 #'      }
 #'     \item The particle filtering branch
