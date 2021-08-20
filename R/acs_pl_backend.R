@@ -94,7 +94,7 @@
       }
     }
   } else{
-    if(n_cores > 1) stop("con = '' is not implemented in parallel (!is.null(cl)). Please supply a directory.")
+    if(verbose & n_cores > 1) stop("con = '' is not implemented in parallel (!is.null(cl)). Please supply a directory.")
   }
   ## Define function
   append_messages <- ifelse(con == "", FALSE, TRUE)
