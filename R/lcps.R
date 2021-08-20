@@ -1538,7 +1538,7 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
 
   #### Join all coordinates for each path into a single element of a list
   cat_to_console("... Processing least-cost paths...")
-  n <- length(which(paths_xy$path_id == 1))
+  n <- length(which(paths_xy$path_id == min(paths_xy$path_id)))
   paths_lc_xyz_by_path <- lapply(seq(1, nrow(paths_xy), by = n), function(start){
     # Get coordinates
     xyz <- do.call(rbind, paths_lc_xy[start:(start + n-1)])
