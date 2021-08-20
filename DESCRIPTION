@@ -12,7 +12,7 @@ Imports:
     prettyGraphics, fields,
     Tools4ETS
 Suggests:
-    plyr, tidyr, 
+    plyr, tidyr, stringr, 
     glatos,
     plotly, animation, scales, viridis,
     circular, 

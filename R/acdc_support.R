@@ -947,13 +947,15 @@ acdc_simplify <- function(acdc, type = c("acs", "dc"), mask = NULL, normalise = 
         }
         return(map_1)
       })
-      # Get the last map of each chunk
+      # Get the cumulative map from each chunk
       maps_last <- lapply(acdc$.acdc, function(chunk) chunk$map)
       # Correct for the repeated influence of the first map due to the overlapping detection time series
       maps <- lapply(2:length(maps_last), function(i){
-        map <- maps_last[[i]] - maps_first[[i]]
+        map <- sum(maps_last[[i]], -maps_first[[i]], na.rm = TRUE)
         return(map)
       })
+      # Create the list of cumulative (adjusted) maps
+      maps <- append(list(maps_last[[1]]), maps)
 
       #### Simplify records
       ## Add chunk-specific records
@@ -1011,6 +1013,61 @@ acdc_simplify <- function(acdc, type = c("acs", "dc"), mask = NULL, normalise = 
   return(out)
 
 }
+
+
+######################################
+######################################
+#### check_class_.acdc()
+
+#' @title Check an object is of class \code{".acdc"}
+#' @description This function checks whether or not an object is of class \code{\link[flapper]{.acdc-class}}.
+#' @param x An object.
+#' @param arg A character that defines the name of a function argument.
+#' @return If \code{x} is not a \code{\link[flapper]{.acdc-class}} object, the function returns a helpful error message.
+#' @author Edward Lavender
+#' @keywords internal
+#'
+
+check_class_.acdc <- function(x, arg = deparse(substitute(x))){
+  if(!inherits(x, ".acdc")){
+    if(inherits(x, "acdc")) {
+      stop(paste0("'", arg, "' must be converted from class 'acdc' to class '.acdc' via flapper::acdc_simplify() before implementing this function."), call. = FALSE)
+    } else{
+      stop(paste0("'", arg, "' must be of class '.acdc'."), call. = FALSE)
+    }
+  }
+}
+
+
+######################################
+######################################
+#### acdc_helper_access_*()
+
+#' @title Short-cuts to elements of an \code{".acdc"} object
+#' @description These functions provide short-cuts to elements of a \code{\link[flapper]{.acdc-class}} object.
+#' @param x An \code{\link[flapper]{.acdc-class}} object.
+#' @details
+#' \itemize{
+#'   \item \code{\link[flapper]{acdc_helper_access_timesteps}} gets the total number of time steps from an AC* algorithm implementation.
+#' }
+#'
+#' @examples
+#' #### Example (1): acdc_helper_access_timesteps()
+#' acdc_helper_access_timesteps(acdc_simplify(dat_acdc))
+#'
+#' @author Edward Lavender
+#' @name acdc_helper_access
+NULL
+
+#### acdc_helper_access_timesteps()
+#' @rdname acdc_helper_access
+#' @export
+
+acdc_helper_access_timesteps <- function(x){
+  check_class_.acdc(x)
+  x$record[[length(x$record)]]$dat$timestep_cumulative
+}
+
 
 ######################################
 ######################################
@@ -1211,7 +1268,7 @@ acdc_plot <- function(acdc,
   if(is.null(plot)) plot <- 1:length(acdc_plot)
   if(check) {
     if(length(acdc_plot) <= 0) stop("No plotting data available for selected plot(s).")
-    if(any(plot > length(acdc_plot))) stop("Some inputs to 'plot' larger than the number of available plots.")
+    if(any(length(plot) > length(acdc_plot))) stop("'plot' exceeds the number of available plots.")
     if(!is.null(add_centroids)){
       if(!rlang::has_name(acdc_plot[[1]], "centroid")){
         add_centroids <- NULL
@@ -1424,3 +1481,93 @@ acdc_animate <-
     verbose = verbose,...
     )
   }
+
+
+######################################
+######################################
+#### acdc_helper_list_record_for_pf()
+
+#' @title List `record' files from an AC/DC algorithm
+#' @description This function creates an ordered list of `record' files derived from the AC/DC/ACDC algorithm.
+#' @param root A string that defines the directory in which files are loaded.
+#' @param type A character that defines the source of the files (\code{type = "acs"} refers to an AC* algorithm and \code{type = "dc"} refers to the DC algorithm).
+#' @param ... Additional arguments passed to \code{\link[base]{list.files}} (excluding \code{full.names}).
+#' @details This function requires the \code{\link[stringr]{stringr}} package.
+#' @return The function returns an ordered list of file paths.
+#' @examples
+#' #### Example (1): Example with the AC algorithm
+#' # Define a directory in which to save files
+#' root <- paste0(tempdir(), "/ac/")
+#' dir.create(root)
+#' # Implement the AC algorithm for some example time series
+#' acc <- dat_acoustics[dat_acoustics$individual_id == 25, ][1:5, ]
+#' out_ac <- ac(acoustics = acc,
+#'              step = 120,
+#'              bathy = dat_gebco,
+#'              detection_range = 425,
+#'              acc_centroids = dat_centroids,
+#'              mobility = 250,
+#'              write_record_spatial_for_pf = list(filename = root))
+#' # List the files for pf()
+#' files <- acdc_helper_list_record_for_pf(root, type = "acs", pattern = "*.grd")
+#' utils::head(files)
+#' # Implement pf() using files (not shown).
+#'
+#' #### Example (2): Example with the DC algorithm
+#' # Define a directory in which to save files
+#' root <- paste0(tempdir(), "/dc/")
+#' dir.create(root)
+#' # Implement the DC algorithm for some example time series
+#' depth <- dat_archival[dat_archival$individual_id == 25, ][1:5, ]
+#' out_dc <- dc(archival = depth,
+#'              bathy = dat_gebco,
+#'              write_record_spatial_for_pf = list(filename = root))
+#' # List the files for pf()
+#' files <- acdc_helper_list_record_for_pf(root, type = "dc", pattern = "*.grd")
+#' utils::head(files)
+#' # Implement pf() using files (not shown).
+#'
+#' @author Edward Lavender
+#' @export
+
+acdc_helper_list_record_for_pf <- function(root, type = c("acs", "dc"),...){
+  if(!requireNamespace("stringr", quietly = TRUE)){
+    stop("This function requires the 'stringr' package. Please install it before continuing with install.packages('stringr').")
+  }
+  check...("full.names",...)
+  type <- match.arg(type)
+  files <- list.files(root,...)
+  msg_unrecognised <- "File naming structure is unrecognised."
+  if(type == "acs"){
+    if(!grepl("chu", files[1], fixed = TRUE)){
+      warning("File naming structure is unrecognised.", immediate. = TRUE)
+      if(grepl("arc", files[1], fixed = TRUE)){
+        if(utils::askYesNo("...Did you mean type = 'dc'?")){
+          type <- "dc"
+        } else stop(msg_unrecognised)
+      } else stop(msg_unrecognised)
+    }
+  } else if(type == "dc"){
+    if(!grepl("arc", files[1], fixed = TRUE)){
+      stop(msg_unrecognised)
+    }
+  }
+  files <- data.frame(index = 1:length(files), name = files)
+  if(type == "acs"){
+    files[, c("chu_id", "acc_id", "arc_id")] <- stringr::str_split_fixed(files$name, "_", 6)[, c(2, 4, 6)]
+    files$chu_id <- as.integer(files$chu_id)
+    files$acc_id <- as.integer(files$acc_id)
+  } else if(type == "dc"){
+    files[, "arc_id"] <- stringr::str_split_fixed(files$name, "_", 2)[, 2]
+  }
+  ext <- tools::file_ext(files$name)
+  n <- nchar(ext) + 1
+  files$arc_id <- as.integer(substr(files$arc_id, 1, nchar(files$arc_id)-n))
+  if(type == "asc"){
+    files <- files %>% dplyr::arrange(.data$chu_id, .data$acc_id, .data$arc_id)
+  } else if(type == "dc"){
+    files <- files %>% dplyr::arrange(.data$arc_id)
+  }
+  files <- list.files(root, full.names = TRUE,...)[files$index]
+  return(files)
+}

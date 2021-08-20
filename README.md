@@ -398,6 +398,15 @@ objects of class `acdc`. These can be processed and analysed using
 several key functions:
 
   - `acdc_simplify()` simplifies the results of the AC/DC algorithm(s);
+  - `acdc_helper_*()` functions provide simple ‘helper’ routines for
+    working with simplified outputs:
+      - `acdc_helper_access_*()` functions provide short-cuts to
+        different elements of the output:
+          - `acdc_helper_access_timesteps()` accesses the total number
+            of time steps from an AC\* algorithm implementation;
+      - `acdc_helper_list_record_for_pf()` creates an ordered list of
+        output files (that can be passed to a particle filtering routine
+        (see below);
   - `acdc_plot()` plots the results of the AC/DC algorithm(s);
   - `acdc_animate()` creates html animations of the AC/DC algorithm(s);
 
@@ -415,6 +424,8 @@ process provided by the `pf*()` family of functions:
     between them;
   - `pf()` implements the particle filtering routine;
   - `pf_plot_history()` plot simulated particle histories;
+  - `pf_plot_map()` maps the ‘probability of use’ across an area based
+    on sampled particles;
   - `pf_simplify()` assembles movement paths from particle histories;
   - `pf_loglik()` calculates the log-likelihood of reconstructed paths,
     given the movement model;
