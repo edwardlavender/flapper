@@ -4,7 +4,7 @@
 #' @param archival A dataframe of depth time series (for a single individual). At a minimum, this should contain a column named `depth' with depth observations. Depth should be recorded using absolute values in the same units as the bathymetry (\code{bathy}, see below).
 #' @param bathy A \code{\link[raster]{raster}} of the bathymetry in an area within which the animal is likely to have been located over the study. Bathymetry values should be recorded as absolute values and in the same units as for depths (see \code{archival}).
 #' @param plot_ts A logical input that defines whether or not to the depth time series before the algorithm is initiated.
-#' @param calc_depth_error A function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.
+#' @param calc_depth_error A function that returns the depth errors around a vector of depths. The function should accept vector of depths (from \code{archival$depth}) and return a matrix, with one row for each (lower and upper) error and one one column for each depth (if the error varies with depth). For each depth, the two numbers are added to the observed depth to define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.
 #' @param check_availability A logical input that defines whether or not to record explicitly, for each time step, whether or not there were any cells on \code{bathy} that matched the observed depth (within the bounds defined by \code{calc_depth_error}).
 #' @param normalise A logical variable that defines whether or not to normalise the map of possible locations at each time step so that their scores sum to one.
 #' @param save_record_spatial An integer vector that defines the time steps for which to return time step-specific and cumulative maps of the individual's possible locations. \code{save_record_spatial = 0} suppresses the return of this information and \code{save_record_spatial = NULL} returns this information for all time steps.
@@ -60,12 +60,27 @@
 #' # ... due to movement beyond this area:
 #' any(do.call(rbind, lapply(dc_summary$record, function(elm) elm$dat))$availability == FALSE)
 #'
-#' #### Example (2): Write timestep-specific maps of allowed positions to file
+#' #### Example (2): Implement depth error functions that depend on depth
+#' ## Here, we will define a calc_depth_error function that depends on:
+#' # ... tag error
+#' # ... tidal range
+#' # ... a depth-dependent bathymetry error
+#' cde <- function(depth){
+#'   e <- 4.77 + 2.5 + sqrt(0.5 ^2 + (0.013 * depth)^2)
+#'   e <- matrix(c(-e, e), nrow = 2)
+#'   return(e)
+#'   }
+#' # Vectorise function over depths (essential)
+#' cde <- Vectorize(cde)
+#' ## Implement algorithm with  depth-dependent error
+#' out_dc <- dc(archival = depth, bathy = dat_gebco, calc_depth_error = cde)
+#'
+#' #### Example (3): Write timestep-specific maps of allowed positions to file
 #' out_dc <- dc(archival = depth, bathy = dat_gebco,
 #'              write_record_spatial_for_pf = list(filename = tempdir()))
 #' list.files(tempdir())
 #'
-#' #### Example (3): Implement the algorithm in parallel
+#' #### Example (4): Implement the algorithm in parallel
 #' ## Trial different options for 'split' and compare speed
 #' # Approach (1)
 #' at1 <- Sys.time()
@@ -91,12 +106,12 @@
 #' difftime(at2, at1)
 #' difftime(bt2, bt1)
 #'
-#' #### Example (4): Write messages to file via con
+#' #### Example (5): Write messages to file via con
 #' out_dc <- dc(archival = depth, bathy = dat_gebco,
 #'              con = paste0(tempdir(), "/dc_log.txt"))
 #' readLines(paste0(tempdir(), "/dc_log.txt"))
 #'
-#' #### Example (5) Compare an automated vs. manual implementation of DC
+#' #### Example (6) Compare an automated vs. manual implementation of DC
 #'
 #' ## (A) Compare step-wise results for randomly select time steps
 #' # Implement algorithm (using default calc_depth_error)
@@ -143,7 +158,7 @@
 dc <- function(archival,
                bathy,
                plot_ts = TRUE,
-               calc_depth_error = function(...) c(-2.5, 2.5),
+               calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                check_availability = TRUE,
                normalise = FALSE,
                save_record_spatial = 1L,
@@ -206,13 +221,16 @@ dc <- function(archival,
   check_names(input = archival, req = "depth", extract_names = colnames, type = all)
   if(any(is.na(archival$depth))) stop("'archival$depth' contains NAs.")
   ## Check calc_depth_error
-  de_1 <- calc_depth_error(archival$depth[1])
-  if(length(de_1) != 2){
-    stop("'calc_depth_error' should be a function that returns a numeric vector of length two (i.e., a lower and upper depth adjustment).")
-  }
-  if(de_1[1] > 0 | de_1[2] < 0){
-    stop("'calc_depth_error' should return a negative and a postive adjustment (in that order).")
-  }
+  de <- calc_depth_error(archival$depth)
+  if(inherits(de, "matrix")){
+    if(nrow(de) == 2){
+      if(ncol(de) == 1) { message("'calc_depth_error' function taken to be independent of depth.")
+      } else {
+        message("'calc_depth_error' taken to depend on depth.")
+      }
+      if(any(de[1, ] > 0) | any(de[2, ] < 0)) stop("'calc_depth_error' should be a function that returns a two-row matrix with lower (negative) adjustment(s) (top row) and upper (positive) adjustment(s) (bottom row).'", call. = FALSE)
+    } else stop("'calc_depth_error' should return a two-row matrix.", call. = FALSE)
+  } else stop("'calc_depth_error' should return a two-row matrix.", call. = FALSE)
   ## Check cluster
   if(is.null(split) & !is.null(cl)) {
     warning("'cl' argument ignored unless 'split' is supplied.",
@@ -242,8 +260,8 @@ dc <- function(archival,
   if(is.null(save_record_spatial)) save_record_spatial <- archival$index
   ## Archival time series with depth error
   cat_to_cf("... Implementing calc_depth_error()...")
-  archival$depth_lwr <- archival$depth + calc_depth_error(archival$depth)[1]
-  archival$depth_upr <- archival$depth + calc_depth_error(archival$depth)[2]
+  archival$depth_lwr <- archival$depth + calc_depth_error(archival$depth)[1, ]
+  archival$depth_upr <- archival$depth + calc_depth_error(archival$depth)[2, ]
   ## Archival time series with availability
   if(check_availability) archival$availability <- NA
   ## Archival time series as list (by chunk)

@@ -120,7 +120,7 @@ prettyGraphics::pretty_map(add_rasters = list(x = surface),
 #### (A) Implement DC algorithm
 dat_dc <- dc(archival = depth,
            bathy = surface,
-           calc_depth_error = function(...) c(-30, 30),
+           calc_depth_error = function(...) matrix(c(-30, 30), nrow = 2),
            save_record_spatial = 0L
            )
 
@@ -129,7 +129,7 @@ dat_dc <- dc(archival = depth,
 # ... force the depth_error to be high in this example.
 dc_1 <- dc(archival = depth,
            bathy = surface,
-           calc_depth_error = function(...) c(-30, 30),
+           calc_depth_error = function(...) matrix(c(-30, 30), nrow = 2),
            save_record_spatial = NULL
            )
 dcpf_1 <- pf(record = lapply(dc_1$.acdc$record, function(elm) elm$spatial[[1]]$map_timestep),
@@ -217,7 +217,7 @@ dat_acdc <- acdc(acoustics = acc,
                  bathy = dat_gebco,
                  detection_range = 425,
                  mobility = 200,
-                 calc_depth_error = function(...) c(-2.5, 2.5),
+                 calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                  acc_centroids = dat_centroids,
                  save_record_spatial = 1:50,
                  progress = 3L,

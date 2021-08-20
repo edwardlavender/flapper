@@ -8,7 +8,7 @@ dc(
   archival,
   bathy,
   plot_ts = TRUE,
-  calc_depth_error = function(...) c(-2.5, 2.5),
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
   check_availability = TRUE,
   normalise = FALSE,
   save_record_spatial = 1L,
@@ -28,7 +28,7 @@ dc(
 
 \item{plot_ts}{A logical input that defines whether or not to the depth time series before the algorithm is initiated.}
 
-\item{calc_depth_error}{A function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.}
+\item{calc_depth_error}{A function that returns the depth errors around a vector of depths. The function should accept vector of depths (from \code{archival$depth}) and return a matrix, with one row for each (lower and upper) error and one one column for each depth (if the error varies with depth). For each depth, the two numbers are added to the observed depth to define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.}
 
 \item{check_availability}{A logical input that defines whether or not to record explicitly, for each time step, whether or not there were any cells on \code{bathy} that matched the observed depth (within the bounds defined by \code{calc_depth_error}).}
 
@@ -94,12 +94,27 @@ prettyGraphics::pretty_map(add_rasters =
 # ... due to movement beyond this area:
 any(do.call(rbind, lapply(dc_summary$record, function(elm) elm$dat))$availability == FALSE)
 
-#### Example (2): Write timestep-specific maps of allowed positions to file
+#### Example (2): Implement depth error functions that depend on depth
+## Here, we will define a calc_depth_error function that depends on:
+# ... tag error
+# ... tidal range
+# ... a depth-dependent bathymetry error
+cde <- function(depth){
+  e <- 4.77 + 2.5 + sqrt(0.5 ^2 + (0.013 * depth)^2)
+  e <- matrix(c(-e, e), nrow = 2)
+  return(e)
+  }
+# Vectorise function over depths (essential)
+cde <- Vectorize(cde)
+## Implement algorithm with  depth-dependent error
+out_dc <- dc(archival = depth, bathy = dat_gebco, calc_depth_error = cde)
+
+#### Example (3): Write timestep-specific maps of allowed positions to file
 out_dc <- dc(archival = depth, bathy = dat_gebco,
              write_record_spatial_for_pf = list(filename = tempdir()))
 list.files(tempdir())
 
-#### Example (3): Implement the algorithm in parallel
+#### Example (4): Implement the algorithm in parallel
 ## Trial different options for 'split' and compare speed
 # Approach (1)
 at1 <- Sys.time()
@@ -125,12 +140,12 @@ bt2 <- Sys.time()
 difftime(at2, at1)
 difftime(bt2, bt1)
 
-#### Example (4): Write messages to file via con
+#### Example (5): Write messages to file via con
 out_dc <- dc(archival = depth, bathy = dat_gebco,
              con = paste0(tempdir(), "/dc_log.txt"))
 readLines(paste0(tempdir(), "/dc_log.txt"))
 
-#### Example (5) Compare an automated vs. manual implementation of DC
+#### Example (6) Compare an automated vs. manual implementation of DC
 
 ## (A) Compare step-wise results for randomly select time steps
 # Implement algorithm (using default calc_depth_error)

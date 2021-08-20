@@ -103,7 +103,7 @@
 #' # ... force a high depth error to be high in this example.
 #' # The calc_depth_error() function can depend on depth, but in this example
 #' # ... we assume the depth error is independent of depth.
-#' cde <- function(...) c(-30, 30)
+#' cde <- function(...) matrix(c(-30, 30), nrow = 2)
 #'
 #' ## Define movement model
 #' # The default movement model is suitable, with skate moving typically

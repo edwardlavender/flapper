@@ -17,7 +17,7 @@
   detection_time_window = 5,
   acc_centroids,
   mobility,
-  calc_depth_error = function(...) c(-2.5, 2.5),
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
   normalise = FALSE,
   chunk = 1L,
   save_record_spatial = 1L,
@@ -55,7 +55,7 @@
 
 \item{mobility}{A number that defines the distance (m) that an individual could move in the time steps between acoustic detections (see also \code{\link[flapper]{acs_setup_centroids}}).}
 
-\item{calc_depth_error}{In the ACDC algorithm, \code{calc_depth_error} is function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.}
+\item{calc_depth_error}{In the ACDC algorithm, \code{calc_depth_error} is a function that returns the depth errors around a vector of depths. The function should accept vector of depths (from \code{archival$depth}) and return a matrix, with one row for each (lower and upper) error and one one column for each depth (if the error varies with depth). For each depth, the two numbers are added to the observed depth to define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.}
 
 \item{normalise}{A logical variable that defines whether or not to normalise the map of possible locations at each time step. In both cases, at each time step the possible locations of the individual are scaled so that the most probable locations have a score of 1 and other scores vary between 0--1. If \code{normalise = FALSE}, these scores are simply summed at each time step, in which case scores on the final map can be interpreted as the number of time steps when the individual could have been in any given location. In contrast, if \code{normalise = TRUE}, at each time step scores are normalised so that they sum to one; the consequence is that time steps with detections, when uncertainty in the individual's location concentrates in the detection centroid around a receiver, are weighted more strongly than time steps between detections, when the uncertainty in the individual's location is spread across a larger area. The final surface can be normalised within \code{\link[flapper]{acdc_simplify}}, with in each cell (0--1) providing a measure of the relative potential use of each location.}
 
@@ -127,7 +127,7 @@ out_acdc_2 <- flapper:::.acs(acoustics = acc,
                              bathy = gebco,
                              detection_range = 425,
                              mobility = 200,
-                             calc_depth_error = function(...) c(-2.5, 2.5),
+                             calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                              acc_centroids = dat_centroids
                              )
 
@@ -179,7 +179,7 @@ out_acdc_3 <- flapper:::.acs(acoustics = acc,
                              detection_kernels_ovelaps = overlaps,
                              detection_time_window = 10,
                              mobility = 200,
-                             calc_depth_error = function(...) c(-2.5, 2.5),
+                             calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                              acc_centroids = dat_centroids
                              )
 
@@ -190,7 +190,7 @@ out_acdc_4a <- flapper:::.acs(acoustics = acc,
                               bathy = gebco,
                               detection_range = 425,
                               mobility = 200,
-                              calc_depth_error = function(...) c(-2.5, 2.5),
+                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                               acc_centroids = dat_centroids
                               )
 out_acdc_4b <- flapper:::.acs(acoustics = acc,
@@ -198,7 +198,7 @@ out_acdc_4b <- flapper:::.acs(acoustics = acc,
                               bathy = gebco,
                               detection_range = 425, normalise = TRUE,
                               mobility = 200,
-                              calc_depth_error = function(...) c(-2.5, 2.5),
+                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                               acc_centroids = dat_centroids
                               )
 ## With detection kernels
@@ -208,7 +208,7 @@ out_acdc_4c <- flapper:::.acs(acoustics = acc,
                               detection_range = 425,
                               detection_kernels = kernels,
                               mobility = 200,
-                              calc_depth_error = function(...) c(-2.5, 2.5),
+                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                               acc_centroids = dat_centroids
                               )
 out_acdc_4d <- flapper:::.acs(acoustics = acc,
@@ -217,7 +217,7 @@ out_acdc_4d <- flapper:::.acs(acoustics = acc,
                               detection_range = 425,
                               detection_kernels = kernels, normalise = TRUE,
                               mobility = 200,
-                              calc_depth_error = function(...) c(-2.5, 2.5),
+                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                               acc_centroids = dat_centroids
                               )
 ## Comparison of final maps
@@ -234,7 +234,7 @@ out_acdc_5 <- flapper:::.acs(acoustics = acc,
                              bathy = gebco,
                              detection_range = 425,
                              mobility = 200,
-                             calc_depth_error = function(...) c(-2.5, 2.5),
+                             calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                              acc_centroids = dat_centroids,
                              verbose = TRUE,
                              con = paste0(tempdir(), "/", "acdc_log.txt")
@@ -252,7 +252,7 @@ out_acdc_6 <- flapper:::.acs(acoustics = acc,
                              space_use = NULL,
                              detection_range = 425,
                              mobility = 200,
-                             calc_depth_error = function(...) c(-2.5, 2.5),
+                             calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                              acc_centroids = dat_centroids,
                              save_record_spatial = NULL,
                              verbose = TRUE,

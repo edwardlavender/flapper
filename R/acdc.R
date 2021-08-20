@@ -15,7 +15,7 @@
 #' @param detection_time_window A number that defines the detection time window (see \code{\link[flapper]{ac}}).
 #' @param acc_centroids A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.
 #' @param mobility The mobility parameter (see \code{\link[flapper]{ac}}).
-#' @param calc_depth_error A function that returns the depth error around a given depth. This should accept a single depth value (from \code{archival$depth}) and return two numbers that, when added to that depth, define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time, given its depth. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) c(-2.5, 2.5)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.
+#' @param calc_depth_error A function that returns the depth errors around a vector of depths. The function should accept vector of depths (from \code{archival$depth}) and return a matrix, with one row for each (lower and upper) error and one one column for each depth (if the error varies with depth). For each depth, the two numbers are added to the observed depth to define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been slightly shallower that observed) and the second positive (i.e., the individual could have been slightly deeper than observed). For example, the constant function \code{calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m. The appropriate form for \code{calc_depth_error} depends on measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations), but this implementation allows the depth error to depend on depth and for the lower and upper error around an observation to differ.
 #' @param normalise A logical input that defines whether or not to normalise maps (see \code{\link[flapper]{ac}}).
 #' @param save_record_spatial An integer of the spatial layers to save (see \code{\link[flapper]{ac}}).
 
@@ -68,7 +68,7 @@
 #'                  bathy = dat_gebco,
 #'                  detection_range = 425,
 #'                  mobility = 200,
-#'                  calc_depth_error = function(...) c(-2.5, 2.5),
+#'                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
 #'                  acc_centroids = dat_centroids
 #'                  )
 #' # The function returns a list with four elements
@@ -83,7 +83,7 @@
 #'                  bathy = dat_gebco,
 #'                  detection_range = 425,
 #'                  mobility = 200,
-#'                  calc_depth_error = function(...) c(-2.5, 2.5),
+#'                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
 #'                  acc_centroids = dat_centroids,
 #'                  con = tempdir()
 #'                  )
@@ -99,7 +99,7 @@
 #'                  bathy = dat_gebco,
 #'                  detection_range = 425,
 #'                  mobility = 200,
-#'                  calc_depth_error = function(...) c(-2.5, 2.5),
+#'                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
 #'                  acc_centroids = dat_centroids,
 #'                  save_record_spatial = NULL
 #'                  )
@@ -113,7 +113,7 @@
 #'                  bathy = dat_gebco,
 #'                  detection_range = 425,
 #'                  mobility = 200,
-#'                  calc_depth_error = function(...) c(-2.5, 2.5),
+#'                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
 #'                  acc_centroids = dat_centroids,
 #'                  con = tempdir(),
 #'                  cl = parallel::makeCluster(2L)
@@ -146,7 +146,7 @@
 #'                  bathy = dat_gebco,
 #'                  detection_range = 425,
 #'                  mobility = 200,
-#'                  calc_depth_error = function(...) c(-2.5, 2.5),
+#'                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
 #'                  acc_centroids = dat_centroids,
 #'                  con = tempdir(),
 #'                  cl = parallel::makeCluster(2L),
@@ -164,7 +164,7 @@
 #'                  bathy = dat_gebco,
 #'                  detection_range = 425,
 #'                  mobility = 200,
-#'                  calc_depth_error = function(...) c(-2.5, 2.5),
+#'                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
 #'                  acc_centroids = dat_centroids,
 #'                  con = tempdir(),
 #'                  cl = parallel::makeCluster(2L)
@@ -202,7 +202,7 @@
 #'                      bathy = dat_gebco,
 #'                      detection_range = 425,
 #'                      mobility = 200,
-#'                      calc_depth_error = function(...) c(-2.5, 2.5),
+#'                      calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
 #'                      acc_centroids = dat_centroids,
 #'                      save_record_spatial = 1:10L,
 #'                      con = dir_id
@@ -239,7 +239,7 @@ acdc <- function(acoustics,
                  detection_kernels = NULL, detection_kernels_overlap = NULL, detection_time_window = 5,
                  acc_centroids,
                  mobility,
-                 calc_depth_error = function(...) c(-2.5, 2.5),
+                 calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                  normalise = FALSE,
                  save_record_spatial = 1L,
                  write_record_spatial_for_pf = NULL,

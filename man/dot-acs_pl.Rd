@@ -16,7 +16,7 @@
   detection_time_window = 5,
   acc_centroids,
   mobility,
-  calc_depth_error = function(...) c(-2.5, 2.5),
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
   normalise = FALSE,
   save_record_spatial = 1L,
   write_record_spatial_for_pf = NULL,

@@ -48,7 +48,7 @@
   detection_kernels = NULL, detection_kernels_overlap = NULL, detection_time_window = 5,
   acc_centroids,
   mobility,
-  calc_depth_error = function(...) c(-2.5, 2.5),
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
   normalise = FALSE,
   save_record_spatial = 1L,
   write_record_spatial_for_pf = NULL,
@@ -146,13 +146,16 @@
   }
   # Check depth error
   if(!is.null(archival)){
-    de_1 <- calc_depth_error(archival$depth[1])
-    if(length(de_1) != 2){
-      stop("'calc_depth_error' should be a function that returns a numeric vector of length two (i.e., a lower and upper depth adjustment).")
-    }
-    if(de_1[1] > 0 | de_1[2] < 0){
-      stop("'calc_depth_error' should return a negative and a postive adjustment (in that order).")
-    }
+    de <- calc_depth_error(archival$depth)
+    if(inherits(de, "matrix")){
+      if(nrow(de) == 2){
+        if(ncol(de) == 1) { message("'calc_depth_error' function taken to be independent of depth.")
+        } else {
+          message("'calc_depth_error' taken to depend on depth.")
+        }
+        if(any(de[1, ] > 0) | any(de[2, ] < 0)) stop("'calc_depth_error' should be a function that returns a two-row matrix with lower (negative) adjustment(s) (top row) and upper (positive) adjustment(s) (bottom row).'", call. = FALSE)
+      } else stop("'calc_depth_error' should return a two-row matrix.", call. = FALSE)
+    } else stop("'calc_depth_error' should return a two-row matrix.", call. = FALSE)
   }
   # Check write opts
   if(!is.null(write_record_spatial_for_pf)){
