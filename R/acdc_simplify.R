@@ -42,40 +42,15 @@ acdc_simplify <- function(archive, type = c("acs", "dc"), mask = NULL, normalise
     #### Otherwise aggregate information across chunks
   } else{
 
-    if(type == "dc"){
+    #### Get a list of the cumulative maps from each chunk (to be summed below)
+    maps <- lapply(archive$archive, function(chunk) chunk$map)
 
-      #### Get cumulative map from each chunk
-      maps <- lapply(archive$archive, function(chunk) chunk$map)
+    #### Simplify records
+    out$record <- lapply(archive$archive, function(chunk) chunk$record)
 
-      #### Simplify records
-      out$record <- lapply(archive$archive, function(chunk) chunk$record)
+    if(type == "acs"){
 
-    } else if(type == "acs"){
-
-      #### Get cumulative map from each chunk
-      # Get the first map of each chunk
-      maps_first <- lapply(archive$archive, function(chunk) {
-        map_1 <- chunk$record[[1]]$spatial[[1]]$map_timestep
-        if(is.null(map_1)) {
-          stop("chunk$record[[1]]$spatial[[1]]$map_timestep is NULL. In flapper::acdc(), save_record_spatial = 1L (or greater/NULL) is required to return the necessary spatial information to correct for overlapping detection time series across chunks in the summation of chunk-specific maps.")
-        }
-        return(map_1)
-      })
-      # Get the cumulative map from each chunk
-      maps_last <- lapply(archive$archive, function(chunk) chunk$map)
-      # Correct for the repeated influence of the first map due to the overlapping detection time series
-      maps <- lapply(2:length(maps_last), function(i){
-        map <- sum(maps_last[[i]], -maps_first[[i]], na.rm = TRUE)
-        return(map)
-      })
-      # Create the list of cumulative (adjusted) maps
-      maps <- append(list(maps_last[[1]]), maps)
-
-      #### Simplify records
-      ## Add chunk-specific records
-      out$record <- lapply(archive$archive, function(chunk) chunk$record)
-      ## Delete the last element of each chunk (except the last chunk) since chunks are overlapping
-      out$record <- lapply(out$record, function(chunk) chunk[1:(length(chunk)-1)])
+      #### Process record time stamps
       ## Define a dataframe to adjust the time stamps recorded for each chunks
       # For chunks 2:n_chunks, we will add the time stamps reached by the previous chunk
       # ... up to the current chunk

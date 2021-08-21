@@ -7,6 +7,7 @@
 #' @param acoustics A dataframe that contains passive acoustic telemetry detection time series for a specific individual (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named `receiver_id' (that must match that inputted to \code{\link[flapper]{acs_setup_centroids}}); a POSIXct vector of time stamps when detections were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'.
 #' @param archival For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series for the same individual (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; a POSIXct vector of time stamps when observations were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.
 #' @param step A number that defines the time step length (s) between consecutive detections. If \code{archival} is supplied, this is the resolution of the archival data (e.g., 120 s).
+#' @param round_ts A logical input that defines whether or not to round the \code{acoustics} and/or \code{archival} time series to the nearest \code{step/60} minutes. This step is necessary to ensure appropriate alignment between the two time series given the assumption of a constant \code{mobility} parameter (see below). For implementations via \code{\link[flapper]{.acs_pl}}, this step is implemented in \code{\link[flapper]{.acs_pl}}.
 #' @param plot_ts A logical input that defines whether or not to the plot movement series before the algorithm is initiated.
 #' @param bathy A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC* algorithm) across the area within which the individual could have moved. For the ACDC algorithm, this must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acs_setup_centroids}}).
 #' @param map (optional) A blank \code{\link[raster]{raster}}, with the same properties (i.e., dimensions, resolution, extent and coordinate reference system) as the area/bathymetry raster (see \code{bathy}), but in which all values are 0. If \code{NULL}, this is computed internally, but supplying a pre-defined raster can be more computationally efficient if the function is applied iteratively (e.g., over different time windows).
@@ -218,6 +219,7 @@
     acoustics,
     archival = NULL,
     step = 120,
+    round_ts = TRUE,
     plot_ts = TRUE,
     bathy,
     map = NULL,
@@ -253,6 +255,7 @@
       out$args <- list(acoustics = acoustics,
                        archival = archival,
                        step = step,
+                       round_ts = round_ts,
                        plot_ts = plot_ts,
                        bathy = bathy,
                        map = map,
@@ -393,6 +396,12 @@
       }
     }
 
+    #### Process time series
+    if(round_ts){
+      acoustics$timestamp <- lubridate::round_date(acoustics$timestamp, paste0(step/60, "mins"))
+      if(is.null(archival)) archival$timestamp <- lubridate::round_date(archival$timestamp, paste(step/60, "mins"))
+    }
+
     #### Visualise time series
     if(plot_ts) {
       ## AC algorithm implementation
@@ -506,6 +515,9 @@
       if(is.null(archival)){
         # Define the sequence of time steps
         pos <- seq(receiver_1_timestamp, receiver_2_timestamp, step)
+        # If the last step coincides with the detection at the next receiver, we will drop this step
+        # ... (we will account for this at the next time step instead)
+        if(length(pos) > 1 & max(pos) == receiver_2_timestamp) pos <- pos[1:(length(pos)-1)]
         # Number of steps
         lpos <- length(pos)
 
@@ -515,10 +527,10 @@
         archival_pos1 <- which.min(abs(archival$timestamp_num - receiver_1_timestamp_num))
         # Define the positions of archival records between the two detections
         pos <- seq(archival_pos1, (archival_pos1 + time_btw_dets/step), by = 1)
+        if(length(pos) > 1 & max(archival$timestamp[pos]) == receiver_2_timestamp) pos <- pos[1:(length(pos)-1)]
         # Define the number of archival records between acoustic detections
         lpos <- length(pos)
       }
-
 
 
       ######################################
@@ -573,7 +585,7 @@
         # ... but keep the location of the current receiver as the centre of the radius in which we search.
         # Note the use of ceiling: if lpos is odd, then this takes us to the middle timestep_archival;
         # ...if lpos is even, then there are two middle t_dsts, and this takes us to the first one.
-        if(timestep_archival == 1 | timestep_archival <= ceiling(lpos/2)){ # less than or equal to (more conservative):
+        if(timestep_archival == 1 | timestep_archival <= ceiling(lpos/2)){
 
           # The radius increases by detection_range + mobility for each time step
           # ... that the individual is not detected by a receiver (until half way)
@@ -680,6 +692,7 @@
         if(!is.null(detection_kernels)){
 
           #### Detection kernel at the moment of detection (timestep_archival == 1)
+          # (Because we only go to one archival step before the next detection, the individual is only detected at timestep_archival == 1)
           # Option (1): Receiver detection kernel does not overlap with any other kernels: standard detection probability kernel
           # Option (2): Receiver detection kernel overlaps with other kernels
           # ... ... i): ... If there is only a detection at the one receiver, we down-weight overlapping regions

@@ -173,6 +173,38 @@
   ######################################
   #### Implement splitting (if necessary)
 
+  #### Round time series to the nearest step
+  round_to <- paste0(step/60, "mins")
+  if(inherits(acoustics, "list")){
+    acoustics <- lapply(1:length(acoustics), function(i){
+      acc <- acoustics[[i]]
+      acc_timestamps_round <- lubridate::round_date(acc$timestamp, round_to)
+      if(!isTRUE(all.equal(acc_timestamps_round, acc$timestamp))){
+        cat_to_cf(paste0("... ... acoustics[[", i, "]]$timestamp rounded to the nearest ", step, " second(s)."))
+        message(paste0("acoustics[[", i, "]]$timestamp rounded to the nearest ", step, " second(s)."))
+        acc$timestamp <- lubridate::round_date(acc$timestamp, round_to)
+      }
+      return(acc)
+    })
+  } else {
+    acoustics_timestamps_round <- lubridate::round_date(acoustics$timestamp, round_to)
+    if(!isTRUE(all.equal(acoustics_timestamps_round, acoustics$timestamp))){
+      cat_to_cf(paste("... ... acoustics$timestamp rounded to the nearest", step, "second(s)."))
+      message(paste("acoustics$timestamp rounded to the nearest", step, "second(s)."))
+      acoustics$timestamp <- lubridate::round_date(acoustics$timestamp, round_to)
+    }
+  }
+  if(!is.null(archival)) {
+    arc_timestamp_round <- lubridate::round_date(archival$timestamp, round_to)
+    if(!isTRUE(all.equal(arc_timestamp_round, archival$timestamp))){
+      cat_to_cf(paste("... ... archival$timestamp rounded to the nearest", step, "second(s)."))
+      message(paste("archival$timestamp rounded to the nearest", step, "second(s)."))
+      archival$timestamp <- lubridate::round_date(archival$timestamp, round_to)
+    }
+  }
+  # Re-define acoustics_tmp
+  if(!inherits(acoustics, "list")) acoustics_tmp <- list(acoustics) else acoustics_tmp <- acoustics
+
   #### Define a list of dataframes
   # .. If the algorithm is to be implemented in parallel
   if(inherits(acoustics, "list") | n_cores > 1 | !is.null(split)){
@@ -383,6 +415,7 @@
                  archival = movement_ts[[1]]$archival,
                  step = step,
                  plot_ts = FALSE,
+                 round_ts = FALSE,
                  bathy = bathy,
                  map = map,
                  detection_range = detection_range,
@@ -414,6 +447,7 @@
       .out <- .acs(acoustics = movement_ts[[i]]$acoustics,
                    archival = movement_ts[[i]]$archival,
                    plot_ts = FALSE,
+                   round_ts = FALSE,
                    step = step,
                    bathy = bathy,
                    map = map,
@@ -447,7 +481,7 @@
   total_duration <- sum(as.numeric(out$time$serial_duration), na.rm = TRUE)
   out$time$total_duration[nrow(out$time)] <- total_duration
   cat_to_cf(paste0("... flapper::.acs_pl() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
-  class(out) <- c(class(out), "acdc")
+  class(out) <- c(class(out), "acdc_archival")
   return(out)
 
 }

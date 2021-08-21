@@ -8,6 +8,7 @@
   acoustics,
   archival = NULL,
   step = 120,
+  round_ts = TRUE,
   plot_ts = TRUE,
   bathy,
   map = NULL,
@@ -36,6 +37,8 @@
 \item{archival}{For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series for the same individual (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; a POSIXct vector of time stamps when observations were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Two-minute intervals are currently assumed.}
 
 \item{step}{A number that defines the time step length (s) between consecutive detections. If \code{archival} is supplied, this is the resolution of the archival data (e.g., 120 s).}
+
+\item{round_ts}{A logical input that defines whether or not to round the \code{acoustics} and/or \code{archival} time series to the nearest \code{step/60} minutes. This step is necessary to ensure appropriate alignment between the two time series given the assumption of a constant \code{mobility} parameter (see below). For implementations via \code{\link[flapper]{.acs_pl}}, this step is implemented in \code{\link[flapper]{.acs_pl}}.}
 
 \item{plot_ts}{A logical input that defines whether or not to the plot movement series before the algorithm is initiated.}
 

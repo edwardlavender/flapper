@@ -342,7 +342,7 @@ dc <- function(archival,
   out$time$total_duration <- NA
   total_duration <- sum(as.numeric(out$time$serial_duration), na.rm = TRUE)
   out$time$total_duration[nrow(out$time)] <- total_duration
-  class(out) <- c(class(out), "acdc")
+  class(out) <- c(class(out), "acdc_archival")
   cat_to_cf(paste0("... flapper::dc() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
   return(out)
 }

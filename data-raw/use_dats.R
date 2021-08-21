@@ -150,7 +150,7 @@ summary(dcpf_1)
 utils::str(dcpf_1)
 dat_dcpf_histories <- dcpf_1
 dat_dcpf_paths     <- pf_simplify(dat_dcpf_histories)
-saveRDS(dat_centroids, paste0(tempdir(), "/dat_dcpf_histories.rds"))
+saveRDS(dat_dcpf_histories, paste0(tempdir(), "/dat_dcpf_histories.rds"))
 file.size(paste0(tempdir(), "/dat_dcpf_histories.rds"))/1e6
 
 
