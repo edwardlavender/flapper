@@ -417,9 +417,9 @@ acdc_plot_record <- function(record,
 #' @examples
 #' dir_current <- getwd()
 #' setwd(tempdir())
-#' dat_acdc <- acdc_simplify(dat_acdc)
+#' acdc_record <- acdc_simplify(dat_acdc)
 #' acdc_animate_record(expr_param =
-#'                      list(record = dat_acdc,
+#'                      list(record = acdc_record,
 #'                           add_coastline = list(x = dat_coast, col = "darkgreen"),
 #'                           plot = 1:5,
 #'                           fix_zlim = FALSE)

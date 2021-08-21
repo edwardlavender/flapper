@@ -473,6 +473,7 @@
   }
 
   #### Return outputs
+  names(.out) <- 1:length(.out)
   out$archive <- .out
   t_end <- Sys.time()
   out$time <- rbind(out$time, data.frame(event = "algorithm_competion", time = t_end))
@@ -481,7 +482,7 @@
   total_duration <- sum(as.numeric(out$time$serial_duration), na.rm = TRUE)
   out$time$total_duration[nrow(out$time)] <- total_duration
   cat_to_cf(paste0("... flapper::.acs_pl() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
-  class(out) <- c(class(out), "acdc_archival")
+  class(out) <- c(class(out), "acdc_archive")
   return(out)
 
 }
