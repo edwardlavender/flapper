@@ -166,17 +166,17 @@
 #### dat_dc
 
 #' @title Example DC algorithm output
-#' @description An object of class \code{\link[flapper]{acdc-class}} from \code{\link[flapper]{dc}} created by a step-wise implementation of this function. This is included principally to streamline function examples.
+#' @description An object of class \code{\link[flapper]{acdc_archive-class}} from \code{\link[flapper]{dc}} created by a step-wise implementation of this function. This is included principally to streamline function examples.
 #'
 #' @format A named list with 4 elements:
 #' \describe{
-#'   \item{.acdc}{A list of results from internal function calls that contain essential results, with one element per chunk.}
+#'   \item{archive}{A list of results from internal function calls that contain essential results, with one element per chunk.}
 #'   \item{ts_by_chunk}{A list of time series, with one element per chunk.}
 #'   \item{time}{A dataframe that defines the times of sequential stages in the algorithm's progression.}
 #'   \item{args}{A named list of user inputs that record the parameters used to generate the outputs.}
 #' }
 #'
-#' @seealso See \code{\link[flapper]{acdc-class}} for further information on this S3 class.
+#' @seealso See \code{\link[flapper]{acdc_archive-class}} for further information on this S3 class.
 "dat_dc"
 
 
@@ -185,17 +185,17 @@
 #### dat_acdc
 
 #' @title Example ACDC algorithm output
-#' @description An object of class \code{\link[flapper]{acdc-class}} from \code{\link[flapper]{acdc}}, created by a (2-hour) chunk-wise implementation of this function. This is included principally to streamline function examples.
+#' @description An object of class \code{\link[flapper]{acdc_archive-class}} from \code{\link[flapper]{acdc}}, created by a (2-hour) chunk-wise implementation of this function. This is included principally to streamline function examples.
 #'
 #' @format A named list with 4 elements:
 #' \describe{
-#'   \item{.acdc}{A list of results from calls to \code{\link[flapper]{.acs}}, with one element per chunk.}
+#'   \item{archive}{A list of results from calls to \code{\link[flapper]{.acs}}, with one element per chunk.}
 #'   \item{ts_by_chunk}{A list of time series, with one element per chunk.}
 #'   \item{time}{A dataframe that defines the times of sequential stages in the algorithm's progression.}
 #'   \item{args}{A named list of user inputs that record the parameters used to generate the outputs.}
 #' }
 #'
-#' @seealso See \code{\link[flapper]{acdc-class}} for further information on this S3 class.
+#' @seealso See \code{\link[flapper]{acdc_archive-class}} for further information on this S3 class.
 "dat_acdc"
 
 

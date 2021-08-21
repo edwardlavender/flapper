@@ -3,15 +3,15 @@
 \name{acdc_helper_access}
 \alias{acdc_helper_access}
 \alias{acdc_helper_access_timesteps}
-\title{Short-cuts to elements of an \code{".acdc"} object}
+\title{Short-cuts to elements of an \code{"acdc_record"} object}
 \usage{
-acdc_helper_access_timesteps(x)
+acdc_helper_access_timesteps(record)
 }
 \arguments{
-\item{x}{An \code{\link[flapper]{.acdc-class}} object.}
+\item{record}{An \code{\link[flapper]{acdc_record-class}} object.}
 }
 \description{
-These functions provide short-cuts to elements of a \code{\link[flapper]{.acdc-class}} object.
+These functions provide short-cuts to elements of an \code{\link[flapper]{acdc_record-class}} object.
 }
 \details{
 \itemize{

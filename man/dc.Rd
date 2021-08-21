@@ -49,7 +49,7 @@ dc(
 \item{...}{Additional arguments (none implemented).}
 }
 \value{
-The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, messages are also written to file relaying function progress.
+The function returns a \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, messages are also written to file relaying function progress.
 }
 \description{
 This function implements the depth-contour (DC) algorithm. Under the assumption that individuals are benthic/demersal, this algorithm relates one-dimensional depth time series to a two-dimensional bathymetry surface to determine the extent to which different parts of an area might have (or have not) been used, or effectively represent occupied depths, over time. Given a sequence of depth observations (\code{archival}) from a benthic animal and a measurement error parameter (\code{calc_depth_error}), at each time step the function determines the cells on a bathymetry \code{\link[raster]{raster}} (\code{bathy}) that match the observed depth*. Across all time steps, matches are summed to produce a single map representing the number of occasions when the depth in each cell matched the observed depth.
@@ -68,9 +68,9 @@ depth <- dat_archival[dat_archival$individual_id == 25, ][1:100, ]
 #### Example (1): Implement algorithm with default options
 ## Implement algorithm
 out_dc <- dc(archival = depth, bathy = dat_gebco)
-## dc() returns a named list that is an 'acdc' class object
+## dc() returns a named list that is an 'acdc_archive' class object
 summary(out_dc)
-# ... .acdc elements contain the key information from the algorithm
+# ... archive elements contain the key information from the algorithm
 # ... ts_by_chunk contains the time series for each chunk
 # ... time contains a dataframe of the algorithm's progression
 # ... args contains a list of user inputs
@@ -157,7 +157,7 @@ out_dc <- dc(archival = depth,
 pp <- graphics::par(mfrow = c(5, 2))
 for(i in sample(1:nrow(depth), 5)){
   # Extract map created via dc()
-  raster::plot(out_dc$.acdc$record[[i]]$spatial[[1]]$map_timestep)
+  raster::plot(out_dc$archive[[1]]$record[[i]]$spatial[[1]]$map_timestep)
   # Compare to manual creation of map
   raster::plot(dat_gebco >= depth$depth[i] - 2.5 & dat_gebco <= depth$depth[i] + 2.5)
 }

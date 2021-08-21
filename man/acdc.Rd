@@ -70,7 +70,7 @@ acdc(
 \item{cl, varlist}{Parallelisation arguments to implement the algorithm in parallel (see \code{\link[flapper]{ac}}).}
 }
 \value{
-The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
+The function returns a \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
 }
 \description{
 This function implements the acoustic-centroid depth-contour (ACDC) algorithm. This is an extension of the AC algorithm implemented by \code{\link[flapper]{ac}} that that integrates acoustic detections and depth observations to infer where benthic/demersal animals could have spent more or less time over the period of observations. To implement the function, a dataframe (or list) of passive acoustic telemetry detections is required (\code{acoustics}), alongside a dataframe of depth observations (\code{archival}). At each time step, the algorithm integrates information from past and future acoustic detections in the form of acoustic centroids and information from depth observations in the form of depth contours to determine the possible locations of an individual in an area (see Details). As for the AC algorithm (\code{\link[flapper]{ac}}), the function can be implemented step-wise or chunk-wise and the outputs can be processed via \code{\link[flapper]{acdc_simplify}}.
@@ -117,7 +117,7 @@ out_acdc <- acdc(acoustics = acc,
                  acc_centroids = dat_centroids
                  )
 # The function returns a list with four elements
-# ... .acdc contains the results of the algorithm, implemented by the back-end
+# ... archive contains the results of the algorithm, implemented by the back-end
 # ... function .acs(). The other elements provide the time series
 # ... for each chunk, the time of the algorithm and a list of user inputs
 summary(out_acdc)
@@ -173,7 +173,7 @@ acdc_log_1 <- readLines(paste0(tempdir(), "/dot_acdc_log_1.txt"))
 utils::head(acdc_log_1)
 utils::tail(acdc_log_1)
 ## Examine outputs
-# Note that there are now four elements in .acdc, one for each chunk
+# Note that there are now four elements in archive, one for each chunk
 # Likewise, there are four elements in ts_by_chunk,
 # ... containing the movement time series for each chunk.
 summary(out_acdc)

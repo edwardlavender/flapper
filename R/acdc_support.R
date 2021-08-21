@@ -890,40 +890,41 @@ acs_setup_detection_kernels <-
 #### acdc_simplify()
 
 #' @title Simplify the outputs of the AC/DC algorithms
-#' @description This function simplifies the output of \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}, by processing information from the '.acdc' elements of a \code{\link[flapper]{acdc-class}} object that hold the results of calls to the workhorse routines. This is especially useful if the algorithm(s) have been applied chunk-wise, in which case the results for each chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series.
-#' @param acdc An \code{\link[flapper]{acdc-class}} object returned by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}.
+#' @description This function simplifies the output of \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}, by processing information from the 'archive' elements of a \code{\link[flapper]{acdc_archive-class}} object that hold the results of calls to the workhorse routines. This is especially useful if the algorithm(s) have been applied chunk-wise, in which case the results for each chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series.
+#' @param archive An \code{\link[flapper]{acdc_archive-class}} object returned by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}.
 #' @param type A character that defines whether the function should be implemented for the outputs of a call to an AC* algorithm (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), in which case \code{type = "acs"}, or the DC algorithm, in which case \code{type = "dc"}.
 #' @param mask (optional) A spatial mask (e.g., the argument passed to \code{bathy} in \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}) to mask areas (e.g., land) from the overall map. If implemented, cells in masked areas are assigned NAs rather than a score of 0.
 #' @param normalise A logical input that defines whether or not to normalise the overall map so that cell scores sum to one.
 #' @param keep_chunks A logical variable that defines whether or not to retain all chunk-specific information.
 #' @param ... Additional arguments (none implemented).
-#' @return The function returns an object of class \code{\link[flapper]{.acdc-class}}.
-#' @details If the \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an \code{\link[flapper]{.acdc-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps (accounting for the overlap between chunks for AC* algorithm(s)); (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series (for AC* algorithm(s)) to (c) return a \code{\link[flapper]{.acdc-class}} object.
+#' @return The function returns an object of class \code{\link[flapper]{acdc_record-class}}.
+#' @details If the \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an \code{\link[flapper]{acdc_record-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps (accounting for the overlap between chunks for AC* algorithm(s)); (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series (for AC* algorithm(s)) to (c) return an \code{\link[flapper]{acdc_record-class}} object.
 #' @seealso The AC, DC and ACDC algorithms are implemented by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}. After simplification, \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} can be implemented to visualise time-specific results.
 #' @author Edward Lavender
 #' @export
 #'
 
-acdc_simplify <- function(acdc, type = c("acs", "dc"), mask = NULL, normalise = FALSE, keep_chunks = FALSE,...) {
+acdc_simplify <- function(archive, type = c("acs", "dc"), mask = NULL, normalise = FALSE, keep_chunks = FALSE,...) {
 
   #### Checks
-  if(!(inherits(acdc, "acdc") | !inherits(acdc, ".acdc"))){
-    stop("Object of class 'acdc' expected.")
+  if(!(inherits(archive, "acdc_archive") | !inherits(archive, "acdc_record"))){
+    stop("Object of class 'acdc_archive' expected.")
   }
-  if(inherits(acdc, ".acdc")) {
-    "class(acdc) == '.acdc': 'acdc' returned unchanged."
-    return(acdc)
+  if(inherits(archive, "acdc_archive")) {
+    "class(archive) == 'acdc_archive': 'archive' returned unchanged."
+    return(archive)
   }
   type <- match.arg(type)
   message("acdc_simplify() implemented for type = '", type, "'.")
 
   #### Set up
-  out <- list(map = NULL, record = NULL, time = acdc$time, args = acdc$args, chunks = NULL, simplify = TRUE)
+  out <- list(map = NULL, record = NULL, time = archive$time, args = archive$args, chunks = NULL, simplify = TRUE)
 
   #### Simplify extract outputs the algorithm has only been implemented for a single chunk
-  if("map" %in% names(acdc$.acdc)) {
-    out$map <- acdc$.acdc$map
-    out$record <- acdc$.acdc$record
+  if(length(archive$archive) == 1){
+
+    out$map <- archive$archive[[1]]$map
+    out$record <- archive$archive[[1]]$record
 
     #### Otherwise aggregate information across chunks
   } else{
@@ -931,16 +932,16 @@ acdc_simplify <- function(acdc, type = c("acs", "dc"), mask = NULL, normalise = 
     if(type == "dc"){
 
       #### Get cumulative map from each chunk
-      maps <- lapply(acdc$.acdc, function(chunk) chunk$map)
+      maps <- lapply(archive$archive, function(chunk) chunk$map)
 
       #### Simplify records
-      out$record <- lapply(acdc$.acdc, function(chunk) chunk$record)
+      out$record <- lapply(archive$archive, function(chunk) chunk$record)
 
     } else if(type == "acs"){
 
       #### Get cumulative map from each chunk
       # Get the first map of each chunk
-      maps_first <- lapply(acdc$.acdc, function(chunk) {
+      maps_first <- lapply(archive$archive, function(chunk) {
         map_1 <- chunk$record[[1]]$spatial[[1]]$map_timestep
         if(is.null(map_1)) {
           stop("chunk$record[[1]]$spatial[[1]]$map_timestep is NULL. In flapper::acdc(), save_record_spatial = 1L (or greater/NULL) is required to return the necessary spatial information to correct for overlapping detection time series across chunks in the summation of chunk-specific maps.")
@@ -948,7 +949,7 @@ acdc_simplify <- function(acdc, type = c("acs", "dc"), mask = NULL, normalise = 
         return(map_1)
       })
       # Get the cumulative map from each chunk
-      maps_last <- lapply(acdc$.acdc, function(chunk) chunk$map)
+      maps_last <- lapply(archive$archive, function(chunk) chunk$map)
       # Correct for the repeated influence of the first map due to the overlapping detection time series
       maps <- lapply(2:length(maps_last), function(i){
         map <- sum(maps_last[[i]], -maps_first[[i]], na.rm = TRUE)
@@ -959,7 +960,7 @@ acdc_simplify <- function(acdc, type = c("acs", "dc"), mask = NULL, normalise = 
 
       #### Simplify records
       ## Add chunk-specific records
-      out$record <- lapply(acdc$.acdc, function(chunk) chunk$record)
+      out$record <- lapply(archive$archive, function(chunk) chunk$record)
       ## Delete the last element of each chunk (except the last chunk) since chunks are overlapping
       out$record <- lapply(out$record, function(chunk) chunk[1:(length(chunk)-1)])
       ## Define a dataframe to adjust the time stamps recorded for each chunks
@@ -1006,10 +1007,10 @@ acdc_simplify <- function(acdc, type = c("acs", "dc"), mask = NULL, normalise = 
   if(normalise) out$map <- out$map/raster::cellStats(out$map, "sum")
 
   #### Keep chunk-specific information, if requested
-  if(keep_chunks) out$chunks <- acdc$.acdc
+  if(keep_chunks) out$chunks <- archive$archive
 
   #### Return outputs
-  class(out) <- c(class(out), ".acdc")
+  class(out) <- c(class(out), "acdc_record")
   return(out)
 
 }
@@ -1017,23 +1018,23 @@ acdc_simplify <- function(acdc, type = c("acs", "dc"), mask = NULL, normalise = 
 
 ######################################
 ######################################
-#### check_class_.acdc()
+#### check_class_acdc_record()
 
-#' @title Check an object is of class \code{".acdc"}
-#' @description This function checks whether or not an object is of class \code{\link[flapper]{.acdc-class}}.
+#' @title Check an object is of class \code{"acdc_record"}
+#' @description This function checks whether or not an object is of class \code{\link[flapper]{acdc_record-class}}.
 #' @param x An object.
 #' @param arg A character that defines the name of a function argument.
-#' @return If \code{x} is not a \code{\link[flapper]{.acdc-class}} object, the function returns a helpful error message.
+#' @return If \code{x} is not an \code{\link[flapper]{acdc_record-class}} object, the function returns a helpful error message.
 #' @author Edward Lavender
 #' @keywords internal
 #'
 
-check_class_.acdc <- function(x, arg = deparse(substitute(x))){
-  if(!inherits(x, ".acdc")){
-    if(inherits(x, "acdc")) {
-      stop(paste0("'", arg, "' must be converted from class 'acdc' to class '.acdc' via flapper::acdc_simplify() before implementing this function."), call. = FALSE)
+check_class_acdc_record <- function(x, arg = deparse(substitute(x))){
+  if(!inherits(x, "acdc_record")){
+    if(inherits(x, "acdc_archive")) {
+      stop(paste0("'", arg, "' must be converted from class 'acdc_archive' to class 'acdc_record' via flapper::acdc_simplify() before implementing this function."), call. = FALSE)
     } else{
-      stop(paste0("'", arg, "' must be of class '.acdc'."), call. = FALSE)
+      stop(paste0("'", arg, "' must be of class 'acdc_record'."), call. = FALSE)
     }
   }
 }
@@ -1043,9 +1044,9 @@ check_class_.acdc <- function(x, arg = deparse(substitute(x))){
 ######################################
 #### acdc_helper_access_*()
 
-#' @title Short-cuts to elements of an \code{".acdc"} object
-#' @description These functions provide short-cuts to elements of a \code{\link[flapper]{.acdc-class}} object.
-#' @param x An \code{\link[flapper]{.acdc-class}} object.
+#' @title Short-cuts to elements of an \code{"acdc_record"} object
+#' @description These functions provide short-cuts to elements of an \code{\link[flapper]{acdc_record-class}} object.
+#' @param record An \code{\link[flapper]{acdc_record-class}} object.
 #' @details
 #' \itemize{
 #'   \item \code{\link[flapper]{acdc_helper_access_timesteps}} gets the total number of time steps from an AC* algorithm implementation.
@@ -1063,9 +1064,9 @@ NULL
 #' @rdname acdc_helper_access
 #' @export
 
-acdc_helper_access_timesteps <- function(x){
-  check_class_.acdc(x)
-  x$record[[length(x$record)]]$dat$timestep_cumulative
+acdc_helper_access_timesteps <- function(record){
+  check_class_acdc_record(record)
+  record$record[[length(record$record)]]$dat$timestep_cumulative
 }
 
 
@@ -1074,13 +1075,13 @@ acdc_helper_access_timesteps <- function(x){
 #### acdc_plot_record()
 
 #' @title Plot time-specific maps from the AC/DC algorithm(s)
-#' @description This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, a \code{\link[flapper]{.acdc-class}} list from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids (if applicable) can be added and customised and the finalised plots can be returned or saved to file.
-#' @param acdc An \code{\link[flapper]{.acdc-class}} object.
+#' @description This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, an \code{\link[flapper]{acdc_record-class}} list from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids (if applicable) can be added and customised and the finalised plots can be returned or saved to file.
+#' @param record An \code{\link[flapper]{acdc_record-class}} object.
 #' @param type A character that defines the plotted surface(s): \code{"map_cumulative"} plots the cumulative surface and \code{"map_timestep"} plots time step-specific surfaces.
-#' @param plot An integer vector that defines the time steps for which to make plots. If \code{plot = NULL}, the function will make a plot for all time steps for which the necessary information is available in \code{acdc}.
+#' @param plot An integer vector that defines the time steps for which to make plots. If \code{plot = NULL}, the function will make a plot for all time steps for which the necessary information is available in \code{archive}.
 #' @param add_coastline (optional) A named list of arguments, passed to \code{\link[raster]{plot}}, to add a polygon (i.e., of the coastline), to the plot. If provided, this must contain an `x' element that contains the coastline as a spatial object (e.g., a SpatialPolygonsDataFrame: see \code{\link[flapper]{dat_coast}} for an example).
 #' @param add_receivers (optional) A named list of arguments, passed to \code{\link[graphics]{points}}, to add points (i.e., receivers) to the plot. If provided, this must contain an `x' element that is a SpatialPoints object that specifies receiver locations (in the same coordinate reference system as other spatial data).
-#' @param add_raster (optional) A named list of arguments, passed to \code{\link[fields]{image.plot}}, to plot the RasterLayer of possible locations that is extracted from \code{acdc}.
+#' @param add_raster (optional) A named list of arguments, passed to \code{\link[fields]{image.plot}}, to plot the RasterLayer of possible locations that is extracted from \code{archive}.
 #' @param add_centroids (optional) For outputs from the AC* algorithms (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), \code{centroids} is a named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic centroid to the plot.
 #' @param add_additional (optional) A stand-alone function, to be executed after the background plot has been made and any specified spatial layers have been added to this, to customise the result (see Examples).
 #' @param crop_spatial A logical variable that defines whether or not to crop spatial data to lie within the axis limits.
@@ -1101,10 +1102,10 @@ acdc_helper_access_timesteps <- function(x){
 #' dat_acdc <- acdc_simplify(dat_acdc)
 #'
 #' #### Example (1): The default options simply plot the first surface
-#' acdc_plot_record(acdc = dat_acdc)
+#' acdc_plot_record(record = dat_acdc)
 #'
 #' #### Example (2): Define the number of plots to be produced and control the plotting window
-#' acdc_plot_record(acdc = dat_acdc,
+#' acdc_plot_record(record = dat_acdc,
 #'                  plot = 1:2,
 #'                  par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)))
 #'
@@ -1116,7 +1117,7 @@ acdc_helper_access_timesteps <- function(x){
 #' rsp <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 #' rsp <- sp::spTransform(rsp, proj_utm)
 #' ## Plot with receiver locations and coastline, customise the centroids and the raster
-#' acdc_plot_record(acdc = dat_acdc,
+#' acdc_plot_record(record = dat_acdc,
 #'                  add_coastline = list(x = dat_coast, col = "darkgreen"),
 #'                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
 #'                  add_centroids = list(col = "red"),
@@ -1126,7 +1127,7 @@ acdc_helper_access_timesteps <- function(x){
 #' #### Example (4): Control axis properties
 #' # ... via smallplot argument for raster, pretty_axis_args, xlim, ylim and fix_zlim
 #' # ... set crop_spatial = TRUE to crop spatial data within adjusted limits
-#' acdc_plot_record(acdc = dat_acdc,
+#' acdc_plot_record(record = dat_acdc,
 #'                  add_coastline = list(x = dat_coast, col = "darkgreen"),
 #'                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
 #'                  add_centroids = list(col = "red"),
@@ -1147,7 +1148,7 @@ acdc_helper_access_timesteps <- function(x){
 #'   mtext(side = 2, "y (UTM)", line = -8)
 #' }
 #' # Make plots with added titles
-#' acdc_plot_record(acdc = dat_acdc,
+#' acdc_plot_record(record = dat_acdc,
 #'                  plot = 1:2,
 #'                  par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)),
 #'                  add_coastline = list(x = dat_coast, col = "darkgreen"),
@@ -1162,7 +1163,7 @@ acdc_helper_access_timesteps <- function(x){
 #'
 #' #### Example (6) Save plots via png_param
 #' list.files(tempdir())
-#' acdc_plot_record(acdc = dat_acdc,
+#' acdc_plot_record(record = dat_acdc,
 #'                  plot = 1:2,
 #'                  png_param = list(filename = tempdir())
 #'                  )
@@ -1184,7 +1185,7 @@ acdc_helper_access_timesteps <- function(x){
 #' @export
 #'
 
-acdc_plot_record <- function(acdc,
+acdc_plot_record <- function(record,
                              type = c("map_cumulative", "map_timestep"),
                              plot = 1,
                              add_coastline = NULL,
@@ -1214,13 +1215,7 @@ acdc_plot_record <- function(acdc,
   if(check){
     cat_to_console("... Checking function inputs...")
     ## Check object class
-    if(!inherits(acdc, ".acdc")){
-      if(inherits(acdc, "acdc")) {
-        stop("'acdc' must be converted from 'acdc' to '.acdc. via flapper::acdc_simplify() before implementing this function.")
-      } else{
-        stop("'acdc' must be of class '.acdc'.")
-      }
-    }
+    check_class_acdc_record(record)
     ## Check plots to be produced
     if(any(plot <= 0L)) stop("Input to 'plot' must be > 0.")
     ## Check spatial data have been provided correctly
@@ -1264,7 +1259,7 @@ acdc_plot_record <- function(acdc,
   #### Define data for background plot
   cat_to_console("... Defining data for background plot...")
   ## Unpack information for plotting and isolate relevant plots
-  acdc_plot <- lapply(acdc$record, function(elm) elm$spatial)
+  acdc_plot <- lapply(record$record, function(elm) elm$spatial)
   acdc_plot <- lapply(acdc_plot, function(x) if(length(x) > 0) return(x))
   acdc_plot <- purrr::flatten(acdc_plot)
   if(!is.null(plot)) acdc_plot <- acdc_plot[plot]
@@ -1276,7 +1271,7 @@ acdc_plot_record <- function(acdc,
     if(!is.null(add_centroids)){
       if(!rlang::has_name(acdc_plot[[1]], "centroid")){
         add_centroids <- NULL
-        message("add_centroids = NULL implemented: 'acdc' does not contain centroids.")
+        message("add_centroids = NULL implemented: 'record' does not contain centroids.")
       }
     }
   }
@@ -1442,7 +1437,7 @@ acdc_plot_record <- function(acdc,
 #' setwd(tempdir())
 #' dat_acdc <- acdc_simplify(dat_acdc)
 #' acdc_animate_record(expr_param =
-#'                      list(acdc = dat_acdc,
+#'                      list(record = dat_acdc,
 #'                           add_coastline = list(x = dat_coast, col = "darkgreen"),
 #'                           plot = 1:5,
 #'                           fix_zlim = FALSE)

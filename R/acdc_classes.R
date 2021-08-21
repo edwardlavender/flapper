@@ -1,11 +1,11 @@
 ######################################
 ######################################
-#### .acdc-class
+#### acdc_record-class
 
-#' @title ".acdc" class
+#' @title "acdc_record" class
 #' @description An S3 class that defines the object returned by an acoustic-centroid/depth-contour (AC/DC) algorithm (\code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}), after simplification via \code{\link[flapper]{acdc_simplify}} or directly from internal routines.
 
-#' @return \subsection{A named list}{An ".acdc" class object is a named list with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific maps of the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by the \code{save_record_spatial} argument). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{save_args = TRUE}, otherwise the `args' element is \code{NULL}). The `chunks' element is a list with chunk-specific information that is generated if the algorithm is implemented chunk-wise and then simplified via \code{\link[flapper]{acdc_simplify}} with the \code{keep_chunks = TRUE} argument. The \code{simplify} element is a logical value that defines whether or not the object was created from \code{\link[flapper]{ac}}/\code{\link[flapper]{dc}}/\code{\link[flapper]{acdc}} and \code{\link[flapper]{acdc_simplify}} or an internal routine. Below, more detail about the `map' and `record' elements is provided.}
+#' @return \subsection{A named list}{An "acdc_record" class object is a named list with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific maps of the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by the \code{save_record_spatial} argument). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{save_args = TRUE}, otherwise the `args' element is \code{NULL}). The `chunks' element is a list with chunk-specific information that is generated if the algorithm is implemented chunk-wise and then simplified via \code{\link[flapper]{acdc_simplify}} with the \code{keep_chunks = TRUE} argument. The \code{simplify} element is a logical value that defines whether or not the object was created from \code{\link[flapper]{ac}}/\code{\link[flapper]{dc}}/\code{\link[flapper]{acdc}} and \code{\link[flapper]{acdc_simplify}} or an internal routine. Below, more detail about the `map' and `record' elements is provided.}
 #'
 #' \subsection{(A) `map'}{This is a RasterLayer that defines the locations in which an individual could have been (or was not), given the movement time series. Each cell is a count of the number of times when the acoustic and/or archival data were compatible with the individual having been in that cell, given the algorithm (unless normalisation has been implemented via \code{normalise = TRUE} in the algorithm or in  post-processing via \code{\link[flapper]{acdc_simplify}}). This provides an overall measure of the locations in which an individual could have spent more or less time, but not where it was.}
 #'
@@ -59,20 +59,20 @@
 #'
 #' @author Edward Lavender
 #' @docType package
-#' @name .acdc-class
+#' @name acdc_record-class
 NULL
 
 
 ######################################
 ######################################
-#### acdc-class
+#### acdc_archive-class
 
-#' @title "acdc" class
+#' @title "acdc-archive" class
 #' @description An S3 class that defines the object returned by an acoustic-centroid/depth-contour (AC/DC) algorithm (\code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}).
 #'
-#' @return An \code{\link[flapper]{acdc-class}} object is a named list that contains the output of a call to \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}. This contains the following elements: `.acdc', `ts_by_chunk', `time' and `args'.
+#' @return An \code{\link[flapper]{acdc_archive-class}} object is a named list that contains the output of a call to \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}. This contains the following elements: `archive', `ts_by_chunk', `time' and `args'.
 #'
-#' The main output is the `.acdc' element. This contains a list of arguments returned by the call(s) to the internal routines that implement the algorithm. If the algorithm is implemented step-wise, this contains a single \code{\link[flapper]{.acdc-class}} object as returned by internal routines. If the algorithm is implemented chunk-wise, this is a list, with one element for each chunk, each element containing a \code{\link[flapper]{.acdc-class}} object with results of the call to internal routines for that chunk. The results across chunks can be aggregated using \code{\link[flapper]{acdc_simplify}}.
+#' The main output is the `archive' element. This contains a list of \code{\link[flapper]{acdc_record-class}} objects returned by the call(s) to the internal routines that implement the algorithm. If the algorithm is implemented step-wise, this list contains a single element; if the algorithm is implemented chunk-wise, there is one element for each chunk. Each element contains a \code{\link[flapper]{acdc_record-class}} object with results of the call to internal routines for that chunk. The results across chunks can be aggregated using \code{\link[flapper]{acdc_simplify}}.
 #'
 #' The `ts_by_chunk' element is a list, with one element for each chunk, that contains the movement time series that were used in that chunk. Each element contains `acoustics' and `archival' dataframes, though the former is \code{NULL} for the DC algorithm and the latter is \code{NULL} for the AC algorithm. For the AC* algorithms, if there is more than one chunk, the last observation of each acoustic chunk is the same as the first acoustic observation for the next chunk. This results from splitting chunks at acoustic observations, which enables the results of chunks that are computed independently to be simply aggregated without the loss of any information.
 #'
@@ -82,5 +82,5 @@ NULL
 #'
 #' @author Edward Lavender
 #' @docType package
-#' @name acdc-class
+#' @name acdc_archive-class
 NULL

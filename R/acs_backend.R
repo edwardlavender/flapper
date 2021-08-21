@@ -29,7 +29,7 @@
 #' @param check A logical input that defines whether or not to check function inputs. This can be switched off to improve computation time when the function is applied iteratively or via a front-end function (e.g., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).
 #' @param ... Additional arguments (none implemented).
 #'
-#' @return The function returns a \code{\link[flapper]{.acdc-class}} object with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific information on the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{save_record_spatial}). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{save_args = TRUE}, otherwise the `args' element is \code{NULL}).
+#' @return The function returns an \code{\link[flapper]{acdc_record-class}} object with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific information on the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{save_record_spatial}). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{save_args = TRUE}, otherwise the `args' element is \code{NULL}).
 #'
 #' @seealso The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call \code{\link[flapper]{.acs_pl}} which in turn calls this function. \code{\link[flapper]{acs_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acs_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results.
 #'
@@ -887,7 +887,7 @@
     total_duration <- sum(as.numeric(out$time$serial_duration), na.rm = TRUE)
     out$time$total_duration[nrow(out$time)] <- total_duration
     cat_to_cf(paste0("... flapper::.acs() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
-    class(out) <- c(class(out), ".acdc")
+    class(out) <- c(class(out), "acdc_record")
     return(out)
 
   }

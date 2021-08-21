@@ -172,7 +172,7 @@ dc_out <- dc(archival = depth,
              save_record_spatial = NULL)
 # Extract time-specific maps
 # ... Either directly for single chunk implementations of dc()
-record <- dc_out$.acdc$record
+record <- dc_out$archive$record
 record <- lapply(record, function(r) r$spatial[[1]]$map_timestep)
 # ... Or indirectly via acdc_simplify() in general
 dc_out_summary <- acdc_simplify(dc_out, type = "dc")
@@ -430,7 +430,7 @@ dc_out <- dc(archival = depth_obs,
 # We will assume that the origin was known.
 # ... We will mostly use the default options.
 history_dcpf <-
-  pf(record = lapply(dc_out$.acdc$record, function(r) r$spatial[[1]]$map_timestep),
+  pf(record = lapply(dc_out$archive$record, function(r) r$spatial[[1]]$map_timestep),
      origin = origin_sim,
      calc_distance = "euclid",
      mobility = 200,

@@ -132,7 +132,7 @@ dc_1 <- dc(archival = depth,
            calc_depth_error = function(...) matrix(c(-30, 30), nrow = 2),
            save_record_spatial = NULL
            )
-dcpf_1 <- pf(record = lapply(dc_1$.acdc$record, function(elm) elm$spatial[[1]]$map_timestep),
+dcpf_1 <- pf(record = lapply(dc_1$archive$record, function(elm) elm$spatial[[1]]$map_timestep),
              origin  = xy,
              calc_distance = "euclid",
              calc_distance_euclid_fast = FALSE,
@@ -197,19 +197,21 @@ file.size(paste0(tempdir(), "/dat_centroids.rds"))/1e6
 id <- 25
 acc <- dat_acoustics[dat_acoustics$individual_id == id, ]
 arc <- dat_archival[dat_archival$individual_id == id, ]
+# Focus on a sample of data to keep package contents small
+acc <- acc[acc$timestamp <= as.POSIXct("2016-03-19"), ]
+arc <- arc[arc$timestamp <= as.POSIXct("2016-03-19"), ]
 # Focus on the subset of data for which we have both acoustic and archival detections
 acc <- acc[acc$timestamp >= min(arc$timestamp) - 2*60 &
              acc$timestamp <= max(arc$timestamp) + 2*60, ]
 arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
              arc$timestamp <= max(acc$timestamp) + 2*60, ]
-# Focus on a sample of data to keep package contents small
-acc <- acc[acc$timestamp <= as.POSIXct("2016-03-19"), ]
-arc <- arc[arc$timestamp <= as.POSIXct("2016-03-19"), ]
 range(arc$timestamp)
 range(acc$timestamp)
 # Examine data in this region
+pp <- par(oma = c(3, 3, 3, 3), xpd = NA)
 prettyGraphics::pretty_plot(arc$timestamp, arc$depth*-1, type = "l")
 prettyGraphics::pretty_line(acc$timestamp, add = TRUE)
+par(pp)
 
 #### dat_acdc
 dat_acdc <- acdc(acoustics = acc,

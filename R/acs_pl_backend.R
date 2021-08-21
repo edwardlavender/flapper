@@ -27,7 +27,7 @@
 #' @param cl,varlist Parallelisation arguments. \code{cl} is cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the algorithm is implemented for each chunk in a list of acoustic time series, either (a) as supplied by the user (if \code{acoustics} is a list), (b) as defined by the input to \code{split}, or (c) as defined automatically from the number of nodes in the cluster if \code{split = NULL}. If \code{cl} is supplied, \code{varlist} may also be required. This is a character vector of objects to export. \code{varlist} is passed to the \code{varlist} of \code{\link[parallel]{clusterExport}}. Exported objects must be located in the global environment.
 #' @param ... Additional arguments (none implemented).
 #'
-#' @return The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
+#' @return The function returns a \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
 #'
 #' @seealso The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call this function, which in turn calls \code{\link[flapper]{.acs}}. \code{\link[flapper]{acs_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acs_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results.
 #'
@@ -66,7 +66,7 @@
 
   #### A list to store overall outputs
   t_onset <- Sys.time()
-  out <- list(.acdc = NULL, ts_by_chunk = NULL, time = NULL, args = NULL)
+  out <- list(archive = NULL, ts_by_chunk = NULL, time = NULL, args = NULL)
 
   #### Check parallelisation options
   if(is.null(cl)) n_cores <- 1 else n_cores <- length(cl)
@@ -378,67 +378,68 @@
 
     #### Implement algorithm
     cat_to_cf("... Calling .acs() to implement ACDC algorithm on one chunk...")
-    out$time <- rbind(out$time, data.frame(event = "calling_.acs", time = Sys.time()))
+    out$time <- rbind(out$time, data.frame(event = "calling_.acs()", time = Sys.time()))
     .out <- .acs(acoustics = movement_ts[[1]]$acoustics,
-                  archival = movement_ts[[1]]$archival,
-                  step = step,
-                  plot_ts = FALSE,
-                  bathy = bathy,
-                  map = map,
-                  detection_range = detection_range,
-                  detection_kernels = detection_kernels,
-                  detection_kernels_overlap = detection_kernels_overlap,
-                  detection_time_window = detection_time_window,
-                  acc_centroids = acc_centroids,
-                  mobility = mobility,
-                  calc_depth_error = calc_depth_error,
-                  normalise = normalise,
-                  save_record_spatial = save_record_spatial,
-                  write_record_spatial_for_pf = write_record_spatial_for_pf,
-                  save_args = FALSE,
-                  verbose = verbose,
-                  con = con,
-                  progress = progress,
-                  check = FALSE)
+                 archival = movement_ts[[1]]$archival,
+                 step = step,
+                 plot_ts = FALSE,
+                 bathy = bathy,
+                 map = map,
+                 detection_range = detection_range,
+                 detection_kernels = detection_kernels,
+                 detection_kernels_overlap = detection_kernels_overlap,
+                 detection_time_window = detection_time_window,
+                 acc_centroids = acc_centroids,
+                 mobility = mobility,
+                 calc_depth_error = calc_depth_error,
+                 normalise = normalise,
+                 save_record_spatial = save_record_spatial,
+                 write_record_spatial_for_pf = write_record_spatial_for_pf,
+                 save_args = FALSE,
+                 verbose = verbose,
+                 con = con,
+                 progress = progress,
+                 check = FALSE)
+    .out <- list(.out)
 
   } else {
 
     #### Implement algorithm in parallel
     cat_to_cf(paste("... Calling .acs() to implement ACDC algorithm on", length(acoustics_ls_wth_overlap), "chunks, using", n_cores, "cores..."))
-    out$time <- rbind(out$time, data.frame(event = "calling_.acs", time = Sys.time()))
+    out$time <- rbind(out$time, data.frame(event = "calling_.acs()", time = Sys.time()))
     if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
     .out <- pbapply::pblapply(1:length(acoustics_ls_wth_overlap), cl = cl, function(i){
 
       #### Implement algorithm
       .out <- .acs(acoustics = movement_ts[[i]]$acoustics,
-                    archival = movement_ts[[i]]$archival,
-                    plot_ts = FALSE,
-                    step = step,
-                    bathy = bathy,
-                    map = map,
-                    detection_range = detection_range,
-                    detection_kernels = detection_kernels,
-                    detection_kernels_overlap = detection_kernels_overlap,
-                    detection_time_window = detection_time_window,
-                    acc_centroids = acc_centroids,
-                    mobility = mobility,
-                    calc_depth_error = calc_depth_error,
-                    normalise = normalise,
-                    save_record_spatial = save_record_spatial,
-                    write_record_spatial_for_pf = write_record_spatial_for_pf,
-                    save_args = FALSE,
-                    chunk = i,
-                    verbose = verbose,
-                    con = con_ls[[i]],
-                    progress = 0L,
-                    check = FALSE)
+                   archival = movement_ts[[i]]$archival,
+                   plot_ts = FALSE,
+                   step = step,
+                   bathy = bathy,
+                   map = map,
+                   detection_range = detection_range,
+                   detection_kernels = detection_kernels,
+                   detection_kernels_overlap = detection_kernels_overlap,
+                   detection_time_window = detection_time_window,
+                   acc_centroids = acc_centroids,
+                   mobility = mobility,
+                   calc_depth_error = calc_depth_error,
+                   normalise = normalise,
+                   save_record_spatial = save_record_spatial,
+                   write_record_spatial_for_pf = write_record_spatial_for_pf,
+                   save_args = FALSE,
+                   chunk = i,
+                   verbose = verbose,
+                   con = con_ls[[i]],
+                   progress = 0L,
+                   check = FALSE)
       return(.out)
     })
     if(!is.null(cl)) parallel::stopCluster(cl = cl)
   }
 
   #### Return outputs
-  out$.acdc <- .out
+  out$archive <- .out
   t_end <- Sys.time()
   out$time <- rbind(out$time, data.frame(event = "algorithm_competion", time = t_end))
   out$time$serial_duration <- Tools4ETS::serial_difference(out$time$time, units = "mins")

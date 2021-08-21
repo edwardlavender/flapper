@@ -22,7 +22,7 @@
 #'
 #' †Under the default options (\code{split = NULL}), the function starts with a blank map of the area and iterates over each time step, adding the `possible positions' of the individual to the map at each step. By continuously updating a single map, this approach is slow but minimises memory requirements. An alternative approach is to split the time series into chunks, implement an iterative approach within each chunk, and then join the maps for each chunk. This is implemented by \code{split} (plus \code{\link[flapper]{acdc_simplify}}).
 #'
-#' @return  The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, messages are also written to file relaying function progress.
+#' @return  The function returns a \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, messages are also written to file relaying function progress.
 #'
 #'
 #' @examples
@@ -34,9 +34,9 @@
 #' #### Example (1): Implement algorithm with default options
 #' ## Implement algorithm
 #' out_dc <- dc(archival = depth, bathy = dat_gebco)
-#' ## dc() returns a named list that is an 'acdc' class object
+#' ## dc() returns a named list that is an 'acdc_archive' class object
 #' summary(out_dc)
-#' # ... .acdc elements contain the key information from the algorithm
+#' # ... archive elements contain the key information from the algorithm
 #' # ... ts_by_chunk contains the time series for each chunk
 #' # ... time contains a dataframe of the algorithm's progression
 #' # ... args contains a list of user inputs
@@ -123,7 +123,7 @@
 #' pp <- graphics::par(mfrow = c(5, 2))
 #' for(i in sample(1:nrow(depth), 5)){
 #'   # Extract map created via dc()
-#'   raster::plot(out_dc$.acdc$record[[i]]$spatial[[1]]$map_timestep)
+#'   raster::plot(out_dc$archive[[1]]$record[[i]]$spatial[[1]]$map_timestep)
 #'   # Compare to manual creation of map
 #'   raster::plot(dat_gebco >= depth$depth[i] - 2.5 & dat_gebco <= depth$depth[i] + 2.5)
 #' }
@@ -195,7 +195,7 @@ dc <- function(archival,
   #### Initiate function with storage container for outputs
   cat_to_cf(paste0("flapper::dc() called (@ ", t_onset, ")..."))
   cat_to_cf("... Setting up function...")
-  out <- list(.acdc = NULL, ts_by_chunk = NULL, time = NULL, args = NULL)
+  out <- list(archive = NULL, ts_by_chunk = NULL, time = NULL, args = NULL)
   out$time <- data.frame(event = "onset", time = t_onset)
   if(save_args){
     out$args <- list(archival = archival,
@@ -329,17 +329,13 @@ dc <- function(archival,
     }
     # Update and return outputs
     .out$map <- use
-    class(.out) <- c(class(.out), ".acdc")
+    class(.out) <- c(class(.out), "acdc_archive")
     return(.out)
   })
   if(!is.null(cl)) parallel::stopCluster(cl)
 
   #### Finalise algorithm
-  if(length(archival_ls) == 1){
-    out$.acdc <- .out_by_chunk[[1]]
-  } else {
-    out$.acdc <- .out_by_chunk
-  }
+  out$archive <- .out_by_chunk
   t_end <- Sys.time()
   out$time <- rbind(out$time, data.frame(event = "algorithm_competion", time = t_end))
   out$time$serial_duration <- Tools4ETS::serial_difference(out$time$time, units = "mins")

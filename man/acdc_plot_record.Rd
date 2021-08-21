@@ -5,7 +5,7 @@
 \title{Plot time-specific maps from the AC/DC algorithm(s)}
 \usage{
 acdc_plot_record(
-  acdc,
+  record,
   type = c("map_cumulative", "map_timestep"),
   plot = 1,
   add_coastline = NULL,
@@ -29,17 +29,17 @@ acdc_plot_record(
 )
 }
 \arguments{
-\item{acdc}{An \code{\link[flapper]{.acdc-class}} object.}
+\item{record}{An \code{\link[flapper]{acdc_record-class}} object.}
 
 \item{type}{A character that defines the plotted surface(s): \code{"map_cumulative"} plots the cumulative surface and \code{"map_timestep"} plots time step-specific surfaces.}
 
-\item{plot}{An integer vector that defines the time steps for which to make plots. If \code{plot = NULL}, the function will make a plot for all time steps for which the necessary information is available in \code{acdc}.}
+\item{plot}{An integer vector that defines the time steps for which to make plots. If \code{plot = NULL}, the function will make a plot for all time steps for which the necessary information is available in \code{archive}.}
 
 \item{add_coastline}{(optional) A named list of arguments, passed to \code{\link[raster]{plot}}, to add a polygon (i.e., of the coastline), to the plot. If provided, this must contain an `x' element that contains the coastline as a spatial object (e.g., a SpatialPolygonsDataFrame: see \code{\link[flapper]{dat_coast}} for an example).}
 
 \item{add_receivers}{(optional) A named list of arguments, passed to \code{\link[graphics]{points}}, to add points (i.e., receivers) to the plot. If provided, this must contain an `x' element that is a SpatialPoints object that specifies receiver locations (in the same coordinate reference system as other spatial data).}
 
-\item{add_raster}{(optional) A named list of arguments, passed to \code{\link[fields]{image.plot}}, to plot the RasterLayer of possible locations that is extracted from \code{acdc}.}
+\item{add_raster}{(optional) A named list of arguments, passed to \code{\link[fields]{image.plot}}, to plot the RasterLayer of possible locations that is extracted from \code{archive}.}
 
 \item{add_centroids}{(optional) For outputs from the AC* algorithms (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), \code{centroids} is a named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic centroid to the plot.}
 
@@ -65,7 +65,7 @@ acdc_plot_record(
 The function plots the results of the AC* algorithm(s) at specified time steps, with one plot per time step. Plots are saved to file if \code{png_param} is supplied.
 }
 \description{
-This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, a \code{\link[flapper]{.acdc-class}} list from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids (if applicable) can be added and customised and the finalised plots can be returned or saved to file.
+This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, an \code{\link[flapper]{acdc_record-class}} list from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids (if applicable) can be added and customised and the finalised plots can be returned or saved to file.
 }
 \examples{
 #### Step (1): Implement AC/DC algorithm(s)
@@ -75,10 +75,10 @@ This function is used to plot time-specific maps from the AC/DC algorithm(s). To
 dat_acdc <- acdc_simplify(dat_acdc)
 
 #### Example (1): The default options simply plot the first surface
-acdc_plot_record(acdc = dat_acdc)
+acdc_plot_record(record = dat_acdc)
 
 #### Example (2): Define the number of plots to be produced and control the plotting window
-acdc_plot_record(acdc = dat_acdc,
+acdc_plot_record(record = dat_acdc,
                  plot = 1:2,
                  par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)))
 
@@ -90,7 +90,7 @@ proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
 rsp <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 rsp <- sp::spTransform(rsp, proj_utm)
 ## Plot with receiver locations and coastline, customise the centroids and the raster
-acdc_plot_record(acdc = dat_acdc,
+acdc_plot_record(record = dat_acdc,
                  add_coastline = list(x = dat_coast, col = "darkgreen"),
                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
                  add_centroids = list(col = "red"),
@@ -100,7 +100,7 @@ acdc_plot_record(acdc = dat_acdc,
 #### Example (4): Control axis properties
 # ... via smallplot argument for raster, pretty_axis_args, xlim, ylim and fix_zlim
 # ... set crop_spatial = TRUE to crop spatial data within adjusted limits
-acdc_plot_record(acdc = dat_acdc,
+acdc_plot_record(record = dat_acdc,
                  add_coastline = list(x = dat_coast, col = "darkgreen"),
                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
                  add_centroids = list(col = "red"),
@@ -121,7 +121,7 @@ add_titles <- function(){
   mtext(side = 2, "y (UTM)", line = -8)
 }
 # Make plots with added titles
-acdc_plot_record(acdc = dat_acdc,
+acdc_plot_record(record = dat_acdc,
                  plot = 1:2,
                  par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)),
                  add_coastline = list(x = dat_coast, col = "darkgreen"),
@@ -136,7 +136,7 @@ acdc_plot_record(acdc = dat_acdc,
 
 #### Example (6) Save plots via png_param
 list.files(tempdir())
-acdc_plot_record(acdc = dat_acdc,
+acdc_plot_record(record = dat_acdc,
                  plot = 1:2,
                  png_param = list(filename = tempdir())
                  )

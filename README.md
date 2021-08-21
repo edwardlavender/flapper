@@ -394,8 +394,8 @@ algorithms are implemented with the `acdc*()` family of functions:
 #### AC/DC post-processing and analysis
 
 The AC/DC branch functions (`ac()`, `dc()` and `acdc()`) all return
-objects of class `acdc`. These can be processed and analysed using
-several key functions:
+objects of class `acdc_archive`. These can be processed and analysed
+using several key functions:
 
   - `acdc_simplify()` simplifies the results of the AC/DC algorithm(s);
   - `acdc_helper_*()` functions provide simple ‘helper’ routines for

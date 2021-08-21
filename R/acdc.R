@@ -35,7 +35,7 @@
 #'
 #' The result is a map that shows where the individual could have spent more or less (or no) time over the time interval under construction. The main limitation of this approach is that reconstructs where the individual could have been, but not where it was. In reality, the individual's current position constrains where it can go next. However, particle filtering can be used to extent this approach via the incorporate a movement model.
 #'
-#' @return The function returns a \code{\link[flapper]{acdc-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
+#' @return The function returns a \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
 #'
 #' @seealso This function calls \code{\link[flapper]{.acs_pl}} and \code{\link[flapper]{.acs}} to implement the ACDC algorithm. The AC component can be implemented via  \code{\link[flapper]{ac}} and the DC component via \code{\link[flapper]{dc}}. \code{\link[flapper]{acs_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acs_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results. Particle filtering can be used to reconstruct movement paths.
 #'
@@ -72,7 +72,7 @@
 #'                  acc_centroids = dat_centroids
 #'                  )
 #' # The function returns a list with four elements
-#' # ... .acdc contains the results of the algorithm, implemented by the back-end
+#' # ... archive contains the results of the algorithm, implemented by the back-end
 #' # ... function .acs(). The other elements provide the time series
 #' # ... for each chunk, the time of the algorithm and a list of user inputs
 #' summary(out_acdc)
@@ -128,7 +128,7 @@
 #' utils::head(acdc_log_1)
 #' utils::tail(acdc_log_1)
 #' ## Examine outputs
-#' # Note that there are now four elements in .acdc, one for each chunk
+#' # Note that there are now four elements in archive, one for each chunk
 #' # Likewise, there are four elements in ts_by_chunk,
 #' # ... containing the movement time series for each chunk.
 #' summary(out_acdc)
