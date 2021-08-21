@@ -9,7 +9,6 @@
 #' @param mask (optional) A spatial mask (e.g., the argument passed to \code{bathy} in \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}) to mask areas (e.g., land) from the overall map. If implemented, cells in masked areas are assigned NAs rather than a score of 0.
 #' @param normalise A logical input that defines whether or not to normalise the overall map so that cell scores sum to one.
 #' @param keep_chunks A logical variable that defines whether or not to retain all chunk-specific information.
-#' @param ... Additional arguments (none implemented).
 #' @return The function returns an object of class \code{\link[flapper]{acdc_record-class}}.
 #' @details If the \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an \code{\link[flapper]{acdc_record-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps (accounting for the overlap between chunks for AC* algorithm(s)); (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series (for AC* algorithm(s)) to (c) return an \code{\link[flapper]{acdc_record-class}} object.
 #' @seealso The AC, DC and ACDC algorithms are implemented by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}. After simplification, \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} can be implemented to visualise time-specific results.
@@ -17,21 +16,28 @@
 #' @export
 #'
 
-acdc_simplify <- function(archive, type = c("acs", "dc"), mask = NULL, normalise = FALSE, keep_chunks = FALSE,...) {
+acdc_simplify <- function(archive,
+                          type = c("acs", "dc"),
+                          mask = NULL,
+                          normalise = FALSE,
+                          keep_chunks = FALSE) {
 
   #### Checks
   if(!(inherits(archive, "acdc_archive") | !inherits(archive, "acdc_record"))){
     stop("Object of class 'acdc_archive' expected.")
   }
-  if(inherits(archive, "acdc_archive")) {
-    "class(archive) == 'acdc_archive': 'archive' returned unchanged."
+  if(inherits(archive, "acdc_record")) {
+    message("class(archive) == 'acdc_record': 'archive' returned unchanged.")
     return(archive)
   }
   type <- match.arg(type)
   message("acdc_simplify() implemented for type = '", type, "'.")
 
-  #### Set up
+  #### Define container for outputs
   out <- list(map = NULL, record = NULL, time = archive$time, args = archive$args, chunks = NULL, simplify = TRUE)
+
+  #### Keep chunk-specific information (unchanged), if requested
+  if(keep_chunks) out$chunks <- archive$archive
 
   #### Simplify extract outputs the algorithm has only been implemented for a single chunk
   if(length(archive$archive) == 1){
@@ -45,12 +51,46 @@ acdc_simplify <- function(archive, type = c("acs", "dc"), mask = NULL, normalise
     #### Get a list of the cumulative maps from each chunk (to be summed below)
     maps <- lapply(archive$archive, function(chunk) chunk$map)
 
+    #### Process spatial elements so that 'map_cumulative' elements are carried forward (summed) across chunks, if necessary
+    try_update_spatial <- TRUE
+    if(!is.null(archive$args)){
+      if(isTRUE(archive$args$save_record_spatial == 0)) try_update_spatial <- FALSE
+    }
+    if(try_update_spatial){
+      archive$archive <-
+        lapply(1:length(archive$archive), function(chunk_id){
+          # chunk_id <- 2
+          folder <- archive$archive[[chunk_id]]
+          if(chunk_id > 1){
+            if(chunk_id == 2){
+              maps_for_previous_chunks <- maps[[1]]
+            } else{
+              maps_for_previous_chunks <- maps[1:(chunk_id-1)]
+              maps_for_previous_chunks <- raster::brick(maps_for_previous_chunks)
+              maps_for_previous_chunks <- raster::calc(maps_for_previous_chunks, sum, na.rm = TRUE)
+            }
+            folder$record <-
+              lapply(folder$record, function(record_elm){
+                record_elm$spatial <-
+                  lapply(record_elm$spatial, function(spatial_elm){
+                    if(rlang::has_name(spatial_elm, "map_cumulative")){
+                      spatial_elm$map_cumulative <- sum(spatial_elm$map_cumulative, maps_for_previous_chunks, na.rm = TRUE)
+                    }
+                    return(spatial_elm)
+                  })
+                return(record_elm)
+              })
+          }
+          return(folder)
+        })
+    }
+
     #### Simplify records
     out$record <- lapply(archive$archive, function(chunk) chunk$record)
 
+    #### Process record time stamps, if necessary
     if(type == "acs"){
 
-      #### Process record time stamps
       ## Define a dataframe to adjust the time stamps recorded for each chunks
       # For chunks 2:n_chunks, we will add the time stamps reached by the previous chunk
       # ... up to the current chunk
@@ -93,9 +133,6 @@ acdc_simplify <- function(archive, type = c("acs", "dc"), mask = NULL, normalise
   #### Mask and normalise the final map
   if(!is.null(mask)) out$map <- raster::mask(out$map, mask)
   if(normalise) out$map <- out$map/raster::cellStats(out$map, "sum")
-
-  #### Keep chunk-specific information, if requested
-  if(keep_chunks) out$chunks <- archive$archive
 
   #### Return outputs
   class(out) <- c(class(out), "acdc_record")

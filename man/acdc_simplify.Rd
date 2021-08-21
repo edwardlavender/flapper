@@ -9,8 +9,7 @@ acdc_simplify(
   type = c("acs", "dc"),
   mask = NULL,
   normalise = FALSE,
-  keep_chunks = FALSE,
-  ...
+  keep_chunks = FALSE
 )
 }
 \arguments{
@@ -23,8 +22,6 @@ acdc_simplify(
 \item{normalise}{A logical input that defines whether or not to normalise the overall map so that cell scores sum to one.}
 
 \item{keep_chunks}{A logical variable that defines whether or not to retain all chunk-specific information.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns an object of class \code{\link[flapper]{acdc_record-class}}.
