@@ -135,7 +135,6 @@ The main thrust of flapper is the implementation of existing and new algorithms 
      \itemize{
         \item \link{acdc_simplify} simplifies the results of the algorithm(s);
         \item \link{acdc_helper_access_timesteps} accesses the total number of time steps from an AC* algorithm implementation;
-        \item \link{acdc_helper_list_record_for_pf} creates an ordered list of output files;
         \item \link{acdc_plot_record} plots the results of the algorithm(s);
         \item \link{acdc_animate_record} creates html animations of the algorithm(s);
         }
@@ -143,6 +142,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
     \item The particle filtering branch
     \itemize{
       \item \link{pf_setup_movement_pr} provides a simple movement model that defines the probability of movement between locations given the distance between them;
+      \item \link{pf_setup_record} creates an ordered list of input files;
       \item \link{pf} implements the PF routine, building on the AC, DC and ACDC algorithms to form the ACPF, DCPF and ACDCPF algorithms;
       \item \link{pf_plot_history} plots simulated particle histories;
       \item \link{pf_plot_map} maps the `probability of use' across an area based on sampled particles;

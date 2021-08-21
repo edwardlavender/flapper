@@ -404,9 +404,6 @@ using several key functions:
         different elements of the output:
           - `acdc_helper_access_timesteps()` accesses the total number
             of time steps from an AC\* algorithm implementation;
-      - `acdc_helper_list_record_for_pf()` creates an ordered list of
-        output files (that can be passed to a particle filtering routine
-        (see below);
   - `acdc_plot_record()` plots the results of the AC/DC algorithm(s);
   - `acdc_animate_record()` creates html animations of the AC/DC
     algorithm(s);
@@ -423,6 +420,7 @@ process provided by the `pf*()` family of functions:
   - `pf_setup_movement_pr` provides a simple movement model that defines
     the probability of movement between locations given the distance
     between them;
+  - `pf_setup_record()` creates an ordered list of input files;
   - `pf()` implements the particle filtering routine;
   - `pf_plot_history()` plot simulated particle histories;
   - `pf_plot_map()` maps the ‘probability of use’ across an area based

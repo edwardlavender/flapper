@@ -197,7 +197,6 @@ The AC/DC branch functions (`ac()`, `dc()` and `acdc()`) all return objects of c
 * `acdc_helper_*()` functions provide simple 'helper' routines for working with simplified outputs: 
     * `acdc_helper_access_*()` functions provide short-cuts to different elements of the output:
       * `acdc_helper_access_timesteps()` accesses the total number of time steps from an AC* algorithm implementation;
-    * `acdc_helper_list_record_for_pf()` creates an ordered list of output files (that can be passed to a particle filtering routine (see below);
 * `acdc_plot_record()` plots the results of the AC/DC algorithm(s); 
 * `acdc_animate_record()` creates html animations of the AC/DC algorithm(s); 
 
@@ -206,6 +205,7 @@ The AC/DC branch functions (`ac()`, `dc()` and `acdc()`) all return objects of c
 Each algorithm (AC, DC and ACDC) can be extended through incorporation of a movement model to reconstruct movement paths over a surface that are consistent with the observations (and model assumptions). The resultant algorithms are termed the ACPF, DCPF and ACDCPF algorithms. The approach is implemented via a particle simulation and filtering process provided by the `pf*()` family of functions: 
 
 * `pf_setup_movement_pr` provides a simple movement model that defines the probability of movement between locations given the distance between them; 
+* `pf_setup_record()` creates an ordered list of input files;
 * `pf()` implements the particle filtering routine; 
 * `pf_plot_history()` plot simulated particle histories; 
 * `pf_plot_map()` maps the 'probability of use' across an area based on sampled particles;
