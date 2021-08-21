@@ -204,7 +204,7 @@
 #### dat_dcpf_histories
 
 #' @title Example DCPF algorithm output: particle histories
-#' @description An example \code{\link[flapper]{.pf-class}} object. This comprises a named list of results from an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dc}} and \code{\link[flapper]{pf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The outputs include algorithm parameters and a list of dataframes that record the particles sampled at each time step. This is included principally to streamline function examples.
+#' @description An example \code{\link[flapper]{pf_archive-class}} object. This comprises a named list of results from an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dc}} and \code{\link[flapper]{pf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The outputs include algorithm parameters and a list of dataframes that record the particles sampled at each time step. This is included principally to streamline function examples.
 #'
 #' @format A named list, with two elements, which records the parameters used in the call to \code{\link[flapper]{pf}} and the particles sampled at each time step:
 #' \describe{
@@ -225,7 +225,7 @@
 #### dat_dcpf_paths
 
 #' @title Example DCPF algorithm output: reconstructed paths
-#' @description An example \code{\link[flapper]{pf-class}} object. This comprises a dataframe of movement paths reconstructed by an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dc}} and \code{\link[flapper]{pf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The resultant particle histories (\code{\link[flapper]{dat_dcpf_histories}}) were processed into this set of movement paths by \code{\link[flapper]{pf_simplify}}. This dataset is included principally to streamline function examples.
+#' @description An example \code{\link[flapper]{pf_path-class}} object. This comprises a dataframe of movement paths reconstructed by an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dc}} and \code{\link[flapper]{pf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The resultant particle histories (\code{\link[flapper]{dat_dcpf_histories}}) were processed into this set of movement paths by \code{\link[flapper]{pf_simplify}}. This dataset is included principally to streamline function examples.
 #'
 #' @format A dataframe with seven columns and 180 observations that records the reconstructed paths. This contains the following columns:
 #' \describe{

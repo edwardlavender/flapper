@@ -32,7 +32,7 @@ pf_setup_movement_pr <- function(distance,...) {
 
 #' @title Plot particle histories from a PF algorithm
 #' @description This function plots the spatiotemporal particle histories from a particle filtering (PF) algorithm (the acoustic-centroid PF, the depth-contour PF or the acoustic-centroid depth-contour PF). This produces, for each time step, a map of the individual's possible locations (from the AC, DC or ACDC algorithm), with sampled locations (derived via the particle filtering routine) overlaid.
-#' @param record A \code{\link[flapper]{.pf-class}} object from \code{\link[flapper]{pf}} that contains particle histories.
+#' @param archive A \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}} that contains particle histories.
 #' @param time_steps An integer vector that defines the time steps for which to plot particle histories.
 #' @param add_surface A named list, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the surface, which shows the set of possible positions that the individual could have occupied at a given time step (from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}), on each map.
 #' @param add_particles A named list, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the particles on each map.
@@ -75,15 +75,15 @@ pf_setup_movement_pr <- function(distance,...) {
 #' @author Edward Lavender
 #' @export
 
-pf_plot_history <- function(record,
+pf_plot_history <- function(archive,
                             time_steps = 1:length(history),
                             add_surface = list(),
                             add_particles = list(pch = "."),
                             forwards = TRUE,
                             prompt = TRUE,...){
-  if(!inherits(record, ".pf")) stop("'record' must be a '.pf' class object.")
-  layers           <- record$args$record
-  history          <- record$history
+  if(!inherits(archive, "pf_archive")) stop("'archive' must be a 'pf_archive' class object.")
+  layers           <- archive$args$record
+  history          <- archive$history
   time_steps       <- sort(time_steps)
   if(!forwards) time_steps <- rev(time_steps)
   lapply(time_steps, function(t){
@@ -110,8 +110,8 @@ pf_plot_history <- function(record,
 #### pf_plot_map()
 
 #' @title Plot `probability of use' from a PF algorithm
-#' @description This function creates a plot of the `probability of use' across an area based on particles sampled by a particle filtering (PF) algorithm. To implement the function, a \code{\link[flapper]{.pf-class}} object that contains particles (locations) sampled by \code{\link[flapper]{pf}} must be supplied. The function extracts all sampled locations and, for each location, calculates `the probability of use' for that location over the time series. This is returned (invisibly) as a \code{\link[raster]{raster}} and plotted.
-#' @param pf A \code{\link[flapper]{.pf-class}} object (from \code{\link[flapper]{pf}}).
+#' @description This function creates a plot of the `probability of use' across an area based on particles sampled by a particle filtering (PF) algorithm. To implement the function, a \code{\link[flapper]{pf_archive-class}} object that contains particles (locations) sampled by \code{\link[flapper]{pf}} must be supplied. The function extracts all sampled locations and, for each location, calculates `the probability of use' for that location over the time series. This is returned (invisibly) as a \code{\link[raster]{raster}} and plotted.
+#' @param archive A \code{\link[flapper]{pf_archive-class}} object (from \code{\link[flapper]{pf}}).
 #' @param map A \code{\link[raster]{raster}} that defines a grid across the area of interest.
 #' @param scale A character that defines how \code{\link[raster]{raster}} values are scaled: \code{"original"} uses the original values; \code{"max"} scales values by the maximum value so that they lie between zero and one; and \code{"sum"} scales values by their sum so that they sum to one.
 #' @param add_rasters A named list, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the plotted surface.
@@ -139,15 +139,15 @@ pf_plot_history <- function(record,
 #' @author Edward Lavender
 #' @export
 
-pf_plot_map <- function(pf,
+pf_plot_map <- function(archive,
                         map,
                         scale = c("original", "max", "sum"),
                         add_rasters = list(),...){
   # Check inputs
-  check_class(input = pf, to_class = ".pf")
+  check_class(input = archive, to_class = "pf_archive")
   scale <- match.arg(scale)
   # Extract particle histories as a single dataframe
-  pf_particle_histories <- lapply(pf$history, function(elm) elm[, c("id_current", "pr_current"), drop = FALSE])
+  pf_particle_histories <- lapply(archive$history, function(elm) elm[, c("id_current", "pr_current"), drop = FALSE])
   pf_particle_histories <- do.call(rbind, pf_particle_histories)
   # Calculated the frequency with which each cell was sampled (weighted by the probability)
   wt_freq <- stats::aggregate(x = list("wt" = pf_particle_histories$pr_current),
@@ -175,20 +175,20 @@ pf_plot_map <- function(pf,
 #### pf_simplify()
 
 #' @title Convert particle histories from \code{\link[flapper]{pf}} into movement paths
-#' @description This function is designed to simplify the \code{\link[flapper]{.pf-class}} object from \code{\link[flapper]{pf}} that defines sampled particle histories into a set of movement paths. The function identifies pairs of cells between which movement may have occurred at each time step (if necessary), (re)calculates distances and probabilities between connected cell pairs and then links pairwise movements between cells into a set of possible movement paths.
-#' @param record A \code{\link[flapper]{.pf-class}} object from \code{\link[flapper]{pf}}.
-#' @param calc_distance A character that defines the method used to calculate distances between sequential combinations of particles (see \code{\link[flapper]{pf}}). Currently supported options are Euclidean distances (\code{"euclid"}) or shortest (least-cost) distances ("lcp"). Note that \code{calc_distance} does not need to be the same method as used for \code{\link[flapper]{pf}}: it is often computationally beneficial to implement \code{\link[flapper]{pf}} using Euclidean distances and then, for the subset of sampled particles, implement \code{\link[flapper]{pf_simplify}} with \code{calc_distance = "lcp"} to re-compute distances using the shortest-distances algorithm, along with the adjusted probabilities. However, for large paths, the quickest option is to implement both functions using \code{calc_distance = "euclid"} and then interpolate shortest paths only for the set of returned paths (see \code{\link[flapper]{lcp_interp}}). If \code{calc_distance = NULL}, the method saved in \code{record} is used.
+#' @description This function is designed to simplify the \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}} that defines sampled particle histories into a set of movement paths. The function identifies pairs of cells between which movement may have occurred at each time step (if necessary), (re)calculates distances and probabilities between connected cell pairs and then links pairwise movements between cells into a set of possible movement paths.
+#' @param archive A \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}}.
+#' @param calc_distance A character that defines the method used to calculate distances between sequential combinations of particles (see \code{\link[flapper]{pf}}). Currently supported options are Euclidean distances (\code{"euclid"}) or shortest (least-cost) distances ("lcp"). Note that \code{calc_distance} does not need to be the same method as used for \code{\link[flapper]{pf}}: it is often computationally beneficial to implement \code{\link[flapper]{pf}} using Euclidean distances and then, for the subset of sampled particles, implement \code{\link[flapper]{pf_simplify}} with \code{calc_distance = "lcp"} to re-compute distances using the shortest-distances algorithm, along with the adjusted probabilities. However, for large paths, the quickest option is to implement both functions using \code{calc_distance = "euclid"} and then interpolate shortest paths only for the set of returned paths (see \code{\link[flapper]{lcp_interp}}). If \code{calc_distance = NULL}, the method saved in \code{archive} is used.
 #' @param bathy (optional) If \code{calc_distance = "lcp"}, \code{bathy} is \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. \code{bathy} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in x, y and z directions (m). The surface's resolution is taken to define the distance between horizontally and vertically connected cells and must be the same in both x and y directions. Any cells with NA values (e.g., due to missing data) are treated as `impossible' to move though by the algorithm (see \code{\link[flapper]{lcp_over_surface}}).
-#' @param calc_distance_graph (optional) If \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in \code{bathy}. If unsupplied, this is taken from \code{record$args$calc_distance_graph}, if available, or computed via \code{\link[flapper]{lcp_graph_surface}}.
+#' @param calc_distance_graph (optional) If \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in \code{bathy}. If unsupplied, this is taken from \code{archive$args$calc_distance_graph}, if available, or computed via \code{\link[flapper]{lcp_graph_surface}}.
 #' @param max_n_copies (optional) An integer that specifies the maximum number of copies of a sampled cell that are retained at each time stamp. Each copy represents a different route to that cell. By default, all copies (i.e. routes to that cell are retained) via \code{max_n_copies = NULL}. However, in cases where there are a large number of paths through a landscape, the function can run into vector memory limitations during path assembly, so \code{max_n_copies} may need to be set. In this case, at each time step, if there are more than \code{max_n_copies} paths to a given cell, then a subset of these (\code{max_n_copies}) are sampled, according to the \code{sample_method} argument.
 #' @param sample_method (optional) If \code{max_n_copies} is supplied, \code{sample_method} is a character that defines the sampling method. Currently supported options are: \code{"random"}, which implements random sampling; \code{"weighted"}, which implements weighted sampling, with random samples taken according to their probability at the current time step; and \code{"max"}, which selects for the top \code{max_n_copies} most likely copies of a given cell according to the probability associated with movement into that cell from the previous location.
 #' @param add_origin A logical input that defines whether or not to include the origin in the returned dataframe.
 #' @param verbose A logical input that defines whether or not to print messages to the console to monitor function progress.
 #' @param ... Additional arguments (none implemented).
 #'
-#' @details The implementation of this function depends on how \code{\link[flapper]{pf}} has been implemented. Under the default options in \code{\link[flapper]{pf}}, the fast Euclidean distances method is used to sample sequential particle positions, in which case the history of each particle through the landscape is not retained and has to be assembled afterwards. In this case, \code{\link[flapper]{pf_simplify}} calculates the distances between all combinations of cells at each time step, using either a Euclidean distances or shortest distances algorithm according to the input to \code{calc_distance}. Distances are converted to probabilities using the `intrinsic' probabilities associated with each location and the movement models retained in \code{record} from the call to \code{\link[flapper]{pf}} to identify possible movement paths between cells at each time step. Pairwise cell movements are then assembled into complete movement paths. If the fast Euclidean distances method has not been used, then pairwise cell movements are retained by  \code{\link[flapper]{pf}}. In this case, the function simply recalculates distances between sequential cell pairs and the associated cell probabilities, which are used to assemble a set of movement paths.
+#' @details The implementation of this function depends on how \code{\link[flapper]{pf}} has been implemented. Under the default options in \code{\link[flapper]{pf}}, the fast Euclidean distances method is used to sample sequential particle positions, in which case the history of each particle through the landscape is not retained and has to be assembled afterwards. In this case, \code{\link[flapper]{pf_simplify}} calculates the distances between all combinations of cells at each time step, using either a Euclidean distances or shortest distances algorithm according to the input to \code{calc_distance}. Distances are converted to probabilities using the `intrinsic' probabilities associated with each location and the movement models retained in \code{archive} from the call to \code{\link[flapper]{pf}} to identify possible movement paths between cells at each time step. Pairwise cell movements are then assembled into complete movement paths. If the fast Euclidean distances method has not been used, then pairwise cell movements are retained by  \code{\link[flapper]{pf}}. In this case, the function simply recalculates distances between sequential cell pairs and the associated cell probabilities, which are used to assemble a set of movement paths.
 #'
-#' @return The function returns a \code{\link[flapper]{pf-class}} object, which is a dataframe that defines the movement paths.
+#' @return The function returns a \code{\link[flapper]{pf_path-class}} object, which is a dataframe that defines the movement paths.
 #'
 #' @examples
 #' #### Example particle histories
@@ -225,7 +225,7 @@ pf_plot_map <- function(pf,
 #' ## Compare depth time series
 #' # There is a relatively large degree of mismatch here, which reflects
 #' # ... the low resolution bathymetry data used for the algorithm.
-#' pf_plot_1d(dat_dc$args$archival, paths_1)
+#' pf_plot_1d(paths_1, dat_dc$args$archival)
 #'
 #' ## Examine paths
 #' # Log likelihood
@@ -300,7 +300,7 @@ pf_plot_map <- function(pf,
 #' @author Edward Lavender
 #' @export
 
-pf_simplify <- function(record,
+pf_simplify <- function(archive,
                         calc_distance = NULL,
                         bathy = NULL,
                         calc_distance_graph = NULL,
@@ -319,30 +319,30 @@ pf_simplify <- function(record,
   }
   t_onset <- Sys.time()
   cat_to_console(paste0("flapper::pf_simplify() called (@ ", t_onset, ")..."))
-  if(!inherits(record, ".pf")) stop("'record' must be a '.pf-class' object.")
-  history <- record$history
-  layers  <- record$args$record
+  if(!inherits(archive, "pf_archive")) stop("'archive' must be a 'pf_archive-class' object.")
+  history <- archive$history
+  layers  <- archive$args$record
   layers_1   <- layers[[1]]
   read_layers <- FALSE
   if(inherits(layers_1, "character")){
     read_layers <- TRUE
-    if(!file.exists(layers_1)) stop(paste0("record[[1]] ('", layers_1, "') does not exist."))
+    if(!file.exists(layers_1)) stop(paste0("archive$args$record[[1]] ('", layers_1, "') does not exist."))
     layers_1     <- raster::raster(layers_1)
   }
-  data    <- record$args$data
-  origin   <- record$args$origin
+  data     <- archive$args$data
+  origin   <- archive$args$origin
   if(!is.null(origin)) {
     origin_cell_id <- raster::cellFromXY(layers_1, origin)
     origin         <- raster::xyFromCell(layers_1, origin_cell_id)
   }
-  if(is.null(calc_distance)) calc_distance <- record$args$calc_distance
+  if(is.null(calc_distance)) calc_distance <- archive$args$calc_distance
   calc_distance                <- match.arg(calc_distance, c("euclid", "lcp"))
-  calc_movement_pr_from_origin <- record$args$calc_movement_pr_from_origin
-  calc_movement_pr             <- record$args$calc_movement_pr
-  mobility                     <- record$args$mobility
-  mobility_from_origin         <- record$args$mobility_from_origin
+  calc_movement_pr_from_origin <- archive$args$calc_movement_pr_from_origin
+  calc_movement_pr             <- archive$args$calc_movement_pr
+  mobility                     <- archive$args$mobility
+  mobility_from_origin         <- archive$args$mobility_from_origin
   sample_method                <- match.arg(sample_method)
-  if(is.null(bathy)) bathy <- record$args$bathy
+  if(is.null(bathy)) bathy <- archive$args$bathy
 
 
   ########################################
@@ -358,11 +358,11 @@ pf_simplify <- function(record,
     }
     raster_comparison <- tryCatch(raster::compareRaster(layers_1, bathy), error = function(e) return(e))
     if(inherits(raster_comparison, "error")){
-      warning("record$args$record[[1]] and 'bathy' have different properties",
+      warning("archive$args$record[[1]] and 'bathy' have different properties",
               immediate. = TRUE, call. = FALSE)
       stop(raster_comparison)
     }
-    if(is.null(calc_distance_graph)) calc_distance_graph <- record$args$calc_distance_graph
+    if(is.null(calc_distance_graph)) calc_distance_graph <- archive$args$calc_distance_graph
     if(is.null(calc_distance_graph)){
       cat_to_console("... ... Setting up cost-surface for calc_distance = 'lcp'...")
       costs <- lcp_costs(bathy, verbose = verbose)
@@ -374,7 +374,7 @@ pf_simplify <- function(record,
   #### Calculate distances and probabilities between cell pairs
   # ... (1) Method for pf outputs derived via calc_distance_euclid_fast
   cat_to_console("... ... Stepping through time steps to join coordinate pairs...")
-  if(record$args$calc_distance == "euclid" & record$args$calc_distance_euclid_fast){
+  if(archive$args$calc_distance == "euclid" & archive$args$calc_distance_euclid_fast){
 
     #### Add element to history for movement from time 0 to time 1
     if(!is.null(origin)){
@@ -609,7 +609,7 @@ pf_simplify <- function(record,
     path_df[, "cell_z"] <- raster::extract(bathy, path_df[, c("cell_x", "cell_y")])
   } else path_df[, "cell_z"] <- NA
   path_df <- path_df[, c("path_id", "timestep", "cell_id", "cell_x", "cell_y", "cell_z", "cell_pr", "dist")]
-  class(path_df) <- c(class(path_df), "pf")
+  class(path_df) <- c(class(path_df), "pf_path")
 
   #### Return outputs
   t_end <- Sys.time()
@@ -626,7 +626,7 @@ pf_simplify <- function(record,
 #' @title Calculate the log-likelihood of movement paths from a PF algorithm
 #' @importFrom rlang .data
 #' @description This function calculates the total log-likelihood of each movement path reconstructed by a particle filtering (PF) algorithm, including the acoustic-centroid (AC), depth-contour (DC) or acoustic-centroid depth-contour (ACDC) algorithms.
-#' @param paths A dataframe containing movement paths from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the probability associated with each cell along each path (`cell_pr').
+#' @param paths A dataframe containing movement paths from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the probability associated with each cell along each path (`cell_pr').
 #' @param ... Additional arguments (none implemented).
 #' @details For each path, at each time step the probability associated with the sampled location depends on (a) the `intrinsic' probability associated with each cell (assigned by the AC, DC or ACDC algorithm) and (b) a user-defined movement model that is driven by the distance between the sampled locations for the individual at the previous and current time steps (and other user-defined parameters). This function simply sums the logarithms of these probabilities for each path as a measure of their relative likelihood, given the movement model.
 #' @examples
@@ -660,8 +660,8 @@ pf_loglik <- function(paths,...){
 
 #' @title Plot one-dimensional depth time series from a PF algorithm
 #' @description This function plots the observed depth time series and the depth time series associated with each path reconstructed by the depth-contour particle filtering (DCPF) or acoustic-centroid depth-contour particle filtering (ACDCPF) algorithm.
+#' @param paths A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id’), timesteps (`timestep') and the depth associated with each cell along each path (`cell_z').
 #' @param archival A dataframe of depth (m) observations named `depth', as used by \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}.
-#' @param paths A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id’), timesteps (`timestep') and the depth associated with each cell along each path (`cell_z').
 #' @param scale A number that vertically scales the depth time series for the observations and the reconstructed path(s). By default, absolute values for depth are assumed and negated for ease of visualisation.
 #' @param pretty_axis_args,xlab,ylab,type,... Plot customisation arguments passed to \code{\link[prettyGraphics]{pretty_plot}}.
 #' @param add_lines A named list, passed to \code{\link[graphics]{lines}}, to customise the appearance of the depth time series for reconstructed path(s).
@@ -670,21 +670,21 @@ pf_loglik <- function(paths,...){
 #' @examples
 #' #### Implement pf() algorithm
 #' # Here, we use pre-defined outputs for speed
-#' archival <- dat_dc$args$archival
 #' paths    <- dat_dcpf_paths
+#' archival <- dat_dc$args$archival
 #'
 #' #### Example (1): The default implementation
-#' pf_plot_1d(archival, paths)
+#' pf_plot_1d(paths, archival)
 #'
 #' #### Example (2): Plot customisation options, e.g.:
-#' pf_plot_1d(archival, paths, scale = 1, pretty_axis_args = list(side = 1:2))
-#' pf_plot_1d(archival, paths, type = "l")
-#' pf_plot_1d(archival, paths, add_lines = list(col = "red", lwd = 0.5))
+#' pf_plot_1d(paths, archival, scale = 1, pretty_axis_args = list(side = 1:2))
+#' pf_plot_1d(paths, archival, type = "l")
+#' pf_plot_1d(paths, archival, add_lines = list(col = "red", lwd = 0.5))
 #'
 #' #### Example (3): Plot individual comparisons
 #' if(interactive()){
 #'   pp <- graphics::par(mfrow = c(3, 4))
-#'   pf_plot_1d(depth, paths, prompt = TRUE)
+#'   pf_plot_1d(paths, depth, prompt = TRUE)
 #'   graphics::par(pp)
 #' }
 #'
@@ -693,8 +693,8 @@ pf_loglik <- function(paths,...){
 #' @author Edward Lavender
 #' @export
 
-pf_plot_1d <- function(archival,
-                       paths,
+pf_plot_1d <- function(paths,
+                       archival,
                        scale = -1,
                        pretty_axis_args = list(side = 3:2),
                        xlab = "Time (index)", ylab = "Depth (m)", type = "b",
@@ -734,7 +734,7 @@ pf_plot_1d <- function(archival,
 
 #' @title Map two-dimensional paths from a PF algorithm
 #' @description This function is a simple wrapper for \code{\link[prettyGraphics]{pretty_map}} that maps the paths reconstructed by a particle filtering (PF) algorithm over a surface.
-#' @param paths A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the x and y coordinates that define the trajectory of each path (`cell_x' and `cell_y').
+#' @param paths A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the x and y coordinates that define the trajectory of each path (`cell_x' and `cell_y').
 #' @param bathy A \code{\link[raster]{raster}} of the surface over which movement was reconstructed.
 #' @param add_paths A named list, passed to \code{\link[prettyGraphics]{add_sp_path}}, to customise the appearance of the paths.
 #' @param prompt A logical input that defines whether or not plot each path on a separate plot, sequentially, with a pause between plots (\code{prompt = TRUE}), or all paths on a single plot (\code{prompt = FALSE}).
@@ -792,7 +792,7 @@ pf_plot_2d <- function(paths,
 
 #' @title Map three-dimensional paths from a PF algorithm
 #' @description This function is a simple wrapper for \code{\link[prettyGraphics]{pretty_scape_3d}} that maps the paths reconstructed by the depth-contour or acoustic-centroid depth-contour particle filtering algorithms (DCPF and ACDCPF) over a surface in three dimensions.
-#' @param paths A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the x, y and z coordinates that define the trajectory of each path (`cell_x', `cell_y' and `cell_z').
+#' @param paths A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the x, y and z coordinates that define the trajectory of each path (`cell_x', `cell_y' and `cell_z').
 #' @param bathy A \code{\link[raster]{raster}} of the bathymetry surface over which movement was reconstructed.
 #' @param add_paths A named list, passed to \code{\link[plotly]{add_paths}}, to customise the appearance of the paths.
 #' @param shift A number that vertically shifts the paths above the surface (\code{bathy}). The default is \code{shift = 5}, which shifts paths 5 m above the surface. This helps to ensure that paths are visible on interactive, three-dimensional \code{\link[plotly]{plotly}} plots.

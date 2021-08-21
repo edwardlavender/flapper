@@ -5,8 +5,8 @@
 \title{Plot one-dimensional depth time series from a PF algorithm}
 \usage{
 pf_plot_1d(
-  archival,
   paths,
+  archival,
   scale = -1,
   pretty_axis_args = list(side = 3:2),
   xlab = "Time (index)",
@@ -18,9 +18,9 @@ pf_plot_1d(
 )
 }
 \arguments{
-\item{archival}{A dataframe of depth (m) observations named `depth', as used by \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}.}
+\item{paths}{A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id’), timesteps (`timestep') and the depth associated with each cell along each path (`cell_z').}
 
-\item{paths}{A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id’), timesteps (`timestep') and the depth associated with each cell along each path (`cell_z').}
+\item{archival}{A dataframe of depth (m) observations named `depth', as used by \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}.}
 
 \item{scale}{A number that vertically scales the depth time series for the observations and the reconstructed path(s). By default, absolute values for depth are assumed and negated for ease of visualisation.}
 
@@ -42,21 +42,21 @@ Observed and reconstructed depth time series can differ due to measurement error
 \examples{
 #### Implement pf() algorithm
 # Here, we use pre-defined outputs for speed
-archival <- dat_dc$args$archival
 paths    <- dat_dcpf_paths
+archival <- dat_dc$args$archival
 
 #### Example (1): The default implementation
-pf_plot_1d(archival, paths)
+pf_plot_1d(paths, archival)
 
 #### Example (2): Plot customisation options, e.g.:
-pf_plot_1d(archival, paths, scale = 1, pretty_axis_args = list(side = 1:2))
-pf_plot_1d(archival, paths, type = "l")
-pf_plot_1d(archival, paths, add_lines = list(col = "red", lwd = 0.5))
+pf_plot_1d(paths, archival, scale = 1, pretty_axis_args = list(side = 1:2))
+pf_plot_1d(paths, archival, type = "l")
+pf_plot_1d(paths, archival, add_lines = list(col = "red", lwd = 0.5))
 
 #### Example (3): Plot individual comparisons
 if(interactive()){
   pp <- graphics::par(mfrow = c(3, 4))
-  pf_plot_1d(depth, paths, prompt = TRUE)
+  pf_plot_1d(paths, depth, prompt = TRUE)
   graphics::par(pp)
 }
 

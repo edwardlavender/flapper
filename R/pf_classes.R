@@ -1,8 +1,8 @@
 ######################################
 ######################################
-#### .pf-class
+#### pf_archive-class
 
-#' @title ".pf" class
+#' @title "pf_archive" class
 #' @description An S3 class that defines the object returned by \code{\link[flapper]{pf}}.
 #'
 #' @return This object is a named list, with two elements, which records the parameters used in the call to \code{\link[flapper]{pf}} and the particles sampled at each time step:
@@ -19,17 +19,17 @@
 #'   }
 #' }
 #'
-#' @seealso \code{\link[flapper]{dat_dcpf_histories}} provides an example of a \code{\link[flapper]{.pf-class}} object. \code{\link[flapper]{pf_simplify}} converts \code{\link[flapper]{.pf-class}} objects into \code{\link[flapper]{pf-class}} objects that comprise the reconstructed movement paths.
+#' @seealso \code{\link[flapper]{dat_dcpf_histories}} provides an example of a \code{\link[flapper]{pf_archive-class}} object. \code{\link[flapper]{pf_simplify}} converts \code{\link[flapper]{pf_archive-class}} objects into \code{\link[flapper]{pf_path-class}} objects that comprise the reconstructed movement paths.
 #'
 #' @author Edward Lavender
 #' @docType package
-#' @name .pf-class
+#' @name pf_archive-class
 NULL
 
 
 ######################################
 ######################################
-#### pf-class
+#### pf_path-class
 
 #' @title "pf" class
 #' @description An S3 class that defines the object returned by \code{\link[flapper]{pf_simplify}}, following \code{\link[flapper]{pf}}.
@@ -46,9 +46,9 @@ NULL
 #' Rows are ordered by path and then time step.
 #'   }
 #'
-#' @seealso \code{\link[flapper]{pf-class}} objects are derived from \code{\link[flapper]{.pf-class}} objects via \code{\link[flapper]{pf_simplify}}. \code{\link[flapper]{dat_dcpf_paths}} provides an example.
+#' @seealso \code{\link[flapper]{pf_path-class}} objects are derived from \code{\link[flapper]{pf_archive-class}} objects via \code{\link[flapper]{pf_simplify}}. \code{\link[flapper]{dat_dcpf_paths}} provides an example.
 #'
 #' @author Edward Lavender
 #' @docType package
-#' @name pf-class
+#' @name pf_path-class
 NULL

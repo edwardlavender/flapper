@@ -132,7 +132,7 @@ dc_1 <- dc(archival = depth,
            calc_depth_error = function(...) matrix(c(-30, 30), nrow = 2),
            save_record_spatial = NULL
            )
-dcpf_1 <- pf(record = lapply(dc_1$archive$record, function(elm) elm$spatial[[1]]$map_timestep),
+dcpf_1 <- pf(record = lapply(dc_1$archive[[1]]$record, function(elm) elm$spatial[[1]]$map_timestep),
              origin  = xy,
              calc_distance = "euclid",
              calc_distance_euclid_fast = FALSE,

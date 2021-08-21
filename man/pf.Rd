@@ -55,7 +55,7 @@ pf(
 
 \item{resample}{(optional) An integer that defines the minimum number of unique cells that should be sampled, given the movement model (\code{calc_movement_pr} or \code{calc_movement_pr_from_origin}). If supplied, if fewer than \code{resample} unique cells are sampled at a time step, \code{n} particles are re-sampled with replacement with equal probability from all of the cells with non-zero probability. This may facilitate algorithm convergence if there are some cells that are overwhelmingly more probable (given the movement model) are `dead ends': re-sampling all possible cells with equal probability allows the algorithm to explore less likely routes more easily when the number of routes becomes low. \code{resample} must be less than or equal to \code{n}.}
 
-\item{update_history}{(optional) A list that defines particle histories from an earlier implementation of \code{\link[flapper]{pf}} (i.e., the `history' element of a \code{\link[flapper]{.pf-class}} object). If provided, the function attempts to continue paths from an earlier time step (see \code{update_history_from_time_step}). This can be useful if the algorithm fails to converge on its initial implementation because the algorithm can be re-started part-way through the time series.}
+\item{update_history}{(optional) A list that defines particle histories from an earlier implementation of \code{\link[flapper]{pf}} (i.e., the `history' element of a \code{\link[flapper]{pf_archive-class}} object). If provided, the function attempts to continue paths from an earlier time step (see \code{update_history_from_time_step}). This can be useful if the algorithm fails to converge on its initial implementation because the algorithm can be re-started part-way through the time series.}
 
 \item{update_history_from_time_step}{If \code{update_history} is provided, \code{update_history_from_time_step} is an integer that defines the time step (i.e., element in \code{update_history}) from which to restart the algorithm. If provided, the algorithm continues from this point, by taking the starting positions for \code{n} particles from \code{update_history[[update_history_from_time_step]]$id_current}.}
 
@@ -70,7 +70,7 @@ pf(
 \item{...}{Additional arguments (none implemented).}
 }
 \value{
-The function returns a \code{\link[flapper]{.pf-class}} object. This is a named list that includes the parameters used to generate function outputs (`args') and the particles sampled at each time step (`history'). The latter can be assembled into a dataframe of movement paths via \code{\link[flapper]{pf_simplify}}.
+The function returns a \code{\link[flapper]{pf_archive-class}} object. This is a named list that includes the parameters used to generate function outputs (`args') and the particles sampled at each time step (`history'). The latter can be assembled into a dataframe of movement paths via \code{\link[flapper]{pf_simplify}}.
 }
 \description{
 This function implements a simulation-based particle filtering process for the reconstruction of animal movement paths. This extends the AC, DC and ACDC algorithms in \code{\link[flapper]{flapper}} (\code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}), which determine the possible locations of an individual through time based on acoustic detections and/or depth contours, by the incorporation of a movement model that connects a subset of the animal's possible locations between time steps into movement paths.
@@ -187,7 +187,7 @@ out_1 <- pf(record = record,
             calc_movement_pr = pf_setup_movement_pr,
             n = 10L,
             seed = 1)
-# The function returns a .pf-class object
+# The function returns a pf_archive-class object
 class(out_1)
 utils::str(out_1)
 # Algorithm duration during testing ~0.03 minutes
@@ -415,8 +415,8 @@ depth_obs <- runif(length(path_sim$cell_z),
                    path_sim$cell_z + cde(path_sim$cell_z)[1],
                    path_sim$cell_z + cde(path_sim$cell_z)[2])
 depth_obs <- data.frame(depth = depth_obs)
-# Compare 'observed' and 'true' depth time series
-pf_plot_1d(depth_obs, path_sim,
+# Compare 'true' and 'observed' depth time series
+pf_plot_1d(path_sim, depth_obs,
            type = "b", cex = 0.5,
            add_lines = list(col = "royalblue", type = "l"))
 
@@ -456,8 +456,8 @@ if(plot_history){
 ## Assemble paths
 path_dcpf <- pf_simplify(history_dcpf, bathy = dat_gebco_planar)
 
-## Compare 'observed' and reconstructed depth time series
-pf_plot_1d(depth_obs, path_dcpf)
+## Compare reconstructed versus observed depth time series
+pf_plot_1d(path_dcpf, depth_obs)
 
 ## Show that the distances between sequential positions are within the restrictions
 # ... of the movement model

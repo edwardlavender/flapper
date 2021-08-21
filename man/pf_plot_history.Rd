@@ -5,7 +5,7 @@
 \title{Plot particle histories from a PF algorithm}
 \usage{
 pf_plot_history(
-  record,
+  archive,
   time_steps = 1:length(history),
   add_surface = list(),
   add_particles = list(pch = "."),
@@ -15,7 +15,7 @@ pf_plot_history(
 )
 }
 \arguments{
-\item{record}{A \code{\link[flapper]{.pf-class}} object from \code{\link[flapper]{pf}} that contains particle histories.}
+\item{archive}{A \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}} that contains particle histories.}
 
 \item{time_steps}{An integer vector that defines the time steps for which to plot particle histories.}
 

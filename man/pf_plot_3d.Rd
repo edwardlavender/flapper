@@ -16,7 +16,7 @@ pf_plot_3d(
 )
 }
 \arguments{
-\item{paths}{A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the x, y and z coordinates that define the trajectory of each path (`cell_x', `cell_y' and `cell_z').}
+\item{paths}{A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the x, y and z coordinates that define the trajectory of each path (`cell_x', `cell_y' and `cell_z').}
 
 \item{bathy}{A \code{\link[raster]{raster}} of the bathymetry surface over which movement was reconstructed.}
 

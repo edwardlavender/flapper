@@ -20,6 +20,6 @@ A named list, with two elements, which records the parameters used in the call t
 dat_dcpf_histories
 }
 \description{
-An example \code{\link[flapper]{.pf-class}} object. This comprises a named list of results from an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dc}} and \code{\link[flapper]{pf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The outputs include algorithm parameters and a list of dataframes that record the particles sampled at each time step. This is included principally to streamline function examples.
+An example \code{\link[flapper]{pf_archive-class}} object. This comprises a named list of results from an implementation of the depth-contour particle filtering (DCPF) algorithm (see \code{\link[flapper]{dc}} and \code{\link[flapper]{pf}}). The algorithm was implemented for a series of depth observations collected from flapper skate (\emph{Dipturus intermedius}) off the west coast of Scotland, where the bathymetry is described by \code{\link[flapper]{dat_gebco}}. The outputs include algorithm parameters and a list of dataframes that record the particles sampled at each time step. This is included principally to streamline function examples.
 }
 \keyword{datasets}

@@ -5,7 +5,7 @@
 \title{Plot `probability of use' from a PF algorithm}
 \usage{
 pf_plot_map(
-  pf,
+  archive,
   map,
   scale = c("original", "max", "sum"),
   add_rasters = list(),
@@ -13,7 +13,7 @@ pf_plot_map(
 )
 }
 \arguments{
-\item{pf}{A \code{\link[flapper]{.pf-class}} object (from \code{\link[flapper]{pf}}).}
+\item{archive}{A \code{\link[flapper]{pf_archive-class}} object (from \code{\link[flapper]{pf}}).}
 
 \item{map}{A \code{\link[raster]{raster}} that defines a grid across the area of interest.}
 
@@ -27,7 +27,7 @@ pf_plot_map(
 The function invisibly returns a \code{\link[raster]{raster}}, in which each cell contains the `probability of use' score and produces a plot of this surface.
 }
 \description{
-This function creates a plot of the `probability of use' across an area based on particles sampled by a particle filtering (PF) algorithm. To implement the function, a \code{\link[flapper]{.pf-class}} object that contains particles (locations) sampled by \code{\link[flapper]{pf}} must be supplied. The function extracts all sampled locations and, for each location, calculates `the probability of use' for that location over the time series. This is returned (invisibly) as a \code{\link[raster]{raster}} and plotted.
+This function creates a plot of the `probability of use' across an area based on particles sampled by a particle filtering (PF) algorithm. To implement the function, a \code{\link[flapper]{pf_archive-class}} object that contains particles (locations) sampled by \code{\link[flapper]{pf}} must be supplied. The function extracts all sampled locations and, for each location, calculates `the probability of use' for that location over the time series. This is returned (invisibly) as a \code{\link[raster]{raster}} and plotted.
 }
 \details{
 For each location, the 'probability of use' is calculated as the sum of the number of times that the location was sampled, weighted by the associated probabilities of each sample.

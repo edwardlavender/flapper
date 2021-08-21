@@ -22,7 +22,7 @@
 #' @param mobility_from_origin (optional) As above for \code{mobility}, but for the first time step (i.e., the horizontal movement the individual could have moved from the \code{origin}) (see \code{calc_movement_pr_from_origin}).
 #' @param n An integer that defines the number of particles (i.e., the number of locations sampled at each time step from the set of possible locations at that time step).
 #' @param resample (optional) An integer that defines the minimum number of unique cells that should be sampled, given the movement model (\code{calc_movement_pr} or \code{calc_movement_pr_from_origin}). If supplied, if fewer than \code{resample} unique cells are sampled at a time step, \code{n} particles are re-sampled with replacement with equal probability from all of the cells with non-zero probability. This may facilitate algorithm convergence if there are some cells that are overwhelmingly more probable (given the movement model) are `dead ends': re-sampling all possible cells with equal probability allows the algorithm to explore less likely routes more easily when the number of routes becomes low. \code{resample} must be less than or equal to \code{n}.
-#' @param update_history (optional) A list that defines particle histories from an earlier implementation of \code{\link[flapper]{pf}} (i.e., the `history' element of a \code{\link[flapper]{.pf-class}} object). If provided, the function attempts to continue paths from an earlier time step (see \code{update_history_from_time_step}). This can be useful if the algorithm fails to converge on its initial implementation because the algorithm can be re-started part-way through the time series.
+#' @param update_history (optional) A list that defines particle histories from an earlier implementation of \code{\link[flapper]{pf}} (i.e., the `history' element of a \code{\link[flapper]{pf_archive-class}} object). If provided, the function attempts to continue paths from an earlier time step (see \code{update_history_from_time_step}). This can be useful if the algorithm fails to converge on its initial implementation because the algorithm can be re-started part-way through the time series.
 #' @param update_history_from_time_step If \code{update_history} is provided, \code{update_history_from_time_step} is an integer that defines the time step (i.e., element in \code{update_history}) from which to restart the algorithm. If provided, the algorithm continues from this point, by taking the starting positions for \code{n} particles from \code{update_history[[update_history_from_time_step]]$id_current}.
 #' @param cl,use_all_cores Parallelisation options. These can be implemented for the approaches that consider particles iteratively (i.e., \code{calc_distance = "euclid"} with \code{calc_distance_euclid_fast = FALSE}, or \code{calc_distance = "lcp"}). The algorithm can be parallelised within time steps over (1) particles via \code{cl} (an integer defining the number of child processes (ignored on Windows) or a cluster object created by \code{\link[parallel]{makeCluster}} (see \code{\link[pbapply]{pblapply}})) or (2) within particles for the calculation of shortest distances (if \code{calc_distance = "lcp"}) via a logical input (\code{TRUE}) to \code{use_all_cores}. For \code{calc_distance = "euclid"}, parallelisation is typically only beneficial for relatively large numbers of particles, because the substantial computation overhead associated with parallelisation across paths at each time step is substantial. For \code{calc_distance = "lcp"}, \code{use_all_cores = TRUE} is typically a better option for parallelisation; however, this may only be beneficial if \code{mobility} relatively large. At present, parallelisation is not very effective, especially if a cluster is supplied, and may be slower.
 #' @param seed (optional) An integer to define the seed for reproducible simulations (see \code{\link[base]{set.seed}}).
@@ -138,7 +138,7 @@
 #'             calc_movement_pr = pf_setup_movement_pr,
 #'             n = 10L,
 #'             seed = 1)
-#' # The function returns a .pf-class object
+#' # The function returns a pf_archive-class object
 #' class(out_1)
 #' utils::str(out_1)
 #' # Algorithm duration during testing ~0.03 minutes
@@ -366,8 +366,8 @@
 #'                    path_sim$cell_z + cde(path_sim$cell_z)[1],
 #'                    path_sim$cell_z + cde(path_sim$cell_z)[2])
 #' depth_obs <- data.frame(depth = depth_obs)
-#' # Compare 'observed' and 'true' depth time series
-#' pf_plot_1d(depth_obs, path_sim,
+#' # Compare 'true' and 'observed' depth time series
+#' pf_plot_1d(path_sim, depth_obs,
 #'            type = "b", cex = 0.5,
 #'            add_lines = list(col = "royalblue", type = "l"))
 #'
@@ -407,8 +407,8 @@
 #' ## Assemble paths
 #' path_dcpf <- pf_simplify(history_dcpf, bathy = dat_gebco_planar)
 #'
-#' ## Compare 'observed' and reconstructed depth time series
-#' pf_plot_1d(depth_obs, path_dcpf)
+#' ## Compare reconstructed versus observed depth time series
+#' pf_plot_1d(path_dcpf, depth_obs)
 #'
 #' ## Show that the distances between sequential positions are within the restrictions
 #' # ... of the movement model
@@ -440,7 +440,7 @@
 #'
 #' }
 #'
-#' @return The function returns a \code{\link[flapper]{.pf-class}} object. This is a named list that includes the parameters used to generate function outputs (`args') and the particles sampled at each time step (`history'). The latter can be assembled into a dataframe of movement paths via \code{\link[flapper]{pf_simplify}}.
+#' @return The function returns a \code{\link[flapper]{pf_archive-class}} object. This is a named list that includes the parameters used to generate function outputs (`args') and the particles sampled at each time step (`history'). The latter can be assembled into a dataframe of movement paths via \code{\link[flapper]{pf_simplify}}.
 #'
 #' @seealso This routine builds on the AC (\code{\link[flapper]{ac}}), (\code{\link[flapper]{dc}}) and (\code{\link[flapper]{acdc}}) algorithms. For the movement model, Euclidean distances are obtained from \code{\link[raster]{distanceFromPoints}} or shortest distances are obtained from \code{\link[flapper]{lcp_from_point}} (via \code{\link[flapper]{lcp_costs}} and \code{\link[flapper]{lcp_graph_surface}}, unless \code{calc_distance_graph} is supplied). The default movement model applied to these distances is \code{\link[flapper]{pf_setup_movement_pr}}. \code{\link[flapper]{get_mvt_resting}} provides a means to assign resting/non-resting behaviour to time steps (in \code{data}) for behaviourally dependent movement models. Particle histories can be visualised with \code{\link[flapper]{pf_plot_history}} and joined into paths via \code{\link[flapper]{pf_simplify}}. For processed paths, shortest distances/paths between sequential locations can be interpolated via \code{\link[flapper]{lcp_interp}}, which is a wrapper for the \code{\link[flapper]{lcp_over_surface}} routine. This can be useful for checking whether the faster Euclidean distances method is acceptable and, if so, for post-hoc adjustments of movement probabilities based on shortest distances (see \code{\link[flapper]{lcp_interp}}). Paths can be visualised with \code{\link[flapper]{pf_plot_1d}}, \code{\link[flapper]{pf_plot_2d}} and \code{\link[flapper]{pf_plot_3d}}. The log-likelihood of the paths, given the movement model, can be calculated via \code{\link[flapper]{pf_loglik}}.
 #'
@@ -666,7 +666,7 @@ pf <- function(record,
     if(all(cells_at_time_current$pr_current == 0)) {
       message("The probability of all cells at time ", t, " is 0. Either (1) the algorithm has been 'unlucky' and all n = ", n, " particles up to this point have led to 'dead ends', (2) the mobility model ('mobility') is too limiting and/or (3) other model assumptions have been violated. The function will now stop, returning outputs up until this point.")
       out_pf$history <- history
-      class(out_pf) <- c(class(out_pf), ".pf")
+      class(out_pf) <- c(class(out_pf), "pf_archive")
       return(out_pf)
     }
     ## Select cells
@@ -776,7 +776,7 @@ pf <- function(record,
       if(length(cells_from_current_to_next) == 0L){
         message("Unable to sample any cells at time ", t, " for the next location for any of the ", n, " particles. Either (1) the algorithm has been 'unlucky' and all n = ", n, " particles up to this point have led to 'dead ends', (2) the mobility model ('mobility') is too limiting and/or (3) the depth error parameter from 'calc_depth_error' is too small. The function will now stop, returning outputs up until this point.")
         out_pf$history <- history
-        class(out_pf) <- c(class(out_pf), ".pf")
+        class(out_pf) <- c(class(out_pf), "pf_archive")
         return(out_pf)
       }
       cells_at_time_current <- cells_from_current_to_next
@@ -787,7 +787,7 @@ pf <- function(record,
 
   #### Define outputs
   out_pf$history <- history
-  class(out_pf) <- c(class(out_pf), ".pf")
+  class(out_pf) <- c(class(out_pf), "pf_archive")
 
   #### Return outputs
   if(!is.null(seed)) set.seed(NULL)
