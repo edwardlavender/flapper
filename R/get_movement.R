@@ -104,6 +104,7 @@ get_mvt_mobility_from_acoustics <- function(data,
   if(!all(unique(data$receiver_id) %in% moorings_data$receiver_id)) stop("Not all unique data$receiver_id are in moorings$receiver_id.")
   calc_distance <- match.arg(calc_distance)
   if(calc_distance == "lcp" & is.null(bathy)) stop("'bathy' is required for calc_distance = 'lcp'.")
+  msg_no_suitable_data <- "No 'data' following filtering with which to estimate mobility."
 
   #### Add receiver coordinates to data
   coords <- sp::coordinates(moorings)
@@ -138,6 +139,10 @@ get_mvt_mobility_from_acoustics <- function(data,
     dplyr::filter(.data$r_1 != .data$r_2) %>%
     dplyr::filter(.data$time >= transmission_interval) %>%
     dplyr::filter(!is.na(.data$r_2))
+  if(nrow(transitions) == 0L){
+    message(msg_no_suitable_data)
+    return(invisible())
+  }
 
   #### Define unique receiver transitions
   # We will use these to calculate distances
@@ -174,12 +179,20 @@ get_mvt_mobility_from_acoustics <- function(data,
     dplyr::mutate(dist_min = .data$dist_avg - detection_range * 2,
                   dist_max = .data$dist_avg + detection_range * 2) %>%
     dplyr::filter(.data$dist_min > 0)
+  if(nrow(receiver_pairwise_dists) == 0L){
+    message(msg_no_suitable_data)
+    return(invisible())
+  }
 
   #### Update transitions
   ## Filter transitions to include transitions between appropriate receivers
   # ... (whose adjusted distance is more than 0 m!)
   transitions <-
     transitions %>% dplyr::filter(.data$r_key %in% receiver_pairwise_dists$r_key)
+  if(nrow(transitions) == 0L){
+    message(msg_no_suitable_data)
+    return(invisible())
+  }
   ## Add distances
   match_index <- match(transitions$r_key, receiver_pairwise_dists$r_key)
   transitions$dist_min <- receiver_pairwise_dists$dist_min[match_index]
