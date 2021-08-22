@@ -120,11 +120,9 @@
 #'      \itemize{
 #'         \item \link{acdc_simplify} simplifies \link{acdc_archive-class} objects into \link{acdc_record-class} objects;
 #'         \item \link{acdc_access} functions provide short-cuts to different elements of \link{acdc_record-class} objects:
-#'           \itemize{
-#'              \item \link{acdc_access_dat} accesses stored dataframes;
-#'              \item \link{acdc_access_timesteps} accesses the total number of time steps;
-#'              \item \link{acdc_access_maps} accesses stored maps;
-#'           }
+#'         \item \link{acdc_access_dat} accesses stored dataframes in an \link{acdc_record-class} object object;
+#'         \item \link{acdc_access_timesteps} accesses the total number of time steps in an \link{acdc_record-class} object;
+#'         \item \link{acdc_access_maps} accesses stored maps in an \link{acdc_record-class} object;
 #'         \item \link{acdc_plot_record} plots the results of the algorithm(s);
 #'         \item \link{acdc_animate_record} creates html animations of the algorithm(s);
 #'         }
