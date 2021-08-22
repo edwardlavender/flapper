@@ -253,11 +253,11 @@ dc <- function(archival,
 
   #### Set up objects for algorithm
   ## Archival index (for saving the spatial record)
-  if(rlang::has_name(archival, "index")) {
-    warning("'archival$index overwritten.", immediate. = TRUE, call. = FALSE)
+  if(rlang::has_name(archival, "timestep_cumulative")) {
+    warning("'archival$timestep_cumulative overwritten.", immediate. = TRUE, call. = FALSE)
   }
-  archival$index <- 1:nrow(archival)
-  if(is.null(save_record_spatial)) save_record_spatial <- archival$index
+  archival$timestep_cumulative <- 1:nrow(archival)
+  if(is.null(save_record_spatial)) save_record_spatial <- archival$timestep_cumulative
   ## Archival time series with depth error
   cat_to_cf("... Implementing calc_depth_error()...")
   archival$depth_lwr <- archival$depth + calc_depth_error(archival$depth)[1, ]
@@ -315,14 +315,14 @@ dc <- function(archival,
       if(normalise) avail <- avail/raster::cellStats(avail, "sum")
       if(!is.null(write_record_spatial_for_pf)){
         write_record_spatial_for_pf$x <- avail
-        write_record_spatial_for_pf$filename <- paste0(write_record_spatial_for_pf_dir, "arc_", d$index[i])
+        write_record_spatial_for_pf$filename <- paste0(write_record_spatial_for_pf_dir, "arc_", d$timestep_cumulative[i])
         do.call(raster::writeRaster, write_record_spatial_for_pf)
       }
       use <- use + avail
       .out$record[[i]] <- list(dat = d[i, , drop = FALSE],
                                spatial = list())
       if(save_record_spatial[1] != 0) {
-        if(d$index[i] %in% save_record_spatial){
+        if(d$timestep_cumulative[i] %in% save_record_spatial){
           .out$record[[i]]$spatial[[1]] <- list(map_timestep = avail, map_cumulative = use)
         }
       }

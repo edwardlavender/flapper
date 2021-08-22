@@ -28,7 +28,7 @@ For the AC* algorithms, \code{record$dat} contains the following information:
 
 For the DC algorithm, \code{record$dat} contains the \code{archival} data for the time step, as inputted, with the following additional columns:
 \itemize{
-  \item `index' is a cumulative integer that defines the time step;
+  \item `timestep_cumulative' is a cumulative integer that defines the time step;
   \item `depth_lwr' is a number that defines the lower bound for the individual's possible depth on the bathymetry layer (\code{bathy}) given the depth error model (\code{calc_depth_error});
   \item `depth_upr' is a number that defines the upper bound for the individual's possible depth on the bathymetry layer (\code{bathy}) given the depth error model (\code{calc_depth_error});
   \item `availability' is a logical variable that defines whether or not there were any cells on the bathymetry layer (\code{bathy}) within the boundaries for the individual's depth at that time step;

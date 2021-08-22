@@ -397,16 +397,16 @@ The AC/DC branch functions (`ac()`, `dc()` and `acdc()`) all return
 objects of class `acdc_archive`. These can be processed and analysed
 using several key functions:
 
-  - `acdc_simplify()` simplifies the results of the AC/DC algorithm(s);
-  - `acdc_helper_*()` functions provide simple ‘helper’ routines for
-    working with simplified outputs:
-      - `acdc_helper_access_*()` functions provide short-cuts to
-        different elements of the output:
-          - `acdc_helper_access_timesteps()` accesses the total number
-            of time steps from an AC\* algorithm implementation;
-  - `acdc_plot_record()` plots the results of the AC/DC algorithm(s);
-  - `acdc_animate_record()` creates html animations of the AC/DC
-    algorithm(s);
+  - `acdc_simplify()` simplifies `acdc_archive-class` objects into
+    `acdc_record-class` objects;
+  - `acdc_access_*()` functions provide short-cuts to different elements
+    of `acdc_record-class` objects:
+      - `acdc_access_dat()` accesses stored dataframes;
+      - `acdc_access_timesteps()` accesses the total number of time
+        steps;
+      - `acdc_access_maps()` accesses stored maps;
+  - `acdc_plot_record()` plots the results of the algorithm(s);
+  - `acdc_animate_record()` creates html animations of algorithm(s);
 
 ### Particle filtering branch algorithms
 

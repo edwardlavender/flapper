@@ -24,31 +24,75 @@ check_class_acdc_record <- function(x, arg = deparse(substitute(x))){
 
 ######################################
 ######################################
-#### acdc_helper_access_*()
+#### acdc_access_*()
 
 #' @title Short-cuts to elements of an \code{"acdc_record"} object
 #' @description These functions provide short-cuts to elements of an \code{\link[flapper]{acdc_record-class}} object.
+#'
 #' @param record An \code{\link[flapper]{acdc_record-class}} object.
+#' @param type For \code{\link[flapper]{acdc_access_maps}}, \code{type} is a character that specifies whether or not to access time step-specific maps (\code{type = "map_timestep"}) or  cumulative maps (\code{type = "map_cumulative"}).
+#' @param select (optional) For \code{\link[flapper]{acdc_access_maps}}, \code{select} is an integer vector that defines the cumulative time steps (i.e., accounting for both primary (acoustic) and secondary (archival) time steps) for which maps are required.
+#'
 #' @details
 #' \itemize{
-#'   \item \code{\link[flapper]{acdc_helper_access_timesteps}} gets the total number of time steps from an AC* algorithm implementation.
+#'   \item \code{\link[flapper]{acdc_access_dat}} accesses the \code{record$dat} elements of an \code{\link[flapper]{acdc_record-class}} object for all time steps.
+#'   \item \code{\link[flapper]{acdc_access_timesteps}} accesses the total number of time steps stored in an \code{\link[flapper]{acdc_record-class}} object, accounting for both primary (acoustic) and secondary (archival) time steps.
+#'   \item \code{\link[flapper]{acdc_access_maps}} accesses all, or specified, maps from the \code{record$spatial} elements of an \code{\link[flapper]{acdc_record-class}} object.
+#' }
+#'
+#' @return
+#' \itemize{
+#'   \item \code{\link[flapper]{acdc_access_dat}} returns a single dataframe for all time steps.
+#'   \item \code{\link[flapper]{acdc_access_timesteps}} returns an integer that defines the total number of time steps.
+#'   \item \code{\link[flapper]{acdc_access_maps}} returns a single list of time-step specific or cumulative maps for specified or all time steps.
 #' }
 #'
 #' @examples
-#' #### Example (1): acdc_helper_access_timesteps()
-#' acdc_helper_access_timesteps(acdc_simplify(dat_acdc))
+#' #### Example (1): acdc_access_dat()
+#' acdc_access_dat(acdc_simplify(dat_acdc))
+#'
+#' #### Example (2): acdc_access_timesteps()
+#' acdc_access_timesteps(acdc_simplify(dat_acdc))
+#'
+#' #### Example (3): acdc_access_maps()
+#' acdc_access_maps(acdc_simplify(dat_acdc))
 #'
 #' @author Edward Lavender
-#' @name acdc_helper_access
+#' @name acdc_access
 NULL
 
-#### acdc_helper_access_timesteps()
-#' @rdname acdc_helper_access
+#### acdc_access_dat()
+#' @rdname acdc_access
 #' @export
 
-acdc_helper_access_timesteps <- function(record){
+acdc_access_dat <- function(record){
   check_class_acdc_record(record)
-  record$record[[length(record$record)]]$dat$timestep_cumulative
+  dat <- lapply(record$record, function(record_elm) record_elm$dat)
+  dat <- do.call(rbind, dat)
+  return(dat)
+}
+
+#### acdc_access_timesteps()
+#' @rdname acdc_access
+#' @export
+
+acdc_access_timesteps <- function(record){
+  check_class_acdc_record(record)
+  max(record$record[[length(record$record)]]$dat$timestep_cumulative)
+}
+
+#### acdc_access_maps()
+#' @rdname acdc_access
+#' @export
+
+acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"), select = NULL){
+  check_class_acdc_record(record)
+  maps <- lapply(record$record, function(record_elm){
+    lapply(record_elm$spatial, function(spatial_elm) spatial_elm$map_cumulative)
+  })
+  maps <- unlist(maps)
+  if(!is.null(select)) maps <- maps[select]
+  return(maps)
 }
 
 
