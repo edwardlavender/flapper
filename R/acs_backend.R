@@ -515,11 +515,11 @@
       if(is.null(archival)){
         # Define the sequence of time steps
         pos <- seq(receiver_1_timestamp, receiver_2_timestamp, step)
+        # Number of steps
+        lpos_loop <- lpos <- length(pos)
         # If the last step coincides with the detection at the next receiver, we will drop this step
         # ... (we will account for this at the next time step instead)
-        if(length(pos) > 1 & max(pos) == receiver_2_timestamp) pos <- pos[1:(length(pos)-1)]
-        # Number of steps
-        lpos <- length(pos)
+        if(lpos > 1 & max(pos) == receiver_2_timestamp) lpos_loop <- lpos - 1
 
       #### ACDC implementation
       } else {
@@ -527,9 +527,9 @@
         archival_pos1 <- which.min(abs(archival$timestamp_num - receiver_1_timestamp_num))
         # Define the positions of archival records between the two detections
         pos <- seq(archival_pos1, (archival_pos1 + time_btw_dets/step), by = 1)
-        if(length(pos) > 1 & max(archival$timestamp[pos]) == receiver_2_timestamp) pos <- pos[1:(length(pos)-1)]
         # Define the number of archival records between acoustic detections
-        lpos <- length(pos)
+        lpos_loop <- lpos <- length(pos)
+        if(length(pos) > 1 & max(archival$timestamp[pos]) == receiver_2_timestamp) lpos_loop <- lpos - 1
       }
 
 
@@ -552,7 +552,7 @@
       if(progress %in% c(2, 3) & lpos > 1) pb2 <- utils::txtProgressBar(min = 0, max = lpos, style = 3)
 
       # For each archival time step between our acoustic detections...
-      for(timestep_archival in 1:lpos){
+      for(timestep_archival in 1:lpos_loop){
 
 
         ######################################
@@ -607,9 +607,22 @@
           # ... (max detection range) at the time when the individual was actually detected
         } else if(timestep_archival > ceiling(lpos/2)){
 
-          # If lpos is odd (e.g. lpos = 3), then if we're on lpos/2 + 1, we're on the second
-          # ... halfway value and we'll keep the same radius, otherwise, we'll decrease the radius
-          if(!(is.integer(lpos/2) & timestep_archival == ((lpos/2) + 1))){
+          ## Retain or shrink the centroid radius as appropriate
+          ## For sequences with an even number of steps, the first post-middle value the radius stays the same
+          # For example, if lpos = 4, then
+          # ... centroid 1 = (say) 800 m (at detection)
+          # ... centroid 2 =       1000 m
+          # ... centroid 3 =       1000 m [first post-middle value - constant]
+          # ... centroid 4 =       800 m (at next detection)
+          # In this scenario, we don't need to change radius.
+          ## For sequences with an odd number of steps, the fist post-middle value starts to  shrink
+          # For example, if lpos = 5,  then
+          # ... centroid 1 = 800 m
+          # ... centroid 2 = 1000 m
+          # ... centroid 3 = 1200 m
+          # ... centroid 4 = 1000 m [first post-middle value - shrinks]
+          # ... centroid 5 = 800 m
+          if(!(timestep_archival == (lpos/2 + 1))){
             # radius is detection_range + mobility * multiplier which shrinks
             # ... as we move beyond halfway and towards the next acoustic detection
             radius <- detection_range + mobility * (lpos - timestep_archival)
