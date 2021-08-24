@@ -15,7 +15,7 @@ acdc_simplify(
 \arguments{
 \item{archive}{An \code{\link[flapper]{acdc_archive-class}} object returned by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}.}
 
-\item{type}{A character that defines whether the function should be implemented for the outputs of a call to an AC* algorithm (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), in which case \code{type = "acs"}, or the DC algorithm, in which case \code{type = "dc"}.}
+\item{type}{A character that defines whether the function should be implemented for the outputs of a call to an AC* algorithm (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), in which case \code{type = "acs"}, or the DC algorithm (\code{\link[flapper]{dc}}), in which case \code{type = "dc"}.}
 
 \item{mask}{(optional) A spatial mask (e.g., the argument passed to \code{bathy} in \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}) to mask areas (e.g., land) from the overall map. If implemented, cells in masked areas are assigned NAs rather than a score of 0.}
 
@@ -27,10 +27,10 @@ acdc_simplify(
 The function returns an object of class \code{\link[flapper]{acdc_record-class}}.
 }
 \description{
-This function simplifies the output of \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}, by processing information from the 'archive' elements of a \code{\link[flapper]{acdc_archive-class}} object that hold the results of calls to the workhorse routines. This is especially useful if the algorithm(s) have been applied chunk-wise, in which case the results for each chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series.
+This function simplifies the output of \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}, by processing information from the 'archive' elements of an \code{\link[flapper]{acdc_archive-class}} object that hold the results of calls to the workhorse routines. This is especially useful if the algorithm(s) have been applied chunk-wise, in which case the results for each chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series.
 }
 \details{
-If the \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an \code{\link[flapper]{acdc_record-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps (accounting for the overlap between chunks for AC* algorithm(s)); (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series (for AC* algorithm(s)) to (c) return an \code{\link[flapper]{acdc_record-class}} object.
+If the \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an \code{\link[flapper]{acdc_record-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps) and (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series (for AC* algorithm(s)) to return an \code{\link[flapper]{acdc_record-class}} object.
 }
 \seealso{
 The AC, DC and ACDC algorithms are implemented by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}. After simplification, \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} can be implemented to visualise time-specific results.

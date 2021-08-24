@@ -20,7 +20,8 @@
 #'   \item `timestep_detection' defines the time step of the detection time series;
 #'   \item `timestep_archival' defines the time steps between the current and next acoustic detection (if applicable);
 #'   \item `receiver_1_id' and `receiver_2_id' define the receiver at which the individual was detected at the current and next acoustic time steps;
-#'   \item `receiver_1_timestamp' and `receiver_2_timestamp' define the time stamps of these detections; \    \item `time_btw_dets' provides the time (s) between these acoustic detections;
+#'   \item `receiver_1_timestamp' and `receiver_2_timestamp' define the time stamps of these detections;
+#'   \item `time_btw_dets' provides the time (s) between these acoustic detections;
 #'   \item `archival_timestamp' defines the time stamp of archival observations between acoustic detections (if applicable);
 #'   \item `archival_depth' defines the depth (m) of the individual each archival time step (if applicable);
 #'   \item `centroid_radius' refers to the size of radius (m) of the acoustic centroid at that time (which depends principally on the time since the last acoustic detection and the time until the next acoustic detection and is a metric of centroid size, bearing-in-mind that the actual centroids can be non-circular);
@@ -72,7 +73,7 @@ NULL
 #'
 #' @return An \code{\link[flapper]{acdc_archive-class}} object is a named list that contains the output of a call to \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}. This contains the following elements: `archive', `ts_by_chunk', `time' and `args'.
 #'
-#' The main output is the `archive' element. This contains a list of \code{\link[flapper]{acdc_record-class}} objects returned by the call(s) to the internal routines that implement the algorithm. If the algorithm is implemented step-wise, this list contains a single element; if the algorithm is implemented chunk-wise, there is one element for each chunk. Each element contains a \code{\link[flapper]{acdc_record-class}} object with results of the call to internal routines for that chunk. The results across chunks can be aggregated using \code{\link[flapper]{acdc_simplify}}.
+#' The main output is the `archive' element. This contains a list of \code{\link[flapper]{acdc_record-class}} objects returned by the call(s) to the internal routines that implement the algorithm. If the algorithm is implemented step-wise, this list contains a single element; if the algorithm is implemented chunk-wise, there is one element for each chunk. Each element contains an \code{\link[flapper]{acdc_record-class}} object with results of the call to internal routines for that chunk. The results across chunks can be aggregated using \code{\link[flapper]{acdc_simplify}}.
 #'
 #' The `ts_by_chunk' element is a list, with one element for each chunk, that contains the movement time series that were used in that chunk. Each element contains `acoustics' and `archival' dataframes, though the former is \code{NULL} for the DC algorithm and the latter is \code{NULL} for the AC algorithm. For the AC* algorithms, if there is more than one chunk, the last observation of each acoustic chunk is the same as the first acoustic observation for the next chunk. This results from splitting chunks at acoustic observations, which enables the results of chunks that are computed independently to be simply aggregated without the loss of any information.
 #'

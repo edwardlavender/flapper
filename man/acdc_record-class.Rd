@@ -20,7 +20,8 @@ For the AC* algorithms, \code{record$dat} contains the following information:
   \item `timestep_detection' defines the time step of the detection time series;
   \item `timestep_archival' defines the time steps between the current and next acoustic detection (if applicable);
   \item `receiver_1_id' and `receiver_2_id' define the receiver at which the individual was detected at the current and next acoustic time steps;
-  \item `receiver_1_timestamp' and `receiver_2_timestamp' define the time stamps of these detections; \    \item `time_btw_dets' provides the time (s) between these acoustic detections;
+  \item `receiver_1_timestamp' and `receiver_2_timestamp' define the time stamps of these detections;
+  \item `time_btw_dets' provides the time (s) between these acoustic detections;
   \item `archival_timestamp' defines the time stamp of archival observations between acoustic detections (if applicable);
   \item `archival_depth' defines the depth (m) of the individual each archival time step (if applicable);
   \item `centroid_radius' refers to the size of radius (m) of the acoustic centroid at that time (which depends principally on the time since the last acoustic detection and the time until the next acoustic detection and is a metric of centroid size, bearing-in-mind that the actual centroids can be non-circular);

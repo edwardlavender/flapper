@@ -22,7 +22,7 @@ analyses of these data
 [fishtrack3d](https://github.com/aspillaga/fishtrack3d) and
 [actel](https://github.com/hugomflavio/actel)), with a particular focus
 on the provision of tools that integrate PAT and archival data for
-improved inference of patterns of space use, especially for
+improved inference of patterns of space use, including for pelagic and
 benthic/demersal species. To this end, `flapper` contains functions in
 the following themes:
 
@@ -85,17 +85,17 @@ discrete detections at receivers, especially:
     barriers to movement (such as coastline), detection probability and
     information provided by the gaps between detections.
   - **`dc()`.** This function implements the ‘depth-contour’ (DC)
-    algorithm to examine patterns of space use of benthic/demersal
-    animals. This relates one-dimensional depth time series to a
-    two-dimensional bathymetry surface to determine the extent to which
-    different parts of an area might have (or have not) been used, or
-    effectively represent occupied depths, over time.
+    algorithm to examine patterns of space use. This relates
+    one-dimensional depth time series to a two-dimensional bathymetry
+    surface to determine the extent to which different parts of an area
+    might have (or have not) been used, or effectively represent
+    occupied depths, over time.
   - **`acdc()`.** This function implements the ‘acoustic-centroid
     depth-contour’ (ACDC) algorithm to examine patterns of space use.
     This integrates the locational information provided by acoustic
-    detections and concurrent depth observations to infer where
-    benthic/demersal animals could have spent more or less time over the
-    period of observations.
+    detections and concurrent depth observations to infer where tagged
+    animals could have spent more or less time over the period of
+    observations.
   - **`pf()`** is a particle filtering routine that refines
     time-specific maps of the possible locations of an animal (from
     `ac()`, `dc()` or `acdc()`) via a particle simulation and filtering
@@ -361,12 +361,14 @@ filtering approach for the reconstruction of possible movement paths.*
 
 The depth-contour (DC) algorithm is the simplest. Whereas the COA
 approach only makes use of detections, the DC approach only uses depth
-observations. Specifically, under the assumption that individuals are
-benthic/demersal, this algorithm uses observed depths (± some error) to
-define the subset of possible locations of each individual within a
-defined area. This is implemented via `dc()`. The ‘quick’ depth-contour
-(DCQ) algorithm, implemented via `dcq()`, uses a modified version of
-this algorithm for quicker run times.
+observations. Specifically, this algorithm uses observed depths (± some
+error) to define the subset of possible locations of each individual
+within a defined area: for pelagic species, tagged individuals must be
+in an area where the depth is at least as deep as the observed depth;
+for benthic/demersal species, tagged individuals must be in an area
+close in depth to the observed depth. This is implemented via `dc()`.
+The ‘quick’ depth-contour (DCQ) algorithm, implemented via `dcq()`, uses
+a modified version of this algorithm for quicker run times.
 
 #### The acoustic-contour\* (AC\*) algorithm(s)
 
