@@ -84,6 +84,7 @@ pf_setup_record <- function(root, type = c("acs", "dc"),...){
   }
   check...("full.names",...)
   type <- match.arg(type)
+  check_dir(input = root)
   files <- list.files(root,...)
   msg_unrecognised <- "File naming structure is unrecognised."
   if(type == "acs"){
@@ -111,11 +112,13 @@ pf_setup_record <- function(root, type = c("acs", "dc"),...){
   ext <- tools::file_ext(files$name)
   n <- nchar(ext) + 1
   files$arc_id <- as.integer(substr(files$arc_id, 1, nchar(files$arc_id)-n))
-  if(type == "asc"){
+  if(type == "acs"){
     files <- files %>% dplyr::arrange(.data$chu_id, .data$acc_id, .data$arc_id)
   } else if(type == "dc"){
     files <- files %>% dplyr::arrange(.data$arc_id)
   }
   files <- list.files(root, full.names = TRUE,...)[files$index]
+  files <- sapply(files, function(f) tools::file_path_as_absolute(f))
+  names(files) <- NULL
   return(files)
 }
