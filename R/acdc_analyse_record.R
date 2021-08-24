@@ -497,8 +497,10 @@ acdc_animate_record <-
     #### Set directory
     if(is.null(dir)) dir <- dirname(html_name)
     wd <- getwd()
+    check_dir(input = dir)
     setwd(dir)
     on.exit(setwd(wd), add = TRUE)
+    html_name <- basename(html_name)
     #### Make plot
     animation::saveHTML({
       do.call(acdc_plot_record, expr_param)
@@ -514,7 +516,6 @@ acdc_animate_record <-
     interval = interval,
     verbose = verbose,...
     )
-    on.exit(setwd(dir))
     return(invisible())
   }
 

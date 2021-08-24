@@ -144,7 +144,9 @@ pf_animate_history <-
     #### Set directory
     if(is.null(dir)) dir <- dirname(html_name)
     wd <- getwd()
+    check_dir(input = dir)
     setwd(dir)
+    html_name <- basename(html_name)
     on.exit(setwd(wd), add = TRUE)
     #### Make plot
     animation::saveHTML({
