@@ -445,8 +445,9 @@ acdc_plot_record <- function(record,
 #### acdc_animate_record()
 
 #' @title Create a html animation of the AC/DC algorithm(s)
-#' @description This function is a simple wrapper for \code{\link[flapper]{acdc_plot_record}} and \code{\link[animation]{saveHTML}} which creates an animation of the AC* algorithm(s) over time. To implement this function, a named list of arguments for \code{\link[flapper]{acdc_plot_record}}, which creates the plots, must be supplied. This is embedded within \code{\link[animation]{saveHTML}}, which creates a folder in the working directory named `images' that contains a .png file for each time step and an animation as a .html file.
+#' @description This function is a simple wrapper for \code{\link[flapper]{acdc_plot_record}} and \code{\link[animation]{saveHTML}} which creates an animation of the AC* algorithm(s) over time. To implement this function, a named list of arguments for \code{\link[flapper]{acdc_plot_record}}, which creates the plots, must be supplied. This is embedded within \code{\link[animation]{saveHTML}}, which creates a folder in the specified directory named `images' that contains a .png file for each time step and an animation as a .html file.
 #' @param expr_param A named list of arguments, passed to \code{\link[flapper]{acdc_plot_record}}, to create plots.
+#' @param dir (optional) A string that defines the directory in which to save files. If unsupplied, if available, \code{dir} is taken from \code{html_name} using \code{\link[base]{dirname}}.
 #' @param html_name A string that defines the name of the html file (see `htmlfile' argument in \code{\link[animation]{saveHTML}}).
 #' @param image_name A string that defines the names of the individual .png files creates (see `img.name' argument in \code{\link[animation]{saveHTML}}).
 #' @param html_title,html_description Character strings that provide a title and a description that are displayed within the html animation (see `title' and `description' arguments in \code{\link[animation]{saveHTML}}).
@@ -456,7 +457,7 @@ acdc_plot_record <- function(record,
 #' @param verbose A logical or character variable that defines whether or not, or what, to write as a footer to the html animation (see `verbose' argument in \code{\link[animation]{ani.options}}).
 #' @param ... Additional arguments passed to \code{\link[animation]{ani.options}}.
 #'
-#' @return The function produces an animation in .html format in the working directory (or a sub-directory of this). A folder named `images' is also produced which contains the images for each time step. The `css' and `js' folders are also produced by \code{\link[animation]{saveHTML}} which creates the animation.
+#' @return The function produces an animation in .html format in the specified directory. A folder named `images' is also produced which contains the images for each time step. The `css' and `js' folders are also produced by \code{\link[animation]{saveHTML}} which creates the animation.
 #'
 #' @examples
 #' dir_current <- getwd()
@@ -476,6 +477,7 @@ acdc_plot_record <- function(record,
 
 acdc_animate_record <-
   function(expr_param,
+           dir = NULL,
            html_name = "ACDC_algorithm_demo.html",
            image_name = "ACDC",
            html_title = "Demonstration of the ACDC Algorithm",
@@ -492,6 +494,12 @@ acdc_animate_record <-
     if (!requireNamespace("animation", quietly = TRUE)) {
       stop("This function requires the 'animation' package. Please install it before continuing with install.packages('animation').")
     }
+    #### Set directory
+    if(is.null(dir)) dir <- dirname(html_name)
+    wd <- getwd()
+    setwd(dir)
+    on.exit(setwd(wd), add = TRUE)
+    #### Make plot
     animation::saveHTML({
       do.call(acdc_plot_record, expr_param)
     },
@@ -506,5 +514,7 @@ acdc_animate_record <-
     interval = interval,
     verbose = verbose,...
     )
+    on.exit(setwd(dir))
+    return(invisible())
   }
 

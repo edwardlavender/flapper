@@ -79,6 +79,94 @@ pf_plot_history <- function(archive,
 
 ######################################
 ######################################
+#### pf_animate_history()
+
+#' @title Create a html animation of the PF algorithm(s)
+#' @description This function is a simple wrapper for \code{\link[flapper]{pf_plot_history}} and \code{\link[animation]{saveHTML}} which creates an animation of the particle filtering (PF) algorithm(s) over time. To implement this function, a named list of arguments for \code{\link[flapper]{pf_plot_history}}, which creates the plots, must be supplied. This is embedded within \code{\link[animation]{saveHTML}}, which creates a folder in the specified directory named `images' that contains a .png file for each time step and an animation as a .html file.
+#' @param expr_param A named list of arguments, passed to \code{\link[flapper]{pf_plot_history}}, to create plots.
+#' @param dir (optional) A string that defines the directory in which to save files. If unsupplied, if available, \code{dir} is taken from \code{html_name} using \code{\link[base]{dirname}}.
+#' @param html_name A string that defines the name of the html file (see `htmlfile' argument in \code{\link[animation]{saveHTML}}).
+#' @param image_name A string that defines the names of the individual .png files creates (see `img.name' argument in \code{\link[animation]{saveHTML}}).
+#' @param html_title,html_description Character strings that provide a title and a description that are displayed within the html animation (see `title' and `description' arguments in \code{\link[animation]{saveHTML}}).
+#' @param navigator A logical variable that defines whether or not to add a navigator panel to the animation (see `navigator' argument in \code{\link[animation]{saveHTML}}).
+#' @param ani_height,ani_width,ani_res Numbers that define the size and the resolution of the animation (see `ani.height' `ani.width' and `ani.res' arguments in \code{\link[animation]{ani.options}}).
+#' @param interval A number that defines the time interval between sequential frames (see `interval' argument in \code{\link[animation]{ani.options}}).
+#' @param verbose A logical or character variable that defines whether or not, or what, to write as a footer to the html animation (see `verbose' argument in \code{\link[animation]{ani.options}}).
+#' @param ... Additional arguments passed to \code{\link[animation]{ani.options}}.
+#'
+#' @return The function produces an animation in .html format in the specified directory. A folder named `images' is also produced which contains the images for each time step. The `css' and `js' folders are also produced by \code{\link[animation]{saveHTML}} which creates the animation.
+#'
+#' @examples
+#' #### Example (1): Create a zoomed-in animation
+#' pf_animate_history(
+#'   expr_param = list(archive = dat_dcpf_histories,
+#'                     add_particles = list(cex = 2.5, pch = 21,
+#'                                          col = "black", bg = "black"),
+#'                     prompt = FALSE),
+#'   dir = tempdir(),
+#'   interval = 0.25)
+#'
+#' #### Example (2): Create a wider scale animation
+#' boundaries <- raster::extent(dat_coast)
+#' pf_animate_history(
+#'   expr_param = list(archive = dat_dcpf_histories,
+#'                     add_particles = list(cex = 0.5, pch = 21,
+#'                                           col = "black", bg = "black"),
+#'                     add_polys = list(x = dat_coast, col = "brown"),
+#'                     xlim = boundaries[1:2], ylim = boundaries[3:4],
+#'                     prompt = FALSE),
+#'   dir = tempdir())
+#'
+#' @details This function requires the \code{\link[animation]{animation}} package.
+#' @author Edward Lavender
+#' @export
+#'
+
+pf_animate_history <-
+  function(expr_param,
+           dir = NULL,
+           html_name = "PF_algorithm_demo.html",
+           image_name = "PF",
+           html_title = "Demonstration of PF",
+           html_description = "",
+           navigator = FALSE,
+           ani_height = 800,
+           ani_width = 800,
+           ani_res = 1200,
+           interval = 0.1,
+           verbose = FALSE,
+           ...){
+    #### Checks
+    ## animation package
+    if (!requireNamespace("animation", quietly = TRUE)) {
+      stop("This function requires the 'animation' package. Please install it before continuing with install.packages('animation').")
+    }
+    #### Set directory
+    if(is.null(dir)) dir <- dirname(html_name)
+    wd <- getwd()
+    setwd(dir)
+    on.exit(setwd(wd), add = TRUE)
+    #### Make plot
+    animation::saveHTML({
+      do.call(pf_plot_history, expr_param)
+    },
+    htmlfile = html_name,
+    img.name = image_name,
+    title = html_title,
+    description = html_description,
+    navigator = navigator,
+    ani.height = ani_height,
+    ani.width = ani_width,
+    ani.res = ani_res,
+    interval = interval,
+    verbose = verbose,...
+    )
+    return(invisible())
+  }
+
+
+######################################
+######################################
 #### pf_plot_map()
 
 #' @title Plot `probability of use' from a PF algorithm

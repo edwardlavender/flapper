@@ -423,6 +423,7 @@ process provided by the `pf*()` family of functions:
   - `pf_setup_record()` creates an ordered list of input files;
   - `pf()` implements the particle filtering routine;
   - `pf_plot_history()` plot simulated particle histories;
+  - `pf_animate_history()` animates simulated particle histories;
   - `pf_plot_map()` maps the ‘probability of use’ across an area based
     on sampled particles;
   - `pf_simplify()` assembles movement paths from particle histories;
