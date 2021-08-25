@@ -358,8 +358,12 @@ acs_setup_centroids <- function(
 ){
 
   #### Initiate function
+  t_onset <- Sys.time()
   cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
-  cat_to_console("flapper::acs_setup_centroids() called...")
+  cat_to_console(paste0("flapper::acs_setup_centroids() called (@ ", t_onset, ")..."))
+
+  #### Function checks
+  cat_to_console("... Checking user inputs...")
   if(!inherits(xy, "SpatialPointsDataFrame"))
     stop(paste("Argument 'xy' must be of class 'SpatialPointsDataFrame', not class(es):"), class(xy))
   rs <- xy$receiver_id
@@ -372,10 +376,17 @@ acs_setup_centroids <- function(
     message("Argument 'xy$receiver_id' contains duplicate elements. 'xy' has been simplified to contain only unique receiver IDs.")
     xy <- xy[!duplicated(xy$receiver_id), ]
   }
+  if(!is.null(coastline)){
+    check_class(input = coastline, to_class = "SpatialPolygonsDataFrame")
+    if(length(coastline) != 1)
+      stop("'coastline' has multiple features which need to be dissolved into a single feature SpatialPolgyonsDataFrame.")
+  }
   if(!is.null(coastline) & !is.null(boundaries)) {
     coastline <- raster::crop(coastline, boundaries)
     if(is.null(coastline)) message("No coastline within defined boundaries. \n")
   }
+
+  #### Plot map of area
   if(plot){
     cat_to_console("... Plotting background map of area...")
     if(!is.null(coastline)) {
@@ -387,52 +398,33 @@ acs_setup_centroids <- function(
     if(!is.null(boundaries)) raster::lines(boundaries, col = "red", lty = 3)
   }
 
-
   #### Define a list of acoustic centroids for each receiver
-  cat_to_console("... Building a nested list of acoustic centroids. This is the slow step...")
-
-  ## Define a sequence of centroid radius
-  # Around each receiver, we'll create a polygon of this radius
+  cat_to_console("... Building a nested list of acoustic centroids...")
+  ## Define a sequence of centroid radii
+  # Around each receiver, we'll create a polygon of for each radius
   radius_seq <- seq(detection_range, length.out = n_timesteps, by = mobility)
-
   ## Define a list of receivers, with a list of centroids for each receiver
-  bathy_ls <- pbapply::pblapply(1:length(rs), cl = cl, function(i){
-
-      centroids_ls <- lapply(radius_seq, function(radius){
-
+  centroids_by_receiver <- pbapply::pblapply(1:length(rs), cl = NULL, function(i){
+      centroids_for_receiver <- lapply(radius_seq, function(radius){
         # Define a buffer around the current receiver of appropriate radius
-        bathy_poly <- rgeos::gBuffer(xy[i, ], width = radius)
-
-        # Reduce the size of the polygon by overlapping to remove areas on land
-        # This keeps the polygons as small as possible which is important for ACDC/MP algorithm computation efficiency.
-        if(!is.null(coastline)) {
-          bathy_poly <- rgeos::gDifference(bathy_poly, coastline, byid = FALSE)
-        }
-
+        poly <- rgeos::gBuffer(xy[i, ], width = radius)
         # Remove any areas beyond specified boundaries
-        # Again this keeps polygon size to a minimum
-        if(!is.null(boundaries)) {
-          bathy_poly <- raster::crop(bathy_poly, boundaries)
-        }
-
+        # (We will remove coastline later, for speed)
+        if(!is.null(boundaries)) poly <- raster::crop(poly, boundaries)
         # Return acoustic centroid
-        return(bathy_poly)
-
+        return(poly)
       })
-
-    # Define names of the rasters forn receiver, i, based on radius
-    names(centroids_ls) <- paste0("s_", radius_seq)
-    return(centroids_ls)
-
+    # Define names of the rasters for each receiver based on radius
+    names(centroids_for_receiver) <- paste0("s_", radius_seq)
+    return(centroids_for_receiver)
     })
-  if(!is.null(cl)) parallel::stopCluster(cl)
-  names(bathy_ls) <- rs
-
-  #### Add NULL elements to the list for any receivers in the range 1:max(rs) that are not in rs
-  # This means we can use receiver numbers to go straight to the correct element in the list in ACDC/MP algorithms.
-  bathy_ls <- lapply(as.integer(1:max(rs)), function(i){
+  ## Process list of acoustic centroids for each receiver
+  # Add NULL elements to the list for any receivers in the range 1:max(rs) that are not in rs
+  # This means we can use receiver numbers to go straight to the correct element in the list in AC* algorithm(s).
+  names(centroids_by_receiver) <- rs
+  centroids_by_receiver <- lapply(as.integer(1:max(rs)), function(i){
     if(i %in% rs){
-      return(bathy_ls[[as.character(i)]])
+      return(centroids_by_receiver[[as.character(i)]])
     } else{
       return(NULL)
     }
@@ -441,17 +433,32 @@ acs_setup_centroids <- function(
   #### Convert nested list of polygons to a SpatialPolygonsDataFrame
   # ... with one element for each receiver and each dataframe containing all the polygons for that receiver
   cat_to_console("... Converting the nested list of acoustic centroids to a SpatialPolygonsDataFrame...")
-  if(is.null(bathy_ls)) {
+  if(is.null(centroids_by_receiver)) {
     stop("There are no acoustic centroids within defined spatial boundaries.")
   }
-  spdf_ls <- pbapply::pblapply(bathy_ls, cl = NULL, function(element){
+  spdf_ls <- pbapply::pblapply(centroids_by_receiver, cl = cl, function(element){
     if(!is.null(element)){
-      # bind all the sub-elements in each element together into a single spatial polygon
-      sp <- raster::bind(element)
-      # convert this into a spatial polygons dataframe
-      spdf <- sp::SpatialPolygonsDataFrame(sp, data.frame(id = 1:length(sp)))
-      return(spdf)
-    }})
+      ## Bind all the sub-elements in each element together into a SpatialPolygons object
+      sp_for_receiver <- raster::bind(element)
+      ## Crop to coastline
+      # This step requires that coastline is a single feature SPDF (hence the checks above)
+      # This is the slow step:
+      # ... But it is much faster to implement at this stage using byid = TRUE, rather than earlier
+      # ... on a centroid-by-centroid basis
+      if(!is.null(coastline)) {
+        # Cut centroids around coastline
+        sp_for_receiver <- rgeos::gDifference(sp_for_receiver, coastline, byid = TRUE)
+        # Re-set names
+        sp_for_receiver <- sp::spChFIDs(sp_for_receiver, as.character(1:length(sp_for_receiver)))
+      }
+      ## Define a SpatialPolygonsDataFrame
+      spdf_for_receiver <-
+        sp::SpatialPolygonsDataFrame(sp_for_receiver,
+                                     data.frame(id = as.character(1:length(sp_for_receiver))))
+      return(spdf_for_receiver)
+    }
+  })
+  if(!is.null(cl)) parallel::stopCluster(cl)
 
   #### Visualise centroids
   if(plot){
@@ -459,9 +466,11 @@ acs_setup_centroids <- function(
     pbapply::pblapply(spdf_ls, function(spdf) if(!is.null(spdf)) raster::lines(spdf, col = "dimgrey", lwd = 0.75))
   }
 
-  #### Return list of SpatialPolygonsDataFrame
+  #### Return list of SpatialPolygonsDataFrames
+  t_end <- Sys.time()
+  total_duration <- difftime(t_end, t_onset, units = "mins")
+  cat_to_console(paste0("... flapper::acs_setup_centroids() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
   return(spdf_ls)
-
 }
 
 
@@ -878,7 +887,7 @@ acs_setup_detection_kernels <-
     # Check function duration
     t_end <- Sys.time()
     total_duration <- difftime(t_end, t_onset, units = "mins")
-    cat_to_console(paste0("... flapper::acs_setup_detection_centroids() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+    cat_to_console(paste0("... flapper::acs_setup_detection_kernels() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
     # Return outputs
     return(out)
 
