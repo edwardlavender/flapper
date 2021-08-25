@@ -324,7 +324,7 @@ get_detection_centroids_overlap <- function(centroids, services = NULL,...){
     # Copy receiver activity status matrix
     info <- rs_active_mat
     # Focus on receiver's deployment window
-    info <- info[as.Date(rownames(info)) %within% lubridate::interval(centroid$receiver_start_date, centroid$receiver_end_date), ]
+    info <- info[as.Date(rownames(info)) %within% lubridate::interval(centroid$receiver_start_date, centroid$receiver_end_date), , drop = FALSE]
 
     #### Convert receiver 'active' index (0, 1) to 'overlapping' index
     # ... A) Check for overlapping receivers
@@ -333,7 +333,7 @@ get_detection_centroids_overlap <- function(centroids, services = NULL,...){
     # ... ... and we force all receivers that didn't overlap in space to 0
     # ... C) If there are no overlapping receivers, the whole matrix just gets forced to 0
 
-    ## (A) Get an index of the receivers that intersected with the current receiver
+    ## (A) Get an index of the receivers that intersected with the current receiver (in space)
     centroids_sbt <- centroids[!(centroids$receiver_id %in% centroid$receiver_id), ]
     int_1 <- rgeos::gIntersects(centroid, centroids_sbt, byid = TRUE)
 
