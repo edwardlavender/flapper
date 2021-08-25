@@ -11,6 +11,7 @@ sim_detections(
   calc_detection_pr,
   by_timestep = FALSE,
   delta_t = NULL,
+  seed = NULL,
   plot = TRUE,
   jitter = function(n) stats::rnorm(n, 0, 0.05),
   add_prob = list(col = "royalblue", pch = 3, cex = 0.5),
@@ -31,6 +32,8 @@ sim_detections(
 \item{by_timestep}{A logical variable that defines whether or not \code{calc_detection_pr} needs to be applied to each time step separately. This may be necessary if some of the parameters of the detection model are vectors (see Examples).}
 
 \item{delta_t}{(optional) An integer that defines the number of time steps over which to aggregate detections. If provided, detections are summed over each \code{delta_t} interval and returned along with averaged distances and probabilities (see Value).}
+
+\item{seed}{An integer that is used to set the seed to enable reproducible simulations (see \code{\link[base]{set.seed}}).}
 
 \item{plot}{A logical variable that defines whether or not to plot detections (and probabilities) against distances.}
 

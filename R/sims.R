@@ -359,7 +359,6 @@ sim_path_sa <- function(n = 10,
   if(!is.null(seed)) set.seed(seed)
   out <- list(xy_mat = NULL, angle_mat = NULL, step_mat = NULL, time = NULL, args = NULL)
   out$time <- data.frame(event = "onset", time = Sys.time())
-  if(!is.null(seed)) set.seed(seed)
 
   #### Define matrices to store movement path param
   cat_to_console("... Setting up simulation...")
@@ -466,7 +465,7 @@ sim_path_sa <- function(n = 10,
 
   #### Return outputs
   ## Define outputs
-  set.seed(NULL)
+  if(!is.null(seed)) set.seed(NULL)
   out <- list()
   out$xy_mat    <- xy_mat
   out$angle_mat <- angle_mat
@@ -674,6 +673,7 @@ summarise_along_walk <- function(vec, every, summarise = sum, na.rm = FALSE,...)
 #' @param calc_detection_pr A function that takes in a vector of distances and returns a vector of detection probabilities.
 #' @param by_timestep A logical variable that defines whether or not \code{calc_detection_pr} needs to be applied to each time step separately. This may be necessary if some of the parameters of the detection model are vectors (see Examples).
 #' @param delta_t (optional) An integer that defines the number of time steps over which to aggregate detections. If provided, detections are summed over each \code{delta_t} interval and returned along with averaged distances and probabilities (see Value).
+#' @param seed An integer that is used to set the seed to enable reproducible simulations (see \code{\link[base]{set.seed}}).
 #' @param plot A logical variable that defines whether or not to plot detections (and probabilities) against distances.
 #' @param jitter,add_prob,xlim,... Plot customisation options. \code{jitter} is a function that jitters \code{n} simulated outcomes (0, 1) in the vertical direction. \code{add_prob} is a named list of arguments, passed to \code{\link[graphics]{points}}, used to customise the addition of calculated probabilities to the plot. (\code{add_prob = NULL} suppresses the addition of probabilities to the plot.) \code{xlim} is a vector of x axis limits. By default, \code{xlim = c(0, 1000)} to improve resolution in the area of the plot that is of interest (under a Universal Transverse Mercator CRS, for most realistic detection probability functions, detection probability beyond 1000 will be negligible) and plotting speed. Additional arguments can be passed to \code{\link[prettyGraphics]{pretty_plot}} to customise the plot via \code{...}.
 #' @param verbose A logical variable that defines whether or not to print messages to the console to relay function progress.
@@ -780,6 +780,7 @@ sim_detections <- function(path,
                            calc_detection_pr,
                            by_timestep = FALSE,
                            delta_t = NULL,
+                           seed = NULL,
                            plot = TRUE,
                            jitter = function(n) stats::rnorm(n, 0, 0.05),
                            add_prob = list(col = "royalblue", pch = 3, cex = 0.5),
@@ -794,6 +795,7 @@ sim_detections <- function(path,
   #### Set up
   cat_to_console("... Setting up simulation...")
   # Define matrices
+  if(!is.null(seed)) set.seed(seed)
   n_timesteps <- nrow(path)
   n_receivers <- nrow(xy)
   n_obs <- n_timesteps * n_receivers
@@ -869,6 +871,7 @@ sim_detections <- function(path,
   }
 
   #### Return list
+  if(!is.null(seed)) set.seed(NULL)
   out <- list(dist_mat = dist_mat, prob_mat = prob_mat, det_mat = det_mat)
   if(!is.null(delta_t)) {
     out <- list(agg = out)
