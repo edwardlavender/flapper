@@ -60,7 +60,7 @@ make_df_detections <- function(acoustics, only_keep_detections = FALSE, set_name
       if(!is.null(as_POSIXct)) dat$timestamp <- as_POSIXct(dat$timestamp)
     } else message("'set_names' not implemented for rows: 'acoustics' does not contain row names.")
     if(!is.null(colnames(acoustics))) {
-      dat$receiver_id <- factor(colnames(acoustics))
+      dat$receiver_id <- factor(colnames(acoustics))[match(dat$receiver_id, 1:ncol(acoustics))]
     } else message("'set_names' not implemented for columns: 'acoustics' does not contain column names.")
   }
   dat <- dat[order(dat$timestamp, dat$receiver), ]
