@@ -313,7 +313,7 @@ Building on the analysis of detection time series, some functions
         from acoustic detections;
       - `get_mvt_mobility_from_archival()` estimates swimming speeds
         from archival time series;
-  - `get_mvt_resting_*()` identifies ‘resting’ behaviour from archival
+  - `get_mvt_resting()` identifies ‘resting’ behaviour from archival
     time series;
 
 ## Space use algorithms
