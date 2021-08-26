@@ -390,7 +390,8 @@ coa_setup_delta_t <- function(acoustics,
 coa <- function(mat, xy, cl = NULL, na_omit = TRUE, as_POSIXct = as.POSIXct, output = "matrix",...){
 
   #### Define objects
-  if(all(mat == 0)) stop("No detection(s) identified in mat: unable to calculate COA(s).")
+  if(all(mat == 0)) stop("No detection(s) identified in mat: unable to calculate COA(s).", call. = FALSE)
+  if(ncol(mat) != nrow(xy)) stop("The number of receivers in 'mat' (ncol(mat)) does not equal the number of receivers for which coordinates have been provided (nrow(xy)).", call. = FALSE)
   output <- check_value(input = output, supp = c("matrix", "data.frame"))
   if(is.null(rownames(mat))) {
     rownames(mat) <- 1:nrow(mat)
