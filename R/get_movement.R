@@ -219,6 +219,7 @@ get_mvt_mobility_from_acoustics <- function(data,
   }
 
   #### Calculate speeds
+  message("Mobility estimates from n = ", nrow(transitions), " observation(s).")
   ## Speeds (m/s)
   transitions$speed_min_ms <- transitions$dist_min/transitions$time
   transitions$speed_avg_ms <- transitions$dist_avg/transitions$time
@@ -286,6 +287,7 @@ get_mvt_mobility_from_archival <- function(data, fct = NULL){
     dplyr::ungroup() %>%
     dplyr::filter(!is.na(.data$dist)) %>%
     dplyr::select(-.data$fct)
+  message("Mobility estimates from n = ", nrow(data), " observation(s).")
   cat("--------------------------------------\n")
   cat("Estimates (m/s)-----------------------\n")
   stats <- data.frame(variable = "speed", min = min(data$speed_ms), mean = mean(data$speed_ms), max = max(data$speed_ms))
