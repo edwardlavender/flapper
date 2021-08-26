@@ -5,11 +5,10 @@
 \alias{pf_archive-class}
 \title{"pf_archive" class}
 \value{
-This object is a named list, with two elements, which records the parameters used in the call to \code{\link[flapper]{pf}} and the particles sampled at each time step:
+This object is a named list, with three elements, which records the particles sampled at each time step, the method and the parameters used in the call to \code{\link[flapper]{pf}}:
 
 \describe{
-  \item{args}{A named list that records the function arguments used to generate outputs. This is as inputted, but with the `calc_distance_graph' elements added if unsupplied and applicable.}
-  \item{history}{A list of dataframes, one for each time step, that record particle samples. Each dataframe comprises \code{n} rows (one for each particle) and the following five columns:}
+  \item{history}{A list of dataframes, one for each time step, that record particle samples. Each dataframe comprises \code{n} rows (one for each particle) and the following five columns:
   \itemize{
     \item{id_previous}{ An integer that uniquely defines a previous location on the \code{record} \code{\link[raster]{raster}}s. This is absent for the first time step. For subsequent time steps, this is \code{NA} if the fast Euclidean distances method has been used, which does not `remember' previous locations, but specified otherwise.)}
     \item{pr_current}{ A double that defines the movement probabilities associated with previous locations. This is absent for the first time step. For subsequent time steps, this is \code{NA} if the fast Euclidean distances method has been used, which does not `remember' previous locations, but specified otherwise.}
@@ -18,12 +17,18 @@ This object is a named list, with two elements, which records the parameters use
     \item{timestep}{ An integer that defines each time step.}
   }
 }
+
+\item{method}{A character that defines whether or not \code{history} was derived directly from \code{\link[flapper]{pf}} (\code{method = "pf"}), in which case \code{history} contains all of the particles sampled at each time step, or via \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with \code{return = "archive"} (\code{method = "pf_simplify"}), in which case \code{history} contains the subset of particles at each time step that were re-sampled at the next time step; for particles that were sampled multiple times on a given time step, this only contains the most probable sample (see \code{\link[flapper]{pf_simplify}}).}
+
+\item{args}{A named list that records the function arguments passed to \code{\link[flapper]{pf}}. This is as inputted to \code{\link[flapper]{pf}}, but with the `calc_distance_graph' elements added if unsupplied and applicable.}
+
+}
 }
 \description{
-An S3 class that defines the object returned by \code{\link[flapper]{pf}}.
+An S3 class that defines the object returned by \code{\link[flapper]{pf}} or \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with the \code{return = "archive"} argument.
 }
 \seealso{
-\code{\link[flapper]{dat_dcpf_histories}} provides an example of a \code{\link[flapper]{pf_archive-class}} object. \code{\link[flapper]{pf_simplify}} converts \code{\link[flapper]{pf_archive-class}} objects into \code{\link[flapper]{pf_path-class}} objects that comprise the reconstructed movement paths.
+\code{\link[flapper]{dat_dcpf_histories}} provides an example of a \code{\link[flapper]{pf_archive-class}} object. \code{\link[flapper]{pf}} and \code{\link[flapper]{pf_simplify}} return \code{\link[flapper]{pf_archive-class}} objects. \code{\link[flapper]{pf_simplify}} can also convert \code{\link[flapper]{pf_archive-class}} objects into \code{\link[flapper]{pf_path-class}} objects that comprise the reconstructed movement paths.
 }
 \author{
 Edward Lavender

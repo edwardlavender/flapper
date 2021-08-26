@@ -4,7 +4,7 @@
 
 #' @title Plot particle histories from a PF algorithm
 #' @description This function plots the spatiotemporal particle histories from a particle filtering (PF) algorithm (the acoustic-centroid PF, the depth-contour PF or the acoustic-centroid depth-contour PF). This produces, for each time step, a map of the individual's possible locations (from the AC, DC or ACDC algorithm), with sampled locations (derived via the particle filtering routine) overlaid.
-#' @param archive A \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}} that contains particle histories.
+#' @param archive A \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}}, or \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with the \code{record = "archive"} argument, that contains particle histories.
 #' @param time_steps An integer vector that defines the time steps for which to plot particle histories.
 #' @param add_surface A named list, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the surface, which shows the set of possible positions that the individual could have occupied at a given time step (from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}), on each map.
 #' @param add_particles A named list, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the particles on each map.
@@ -37,6 +37,18 @@
 #' #### Example (3): Plot multiple time steps
 #' pp <- graphics::par(mfrow = c(2, 2))
 #' pf_plot_history(dat_dcpf_histories, time_steps = 1:4, prompt = FALSE)
+#' graphics::par(pp)
+#'
+#' #### Example (4): Compare outputs for sampled versus connected particles
+#' dat_dcpf_histories_connected <-
+#'   pf_simplify(dat_dcpf_histories, return = "archive")
+#' pp <- graphics::par(mfcol = c(2, 4))
+#' pf_plot_history(dat_dcpf_histories, time_steps = 1:4,
+#'                 add_particles = list(pch = 21, bg = "black"),
+#'                 prompt  = FALSE)
+#' pf_plot_history(dat_dcpf_histories_connected, time_steps = 1:4,
+#'                 add_particles = list(pch = 21, bg = "black"),
+#'                 prompt = FALSE)
 #' graphics::par(pp)
 #'
 #' @return The function returns a plot, for each time step, of all the possible locations of the individual, with sampled locations overlaid.
@@ -172,28 +184,41 @@ pf_animate_history <-
 #### pf_plot_map()
 
 #' @title Plot `probability of use' from a PF algorithm
-#' @description This function creates a plot of the `probability of use' across an area based on particles sampled by a particle filtering (PF) algorithm. To implement the function, a \code{\link[flapper]{pf_archive-class}} object that contains particles (locations) sampled by \code{\link[flapper]{pf}} must be supplied. The function extracts all sampled locations and, for each location, calculates `the probability of use' for that location over the time series. This is returned (invisibly) as a \code{\link[raster]{raster}} and plotted.
-#' @param archive A \code{\link[flapper]{pf_archive-class}} object (from \code{\link[flapper]{pf}}).
+#' @description This function creates a plot of the `probability of use' across an area based on particles sampled by a particle filtering (PF) algorithm. To implement the function, a \code{\link[flapper]{pf_archive-class}} object that contains connected particles (locations) sampled by \code{\link[flapper]{pf}} and processed by \code{\link[flapper]{pf_simplify}} must be supplied. The function extracts sampled locations and, for each location, calculates `the probability of use' for that location over the time series. This is returned (invisibly) as a \code{\link[raster]{raster}} and plotted.
+#' @param archive A \code{\link[flapper]{pf_archive-class}} object (from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with \code{record = "archive"}).
 #' @param map A \code{\link[raster]{raster}} that defines a grid across the area of interest.
-#' @param scale A character that defines how \code{\link[raster]{raster}} values are scaled: \code{"original"} uses the original values; \code{"max"} scales values by the maximum value so that they lie between zero and one; and \code{"sum"} scales values by their sum so that they sum to one.
+#' @param transform (optional) A function to transform cell weights (e.g, \code{\link[base]{log}}).
+#' @param scale A character that defines how \code{\link[raster]{raster}} values are scaled: \code{"original"} uses the original values; \code{"max"} scales values by the maximum value (so that, if \code{transform = NULL}, they lie between zero and one; and \code{"sum"} scales values by their sum so that they sum to one.
 #' @param add_rasters A named list, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the plotted surface.
 #' @param ... Additional arguments passed to \code{\link[prettyGraphics]{pretty_map}}.
 #'
-#' @details For each location, the 'probability of use' is calculated as the sum of the number of times that the location was sampled, weighted by the associated probabilities of each sample.
+#' @details For each location, the 'probability of use' is calculated as the sum of the number of times (time steps) that the location was sampled, weighted by the associated probabilities of each sample.
 #'
 #' @return The function invisibly returns a \code{\link[raster]{raster}}, in which each cell contains the `probability of use' score and produces a plot of this surface.
 #'
 #' @examples
+#' #### Prepare data
+#' # The example data 'dat_dcpf_histories' contains all particles sampled
+#' # ... by an implementation of the DCPF algorithm. However, not all particles
+#' # ... that were sampled at one time step may have been near to particles sampled
+#' # ... at the next time step. In addition, some particles may have been sampled
+#' # ... multiple times at one time step, but our maps of space use should reflect
+#' # ... the number of time steps that the individual could have occupied a location,
+#' # ... rather than the total number of samples of a location. Hence, to map
+#' # ... space use, we should focus on the subset of particles that were connected
+#' # ... between time steps and only retain one record of each particle at each time step
+#' # ... using pf_simplify() with record = "archive"
+#' dat_dcpf_histories_connected <- pf_simplify(dat_dcpf_histories, return = "archive")
+#'
 #' #### Example (1): Implement the function with default options
-#' # using the example 'dat_dcpf_histories' data
-#' pf_plot_map(dat_dcpf_histories, map = dat_dc$args$bathy)
+#' pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy)
 #'
 #' #### Example (2): Re-scale the map
-#' pf_plot_map(dat_dcpf_histories, map = dat_dc$args$bathy, scale = "max")
-#' pf_plot_map(dat_dcpf_histories, map = dat_dc$args$bathy, scale = "sum")
+#' pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy, scale = "max")
+#' pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy, scale = "sum")
 #'
 #' #### Example (3): Customise the map
-#' pf_plot_map(dat_dcpf_histories, map = dat_dc$args$bathy,
+#' pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy,
 #'             add_rasters = list(col = grDevices::grey.colors(n = 100)),
 #'             xlab = "x", ylab = "y")
 #'
@@ -203,6 +228,7 @@ pf_animate_history <-
 
 pf_plot_map <- function(archive,
                         map,
+                        transform = NULL,
                         scale = c("original", "max", "sum"),
                         add_rasters = list(),...){
   # Check inputs
@@ -215,6 +241,11 @@ pf_plot_map <- function(archive,
   wt_freq <- stats::aggregate(x = list("wt" = pf_particle_histories$pr_current),
                               by = list("id" = pf_particle_histories$id_current),
                               FUN = sum)
+  # Transform weighted frequencies
+  if(!is.null(transform)) {
+    wt_freq$wt <- transform(wt_freq$wt)
+    if(any(is.na(wt_freq$wt))) stop("'transform' function has created NAs.")
+  }
   # Re-scale weighted frequencies e.g. so that the maximum value has a score of one
   if(scale == "max"){
     wt_freq$wt <- wt_freq$wt/max(wt_freq$wt)

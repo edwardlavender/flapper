@@ -18,7 +18,7 @@ Rows are ordered by path and then time step.
   }
 }
 \description{
-An S3 class that defines the object returned by \code{\link[flapper]{pf_simplify}}, following \code{\link[flapper]{pf}}.
+An S3 class that defines the object returned by \code{\link[flapper]{pf_simplify}} with \code{return = "path"}, following \code{\link[flapper]{pf}}.
 }
 \seealso{
 \code{\link[flapper]{pf_path-class}} objects are derived from \code{\link[flapper]{pf_archive-class}} objects via \code{\link[flapper]{pf_simplify}}. \code{\link[flapper]{dat_dcpf_paths}} provides an example.

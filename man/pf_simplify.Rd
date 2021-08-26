@@ -9,6 +9,7 @@ pf_simplify(
   calc_distance = NULL,
   bathy = NULL,
   calc_distance_graph = NULL,
+  return = c("path", "archive"),
   max_n_copies = NULL,
   sample_method = c("random", "weighted", "max"),
   add_origin = TRUE,
@@ -23,26 +24,30 @@ pf_simplify(
 
 \item{bathy}{(optional) If \code{calc_distance = "lcp"}, \code{bathy} is \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. \code{bathy} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in x, y and z directions (m). The surface's resolution is taken to define the distance between horizontally and vertically connected cells and must be the same in both x and y directions. Any cells with NA values (e.g., due to missing data) are treated as `impossible' to move though by the algorithm (see \code{\link[flapper]{lcp_over_surface}}).}
 
-\item{calc_distance_graph}{(optional) If \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in \code{bathy}. If unsupplied, this is taken from \code{archive$args$calc_distance_graph}, if available, or computed via \code{\link[flapper]{lcp_graph_surface}}.}
+\item{calc_distance_graph}{(optional) For \code{return = "path"}, if \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in \code{bathy}. If unsupplied, this is taken from \code{archive$args$calc_distance_graph}, if available, or computed via \code{\link[flapper]{lcp_graph_surface}}.}
 
-\item{max_n_copies}{(optional) An integer that specifies the maximum number of copies of a sampled cell that are retained at each time stamp. Each copy represents a different route to that cell. By default, all copies (i.e. routes to that cell are retained) via \code{max_n_copies = NULL}. However, in cases where there are a large number of paths through a landscape, the function can run into vector memory limitations during path assembly, so \code{max_n_copies} may need to be set. In this case, at each time step, if there are more than \code{max_n_copies} paths to a given cell, then a subset of these (\code{max_n_copies}) are sampled, according to the \code{sample_method} argument.}
+\item{return}{A character (\code{return = "path"} or \code{return = "archive"}) that defines the type of object that is returned (see Details).}
 
-\item{sample_method}{(optional) If \code{max_n_copies} is supplied, \code{sample_method} is a character that defines the sampling method. Currently supported options are: \code{"random"}, which implements random sampling; \code{"weighted"}, which implements weighted sampling, with random samples taken according to their probability at the current time step; and \code{"max"}, which selects for the top \code{max_n_copies} most likely copies of a given cell according to the probability associated with movement into that cell from the previous location.}
+\item{max_n_copies}{(optional) For \code{return = "path"}, \code{max_n_copies} is an integer that specifies the maximum number of copies of a sampled cell that are retained at each time stamp. Each copy represents a different route to that cell. By default, all copies (i.e. routes to that cell are retained) via \code{max_n_copies = NULL}. However, in cases where there are a large number of paths through a landscape, the function can run into vector memory limitations during path assembly, so \code{max_n_copies} may need to be set. In this case, at each time step, if there are more than \code{max_n_copies} paths to a given cell, then a subset of these (\code{max_n_copies}) are sampled, according to the \code{sample_method} argument.}
 
-\item{add_origin}{A logical input that defines whether or not to include the origin in the returned dataframe.}
+\item{sample_method}{(optional) For \code{return = "path"}, if \code{max_n_copies} is supplied, \code{sample_method} is a character that defines the sampling method. Currently supported options are: \code{"random"}, which implements random sampling; \code{"weighted"}, which implements weighted sampling, with random samples taken according to their probability at the current time step; and \code{"max"}, which selects for the top \code{max_n_copies} most likely copies of a given cell according to the probability associated with movement into that cell from the previous location.}
+
+\item{add_origin}{For \code{return = "path"}, \code{add_origin} is a logical input that defines whether or not to include the origin in the returned dataframe.}
 
 \item{verbose}{A logical input that defines whether or not to print messages to the console to monitor function progress.}
 
-\item{...}{Additional arguments (none implemented).}
+\item{...}{Additional arguments, if \code{calc_distance = "lcp"}, passed to \code{\link[cppRouting]{get_distance_matrix}}.}
 }
 \value{
-The function returns a \code{\link[flapper]{pf_path-class}} object, which is a dataframe that defines the movement paths.
+If \code{return = "archive"}, the function returns a \code{\link[flapper]{pf_archive-class}} object, as inputted, but in which only the most likely record of each cell that was connected to cells at the next time step is retained and with the \code{method = "pf_simplify"} flag. If \code{return = "path"}, the function returns a \code{\link[flapper]{pf_path-class}} object, which is a dataframe that defines the movement paths.
 }
 \description{
-This function is designed to simplify the \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}} that defines sampled particle histories into a set of movement paths. The function identifies pairs of cells between which movement may have occurred at each time step (if necessary), (re)calculates distances and probabilities between connected cell pairs and then links pairwise movements between cells into a set of possible movement paths.
+This function is designed to simplify the \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}} that defines sampled particle histories into a set of movement paths. The function identifies pairs of cells between which movement may have occurred at each time step (if necessary), (re)calculates distances and probabilities between connected cell pairs and then, if specified, links pairwise movements between cells into a set of possible movement paths.
 }
 \details{
-The implementation of this function depends on how \code{\link[flapper]{pf}} has been implemented. Under the default options in \code{\link[flapper]{pf}}, the fast Euclidean distances method is used to sample sequential particle positions, in which case the history of each particle through the landscape is not retained and has to be assembled afterwards. In this case, \code{\link[flapper]{pf_simplify}} calculates the distances between all combinations of cells at each time step, using either a Euclidean distances or shortest distances algorithm according to the input to \code{calc_distance}. Distances are converted to probabilities using the `intrinsic' probabilities associated with each location and the movement models retained in \code{archive} from the call to \code{\link[flapper]{pf}} to identify possible movement paths between cells at each time step. Pairwise cell movements are then assembled into complete movement paths. If the fast Euclidean distances method has not been used, then pairwise cell movements are retained by  \code{\link[flapper]{pf}}. In this case, the function simply recalculates distances between sequential cell pairs and the associated cell probabilities, which are used to assemble a set of movement paths.
+The implementation of this function depends on how \code{\link[flapper]{pf}} has been implemented and the \code{return} argument. Under the default options in \code{\link[flapper]{pf}}, the fast Euclidean distances method is used to sample sequential particle positions, in which case the history of each particle through the landscape is not retained and has to be assembled afterwards. In this case, \code{\link[flapper]{pf_simplify}} calculates the distances between all combinations of cells at each time step, using either a Euclidean distances or shortest distances algorithm according to the input to \code{calc_distance}. Distances are converted to probabilities using the `intrinsic' probabilities associated with each location and the movement models retained in \code{archive} from the call to \code{\link[flapper]{pf}} to identify possible movement paths between cells at each time step. If the fast Euclidean distances method has not been used, then pairwise cell movements are retained by \code{\link[flapper]{pf}}. In this case, the function simply recalculates distances between sequential cell pairs and the associated cell probabilities, which are then processed according to the \code{return} argument.
+
+Following the identification of pairwise cell movements, if \code{return = "archive"}, the function selects all of the unique cells at each time step that were connected to cells at the next time step. (For cells that were selected multiple times at a given time step, due to sampling with replacement in \code{\link[flapper]{pf}}, only the most probable sample is retained: in maps of the `probability of use' across an area (see \code{\link[flapper]{pf_plot_map}}), this ensures that cell scores depend on the number of time steps when the individual could have occupied a given cell, rather than the total number of samples of a location.) Otherwise, if \code{return = "path"}, pairwise cell movements are assembled into complete movement paths.
 }
 \examples{
 #### Example particle histories
@@ -50,7 +55,7 @@ The implementation of this function depends on how \code{\link[flapper]{pf}} has
 summary(dat_dcpf_histories)
 
 #### Example (1): The default implementation
-paths_1 <- pf_simplify(dat_dcpf_histories)
+paths_1   <- pf_simplify(dat_dcpf_histories)
 
 ## Demonstration that the distance and probabilities calculations are correct
 # The simple method below works if three conditions are met:
@@ -150,6 +155,10 @@ head(paths_5a)
 # If specified, the origin is dropped with add_origin = FALS
 paths_5b <- pf_simplify(dat_dcpf_histories, add_origin = FALSE)
 head(paths_5b)
+
+#### Example (6) Returning unique particle samples for connected particles
+archive_6 <- pf_simplify(dat_dcpf_histories, return = "archive")
+pf_plot_map(archive_6, archive_6$args$bathy)
 
 }
 \author{
