@@ -413,7 +413,7 @@ pf_simplify <- function(archive,
       history_for_t <-
         history_for_t %>%
         dplyr::group_by(.data$id_current) %>%
-        dplyr::arrange(.data$id_current, .data$pr_current) %>%
+        dplyr::arrange(.data$id_current, dplyr::desc(.data$pr_current)) %>%
         dplyr::slice(1L) %>%
         dplyr::ungroup() %>%
         data.frame()
