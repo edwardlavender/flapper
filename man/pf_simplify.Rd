@@ -9,12 +9,14 @@ pf_simplify(
   calc_distance = NULL,
   bathy = NULL,
   calc_distance_graph = NULL,
+  cl = NULL,
+  varlist = NULL,
+  use_all_cores = FALSE,
   return = c("path", "archive"),
   max_n_copies = NULL,
   sample_method = c("random", "weighted", "max"),
   add_origin = TRUE,
-  verbose = TRUE,
-  ...
+  verbose = TRUE
 )
 }
 \arguments{
@@ -24,7 +26,9 @@ pf_simplify(
 
 \item{bathy}{(optional) If \code{calc_distance = "lcp"}, \code{bathy} is \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. \code{bathy} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in x, y and z directions (m). The surface's resolution is taken to define the distance between horizontally and vertically connected cells and must be the same in both x and y directions. Any cells with NA values (e.g., due to missing data) are treated as `impossible' to move though by the algorithm (see \code{\link[flapper]{lcp_over_surface}}).}
 
-\item{calc_distance_graph}{(optional) For \code{return = "path"}, if \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in \code{bathy}. If unsupplied, this is taken from \code{archive$args$calc_distance_graph}, if available, or computed via \code{\link[flapper]{lcp_graph_surface}}.}
+\item{calc_distance_graph}{(optional) If \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in \code{bathy}. If unsupplied, this is taken from \code{archive$args$calc_distance_graph}, if available, or computed via \code{\link[flapper]{lcp_graph_surface}}.}
+
+\item{cl, varlist, use_all_cores}{Parallelisation options for the first stage of the algorithm, which identifies connected cell pairs, associated distances and movement probabilities. The first parallelisation option is to parallelise the algorithm over time steps via \code{cl}. This is a cluster object created by \code{\link[parallel]{makeCluster}} or an integer defining the number of child processes (ignored on Windows) (see \code{\link[pbapply]{pblapply}}). If \code{cl} is supplied, \code{varlist} may be required. This is a character vector of object names to export (see \code{\link[parallel]{clusterExport}}). Exported objects must be located in the global environment. The second parallelisation option is to parallelise shortest distance calculations within time steps via a logical input (\code{TRUE}) to \code{use_all_cores} that is passed to \code{\link[cppRouting]{get_distance_matrix}}. This option is only implemented for \code{calc_distance = "lcp"}.}
 
 \item{return}{A character (\code{return = "path"} or \code{return = "archive"}) that defines the type of object that is returned (see Details).}
 
@@ -35,8 +39,6 @@ pf_simplify(
 \item{add_origin}{For \code{return = "path"}, \code{add_origin} is a logical input that defines whether or not to include the origin in the returned dataframe.}
 
 \item{verbose}{A logical input that defines whether or not to print messages to the console to monitor function progress.}
-
-\item{...}{Additional arguments, if \code{calc_distance = "lcp"}, passed to \code{\link[cppRouting]{get_distance_matrix}}.}
 }
 \value{
 If \code{return = "archive"}, the function returns a \code{\link[flapper]{pf_archive-class}} object, as inputted, but in which only the most likely record of each cell that was connected to cells at the next time step is retained and with the \code{method = "pf_simplify"} flag. If \code{return = "path"}, the function returns a \code{\link[flapper]{pf_path-class}} object, which is a dataframe that defines the movement paths.

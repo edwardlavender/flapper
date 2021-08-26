@@ -7,13 +7,13 @@
 #' @param archive A \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}}.
 #' @param calc_distance A character that defines the method used to calculate distances between sequential combinations of particles (see \code{\link[flapper]{pf}}). Currently supported options are Euclidean distances (\code{"euclid"}) or shortest (least-cost) distances ("lcp"). Note that \code{calc_distance} does not need to be the same method as used for \code{\link[flapper]{pf}}: it is often computationally beneficial to implement \code{\link[flapper]{pf}} using Euclidean distances and then, for the subset of sampled particles, implement \code{\link[flapper]{pf_simplify}} with \code{calc_distance = "lcp"} to re-compute distances using the shortest-distances algorithm, along with the adjusted probabilities. However, for large paths, the quickest option is to implement both functions using \code{calc_distance = "euclid"} and then interpolate shortest paths only for the set of returned paths (see \code{\link[flapper]{lcp_interp}}). If \code{calc_distance = NULL}, the method saved in \code{archive} is used.
 #' @param bathy (optional) If \code{calc_distance = "lcp"}, \code{bathy} is \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. \code{bathy} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in x, y and z directions (m). The surface's resolution is taken to define the distance between horizontally and vertically connected cells and must be the same in both x and y directions. Any cells with NA values (e.g., due to missing data) are treated as `impossible' to move though by the algorithm (see \code{\link[flapper]{lcp_over_surface}}).
-#' @param calc_distance_graph (optional) For \code{return = "path"}, if \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in \code{bathy}. If unsupplied, this is taken from \code{archive$args$calc_distance_graph}, if available, or computed via \code{\link[flapper]{lcp_graph_surface}}.
+#' @param calc_distance_graph (optional) If \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in \code{bathy}. If unsupplied, this is taken from \code{archive$args$calc_distance_graph}, if available, or computed via \code{\link[flapper]{lcp_graph_surface}}.
+#' @param cl,varlist,use_all_cores Parallelisation options for the first stage of the algorithm, which identifies connected cell pairs, associated distances and movement probabilities. The first parallelisation option is to parallelise the algorithm over time steps via \code{cl}. This is a cluster object created by \code{\link[parallel]{makeCluster}} or an integer defining the number of child processes (ignored on Windows) (see \code{\link[pbapply]{pblapply}}). If \code{cl} is supplied, \code{varlist} may be required. This is a character vector of object names to export (see \code{\link[parallel]{clusterExport}}). Exported objects must be located in the global environment. The second parallelisation option is to parallelise shortest distance calculations within time steps via a logical input (\code{TRUE}) to \code{use_all_cores} that is passed to \code{\link[cppRouting]{get_distance_matrix}}. This option is only implemented for \code{calc_distance = "lcp"}.
 #' @param return A character (\code{return = "path"} or \code{return = "archive"}) that defines the type of object that is returned (see Details).
 #' @param max_n_copies (optional) For \code{return = "path"}, \code{max_n_copies} is an integer that specifies the maximum number of copies of a sampled cell that are retained at each time stamp. Each copy represents a different route to that cell. By default, all copies (i.e. routes to that cell are retained) via \code{max_n_copies = NULL}. However, in cases where there are a large number of paths through a landscape, the function can run into vector memory limitations during path assembly, so \code{max_n_copies} may need to be set. In this case, at each time step, if there are more than \code{max_n_copies} paths to a given cell, then a subset of these (\code{max_n_copies}) are sampled, according to the \code{sample_method} argument.
 #' @param sample_method (optional) For \code{return = "path"}, if \code{max_n_copies} is supplied, \code{sample_method} is a character that defines the sampling method. Currently supported options are: \code{"random"}, which implements random sampling; \code{"weighted"}, which implements weighted sampling, with random samples taken according to their probability at the current time step; and \code{"max"}, which selects for the top \code{max_n_copies} most likely copies of a given cell according to the probability associated with movement into that cell from the previous location.
 #' @param add_origin For \code{return = "path"}, \code{add_origin} is a logical input that defines whether or not to include the origin in the returned dataframe.
 #' @param verbose A logical input that defines whether or not to print messages to the console to monitor function progress.
-#' @param ... Additional arguments, if \code{calc_distance = "lcp"}, passed to \code{\link[cppRouting]{get_distance_matrix}}.
 #'
 #' @details The implementation of this function depends on how \code{\link[flapper]{pf}} has been implemented and the \code{return} argument. Under the default options in \code{\link[flapper]{pf}}, the fast Euclidean distances method is used to sample sequential particle positions, in which case the history of each particle through the landscape is not retained and has to be assembled afterwards. In this case, \code{\link[flapper]{pf_simplify}} calculates the distances between all combinations of cells at each time step, using either a Euclidean distances or shortest distances algorithm according to the input to \code{calc_distance}. Distances are converted to probabilities using the `intrinsic' probabilities associated with each location and the movement models retained in \code{archive} from the call to \code{\link[flapper]{pf}} to identify possible movement paths between cells at each time step. If the fast Euclidean distances method has not been used, then pairwise cell movements are retained by \code{\link[flapper]{pf}}. In this case, the function simply recalculates distances between sequential cell pairs and the associated cell probabilities, which are then processed according to the \code{return} argument.
 #'
@@ -139,11 +139,12 @@ pf_simplify <- function(archive,
                         calc_distance = NULL,
                         bathy = NULL,
                         calc_distance_graph = NULL,
+                        cl = NULL, varlist = NULL, use_all_cores = FALSE,
                         return = c("path", "archive"),
                         max_n_copies = NULL,
                         sample_method = c("random", "weighted", "max"),
                         add_origin = TRUE,
-                        verbose = TRUE,...){
+                        verbose = TRUE){
 
 
   ########################################
@@ -180,6 +181,23 @@ pf_simplify <- function(archive,
   mobility_from_origin         <- archive$args$mobility_from_origin
   sample_method                <- match.arg(sample_method)
   if(is.null(bathy)) bathy <- archive$args$bathy
+  # Check cluster
+  if(is.null(cl)){
+    if(!is.null(varlist)){
+      warning("'cl' is NULL: input to 'varlist' ignored.", immediate. = TRUE, call. = FALSE)
+      varlist <- NULL
+    }
+  } else {
+    if(use_all_cores) {
+      warning("Both 'cl' and 'use_all_cores' supplied: 'use_all_cores' ignored.", immediate. = TRUE, call. = FALSE)
+      use_all_cores <- FALSE
+    }
+  }
+  if(use_all_cores & calc_distance != "lcp") {
+    warning("'use_all_cores' ignored: calc_distance != 'lcp'.", immediate. = TRUE, call. = FALSE)
+    use_all_cores <- FALSE
+  }
+
 
 
   ########################################
@@ -225,8 +243,9 @@ pf_simplify <- function(archive,
     }
     layers <- append(raster::setValues(layers_1, 1), layers)
 
-    #### Re-define history with cell -pairs
-    history <- pbapply::pblapply(2:length(history), function(t){
+    #### Re-define history with cell pairs
+    if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
+    history <- pbapply::pblapply(2:length(history), cl = cl, function(t){
 
       ## Get full suite of allowed cells from current time step
       layers_2 <- layers[[t]]
@@ -250,7 +269,8 @@ pf_simplify <- function(archive,
       } else if(calc_distance == "lcp"){
         dist_btw_cells <- cppRouting::get_distance_matrix(Graph = calc_distance_graph,
                                                           from = z1$id_current,
-                                                          to = z2$id_current,...)
+                                                          to = z2$id_current,
+                                                          allcores = use_all_cores)
       }
       # Adjust distances according to mobility_from_origin or mobility parameters
       if((t - 1) == 1){
@@ -305,6 +325,7 @@ pf_simplify <- function(archive,
       tmp$col <- NULL
       return(tmp)
     })
+    if(!is.null(cl)) parallel::stopCluster(cl = cl)
 
     # ... (2) Method for pf outputs not derived via calc_distance_euclid_fast
   } else {
@@ -320,7 +341,8 @@ pf_simplify <- function(archive,
     }
 
     #### Update history with distances and probabilities of movement between connected cells
-    history <- lapply(1:length(history), function(t){
+    if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
+    history <- pbapply::pblapply(1:length(history), cl = cl, function(t){
 
       #### Get full suite of allowed cells from current time step
       layers_2 <- layers[[t]]
@@ -344,7 +366,8 @@ pf_simplify <- function(archive,
         } else if(calc_distance == "lcp"){
           d$dist_current <- cppRouting::get_distance_pair(Graph = calc_distance_graph,
                                                           from = d$id_previous,
-                                                          to = d$id_current,...)
+                                                          to = d$id_current,
+                                                          allcores = use_all_cores)
         }
       }
 
@@ -365,6 +388,7 @@ pf_simplify <- function(archive,
 
       return(d)
     })
+    if(!is.null(cl)) parallel::stopCluster(cl = cl)
   }
 
 
