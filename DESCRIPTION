@@ -21,7 +21,7 @@ Suggests:
 Remotes: 
     github::edwardlavender/prettyGraphics, 
     github::edwardlavender/Tools4ETS,
-    url::https://gitlab.oceantrack.org/GreatLakes/glatos/repository/master/archive.zip
+    url::https://gitlab.oceantrack.org/GreatLakes/glatos/-/archive/master/glatos-master.zip
 Depends: R (>= 4.0)
 License: GPL-3
 URL: http://github.com/edwardlavender/flapper
