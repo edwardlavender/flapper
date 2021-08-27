@@ -229,7 +229,7 @@ get_mvt_mobility_from_acoustics <- function(data,
   stats <- data.frame(variable = c("speed_min_ms", "speed_avg_ms", "speed_max_ms"),
                       min = c(min(transitions$speed_min_ms), min(transitions$speed_avg_ms), min(transitions$speed_max_ms)),
                       mean = c(mean(transitions$speed_min_ms), mean(transitions$speed_avg_ms), mean(transitions$speed_max_ms)),
-                      max = max(c(transitions$speed_min_ms), max(transitions$speed_avg_ms), max(transitions$speed_max_ms))
+                      max = c(max(transitions$speed_min_ms), max(transitions$speed_avg_ms), max(transitions$speed_max_ms))
                       )
   stats$min  <- round(stats$min, 2)
   stats$mean <- round(stats$mean, 2)
@@ -245,7 +245,7 @@ get_mvt_mobility_from_acoustics <- function(data,
     stats <- data.frame(variable = c("speed_min_mstep", "speed_avg_mstep", "speed_max_mstep"),
                         min = c(min(transitions$speed_min_mstep), min(transitions$speed_avg_mstep), min(transitions$speed_max_mstep)),
                         mean = c(mean(transitions$speed_min_mstep), mean(transitions$speed_avg_mstep), mean(transitions$speed_max_mstep)),
-                        max = max(c(transitions$speed_min_mstep), min(transitions$speed_avg_mstep), min(transitions$speed_max_mstep))
+                        max = c(max(transitions$speed_min_mstep), max(transitions$speed_avg_mstep), max(transitions$speed_max_mstep))
                         )
     stats$min  <- round(stats$min, 2)
     stats$mean <- round(stats$mean, 2)
