@@ -261,3 +261,110 @@ pf_plot_map <- function(archive,
                              add_rasters = add_rasters,...)
   return(invisible(p))
 }
+
+
+######################################
+######################################
+#### pf_kud()
+
+#' @title Apply kernel smoothing to particle samples from a PF algorithm
+#' @description This function is a wrapper designed to apply kernel utilisation distribution (KUD) estimation to the outputs of a particle filtering (PF) algorithm. To implement the approach, a \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}} (plus \code{\link[flapper]{pf_simplify}} with the \code{return = "archive"} argument) containing particle histories for connected particles must be supplied. Using all, or a subset of these particles, the function applies a KUD smoother to sampled particles via a user-supplied estimation routine (i.e., \code{\link[adehabitatHR]{kernelUD}} or \code{\link[flapper]{kud_around_coastline}}). The function extracts the utilisation distribution as a \code{\link[raster]{raster}}, applies a spatial mask (e.g.  coastline) and plots the distribution, if specified, before returning a \code{\link[raster]{raster}} of the processed KUD.
+#'
+#' @param archive A \code{\link[flapper]{pf_archive-class}} object (from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with \code{record = "archive"}).
+#' @param bathy A \code{\link[raster]{raster}} that defines the grid across which \code{\link[flapper]{pf}} was applied.
+#' @param sample_size (optional) An integer that defines the number of particles to sample from \code{archive} for the estimation. If \code{sample_size = NULL}, all particles are used. If specified, \code{sample_size} particles are sampled without replacement in line with their probability. Sampling is implemented to improve estimation speed.
+#' @param estimate_ud A function (either \code{\link[adehabitatHR]{kernelUD}} or \code{\link[flapper]{kud_around_coastline}}) that estimates kernel utilisation distributions. The latter option is used when kernels need to be processed to account for barriers to movement that cannot be modelled via \code{\link[adehabitatHR]{kernelUD}}.
+#' @param grid,... Arguments passed to \code{estimate_ud} (and ultimately \code{\link[adehabitatHR]{kernelUD}}, where they are defined) to estimate the kernel utilisation distribution. If  \code{\link[flapper]{kud_around_coastline}} is supplied to \code{estimate_ud}, then \code{grid} must be a \code{\link[sp]{SpatialPixelsDataFrame}}.
+#' @param mask (optional) A spatial mask (see \code{\link[raster]{mask}}).
+#' @param plot A logical input that defines whether or not to plot the KUD.
+#'
+#' @return The function returns a \code{\link[raster]{raster}} of the KUD.
+#'
+#' @examples
+#' #### Define a grid across which to implement estimation
+#' # This grid takes values of 0 on land and values of 1 in the sea
+#' bathy <- dat_dcpf_histories$args$bathy
+#' grid <- raster::raster(raster::extent(bathy), nrows = 100, ncols = 100)
+#' raster::values(grid) <- 0
+#' grid <- raster::mask(grid, dat_coast, updatevalue = 1)
+#' grid <- methods::as(grid, "SpatialPixelsDataFrame")
+#'
+#' #### Example (1): Implement function using default options
+#' pf_kud(pf_simplify(dat_dcpf_histories, return = "archive"),
+#'        bathy = bathy,
+#'        estimate_ud = kud_around_coastline, grid = grid)
+#'
+#' #### Example (2): Implement function using random sampling (for speed)
+#' pf_kud(pf_simplify(dat_dcpf_histories, return = "archive"),
+#'        bathy = bathy,
+#'        sample_size = 100,
+#'        estimate_ud = kud_around_coastline, grid = grid)
+#'
+#' @seealso \code{\link[flapper]{pf}}, \code{\link[flapper]{pf_simplify}}, \code{\link[flapper]{pf_plot_map}}, \code{\link[adehabitatHR]{kernelUD}}, \code{\link[flapper]{kud_around_coastline}}, \code{\link[flapper]{eval_by_kud}}
+#' @export
+#' @author Edward Lavender
+#'
+
+pf_kud <- function(archive,
+                   bathy,
+                   sample_size = 10,
+                   estimate_ud = adehabitatHR::kernelUD,
+                   grid, ...,
+                   mask = NULL,
+                   plot = TRUE){
+
+  #### Checks
+  check_class(input = archive, to_class = "pf_archive")
+  if(archive$method != "pf_simplify"){
+    warning("archive$method != 'pf_simplify'", immediate. = TRUE, call. = FALSE)
+  }
+
+  #### Extract particle coordinates
+  pairs_df <-
+    lapply(archive$history, function(elm) {
+      elm[, c("id_current", "pr_current"), drop = FALSE]
+    })
+  pairs_df <- do.call(rbind, pairs_df)
+  pairs_xy <- raster::xyFromCell(bathy, pairs_df$id_current)
+
+  #### Sample locations according to their probability
+  if(!is.null(sample_size)){
+    if(sample_size > nrow(pairs_xy)){
+      warning(paste0("'sample_size' (n = ", sample_size,
+                     ") exceeds the number of sampled locations (n = ", nrow(pairs_xy),
+                     "): implementing estimation using all sampled locations."),
+              immediate. = TRUE)
+      sample_size <- NULL
+    }
+    if(!is.null(sample_size)){
+      pairs_xy <-
+        pairs_xy[sample(x = 1:nrow(pairs_xy),
+                        size = sample_size,
+                        prob = pairs_df$pr_current), ]
+    }
+  }
+
+  #### Implement KUD estimation
+  pairs_xy_spdf <- sp::SpatialPointsDataFrame(
+    pairs_xy,
+    data = data.frame(ID = factor(rep(1, nrow(pairs_xy)))),
+    proj4string = raster::crs(bathy))
+  pairs_ud <- estimate_ud(xy = pairs_xy_spdf, grid = grid,...)
+
+  #### Process KUD
+  pairs_ud <- raster::raster(pairs_ud[[1]])
+  if(!is.null(mask)) {
+    if(raster::crs(bathy) != raster::crs(mask)){
+      warning(paste0("'bathy' CRS ('", raster::crs(bathy),
+                     "') is different from 'mask' CRS ('", raster::crs(mask), "')."),
+              immediate. = TRUE)
+    }
+    pairs_ud <- raster::mask(pairs_ud, mask)
+  }
+
+  #### Visualise KUD
+  if(plot) prettyGraphics::pretty_map(add_rasters = list(x = pairs_ud))
+
+  #### Return KUD
+  return(pairs_ud)
+}

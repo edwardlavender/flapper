@@ -428,6 +428,7 @@ process provided by the `pf*()` family of functions:
   - `pf_animate_history()` animates simulated particle histories;
   - `pf_plot_map()` maps the ‘probability of use’ across an area based
     on sampled particles;
+  - `pf_kud()` applies a kernel smoother to sampled particles;
   - `pf_simplify()` assembles movement paths from particle histories;
   - `pf_loglik()` calculates the log-likelihood of reconstructed paths,
     given the movement model;
