@@ -146,13 +146,13 @@ kud_around_coastline <- function(xy, grid,...) {
   ud <- adehabitatHR::estUDm2spixdf(ud) # ud as SpatialPointsDataFrame required for estUDm2spixdf function.
   ## Convert to SpatialGridDataFrames
   sp::fullgrid(ud) <- TRUE
-  sp::fullgrid(habitat) <- TRUE
+  sp::fullgrid(grid) <- TRUE
 
   ## Exclude areas of 'unsuitable habitat' and renormalise
   # ... by multiplying the value of the UD by the habitat (0, 1) and
   # ... dividing by the total value of the UD
   ud_vals_renorm <- lapply(1:ncol(ud), function(i) {
-    ud[[i]] * habitat[[1]] / sum(ud[[i]] * habitat[[1]])
+    ud[[i]] * grid[[1]] / sum(ud[[i]] * grid[[1]])
   })
   ud_vals_renorm <- as.data.frame(ud_vals_renorm)
   names(ud_vals_renorm) <- "ud"
