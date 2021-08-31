@@ -301,7 +301,11 @@ make_matrix_detections <- function(acoustics,
   cat_to_console("... Defining time bins given 'delta_t'...")
 
   bin <- seq.POSIXt(start, end, delta_t)
-  acoustics$bin <- cut(acoustics$timestamp, bin)
+  if(length(bin) == 1){
+    acoustics$bin <- bin
+  } else {
+    acoustics$bin <- cut(acoustics$timestamp, bin)
+  }
   acoustics$bin <- factor(acoustics$bin, levels = levels(factor(bin)))
 
   #### Determine receiver activity in each bin
