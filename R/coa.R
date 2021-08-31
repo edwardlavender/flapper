@@ -174,13 +174,20 @@ coa_setup_delta_t <- function(acoustics,
   #### Receiver statistics
   cat_to_console("... Calculating detection statistics across time intervals....")
   # Calculate the total number of detections at each receiver in each interval across the whole study
-  acoustics$intervals <- cut(acoustics$timestamp, breaks = delta_t)
+  if(nrow(dat) == 1){
+    acoustics$intervals <- dat$interval
+  } else {
+    acoustics$intervals <- cut(acoustics$timestamp, breaks = dat$interval)
+  }
   n_intervals <- length(levels(acoustics$intervals))
   n_detections_per_receiver <- table(acoustics$intervals, acoustics$receiver_id)
 
   # Calculate the total number of receivers which received a detection in each X minute interval
   n_receiver_with_detections     <- rowSums(n_detections_per_receiver > 0)
-  dat$n_receiver_with_detections <- as.numeric(n_receiver_with_detections)
+  dat$n_receiver_with_detections <-
+    as.numeric(n_receiver_with_detections)[match(as.character(dat$interval),
+                                                 names(n_receiver_with_detections))]
+  dat$n_receiver_with_detections[is.na(dat$n_receiver_with_detections)] <- 0
 
   #### Method (1): The frequency distribution of the number (or %) of receivers with detections
   if(1L %in% method) {
@@ -252,7 +259,8 @@ coa_setup_delta_t <- function(acoustics,
     cat_to_console("... Implementing method 2...")
 
     # Calculate the total number of detections in each interval
-    dat$n_detections <- rowSums(n_detections_per_receiver)
+    n_detections <- rowSums(n_detections_per_receiver)
+    dat$n_detections <- as.numeric(n_detections)[match(as.character(dat$interval), names(n_detections))]
 
     #### Implementation (1)
     # ... The number of receivers is constant and we simply express the distribution for the total number of detections
