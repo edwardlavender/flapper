@@ -149,7 +149,10 @@ check_class <-
       if(!inherits(input, to_class)){
         # Either stop...
         if(type == "stop"){
-          msg <- paste0("Argument '", arg, "' must be of class '", to_class, "', not class(es): '", paste(class(input), collapse = "', '"), "'.")
+          msg <- paste0("Argument '", arg, "' must be of class(es) '",
+                        paste0(to_class, collapse =  "', '"),
+                        "', not class(es) '",
+                        paste(class(input), collapse = "', '"), "'.")
           stop(msg)
           # Or print a warning and use coerce_input() to convert the object to the desired class.
         } else if(type == "warning"){

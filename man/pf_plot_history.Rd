@@ -15,7 +15,7 @@ pf_plot_history(
 )
 }
 \arguments{
-\item{archive}{A \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}}, or \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with the \code{record = "archive"} argument, that contains particle histories.}
+\item{archive}{A \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}}, or \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with the \code{return = "archive"} argument, that contains particle histories.}
 
 \item{time_steps}{An integer vector that defines the time steps for which to plot particle histories.}
 
