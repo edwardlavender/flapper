@@ -2,7 +2,7 @@
 % Please edit documentation in R/pf_analyse_either.R
 \name{pf_kud}
 \alias{pf_kud}
-\title{Apply kernel smoothing to particle samples from a PF algorithm}
+\title{Apply kernel smoothing to particles or paths from a PF algorithm}
 \usage{
 pf_kud(
   xpf,
@@ -55,15 +55,32 @@ grid <- raster::mask(grid, dat_coast, updatevalue = 1)
 grid <- methods::as(grid, "SpatialPixelsDataFrame")
 
 #### Example (1): Implement function using default options
-pf_kud(pf_simplify(dat_dcpf_histories, return = "archive"),
+## Implementation based on particles
+pp <- par(mfrow = c(1, 2))
+pf_kud(pf_simplify(dat_dcpf_histories, summarise_pr = max, return = "archive"),
        bathy = bathy,
        estimate_ud = kud_around_coastline, grid = grid)
+## Implementation based on paths
+pf_kud(dat_dcpf_paths,
+       bathy = bathy,
+       estimate_ud = kud_around_coastline, grid = grid)
+prettyGraphics::add_sp_path(x = dat_dcpf_paths$cell_x, y = dat_dcpf_paths$cell_y,
+                            length = 0.01)
+par(pp)
 
 #### Example (2): Implement function using random sampling (for speed)
+## Implementation based on particles
+pp <- par(mfrow = c(1, 2), mar = c(3, 3, 3, 3))
 pf_kud(pf_simplify(dat_dcpf_histories, return = "archive"),
        bathy = bathy,
-       sample_size = 100,
+       sample_size = 50, # sample 50 particles overall
        estimate_ud = kud_around_coastline, grid = grid)
+## Implementation based on paths
+pf_kud(dat_dcpf_paths,
+       bathy = bathy,
+       sample_size = 50, # sample 50 particles per path
+       estimate_ud = kud_around_coastline, grid = grid)
+par(pp)
 
 }
 \seealso{

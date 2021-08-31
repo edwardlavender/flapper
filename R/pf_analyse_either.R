@@ -41,16 +41,28 @@
 #' # ... by the DCPF algorithm and we can also implement the function for these paths.
 #'
 #' #### Example (1): Implement the function with default options
+#' pp <- par(mfrow = c(1, 2))
 #' pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy)
+#' pf_plot_map(dat_dcpf_paths, map = dat_dc$args$bathy)
+#' par(pp)
 #'
-#' #### Example (2): Re-scale the map
+#' #### Example (2): Re-scale the map(s)
+#' pp <- par(mfrow = c(2, 2))
 #' pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy, scale = "max")
 #' pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy, scale = "sum")
+#' pf_plot_map(dat_dcpf_paths, map = dat_dc$args$bathy, scale = "max")
+#' pf_plot_map(dat_dcpf_paths, map = dat_dc$args$bathy, scale = "sum")
+#' par(pp)
 #'
-#' #### Example (3): Customise the map
+#' #### Example (3): Customise the map(s)
+#' pp <- par(mfrow = c(1, 2))
 #' pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy,
 #'             add_rasters = list(col = grDevices::grey.colors(n = 100)),
 #'             xlab = "x", ylab = "y")
+#' pf_plot_map(dat_dcpf_paths, map = dat_dc$args$bathy,
+#'             add_rasters = list(col = grDevices::topo.colors(n = 100)),
+#'             xlab = "x", ylab = "y")
+#' par(pp)
 #'
 #' @seealso \code{\link[flapper]{pf}} implements PF. \code{\link[flapper]{pf_simplify}} assembles paths from particle histories. \code{\link[flapper]{pf_plot_history}} visualises particle histories. \code{\link[flapper]{pf_plot_1d}}, \code{\link[flapper]{pf_plot_2d}} and \code{\link[flapper]{pf_plot_3d}} provide plotting routines for paths. \code{\link[flapper]{pf_loglik}} calculates the log-likelihood of each path.
 #' @author Edward Lavender
@@ -142,7 +154,7 @@ pf_plot_map <- function(xpf,
 ######################################
 #### pf_kud()
 
-#' @title Apply kernel smoothing to particle samples from a PF algorithm
+#' @title Apply kernel smoothing to particles or paths from a PF algorithm
 #' @description This function is a wrapper designed to apply kernel utilisation distribution (KUD) estimation to the outputs of a particle filtering (PF) algorithm. To implement the approach, an (a) \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}} (plus \code{\link[flapper]{pf_simplify}} with the \code{return = "archive"} argument) containing particle histories for connected particles or (b) a \code{\link[flapper]{pf_path-class}} object containing reconstructed paths must be supplied. Using all, or a subset of sampled locations, the function applies KUD smoother(s) via a user-supplied estimation routine (i.e., \code{\link[adehabitatHR]{kernelUD}} or \code{\link[flapper]{kud_around_coastline}}). The function extracts the utilisation distribution(s) as a \code{\link[raster]{raster}}, applies a spatial mask (e.g.  coastline), combines the distributions (if necessary), plots the processed distribution (if specified) and returns this as a a \code{\link[raster]{raster}}.
 #'
 #' @param xpf A \code{\link[flapper]{pf_archive-class}} object (from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with \code{return = "archive"}) or a \code{\link[flapper]{pf_path-class}} object (from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with \code{return = "path"}).
@@ -173,15 +185,32 @@ pf_plot_map <- function(xpf,
 #' grid <- methods::as(grid, "SpatialPixelsDataFrame")
 #'
 #' #### Example (1): Implement function using default options
-#' pf_kud(pf_simplify(dat_dcpf_histories, return = "archive"),
+#' ## Implementation based on particles
+#' pp <- par(mfrow = c(1, 2))
+#' pf_kud(pf_simplify(dat_dcpf_histories, summarise_pr = max, return = "archive"),
 #'        bathy = bathy,
 #'        estimate_ud = kud_around_coastline, grid = grid)
+#' ## Implementation based on paths
+#' pf_kud(dat_dcpf_paths,
+#'        bathy = bathy,
+#'        estimate_ud = kud_around_coastline, grid = grid)
+#' prettyGraphics::add_sp_path(x = dat_dcpf_paths$cell_x, y = dat_dcpf_paths$cell_y,
+#'                             length = 0.01)
+#' par(pp)
 #'
 #' #### Example (2): Implement function using random sampling (for speed)
+#' ## Implementation based on particles
+#' pp <- par(mfrow = c(1, 2), mar = c(3, 3, 3, 3))
 #' pf_kud(pf_simplify(dat_dcpf_histories, return = "archive"),
 #'        bathy = bathy,
-#'        sample_size = 100,
+#'        sample_size = 50, # sample 50 particles overall
 #'        estimate_ud = kud_around_coastline, grid = grid)
+#' ## Implementation based on paths
+#' pf_kud(dat_dcpf_paths,
+#'        bathy = bathy,
+#'        sample_size = 50, # sample 50 particles per path
+#'        estimate_ud = kud_around_coastline, grid = grid)
+#' par(pp)
 #'
 #' @seealso \code{\link[flapper]{pf}}, \code{\link[flapper]{pf_simplify}}, \code{\link[flapper]{pf_plot_map}}, \code{\link[adehabitatHR]{kernelUD}}, \code{\link[flapper]{kud_around_coastline}}, \code{\link[flapper]{eval_by_kud}}
 #' @export
@@ -205,8 +234,8 @@ pf_kud <- function(xpf,
   crs <- list(crs_bathy, crs_grid, crs_mask)
   crs <- compact(crs)
   if(!length(unique(crs)) == 1L){
-    warning("The CRSs of spatial layers ('bathy', 'grid' and 'mask', if applicable) are not identical.",
-            immediate. = TRUE)
+    warning("The CRS(s) of spatial layer(s) ('bathy', 'grid' and 'mask', if applicable) are not identical.",
+            immediate. = TRUE, call. = FALSE)
   }
   crs_spp <- sapply(crs, function(x) !is.na(x))
   if(any(crs_spp)){
@@ -214,7 +243,7 @@ pf_kud <- function(xpf,
   } else {
     crs <- sp::CRS(as.character(NA))
   }
-  message("crs taken as '", crs, "'.")
+  message("CRS taken as '", crs, "'.")
 
 
   ######################################
@@ -240,7 +269,7 @@ pf_kud <- function(xpf,
         warning(paste0("'sample_size' (n = ", sample_size,
                        ") exceeds the number of sampled locations (n = ", nrow(pairs_xy),
                        "): implementing estimation using all sampled locations."),
-                immediate. = TRUE)
+                immediate. = TRUE, call. = FALSE)
         sample_size <- NULL
       }
       if(!is.null(sample_size)){
@@ -269,7 +298,7 @@ pf_kud <- function(xpf,
   } else if(inherits(xpf, "pf_path")){
 
     #### Get cell coordinates
-    pairs_df <- xpf
+    pairs_df <- data.frame(xpf)
     pairs_xy <- xpf[, c("cell_x", "cell_y")]
 
     #### Sub sample
@@ -278,7 +307,7 @@ pf_kud <- function(xpf,
         warning(paste0("'sample_size' (n = ", sample_size,
                        ") exceeds the number of sampled locations (n = ", nrow(pairs_xy),
                        "): implementing estimation using all sampled locations."),
-                immediate. = TRUE)
+                immediate. = TRUE, call. = FALSE)
         sample_size <- NULL
       }
       if(!is.null(sample_size)){
@@ -313,7 +342,7 @@ pf_kud <- function(xpf,
     # wts <- wts[order(wts$path_id), ]
     ## Summarise KUDs across paths
     # pairs_ud <- raster::weighted.mean(pairs_ud, wts$wt)
-    pairs_ud <- mean(pairs_ud)
+    pairs_ud <- raster::calc(pairs_ud, mean)
     ## Renormalise KUDs
     pairs_ud <- pairs_ud/raster::cellStats(pairs_ud, "sum")
   }

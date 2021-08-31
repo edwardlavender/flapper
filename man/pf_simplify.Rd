@@ -161,9 +161,71 @@ head(paths_5a)
 paths_5b <- pf_simplify(dat_dcpf_histories, add_origin = FALSE)
 head(paths_5b)
 
-#### Example (6) Returning particle samples for connected particles
-archive_6a <- pf_simplify(dat_dcpf_histories, return = "archive")
-pf_plot_map(archive_6a, archive_6a$args$bathy)
+#### Example (6) Get particle samples for connected particles
+## Implement DCPF with more particles for demonstration purposes
+set.seed(1)
+dcpf_args <- dat_dcpf_histories$args
+dcpf_args$calc_distance_euclid_fast <- TRUE
+dcpf_args$n <- 250
+out_dcpf_6a <- do.call(pf, dcpf_args)
+head(out_dcpf_6a$history[[1]])
+## Extract particle samples for connected particles
+# There may be multiple records of any given cell at any given time step
+# ... due to sampling with replacement.
+out_dcpf_6b <- pf_simplify(out_dcpf_6a, return = "archive")
+head(out_dcpf_6b$history[[1]])
+table(duplicated(out_dcpf_6b$history[[1]]$id_current))
+## Extract particle samples for connected particles,
+# ... with only the most likely record of each particle returned.
+# We can implement the approach using out_dcpf_6b
+# ... to skip distance calculations.
+# Now, there is only one (the most likely) record of sampled cells
+# ... at each time step.
+out_dcpf_6c <- pf_simplify(out_dcpf_6b,
+                           summarise_pr = max,
+                           return = "archive")
+head(out_dcpf_6c$history[[1]])
+table(duplicated(out_dcpf_6c$history[[1]]$id_current))
+## Make movement paths
+# Again, we use out_dcpf_6b to skip distance calculations.
+out_dcpf_6d <- pf_simplify(out_dcpf_6b,
+                           max_n_copies = 2L,
+                           return = "path")
+## Compare resultant maps
+# The map for all particles is influenced by particles that were 'dead ends',
+# ... which isn't ideal for a map of space use.
+# The map for connected samples deals with this problem, but is influenced by
+# ... the total number of samples of each cell, rather than the number of time steps
+# ... in which the individual could have been located in a given cell.
+# The map for unique, connected samples deals with this issue, so that scores
+# ... represent the number of time steps in which the individual could have occupied
+# ... a given cell, over the length of the time series.
+# The map for the paths are sparser because paths have only been reconstructed
+# ... for a sample of sampled particles.
+pp <- par(mfrow = c(2, 2), oma = c(2, 2, 2, 2), mar = c(2, 4, 2, 4))
+paa <- list(side = 1:4, axis = list(labels = FALSE))
+transform = NULL
+m_1 <- pf_plot_map(out_dcpf_6a, dcpf_args$bathy,
+                   transform = transform,
+                   pretty_axis_args = paa, main = "all samples")
+m_2 <- pf_plot_map(out_dcpf_6b, dcpf_args$bathy,
+                   transform = transform,
+                   pretty_axis_args = paa, main = "connected samples")
+m_3 <- pf_plot_map(out_dcpf_6c, dcpf_args$bathy,
+                   transform = transform,
+                   pretty_axis_args = paa, main = "unique, connected samples")
+m_4 <- pf_plot_map(out_dcpf_6d, dcpf_args$bathy,
+                   transform = transform,
+                   pretty_axis_args = paa, main = "paths")
+par(pp)
+# Note that all locations in reconstructed paths are derived from PF samples
+all(out_dcpf_6d$cell_id[out_dcpf_6d$timestep != 0] \%in\%
+      do.call(rbind, out_dcpf_6c$history)$id_current)
+# But the paths only contain a subset of sampled particles
+h_6a <- lapply(out_dcpf_6a$history, function(elm) elm[, "id_current"])
+table(unique(unlist(h_6a)) \%in\% out_dcpf_6d$cell_id[out_dcpf_6d$timestep != 0])
+h_6b <- lapply(out_dcpf_6b$history, function(elm) elm[, "id_current"])
+table(unique(unlist(h_6b)) \%in\% out_dcpf_6d$cell_id[out_dcpf_6d$timestep != 0])
 
 }
 \author{

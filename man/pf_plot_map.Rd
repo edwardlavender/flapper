@@ -61,16 +61,28 @@ dat_dcpf_histories_connected <-
 # ... by the DCPF algorithm and we can also implement the function for these paths.
 
 #### Example (1): Implement the function with default options
+pp <- par(mfrow = c(1, 2))
 pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy)
+pf_plot_map(dat_dcpf_paths, map = dat_dc$args$bathy)
+par(pp)
 
-#### Example (2): Re-scale the map
+#### Example (2): Re-scale the map(s)
+pp <- par(mfrow = c(2, 2))
 pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy, scale = "max")
 pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy, scale = "sum")
+pf_plot_map(dat_dcpf_paths, map = dat_dc$args$bathy, scale = "max")
+pf_plot_map(dat_dcpf_paths, map = dat_dc$args$bathy, scale = "sum")
+par(pp)
 
-#### Example (3): Customise the map
+#### Example (3): Customise the map(s)
+pp <- par(mfrow = c(1, 2))
 pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy,
             add_rasters = list(col = grDevices::grey.colors(n = 100)),
             xlab = "x", ylab = "y")
+pf_plot_map(dat_dcpf_paths, map = dat_dc$args$bathy,
+            add_rasters = list(col = grDevices::topo.colors(n = 100)),
+            xlab = "x", ylab = "y")
+par(pp)
 
 }
 \seealso{

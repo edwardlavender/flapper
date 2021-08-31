@@ -134,9 +134,9 @@
 #'       \item \link{pf} implements the PF routine, building on the AC, DC and ACDC algorithms to form the ACPF, DCPF and ACDCPF algorithms;
 #'       \item \link{pf_plot_history} plots simulated particle histories;
 #'       \item \link{pf_animate_history} animates simulated particle histories;
-#'       \item \link{pf_plot_map} maps the `probability of use' across an area based on sampled particles;
-#'       \item \link{pf_kud} applies a kernel smoother to sampled particles;
 #'       \item \link{pf_simplify} assembles movement paths from particle histories;
+#'       \item \link{pf_plot_map} maps the `probability of use' across an area based on sampled particles or reconstructed paths;
+#'       \item \link{pf_kud} applies a kernel smoother to sampled particles or reconstructed paths;
 #'       \item \link{pf_loglik} calculates the log-likelihood of reconstructed paths, given the movement model;
 #'       \item \link{pf_plot_1d} plots the depth time series from observed and reconstructed paths;
 #'       \item \link{pf_plot_2d} maps the reconstructed paths in two-dimensions;
