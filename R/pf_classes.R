@@ -10,11 +10,15 @@
 #' \describe{
 #'   \item{history}{A list of dataframes, one for each time step, that record particle samples. Each dataframe comprises \code{n} rows (one for each particle) and the following five columns:
 #'   \itemize{
-#'     \item{id_previous}{ An integer that uniquely defines a previous location on the \code{record} \code{\link[raster]{raster}}s. This is absent for the first time step. For subsequent time steps, this is \code{NA} if the fast Euclidean distances method has been used, which does not `remember' previous locations, but specified otherwise.)}
-#'     \item{pr_current}{ A double that defines the movement probabilities associated with previous locations. This is absent for the first time step. For subsequent time steps, this is \code{NA} if the fast Euclidean distances method has been used, which does not `remember' previous locations, but specified otherwise.}
-#'     \item{id_current}{ An integer that uniquely defines each location on the \code{record} \code{\link[raster]{raster}}s.}
-#'     \item{pr_current} A double that defines the probability of movement into each cell.
-#'     \item{timestep}{ An integer that defines each time step.}
+#'     \item{id_previous.}{ An integer that uniquely defines a previous location on the \code{record} \code{\link[raster]{raster}}s. Following implementation of \code{\link[flapper]{pf}}, this is absent for the first time step. For subsequent time steps, this is \code{NA} if the fast Euclidean distances method has been used, which does not `remember' previous locations, but specified otherwise.) For \code{\link[flapper]{pf_simplify}}, \code{id_previous} is \code{NA} for the fist time step, unless an \code{origin} has been specified; for subsequent time steps, \code{id_previous} is included.}
+#'     \item{pr_previous.}{ A double that defines the movement probabilities associated with previous locations. Following implementation of \code{\link[flapper]{pf}}, this is absent for the first time step. For subsequent time steps, this is \code{NA} if the fast Euclidean distances method has been used, which does not `remember' previous locations, but specified otherwise. For \code{\link[flapper]{pf_simplify}} probabilities are included for all time steps.}
+#'     \item{id_current.}{ An integer that uniquely defines each location on the \code{record} \code{\link[raster]{raster}}s.}
+#'     \item{pr_current.} A double that defines the probability of movement into each cell.
+#'     \item{timestep.}{ An integer that defines each time step.}
+#'   }
+#'   Following implementations of \code{\link[flapper]{pf_simplify}} an additional column is included:
+#'   \itemize{
+#'     \item{dist_current.} {A double that defines the distance between \code{id_previous} and \code{id_current}.}
 #'   }
 #' }
 #'
