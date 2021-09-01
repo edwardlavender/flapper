@@ -90,6 +90,7 @@ get_detection_pr <- function(distance = 1:1000,
 #'
 #' @param xy A \code{\link[sp]{SpatialPoints-class}} or \code{\link[sp]{SpatialPointsDataFrame-class}} object that defines receiver locations. The coordinate reference system should be the Universe Transverse Mercator coordinate reference system.
 #' @param detection_range A number that defines the detection range (m) of receivers.
+#' @param boundaries An \code{\link[raster]{extent}} object (on an object from which this can be extracted) that defines the boundaries of the study area.
 #' @param coastline (optional) A \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines barriers (such as the coastline) that block receivers from surveying areas within their detection range.
 #' @param plot A logical input that defines whether or not to plot receivers, their centroids, and the buffer (if specified).
 #' @param ... Additional arguments passed to \code{\link[rgeos]{gBuffer}}, such as \code{byid} and/or \code{quadsegs}.
@@ -139,9 +140,9 @@ get_detection_pr <- function(distance = 1:1000,
 #' @export
 
 get_detection_centroids <- function(xy,
-                                detection_range = 425,
-                                coastline = NULL,
-                                plot = TRUE,...){
+                                    detection_range = 425,
+                                    boundaries = NULL, coastline = NULL,
+                                    plot = TRUE,...){
 
   #### Checks
   # Check xy is a SpatialPoints object or similar
@@ -150,7 +151,15 @@ get_detection_centroids <- function(xy,
   #### Define buffers around receivers equal to detection radius
   xy_buf <- rgeos::gBuffer(xy, width = detection_range,...)
 
-  #### Clip around coastline (if applicable)
+  #### Clip around boundaries/coastline (if applicable)
+  if(!is.null(boundaries)){
+    if(length(xy_buf) == 1) {
+      xy_buf <- raster::crop(xy_buf, boundaries)
+    } else {
+      xy_buf <- lapply(1:length(xy_buf), function(i) raster::crop(xy_buf[i], boundaries))
+      xy_buf <- do.call(raster::bind, xy_buf)
+    }
+  }
   if(!is.null(coastline)) {
     if(length(xy_buf) == 1) {
       xy_buf <- rgeos::gDifference(xy_buf, coastline)

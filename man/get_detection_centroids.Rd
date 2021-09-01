@@ -7,6 +7,7 @@
 get_detection_centroids(
   xy,
   detection_range = 425,
+  boundaries = NULL,
   coastline = NULL,
   plot = TRUE,
   ...
@@ -16,6 +17,8 @@ get_detection_centroids(
 \item{xy}{A \code{\link[sp]{SpatialPoints-class}} or \code{\link[sp]{SpatialPointsDataFrame-class}} object that defines receiver locations. The coordinate reference system should be the Universe Transverse Mercator coordinate reference system.}
 
 \item{detection_range}{A number that defines the detection range (m) of receivers.}
+
+\item{boundaries}{An \code{\link[raster]{extent}} object (on an object from which this can be extracted) that defines the boundaries of the study area.}
 
 \item{coastline}{(optional) A \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines barriers (such as the coastline) that block receivers from surveying areas within their detection range.}
 
