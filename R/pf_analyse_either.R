@@ -158,10 +158,10 @@ pf_plot_map <- function(xpf,
 #' @description This function is a wrapper designed to apply kernel utilisation distribution (KUD) estimation to the outputs of a particle filtering (PF) algorithm. To implement the approach, an (a) \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}} (plus \code{\link[flapper]{pf_simplify}} with the \code{return = "archive"} argument) containing particle histories for connected particles or (b) a \code{\link[flapper]{pf_path-class}} object containing reconstructed paths must be supplied. Using all, or a subset of sampled locations, the function applies KUD smoother(s) via a user-supplied estimation routine (i.e., \code{\link[adehabitatHR]{kernelUD}} or \code{\link[flapper]{kud_around_coastline}}). The function extracts the utilisation distribution(s) as a \code{\link[raster]{raster}}, applies a spatial mask (e.g.  coastline), combines the distributions (if necessary), plots the processed distribution (if specified) and returns this as a a \code{\link[raster]{raster}}.
 #'
 #' @param xpf A \code{\link[flapper]{pf_archive-class}} object (from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with \code{return = "archive"}) or a \code{\link[flapper]{pf_path-class}} object (from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with \code{return = "path"}).
-#' @param bathy If \code{xpf} is a \code{\link[flapper]{pf_archive-class}} object, \code{bathy} is \code{\link[raster]{raster}} that defines the grid across which \code{\link[flapper]{pf}} was applied that is used to extract cell coordinates.
+#' @param bathy A \code{\link[raster]{raster}} that defines the grid across which \code{\link[flapper]{pf}} was applied. This used to extract cell coordinates and to express KUD(s).
 #' @param sample_size (optional) An integer that defines the number of particles to sample from (a) particle histories or (b) each path in \code{xpf} for the estimation. If \code{sample_size = NULL}, all particles are used. If specified, \code{sample_size} particles are sampled from (a) particle histories or (b) each path without replacement in line with their probability. Sampling is implemented to improve estimation speed.
 #' @param estimate_ud A function (either \code{\link[adehabitatHR]{kernelUD}} or \code{\link[flapper]{kud_around_coastline}}) that estimates kernel utilisation distributions. The latter option is used when kernels need to be processed to account for barriers to movement that cannot be modelled via \code{\link[adehabitatHR]{kernelUD}}.
-#' @param grid,... Arguments passed to \code{estimate_ud} (and ultimately \code{\link[adehabitatHR]{kernelUD}}, where they are defined) to estimate the kernel utilisation distribution. If  \code{\link[flapper]{kud_around_coastline}} is supplied to \code{estimate_ud}, then \code{grid} must be a \code{\link[sp]{SpatialPixelsDataFrame}}.
+#' @param grid,... Arguments passed to \code{estimate_ud} (and ultimately \code{\link[adehabitatHR]{kernelUD}}, where they are defined) to estimate the kernel utilisation distribution. If  \code{\link[flapper]{kud_around_coastline}} is supplied to \code{estimate_ud}, then \code{grid} must be a \code{\link[sp]{SpatialPixelsDataFrame}}. However, note that in all cases, KUD(s) are resampled onto \code{bathy}.
 #' @param mask (optional) A spatial mask (see \code{\link[raster]{mask}}).
 #' @param plot A logical input that defines whether or not to plot the KUD.
 #'
@@ -188,7 +188,7 @@ pf_plot_map <- function(xpf,
 #' ## Implementation based on particles
 #' pp <- par(mfrow = c(1, 2))
 #' pf_kud(pf_simplify(dat_dcpf_histories, summarise_pr = max, return = "archive"),
-#'        bathy = bathy,
+#'        bathy = bathy, sample_size = 100,
 #'        estimate_ud = kud_around_coastline, grid = grid)
 #' ## Implementation based on paths
 #' pf_kud(dat_dcpf_paths,
@@ -218,8 +218,8 @@ pf_plot_map <- function(xpf,
 #'
 
 pf_kud <- function(xpf,
-                   bathy = NULL,
-                   sample_size = 10,
+                   bathy,
+                   sample_size = NULL,
                    estimate_ud = adehabitatHR::kernelUD,
                    grid, ...,
                    mask = NULL,
@@ -228,8 +228,8 @@ pf_kud <- function(xpf,
   #### Checks
   check_class(input = xpf, to_class = c("pf_archive", "pf_path"))
   crs_bathy <- crs_grid <- crs_mask <- NULL
-  if(!is.null(bathy)) crs_bathy <- raster::crs(bathy)
-  if(!is.null(grid)) crs_grid <- raster::crs(grid)
+  crs_bathy <- raster::crs(bathy)
+  if(!is.null(grid)) if(!inherits(grid, c("numeric", "integer"))) crs_grid <- raster::crs(grid)
   if(!is.null(mask)) crs_mask <- raster::crs(mask)
   crs <- list(crs_bathy, crs_grid, crs_mask)
   crs <- compact(crs)
@@ -243,7 +243,7 @@ pf_kud <- function(xpf,
   } else {
     crs <- sp::CRS(as.character(NA))
   }
-  message("CRS taken as '", crs, "'.")
+  message("CRS taken as: '", crs, "'.")
 
 
   ######################################
@@ -255,7 +255,6 @@ pf_kud <- function(xpf,
     if(xpf$method != "pf_simplify"){
       warning("xpf$method != 'pf_simplify'", immediate. = TRUE, call. = FALSE)
     }
-    if(is.null(bathy)) stop("'bathy' must be provided for this implementation.")
     pairs_df <-
       lapply(xpf$history, function(elm) {
         elm[, c("id_current", "pr_current"), drop = FALSE]
@@ -330,8 +329,10 @@ pf_kud <- function(xpf,
 
     #### Combine KUDs across paths
     ## Convert KUDs to rasterStack
+    blank <- raster::setValues(bathy, 0)
     pairs_ud <- lapply(pairs_ud, function(ud){
       ud <- raster::raster(ud)
+      ud <- raster::resample(ud, blank)
       if(!is.null(mask)) ud <- raster::mask(ud, mask)
       return(ud)
     })
@@ -348,7 +349,9 @@ pf_kud <- function(xpf,
   }
 
   #### Visualise KUD
-  if(plot) prettyGraphics::pretty_map(add_rasters = list(x = pairs_ud))
+  ext <- raster::extent(pairs_ud)
+  if(plot) prettyGraphics::pretty_map(add_rasters = list(x = pairs_ud),
+                                      xlim = ext[1:2], ylim = ext[3:4])
 
   #### Return KUD
   return(pairs_ud)

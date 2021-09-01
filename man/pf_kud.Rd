@@ -6,8 +6,8 @@
 \usage{
 pf_kud(
   xpf,
-  bathy = NULL,
-  sample_size = 10,
+  bathy,
+  sample_size = NULL,
   estimate_ud = adehabitatHR::kernelUD,
   grid,
   ...,
@@ -18,13 +18,13 @@ pf_kud(
 \arguments{
 \item{xpf}{A \code{\link[flapper]{pf_archive-class}} object (from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with \code{return = "archive"}) or a \code{\link[flapper]{pf_path-class}} object (from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with \code{return = "path"}).}
 
-\item{bathy}{If \code{xpf} is a \code{\link[flapper]{pf_archive-class}} object, \code{bathy} is \code{\link[raster]{raster}} that defines the grid across which \code{\link[flapper]{pf}} was applied that is used to extract cell coordinates.}
+\item{bathy}{A \code{\link[raster]{raster}} that defines the grid across which \code{\link[flapper]{pf}} was applied. This used to extract cell coordinates and to express KUD(s).}
 
 \item{sample_size}{(optional) An integer that defines the number of particles to sample from (a) particle histories or (b) each path in \code{xpf} for the estimation. If \code{sample_size = NULL}, all particles are used. If specified, \code{sample_size} particles are sampled from (a) particle histories or (b) each path without replacement in line with their probability. Sampling is implemented to improve estimation speed.}
 
 \item{estimate_ud}{A function (either \code{\link[adehabitatHR]{kernelUD}} or \code{\link[flapper]{kud_around_coastline}}) that estimates kernel utilisation distributions. The latter option is used when kernels need to be processed to account for barriers to movement that cannot be modelled via \code{\link[adehabitatHR]{kernelUD}}.}
 
-\item{grid, ...}{Arguments passed to \code{estimate_ud} (and ultimately \code{\link[adehabitatHR]{kernelUD}}, where they are defined) to estimate the kernel utilisation distribution. If  \code{\link[flapper]{kud_around_coastline}} is supplied to \code{estimate_ud}, then \code{grid} must be a \code{\link[sp]{SpatialPixelsDataFrame}}.}
+\item{grid, ...}{Arguments passed to \code{estimate_ud} (and ultimately \code{\link[adehabitatHR]{kernelUD}}, where they are defined) to estimate the kernel utilisation distribution. If  \code{\link[flapper]{kud_around_coastline}} is supplied to \code{estimate_ud}, then \code{grid} must be a \code{\link[sp]{SpatialPixelsDataFrame}}. However, note that in all cases, KUD(s) are resampled onto \code{bathy}.}
 
 \item{mask}{(optional) A spatial mask (see \code{\link[raster]{mask}}).}
 
@@ -58,7 +58,7 @@ grid <- methods::as(grid, "SpatialPixelsDataFrame")
 ## Implementation based on particles
 pp <- par(mfrow = c(1, 2))
 pf_kud(pf_simplify(dat_dcpf_histories, summarise_pr = max, return = "archive"),
-       bathy = bathy,
+       bathy = bathy, sample_size = 100,
        estimate_ud = kud_around_coastline, grid = grid)
 ## Implementation based on paths
 pf_kud(dat_dcpf_paths,
