@@ -4,7 +4,7 @@
 \alias{lcp_graph_surface}
 \title{Construct a graph for least-cost paths analysis of movement from a point on a Raster*}
 \usage{
-lcp_graph_surface(surface, cost, verbose = TRUE, ...)
+lcp_graph_surface(surface, cost, verbose = TRUE)
 }
 \arguments{
 \item{surface}{A \code{\link[raster]{raster}} for which to construct the graph. There are some constraints on the form of this raster if the costs of movement between cells are derived from \code{\link[flapper]{lcp_costs}} (see below).}
@@ -12,8 +12,6 @@ lcp_graph_surface(surface, cost, verbose = TRUE, ...)
 \item{cost}{A sparse \code{\link[Matrix]{dsCMatrix-class}} matrix that defines the cost of movement between connected cells on the \code{surface} (see \code{\link[flapper]{lcp_costs}}).}
 
 \item{verbose}{A logical function that defines whether or not to print messages to the console to relay function progress.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a named list that defines the graph (see \code{\link[cppRouting]{makegraph}})

@@ -45,8 +45,6 @@ dc(
 \item{con}{If \code{verbose = TRUE}, \code{con} is character string that defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}). Otherwise, \code{con} defines the full pathway to a .txt file (which can be created on-the-fly) into which messages are written to relay function progress.}
 
 \item{split, cl, varlist}{(optional) Parallelisation arguments. \code{split} is an integer which, if supplied, splits the \code{archival} dataframe every \code{n}th row into chunks†. The algorithm is applied sequentially within each chunk (if applicable) and chunk-wise maps can be summed afterwards to create a single map of space use. The advantage of this approach is that chunks can be analysed in parallel, via \code{cl} and \code{varlist}, while memory use is minimised. \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. \code{varlist} is a character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns an \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, messages are also written to file relaying function progress.

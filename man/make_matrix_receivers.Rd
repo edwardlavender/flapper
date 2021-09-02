@@ -11,8 +11,7 @@ make_matrix_receivers(
   end = NULL,
   delta_t = "120 mins",
   as_POSIXct = as.POSIXct,
-  set_names = TRUE,
-  ...
+  set_names = TRUE
 )
 }
 \arguments{
@@ -27,8 +26,6 @@ make_matrix_receivers(
 \item{as_POSIXct}{(optional) A function that coerces supplied any supplied times (\code{moorings$receiver_start_date}, \code{moorings$receiver_end_date}, \code{services$service_start_date}, \code{services$service_end_date}, \code{start} and \code{end}) that are not POSIXct objects to POSIXct objects. This can be suppressed via \code{as_POSIXct = NULL} if supplied times are Date objects and \code{delta_t} is not less than one day.}
 
 \item{set_names}{A logical variable that defines whether or not to set the row and column names of the matrix to the time steps and the receiver IDs respectively.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a matrix with one row for each time step and one column for each receiver. Each cell defines whether (1) or not (0) each receiver was at active during that time step. A `bins' attribute is included, which defines the time steps as a Date or POSIXct vector.

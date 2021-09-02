@@ -10,8 +10,7 @@ assemble_sentinel_counts(
   breaks = "hours",
   as_POSIXct = function(x, tz = "UTC", ...) fasttime::fastPOSIXct(x, tz = tz, ...),
   detection_range = 2000,
-  dist_btw_receivers = NULL,
-  ...
+  dist_btw_receivers = NULL
 )
 }
 \arguments{
@@ -26,8 +25,6 @@ assemble_sentinel_counts(
 \item{detection_range}{A number that defines the maximum distance (m) between a transmitting receiver and other receivers within with detections may plausibly be received. For each transmission, all detections at active receivers within this distance are counted; other receivers are not considered.}
 
 \item{dist_btw_receivers}{(optional) A dataframe that specifies the distances between all combinations of receivers. If not provided, this is computed internally by \code{\link[flapper]{dist_btw_receivers}}, which assumes Euclidean distances are appropriate. If provided, the dataframe should contain columns: `r1', `r2', `dist' (see \code{\link[flapper]{dist_btw_receivers}}). Note that, if provided, the `dist' column should be in m, not km, as returned by default by \code{\link[flapper]{dist_btw_receivers}}, to match the units of \code{detection_range}.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a dataframe that, for each source receiver (i.e., sentinel tag), specifies the number of transmissions from that receiver and the number of detections at each nearby receiver over the specified time window. The dataframe has the following columns: `timestamp_bin', the time window; `source_id', the identifier of the source of transmission; `sink_id', the identifier of each potential recipient of each transmission; `n_trms', the number of transmissions from the source over each time window; `n_dets', the number of detections of each transmission at each potential recipient receiver; `dist_btw_receivers', the distance between the source and the sink receiver. Rows are ordered by `source_id', then `timestamp' and finally `sink_id'.

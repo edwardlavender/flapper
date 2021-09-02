@@ -4,7 +4,7 @@
 \alias{get_detection_overlaps}
 \title{Get `overlapping' detections}
 \usage{
-get_detection_overlaps(acoustics, overlaps = NULL, clock_drift = 5, ...)
+get_detection_overlaps(acoustics, overlaps = NULL, clock_drift = 5)
 }
 \arguments{
 \item{acoustics}{A dataframe of passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. This must contain an integer vector of receiver IDs, named `receiver_id' and a POSIXct vector of time stamps when detections were made, named `timestamp'.}
@@ -12,8 +12,6 @@ get_detection_overlaps(acoustics, overlaps = NULL, clock_drift = 5, ...)
 \item{overlaps}{(optional) A named list, from \code{\link[flapper]{get_detection_centroids_overlap}}, that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers.}
 
 \item{clock_drift}{A number that defines the time (s) between sequential detections at which they are considered to have occurred at `effectively the same time'.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a message that defines the number of detections at different receivers that occurred at effectively the same time (within \code{clock_drift}) and, if \code{overlaps} is supplied, the subset of these that occurred at non-overlapping receivers. A dataframe is also invisibly returned that records the details of overlapping detections. This includes the following columns:

@@ -196,7 +196,6 @@ get_detection_centroids <- function(xy,
 #'
 #' @param centroids A \code{\link[sp]{SpatialPolygonsDataFrame}} that defines detection centroids (see \code{\link[flapper]{get_detection_centroids}}). The \code{data} slot must include a dataframe with the following columns: an unique, integer identifier for each receiver (`receiver_id') and receiver deployment \code{\link[base]{Dates}} (`receiver_start_date' and `receiver_end_date').
 #' @param services (optional) A dataframe that defines receiver IDs and servicing \code{\link[base]{Dates}} (times during the deployment period of a receiver when it was not active due to servicing). If provided, this must contain the following columns: an integer identifier for serviced receivers (named ‘receiver_id’) and two columns that define the time of the service(s) (‘service_start_date’ and ‘service_end_date’) (see \code{\link[flapper]{make_matrix_receivers}}).
-#' @param ... Additional arguments (none implemented).
 #'
 #' @details This function requires the \code{\link[tidyr]{tidyr-package}} (specifically \code{\link[tidyr]{pivot_longer}}).
 #'
@@ -275,7 +274,7 @@ get_detection_centroids <- function(xy,
 #' @export
 
 
-get_detection_centroids_overlap <- function(centroids, services = NULL,...){
+get_detection_centroids_overlap <- function(centroids, services = NULL){
 
   #### Checks
   ## packages
@@ -305,12 +304,6 @@ get_detection_centroids_overlap <- function(centroids, services = NULL,...){
     }
     services$interval <- lubridate::interval(services$service_start_date,
                                              services$service_end_date)
-  }
-  ## dots
-  if(!is.null(names(list(...)))){
-    warning(paste0("The following argument(s) passed via ... are not supported: ",
-                   paste(names(list(...)), collapse = ", "), "."),
-            call. = FALSE, immediate. = TRUE)
   }
 
   #### Define receiver activity status matrix
@@ -697,7 +690,6 @@ get_n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,..
 #' @param receiver_id (optional) A vector of receivers for which to calculate overlap duration.
 #' @param type If both \code{individual_id} and \code{receiver_id} are specified, then \code{type} is an integer that defines whether or not to calculate overlap duration for (a) each individual/receiver pair (\code{type = 1L}) or (b) all combinations of specified individuals/receivers (\code{type = 2L}).
 #' @param match_to (optional) A dataframe against which to match the calculated overlap duration(s). This must contain an `individual_id' and `receiver_id' column, as in \code{ids} and \code{moorings} respectively. If supplied, an integer vector of overlap durations for individual/receiver combinations, matched against the individuals/receivers in this dataframe, is returned (see also Value).
-#' @param ... Additional arguments (none implemented).
 #'
 #' @return The function returns a dataframe with the deployment overlap duration for specific or all combinations of individuals and receivers, with the `individual_id', `receiver_id', `tag_start_date', `tag_end_date', `receiver_start_date' and `receiver_end_date' columns retained, plus `tag_interval' and `receiver_interval' columns that define individual and receiver deployment periods as \code{\link[lubridate]{Interval-class}} objects. The `id_rec_overlap' column defines the temporal overlap (days). Alternatively, if \code{match_to} is supplied, a vector of overlap durations that matches each individual/receiver observation in that dataframe is returned.
 #'
@@ -744,7 +736,7 @@ get_id_rec_overlap <- function(ids,
                            individual_id = NULL,
                            receiver_id = NULL,
                            type = 1L,
-                           match_to = NULL,...){
+                           match_to = NULL){
 
   #### Checks
   # Dataframes must contains required names
@@ -1144,7 +1136,6 @@ get_detection_days <- function(acoustics,
 #' @param acoustics A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). At a minimum, this should contain a POSIXct vector of time stamps when detections were made named `timestamp'.
 #' @param fct (optional) A character that defines the name of a column in \code{acoustics} that distinguishes acoustic time series for different individuals.
 #' @param interval A character that defines the time interval. This must be supported by \code{\link[lubridate]{round_date}}. The default is \code{"days"}, in which case the function gets the frequency distribution of the duration of clump lengths in units of days, with detections within the same clump occurring within one day of each other.
-#' @param ... Additional arguments (none implemented).
 #'
 #' @details Detection clumps provide a means to assess residency within an array by determining how long individuals tended to spend around receivers.
 #'
@@ -1207,7 +1198,7 @@ get_detection_days <- function(acoustics,
 get_detection_clump_lengths <-
   function(acoustics,
            fct = NULL,
-           interval = "days",...){
+           interval = "days"){
 
     #### Checks
     check_names(input = acoustics, req = c("timestamp", fct), type = all)
@@ -1269,7 +1260,6 @@ get_detection_clump_lengths <-
 #' @param acoustics A dataframe of passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. This must contain an integer vector of receiver IDs, named `receiver_id' and a POSIXct vector of time stamps when detections were made, named `timestamp'.
 #' @param overlaps (optional) A named list, from \code{\link[flapper]{get_detection_centroids_overlap}}, that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers.
 #' @param clock_drift A number that defines the time (s) between sequential detections at which they are considered to have occurred at `effectively the same time'.
-#' @param ... Additional arguments (none implemented).
 #'
 #' @details Detections at different receivers that occur at effectively the same time have important implications for inferences of animal movement patterns, especially via the AC* algorithm(s) in \code{\link[flapper]{flapper}} (e.g. \code{\link[flapper]{acdc}}). Within the AC* algorithm(s), when an individual is detected at the same time at two different receivers, detection probability kernels dictate that these receivers must have overlapping detection centroids. If the detection centroids do not overlap, this suggests that either (a) receiver clocks are not well-aligned; (b) the definition of `effectively the same time' is be overly large (such that the individual could move from within the detection centroid of one receiver into the detection centroid of another); (c) detection centroids are too small and detection probability is higher than realised; and/or (d) one or more of the detections are false. The most likely cause may be guided by knowledge of the array design, detection probability and false detection algorithms. For example, if it is plausible that detection centroids are too small, repeating the implementation of this function with larger centroids may indicate whether or not this is likely to have been the case: if so, all detections that occurred at effectively the same time at receivers with non-overlapping detection centroids should be captured by the large centroids (though this does not rule out other explanations). The purpose of this function is to flag any such detections so that they can be investigated and addressed prior to the implementation of the AC* algorithm(s).
 #'
@@ -1343,7 +1333,7 @@ get_detection_clump_lengths <-
 #' @export
 #'
 
-get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5,...){
+get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5){
 
   #### Checks
   check_names(input = acoustics, req = c("timestamp", "receiver_id"), type = all)

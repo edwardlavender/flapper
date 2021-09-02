@@ -4,14 +4,12 @@
 \alias{get_detection_centroids_overlap}
 \title{Get detection centroid overlaps}
 \usage{
-get_detection_centroids_overlap(centroids, services = NULL, ...)
+get_detection_centroids_overlap(centroids, services = NULL)
 }
 \arguments{
 \item{centroids}{A \code{\link[sp]{SpatialPolygonsDataFrame}} that defines detection centroids (see \code{\link[flapper]{get_detection_centroids}}). The \code{data} slot must include a dataframe with the following columns: an unique, integer identifier for each receiver (`receiver_id') and receiver deployment \code{\link[base]{Dates}} (`receiver_start_date' and `receiver_end_date').}
 
 \item{services}{(optional) A dataframe that defines receiver IDs and servicing \code{\link[base]{Dates}} (times during the deployment period of a receiver when it was not active due to servicing). If provided, this must contain the following columns: an integer identifier for serviced receivers (named ‘receiver_id’) and two columns that define the time of the service(s) (‘service_start_date’ and ‘service_end_date’) (see \code{\link[flapper]{make_matrix_receivers}}).}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a list with two elements:

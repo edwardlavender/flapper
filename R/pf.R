@@ -28,7 +28,6 @@
 #' @param seed (optional) An integer to define the seed for reproducible simulations (see \code{\link[base]{set.seed}}).
 #' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console; otherwise, they are written to file (see below).
 #' @param con If \code{verbose = TRUE}, \code{con} is character string that defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}). Otherwise, \code{con} defines the full pathway to a .txt file (which can be created on-the-fly) into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging.
-#' @param ... Additional arguments (none implemented).
 #'
 #' @details
 #' \subsection{Background}{This function implements a widely applicable particle simulation and filtering based approach to refine maps of possible locations of an individual through time via the incorporation of a movement model that facilitates the reconstruction of movement paths. Within \code{\link[flapper]{flapper}}, the acoustic-centroid (AC), depth-contour (DC) and acoustic-centroid depth-contour (ACDC) algorithms, which define the possible locations of an individual through time based on acoustic centroids and/or depth contours, can be passed through a this process, resulting in the DCPF, ACPF and ACDCPF algorithms.
@@ -464,7 +463,7 @@ pf <- function(record,
                update_history_from_time_step = 1L,
                cl = NULL, use_all_cores = FALSE,
                seed = NULL,
-               verbose = TRUE, con = "",...){
+               verbose = TRUE, con = ""){
 
   #### Set up function
   t_onset <- Sys.time()
@@ -512,19 +511,11 @@ pf <- function(record,
                              cl = cl,
                              use_all_cores = use_all_cores,
                              seed = seed,
-                             verbose = verbose,
-                             dots = list(...)
+                             verbose = verbose
                  )
   )
 
   #### Checks
-
-  ## Check dots
-  if(!is.null(names(list(...)))){
-    warning(paste0("The following argument(s) passed via ... are not supported: ",
-                   paste(names(list(...)), collapse = ", "), "."),
-            call. = FALSE, immediate. = TRUE)
-  }
 
   ## Check data and define data_1 and data_t_next if unsupplied
   if(!is.null(data)){

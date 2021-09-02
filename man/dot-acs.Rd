@@ -27,8 +27,7 @@
   verbose = TRUE,
   con = "",
   progress = 1L,
-  check = TRUE,
-  ...
+  check = TRUE
 )
 }
 \arguments{
@@ -77,8 +76,6 @@
 \item{progress}{(optional) If the algorithm is implemented step-wise, \code{progress} is an integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the `archival' time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar. If the algorithm is implemented for chunks, inputs to \code{progress} are ignored and a single progress bar is shown of the progress across acoustic chunks.}
 
 \item{check}{A logical input that defines whether or not to check function inputs. This can be switched off to improve computation time when the function is applied iteratively or via a front-end function (e.g., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns an \code{\link[flapper]{acdc_record-class}} object with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific information on the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{save_record_spatial}). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{save_args = TRUE}, otherwise the `args' element is \code{NULL}).
@@ -179,7 +176,7 @@ out_acdc_3 <- flapper:::.acs(acoustics = acc,
                              bathy = gebco,
                              detection_range = 425,
                              detection_kernels = kernels,
-                             detection_kernels_ovelaps = overlaps,
+                             detection_kernels_overlap = overlaps$list_by_receiver,
                              detection_time_window = 10,
                              mobility = 200,
                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
@@ -252,7 +249,6 @@ utils::tail(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
 out_acdc_6 <- flapper:::.acs(acoustics = acc,
                              archival = arc,
                              bathy = gebco,
-                             space_use = NULL,
                              detection_range = 425,
                              mobility = 200,
                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),

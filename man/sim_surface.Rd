@@ -10,8 +10,7 @@ sim_surface(
   sim_values,
   mask = NULL,
   mask_inside = FALSE,
-  plot = 1:2L,
-  ...
+  plot = 1:2L
 )
 }
 \arguments{
@@ -24,8 +23,6 @@ sim_surface(
 \item{mask, mask_inside}{Arguments required to implement a spatial mask via \code{\link[flapper]{mask_io}}.}
 
 \item{plot}{An integer that defines whether or not to plot a histogram of simulated values (\code{1L}), a heat map of the simulated raster (\code{2L}) or both (\code{1:2L}).}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a \code{\link[raster]{raster}}, with the same properties as \code{blank}, with values generated from the \code{sim_values} function(s).

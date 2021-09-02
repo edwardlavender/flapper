@@ -4,14 +4,12 @@
 \alias{lcp_costs}
 \title{Calculate the distances between connected cells in a Raster*}
 \usage{
-lcp_costs(surface, verbose = TRUE, ...)
+lcp_costs(surface, verbose = TRUE)
 }
 \arguments{
 \item{surface}{A \code{\link[raster]{raster}} for which to calculate distances. The \code{surface} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in the x, y and z directions. The \code{surface}'s \code{\link[raster]{resolution}} is taken to define the distance between connected cells in the x and y directions and must be the same in both cases (for \code{surface}'s with unequal horizontal resolution, \code{\link[raster]{resample}} can be used to equalise resolution).}
 
 \item{verbose}{A logical function that defines whether or not to print messages to the console to relay function progress.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a named list of sparse \code{\link[Matrix]{dsCMatrix-class}} matrices that define the distances (m) between connected cells under a rook's or bishop's movement (`dist_rook' and `dist_bishop'), the planar and vertical distances between connected cells (`dist_planar' and `dist_vertical') and the total distance between connected cells (`dist_total').

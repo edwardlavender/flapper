@@ -11,7 +11,7 @@ invert_poly(x, boundaries = raster::extent(x), ...)
 
 \item{boundaries}{A \code{\link[raster]{extent}} object that defines the boundaries of the area under consideration. By default, this is defined by the extent of \code{x}.}
 
-\item{...}{Additional arguments (none implemented).}
+\item{...}{Additional arguments passed to \code{\link[rgeos]{gDifference}}.}
 }
 \value{
 The function returns a \code{\link[sp]{SpatialPolygons-class}} object.

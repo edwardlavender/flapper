@@ -4,12 +4,10 @@
 \alias{pf_loglik}
 \title{Calculate the log-likelihood of movement paths from a PF algorithm}
 \usage{
-pf_loglik(paths, ...)
+pf_loglik(paths)
 }
 \arguments{
 \item{paths}{A dataframe containing movement paths from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the probability associated with each cell along each path (`cell_pr').}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a dataframe with the log likelihood (`loglik') of each path (`path_id'). Rows are ordered by log-likelihood and a `delta' column is provided with the differences in log-likelihood between the most likely path and every other path.

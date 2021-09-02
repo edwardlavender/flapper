@@ -10,8 +10,7 @@ get_id_rec_overlap(
   individual_id = NULL,
   receiver_id = NULL,
   type = 1L,
-  match_to = NULL,
-  ...
+  match_to = NULL
 )
 }
 \arguments{
@@ -26,8 +25,6 @@ get_id_rec_overlap(
 \item{type}{If both \code{individual_id} and \code{receiver_id} are specified, then \code{type} is an integer that defines whether or not to calculate overlap duration for (a) each individual/receiver pair (\code{type = 1L}) or (b) all combinations of specified individuals/receivers (\code{type = 2L}).}
 
 \item{match_to}{(optional) A dataframe against which to match the calculated overlap duration(s). This must contain an `individual_id' and `receiver_id' column, as in \code{ids} and \code{moorings} respectively. If supplied, an integer vector of overlap durations for individual/receiver combinations, matched against the individuals/receivers in this dataframe, is returned (see also Value).}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a dataframe with the deployment overlap duration for specific or all combinations of individuals and receivers, with the `individual_id', `receiver_id', `tag_start_date', `tag_end_date', `receiver_start_date' and `receiver_end_date' columns retained, plus `tag_interval' and `receiver_interval' columns that define individual and receiver deployment periods as \code{\link[lubridate]{Interval-class}} objects. The `id_rec_overlap' column defines the temporal overlap (days). Alternatively, if \code{match_to} is supplied, a vector of overlap durations that matches each individual/receiver observation in that dataframe is returned.

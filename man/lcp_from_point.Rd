@@ -11,8 +11,7 @@ lcp_from_point(
   cost = NULL,
   graph = NULL,
   use_all_cores = FALSE,
-  verbose = TRUE,
-  ...
+  verbose = TRUE
 )
 }
 \arguments{
@@ -29,8 +28,6 @@ lcp_from_point(
 \item{use_all_cores}{A logical input that defines whether or not to parallelise least-cost distance calculations across all cores. This is passed to \code{\link[cppRouting]{get_distance_matrix}} which implements calculations.}
 
 \item{verbose}{A logical input that defines whether or not to print messages to the console to relay function progress.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a \code{\link[raster]{raster}} in which each cell represents the least-cost distance from a specified \code{origin} to that cell. The \code{origin} is assigned a value of zero. Any cells excluded by the \code{destination} filter have a value of NA.

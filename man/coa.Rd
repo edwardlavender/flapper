@@ -10,8 +10,7 @@ coa(
   cl = NULL,
   na_omit = TRUE,
   as_POSIXct = as.POSIXct,
-  output = "matrix",
-  ...
+  output = "matrix"
 )
 }
 \arguments{
@@ -24,8 +23,6 @@ coa(
 \item{na_omit, as_POSIXct}{Processing options. \code{na_omit} is a logical variable that defines whether or not to omit NAs (i.e., rows in \code{mat} for which no detections were made and thus for which COAs cannot be calculated) from returned coordinates. If \code{output = "data.frame"} (see below), \code{as_POSIXct} is a function to convert time stamps, taken from the row names of \code{mat}, to a POSIXct vector. \code{as_POSIXct = NULL} suppresses this conversion.}
 
 \item{output}{A character that defines the output format. Currently supported options are: \code{"matrix"}, which returns a matrix of the coordinates of COAs; and \code{"data.frame"}, which returns a dataframe with timestamps (taken from the row names of \code{mat}) and COA coordinates.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a matrix or a dataframe, depending on the \code{output} argument, that represents a time series of COAs. If \code{na_omit = TRUE}, the time series may have `gaps' over which COAs could not be calculated due to the absence of detections.

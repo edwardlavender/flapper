@@ -12,13 +12,12 @@
 #' @param delta_t A number or character that defines the time interval between successive time steps. This is passed to the `by' argument of \code{\link[base]{seq.POSIXt}}.
 #' @param as_POSIXct A function that coerces any supplied times (\code{ids$tag_start_date}, \code{ids$tag_end_date}, \code{start} and \code{end}) that are not POSIXct objects to POSIXct objects.
 #' @param set_names A logical variable that defines whether or not to set the row and column names of the matrix to the time steps and the individual IDs respectively.
-#' @param ... Additional arguments (none implemented).
 #'
 #' @return The function returns a matrix with one row for each time step and one column for each individual. Each cell defines whether (1) or not (0) each individual was at liberty during that time step.
 #'
 #' @examples
 #' dat_ids$tag_end_date <- as.Date("2017-06-02")
-#' mat_hours <- make_matrix_ids(dat_ids, delat_t = "hours")
+#' mat_hours <- make_matrix_ids(dat_ids, delta_t = "hours")
 #' mat_days  <- make_matrix_ids(dat_ids, delta_t = "days")
 #' utils::str(mat_hours)
 #' utils::str(mat_days)
@@ -31,7 +30,7 @@ make_matrix_ids <- function(ids,
                             end = NULL,
                             delta_t = "120 mins",
                             as_POSIXct = as.POSIXct,
-                            set_names = TRUE,...) {
+                            set_names = TRUE) {
   check_names(input = ids, req = c("individual_id", "tag_start_date", "tag_end_date"),
               extract_names = colnames, type = all)
   if(is.null(start)) start <- min(ids$tag_start_date, na.rm = TRUE)
@@ -71,7 +70,6 @@ make_matrix_ids <- function(ids,
 #' @param delta_t A number or character that defines the time interval between successive time steps. This is passed to the `by' argument of \code{\link[base]{seq.POSIXt}} or \code{\link[base]{seq.Date}} (depending on \code{as_POSIXct}, below).
 #' @param as_POSIXct (optional) A function that coerces supplied any supplied times (\code{moorings$receiver_start_date}, \code{moorings$receiver_end_date}, \code{services$service_start_date}, \code{services$service_end_date}, \code{start} and \code{end}) that are not POSIXct objects to POSIXct objects. This can be suppressed via \code{as_POSIXct = NULL} if supplied times are Date objects and \code{delta_t} is not less than one day.
 #' @param set_names A logical variable that defines whether or not to set the row and column names of the matrix to the time steps and the receiver IDs respectively.
-#' @param ... Additional arguments (none implemented).
 #'
 #' @return The function returns a matrix with one row for each time step and one column for each receiver. Each cell defines whether (1) or not (0) each receiver was at active during that time step. A `bins' attribute is included, which defines the time steps as a Date or POSIXct vector.
 #'
@@ -131,7 +129,7 @@ make_matrix_receivers <- function(moorings,
                                   end = NULL,
                                   delta_t = "120 mins",
                                   as_POSIXct = as.POSIXct,
-                                  set_names = TRUE,...){
+                                  set_names = TRUE){
 
   #### Check inputs
   check_names(input = moorings, req = c("receiver_id", "receiver_start_date", "receiver_end_date"),
@@ -220,7 +218,6 @@ make_matrix_receivers <- function(moorings,
 #' @param as_POSIXct A function that coerces any supplied times that are not POSIXct objects to POSIXct objects.
 #' @param set_names A logical variable that defines whether or not to set the row and column names of the matrix to the time steps and the receiver IDs respectively.
 #' @param verbose A logical variable that defines whether or not to print messages to the console to relay function progress.
-#' @param ... Additional arguments (none implemented).
 #'
 #' @return A matrix, or a list of matrices (one for each individual in \code{acoustics} if there is more than one individual) with one column for each time step and one column for each receiver. Each cell defines whether (1) or not (0) the individual was detected (or, if \code{set_outside} is supplied, it could not have been detected) during that time step. All matrices are expressed across the same sequence of time steps and receivers.
 #'
@@ -254,7 +251,7 @@ make_matrix_detections <- function(acoustics,
                                    set_outside = NULL,
                                    as_POSIXct = as.POSIXct,
                                    set_names = TRUE,
-                                   verbose = TRUE,...) {
+                                   verbose = TRUE) {
 
   #### Initiate function
   t_onset <- Sys.time()

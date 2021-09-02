@@ -7,7 +7,6 @@
 #'
 #' @param surface A \code{\link[raster]{raster}} for which to calculate distances. The \code{surface} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in the x, y and z directions. The \code{surface}'s \code{\link[raster]{resolution}} is taken to define the distance between connected cells in the x and y directions and must be the same in both cases (for \code{surface}'s with unequal horizontal resolution, \code{\link[raster]{resample}} can be used to equalise resolution).
 #' @param verbose A logical function that defines whether or not to print messages to the console to relay function progress.
-#' @param ... Additional arguments (none implemented).
 #'
 #' @details This function was motivated by the need to determine the shortest paths between locations over the seabed for benthic animals (see \code{\link[flapper]{lcp_over_surface}}). An animal's movement can be conceptualised as that of a queen on a chessboard, which can move, in eight directions around its current position, across a surface. Movements in the x and y direction are termed `rook's movement' and movements in the diagonal direction are termed `bishop's movement'.
 #'
@@ -34,7 +33,7 @@
 #' @export
 #'
 
-lcp_costs <- function(surface, verbose = TRUE,...){
+lcp_costs <- function(surface, verbose = TRUE){
 
   #### Define functions to compute distances between connected of cells
   cat_to_console <- function(..., show = verbose){
@@ -96,7 +95,6 @@ lcp_costs <- function(surface, verbose = TRUE,...){
 #' @param surface A \code{\link[raster]{raster}} for which to construct the graph. There are some constraints on the form of this raster if the costs of movement between cells are derived from \code{\link[flapper]{lcp_costs}} (see below).
 #' @param cost A sparse \code{\link[Matrix]{dsCMatrix-class}} matrix that defines the cost of movement between connected cells on the \code{surface} (see \code{\link[flapper]{lcp_costs}}).
 #' @param verbose A logical function that defines whether or not to print messages to the console to relay function progress.
-#' @param ... Additional arguments (none implemented).
 #' @details This is a wrapper for the \code{\link[cppRouting]{makegraph}} function.
 #' @return The function returns a named list that defines the graph (see \code{\link[cppRouting]{makegraph}})
 #' @examples
@@ -120,7 +118,7 @@ lcp_costs <- function(surface, verbose = TRUE,...){
 #' @author Edward Lavender
 #' @export
 
-lcp_graph_surface <- function(surface, cost, verbose = TRUE,...){
+lcp_graph_surface <- function(surface, cost, verbose = TRUE){
 
   #### Set up function
   cat_to_console <- function(..., show = verbose){
@@ -168,7 +166,7 @@ lcp_graph_surface <- function(surface, cost, verbose = TRUE,...){
 #' @param graph (optional) A graph object that defines cell nodes and edge costs for connected cells within the \code{surface} (see \code{\link[flapper]{lcp_graph_surface}}). If supplied, the calculation of the cost surface and the construction of the graph stages in the computation of least-cost distances are skipped (see Details), which is desirable in iterative applications.
 #' @param verbose A logical input that defines whether or not to print messages to the console to relay function progress.
 #' @param use_all_cores A logical input that defines whether or not to parallelise least-cost distance calculations across all cores. This is passed to \code{\link[cppRouting]{get_distance_matrix}} which implements calculations.
-#' @param ... Additional arguments (none implemented).
+#'
 #' @details This function implements routines provided via \code{\link[flapper]{flapper}} and the \code{\link[cppRouting]{cppRouting}} package to calculate least-cost distances. The main steps are:
 #' \enumerate{
 #'   \item The calculation of distances between adjacent cells (i.e., \code{cost}, if not supplied, via \code{\link[flapper]{lcp_costs}});
@@ -253,7 +251,7 @@ lcp_from_point <- function(origin,
                            destination = NULL,
                            cost = NULL, graph = NULL,
                            use_all_cores = FALSE,
-                           verbose = TRUE,...){
+                           verbose = TRUE){
 
   #### Get surface info
   cat_to_console <- function(..., show = verbose){
@@ -349,7 +347,6 @@ lcp_from_point <- function(origin,
 #' @param use_all_cores,cl,varlist Parallelisation arguments for \code{method = "cppRouting"} (\code{use_all_cores}) or \code{method = "gdistance"} (\code{cl} and \code{varlist}) respectively. If \code{method = "cppRouting"}, parallelisation is implemented via \code{use_all_cores} for computing shortest distances only (not computing shortest paths). \code{use_all_cores} is a logical input that defines whether or not to use all cores for computing shortest distance(s). If \code{method = "gdistance"}, parallelisation is implemented via \code{cl} and \code{varlist} for both shortest paths and distances function calls. \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is stopped within the function. \code{varlist} is a character vector of containing the names of exported objects. This may be required if \code{cl} is supplied. This is passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. Exported objects must be located in the global environment.
 #' @param check A logical input that defines whether or not to check function inputs. If \code{TRUE}, internal checks are implemented to check user-inputs and whether or not inputted coordinates are in appropriate places on the processed \code{surface} (for instance, to ensure inputted coordinates do not lie over masked areas). This helps to prevent intractable error messages. If \code{FALSE}, these checks are not implemented, so function progress may be faster initially (especially for large \code{origin}/\code{destination} coordinate matrices).
 #' @param verbose A logical input that defines whether or not to print messages to the console to monitor function progress. This is especially useful with a large \code{surface} since the algorithms are computationally intensive.
-#' @param ... Additional arguments (none implemented).
 #'
 #' @details
 #' \subsection{Methods}{
@@ -831,8 +828,7 @@ lcp_over_surface <-
            cppRouting_algorithm = "bi",
            cl = NULL, varlist = NULL, use_all_cores = FALSE,
            check = TRUE,
-           verbose = TRUE,
-           ...
+           verbose = TRUE
   ){
 
     ########################################
@@ -863,8 +859,7 @@ lcp_over_surface <-
                      varlist = varlist,
                      use_all_cores = use_all_cores,
                      check = check,
-                     verbose = TRUE,
-                     dots = ...)
+                     verbose = TRUE)
 
     #### Checks
     if(check){

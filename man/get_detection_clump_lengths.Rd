@@ -4,7 +4,7 @@
 \alias{get_detection_clump_lengths}
 \title{Get detection clump lengths}
 \usage{
-get_detection_clump_lengths(acoustics, fct = NULL, interval = "days", ...)
+get_detection_clump_lengths(acoustics, fct = NULL, interval = "days")
 }
 \arguments{
 \item{acoustics}{A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). At a minimum, this should contain a POSIXct vector of time stamps when detections were made named `timestamp'.}
@@ -12,8 +12,6 @@ get_detection_clump_lengths(acoustics, fct = NULL, interval = "days", ...)
 \item{fct}{(optional) A character that defines the name of a column in \code{acoustics} that distinguishes acoustic time series for different individuals.}
 
 \item{interval}{A character that defines the time interval. This must be supported by \code{\link[lubridate]{round_date}}. The default is \code{"days"}, in which case the function gets the frequency distribution of the duration of clump lengths in units of days, with detections within the same clump occurring within one day of each other.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a dataframe that defines the frequency distribution of the duration of detection clumps (i.e., the number of occasions when detection clumps lasted different lengths of time). This includes the following columns: (1) `n_interval', the duration of the clump, in units of \code{interval}; (2) `n_occasions', the number of occasions when detections clumped into windows of that duration; and, if \code{fct} is supplied, a column that distinguishes each individual.

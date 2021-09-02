@@ -25,8 +25,7 @@
   progress = 1L,
   split = NULL,
   cl = NULL,
-  varlist = NULL,
-  ...
+  varlist = NULL
 )
 }
 \arguments{
@@ -69,8 +68,6 @@
 \item{split}{A character string that defines the time unit used to split acoustic time series into chunks (e.g., \code{"12 hours"}). If provided, this must be supported by \code{\link[lubridate]{floor_date}} (otherwise, a pre-defined list of acoustic time series can be passed to \code{acoustics}, e.g., specifying seasonal chunks). If \code{split = NULL} and a cluster has been specified (see \code{cl}) (and \code{acoustics} is a dataframe), then the acoustic time series is automatically split into chunks and the algorithm implemented for each chunk in parallel.}
 
 \item{cl, varlist}{Parallelisation arguments. \code{cl} is cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the algorithm is implemented for each chunk in a list of acoustic time series, either (a) as supplied by the user (if \code{acoustics} is a list), (b) as defined by the input to \code{split}, or (c) as defined automatically from the number of nodes in the cluster if \code{split = NULL}. If \code{cl} is supplied, \code{varlist} may also be required. This is a character vector of objects to export. \code{varlist} is passed to the \code{varlist} of \code{\link[parallel]{clusterExport}}. Exported objects must be located in the global environment.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns an \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.

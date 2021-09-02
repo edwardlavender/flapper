@@ -10,8 +10,7 @@ make_matrix_ids(
   end = NULL,
   delta_t = "120 mins",
   as_POSIXct = as.POSIXct,
-  set_names = TRUE,
-  ...
+  set_names = TRUE
 )
 }
 \arguments{
@@ -24,8 +23,6 @@ make_matrix_ids(
 \item{as_POSIXct}{A function that coerces any supplied times (\code{ids$tag_start_date}, \code{ids$tag_end_date}, \code{start} and \code{end}) that are not POSIXct objects to POSIXct objects.}
 
 \item{set_names}{A logical variable that defines whether or not to set the row and column names of the matrix to the time steps and the individual IDs respectively.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a matrix with one row for each time step and one column for each individual. Each cell defines whether (1) or not (0) each individual was at liberty during that time step.
@@ -35,7 +32,7 @@ This function creates a matrix that, for each time step (matrix row) in a sequen
 }
 \examples{
 dat_ids$tag_end_date <- as.Date("2017-06-02")
-mat_hours <- make_matrix_ids(dat_ids, delat_t = "hours")
+mat_hours <- make_matrix_ids(dat_ids, delta_t = "hours")
 mat_days  <- make_matrix_ids(dat_ids, delta_t = "days")
 utils::str(mat_hours)
 utils::str(mat_days)

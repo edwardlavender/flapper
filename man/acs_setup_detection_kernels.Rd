@@ -13,8 +13,7 @@ acs_setup_detection_kernels(
   map,
   coastline = NULL,
   boundaries = NULL,
-  verbose = TRUE,
-  ...
+  verbose = TRUE
 )
 }
 \arguments{
@@ -35,8 +34,6 @@ acs_setup_detection_kernels(
 \item{boundaries}{An \code{\link[raster]{extent}} object that defines the boundaries of an area within which individuals are assumed to have remained (as in \code{\link[flapper]{acs_setup_centroids}}), if these are different from the extent of \code{map}. If provided, detection probability kernels are processed to remain within this area.}
 
 \item{verbose}{A logical input that defines whether or not to print messages to the console to relay function progress.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a named list with five elements:

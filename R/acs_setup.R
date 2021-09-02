@@ -494,7 +494,6 @@ acs_setup_centroids <- function(
 #' @param coastline (optional) A \code{\link[sp]{SpatialPolygonsDataFrame-class}} mask applied to detection probability kernels (e.g. on land, as in  \code{\link[flapper]{acs_setup_centroids}}). Algorithm speed declines with the complexity of \code{coastline}.
 #' @param boundaries An \code{\link[raster]{extent}} object that defines the boundaries of an area within which individuals are assumed to have remained (as in \code{\link[flapper]{acs_setup_centroids}}), if these are different from the extent of \code{map}. If provided, detection probability kernels are processed to remain within this area.
 #' @param verbose A logical input that defines whether or not to print messages to the console to relay function progress.
-#' @param ... Additional arguments (none implemented).
 #'
 #' @details A detection probability kernel is a bivariate probability density function that describes detection probability around a receiver. Typically, this takes the shape of a dome whereby detection probability declines uniformly around a receiver with increasing distance. Accordingly, this function assumes that detection probability kernels only depend on distance (via \code{calc_detection_pr}) and are constant in space and time. Spatially variable detection probability kernels can be incorporated just as easily into the AC* algorithm(s) but need to be created manually. For example, in areas of complex coastline, narrow peninsulas that punctuate detection centroids may effectively block transmissions from the outer regions of detection centroids from being detected at receivers, in which case a model that incorporates the `line of sight' between receivers and the surrounding regions may be appropriate. However, temporally variable detection probability kernels are not currently supported by the AC* algorithm(s).
 #'
@@ -678,7 +677,7 @@ acs_setup_detection_kernels <-
            calc_detection_pr,
            map,
            coastline = NULL, boundaries = NULL,
-           verbose = TRUE,...
+           verbose = TRUE
   ){
 
 

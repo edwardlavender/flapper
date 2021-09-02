@@ -201,8 +201,8 @@ sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
                   add_sea = add_sea,
                   add_land = add_land,
                   add_receivers = add_receivers,
-                  verbose = verbose,
-                  dots = list(...))
+                  verbose = verbose)
+  out$args <- append(out$args, list(...))
   ## Return outputs
   t_end <- Sys.time()
   duration <- difftime(t_end, t_onset, units = "mins")
@@ -479,8 +479,8 @@ sim_path_sa <- function(n = 10,
                   lag = lag,
                   plot = plot, add_points = add_points, add_path = add_path,
                   seed = seed,
-                  verbose = verbose,
-                  dots = list(...))
+                  verbose = verbose)
+  out$args <- append(out$args, list(...))
   ## Return outputs
   t_end <- Sys.time()
   duration <- difftime(t_end, t_onset, units = "mins")

@@ -6,7 +6,7 @@
 #' @importFrom rlang .data
 #' @description This function calculates the total log-likelihood of each movement path reconstructed by a particle filtering (PF) algorithm, including the acoustic-centroid (AC), depth-contour (DC) or acoustic-centroid depth-contour (ACDC) algorithms.
 #' @param paths A dataframe containing movement paths from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the probability associated with each cell along each path (`cell_pr').
-#' @param ... Additional arguments (none implemented).
+#'
 #' @details For each path, at each time step the probability associated with the sampled location depends on (a) the `intrinsic' probability associated with each cell (assigned by the AC, DC or ACDC algorithm) and (b) a user-defined movement model that is driven by the distance between the sampled locations for the individual at the previous and current time steps (and other user-defined parameters). This function simply sums the logarithms of these probabilities for each path as a measure of their relative likelihood, given the movement model.
 #' @examples
 #' # An example with the DCPF paths dataset included in flapper
@@ -16,7 +16,7 @@
 #' @export
 #'
 
-pf_loglik <- function(paths,...){
+pf_loglik <- function(paths){
   check_names(input = paths, req = c("path_id", "cell_pr"))
   op <- options()
   options(dplyr.summarise.inform = FALSE)
@@ -88,7 +88,6 @@ pf_plot_1d <- function(paths,
   # paths <- paths[paths$timestep != 0, ]
   if(nrow(paths) < 1) stop("'paths' does not contain any timesteps post-origin.")
   # Make plots
-  dots <- list(...)
   if(!prompt) prettyGraphics::pretty_plot(1:nrow(archival), archival$depth*scale,
                                           pretty_axis_args = pretty_axis_args,
                                           xlab = xlab, ylab = ylab,

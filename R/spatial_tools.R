@@ -141,7 +141,7 @@ crop_from_click <- function(x, plot = TRUE,...){
 #'
 #' @param x An \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} object.
 #' @param boundaries A \code{\link[raster]{extent}} object that defines the boundaries of the area under consideration. By default, this is defined by the extent of \code{x}.
-#' @param ... Additional arguments (none implemented).
+#' @param ... Additional arguments passed to \code{\link[rgeos]{gDifference}}.
 #'
 #' @return The function returns a \code{\link[sp]{SpatialPolygons-class}} object.
 #'
@@ -168,7 +168,7 @@ invert_poly <- function(x, boundaries = raster::extent(x),...){
   boundary_poly <- sp::Polygon(boundary_xy)
   boundary_sp_poly <- sp::SpatialPolygons(list(sp::Polygons(list(boundary_poly), ID = 1)))
   raster::crs(boundary_sp_poly) <- raster::crs(x)
-  x <- rgeos::gDifference(boundary_sp_poly, x)
+  x <- rgeos::gDifference(boundary_sp_poly, x,...)
   return(x)
 }
 
@@ -184,7 +184,6 @@ invert_poly <- function(x, boundaries = raster::extent(x),...){
 #' @param interval If y is a vector of length two, \code{interval} is an integer that controls whether or not to query cells within and equal to (\code{interval = 1L}) or simply within (\code{interval = 2L}) the range specified by \code{y}.
 #' @param cells A logical variable that defines whether or not to return a vector of cell numbers (\code{TRUE}) or a RasterLayer of the cells corresponding to \code{y}.
 #' @param na.rm A logical variable that defines whether or not to ignore NAs.
-#' @param ... Additional arguments (none implemented).
 #'
 #' @return The function returns a RasterLayer (if \code{cells = FALSE}) or an integer vector of numbers (if \code{cells = TRUE}) that defines the cells that are equal to, or lie within, specified value(s) \code{y}.
 #'
@@ -212,7 +211,7 @@ invert_poly <- function(x, boundaries = raster::extent(x),...){
 #' @author Edward Lavender
 #' @export
 
-cells_from_val <- function(x, y, interval = 1L, cells = TRUE, na.rm = TRUE,...){
+cells_from_val <- function(x, y, interval = 1L, cells = TRUE, na.rm = TRUE){
   if(length(y) == 1){
     cells <- raster::Which(x == y, cells = cells, na.rm = na.rm)
   } else if(length(y) == 2){
@@ -360,7 +359,6 @@ split_raster_equally <- function(r, n) {
 #' @param sim_values A function or, if \code{n > 1L}, a list of functions, that, for a given number of cells, simulate new values for those cells.
 #' @param mask,mask_inside Arguments required to implement a spatial mask via \code{\link[flapper]{mask_io}}.
 #' @param plot An integer that defines whether or not to plot a histogram of simulated values (\code{1L}), a heat map of the simulated raster (\code{2L}) or both (\code{1:2L}).
-#' @param ... Additional arguments (none implemented).
 #'
 #' @return The function returns a \code{\link[raster]{raster}}, with the same properties as \code{blank}, with values generated from the \code{sim_values} function(s).
 #'
@@ -393,7 +391,7 @@ sim_surface <- function(blank,
                         n = 1L,
                         sim_values,
                         mask = NULL, mask_inside = FALSE,
-                        plot = 1:2L,...){
+                        plot = 1:2L){
 
   #### Simulate values across a single raster
   if(n == 1L) {

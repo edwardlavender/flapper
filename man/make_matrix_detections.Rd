@@ -14,8 +14,7 @@ make_matrix_detections(
   set_outside = NULL,
   as_POSIXct = as.POSIXct,
   set_names = TRUE,
-  verbose = TRUE,
-  ...
+  verbose = TRUE
 )
 }
 \arguments{
@@ -36,8 +35,6 @@ make_matrix_detections(
 \item{set_names}{A logical variable that defines whether or not to set the row and column names of the matrix to the time steps and the receiver IDs respectively.}
 
 \item{verbose}{A logical variable that defines whether or not to print messages to the console to relay function progress.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 A matrix, or a list of matrices (one for each individual in \code{acoustics} if there is more than one individual) with one column for each time step and one column for each receiver. Each cell defines whether (1) or not (0) the individual was detected (or, if \code{set_outside} is supplied, it could not have been detected) during that time step. All matrices are expressed across the same sequence of time steps and receivers.

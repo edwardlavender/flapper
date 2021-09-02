@@ -4,7 +4,7 @@
 \alias{cells_from_val}
 \title{Obtain a RasterLayer or the cells of RasterLayer that are equal to or lie within a range of specified values}
 \usage{
-cells_from_val(x, y, interval = 1L, cells = TRUE, na.rm = TRUE, ...)
+cells_from_val(x, y, interval = 1L, cells = TRUE, na.rm = TRUE)
 }
 \arguments{
 \item{x}{A \code{\link[raster]{raster}} object.}
@@ -16,8 +16,6 @@ cells_from_val(x, y, interval = 1L, cells = TRUE, na.rm = TRUE, ...)
 \item{cells}{A logical variable that defines whether or not to return a vector of cell numbers (\code{TRUE}) or a RasterLayer of the cells corresponding to \code{y}.}
 
 \item{na.rm}{A logical variable that defines whether or not to ignore NAs.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 The function returns a RasterLayer (if \code{cells = FALSE}) or an integer vector of numbers (if \code{cells = TRUE}) that defines the cells that are equal to, or lie within, specified value(s) \code{y}.

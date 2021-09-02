@@ -328,7 +328,6 @@ coa_setup_delta_t <- function(acoustics,
 #' @param cl A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the connection to the cluster is closed within the function.
 #' @param na_omit,as_POSIXct Processing options. \code{na_omit} is a logical variable that defines whether or not to omit NAs (i.e., rows in \code{mat} for which no detections were made and thus for which COAs cannot be calculated) from returned coordinates. If \code{output = "data.frame"} (see below), \code{as_POSIXct} is a function to convert time stamps, taken from the row names of \code{mat}, to a POSIXct vector. \code{as_POSIXct = NULL} suppresses this conversion.
 #' @param output A character that defines the output format. Currently supported options are: \code{"matrix"}, which returns a matrix of the coordinates of COAs; and \code{"data.frame"}, which returns a dataframe with timestamps (taken from the row names of \code{mat}) and COA coordinates.
-#' @param ... Additional arguments (none implemented).
 #'
 #' @details Centres of activity (COA) are a widely used metric for the reconstruction of patterns of space use from passive acoustic telemetry detections. Several methods have been developed to calculate COAs, but the mean-position algorithm is the commonest. Under this approach, COAs are estimated as an average of the locations of receivers at which an individual is detected over a specified time interval, weighted by the frequency of detections at each of those receivers. Within \code{\link[flapper]{flapper}}, COAs are calculated in three stages by first exploring possible time intervals over which to calculate COAs with \code{\link[flapper]{coa_setup_delta_t}}; then summarising detections over those intervals with \code{\link[flapper]{make_matrix_detections}}; and finally passing the resultant detection matrix to the \code{\link[flapper]{coa}} function to calculate COAs. This implements the arithmetic version of the mean-position algorithm, calculating the arithmetic mean of the receiver locations, weighted by the frequency of detections at each receiver.
 #'
@@ -395,7 +394,7 @@ coa_setup_delta_t <- function(acoustics,
 #' @export
 #'
 
-coa <- function(mat, xy, cl = NULL, na_omit = TRUE, as_POSIXct = as.POSIXct, output = "matrix",...){
+coa <- function(mat, xy, cl = NULL, na_omit = TRUE, as_POSIXct = as.POSIXct, output = "matrix"){
 
   #### Define objects
   if(all(mat == 0)) stop("No detection(s) identified in mat: unable to calculate COA(s).", call. = FALSE)

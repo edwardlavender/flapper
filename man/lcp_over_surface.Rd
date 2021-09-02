@@ -22,8 +22,7 @@ lcp_over_surface(
   varlist = NULL,
   use_all_cores = FALSE,
   check = TRUE,
-  verbose = TRUE,
-  ...
+  verbose = TRUE
 )
 }
 \arguments{
@@ -58,8 +57,6 @@ lcp_over_surface(
 \item{check}{A logical input that defines whether or not to check function inputs. If \code{TRUE}, internal checks are implemented to check user-inputs and whether or not inputted coordinates are in appropriate places on the processed \code{surface} (for instance, to ensure inputted coordinates do not lie over masked areas). This helps to prevent intractable error messages. If \code{FALSE}, these checks are not implemented, so function progress may be faster initially (especially for large \code{origin}/\code{destination} coordinate matrices).}
 
 \item{verbose}{A logical input that defines whether or not to print messages to the console to monitor function progress. This is especially useful with a large \code{surface} since the algorithms are computationally intensive.}
-
-\item{...}{Additional arguments (none implemented).}
 }
 \value{
 \subsection{A named list}{The function returns a named list. The most important element(s) of this list are `path_lcp' and/or `dist_lcp', the shortest path(s) and/or distance(s) (m) between \code{origin} and \code{destination} coordinate pairs/combinations. `path_lcp' is returned if \code{goal = 2} or \code{goal = 3} and `dist_lcp' is returned if \code{goal = 1} or \code{goal = 3}. `path_lcp' contains (a) a dataframe with the cells comprising each path (`cells'), (b) a named list containing a \code{\link[sp]{SpatialLines}} object for each path (`SpatialLines') and (c) a named list of matrices of the coordinates of each path (`coordinates'). `dist_lcp' is a (a) numeric vector or (b) matrix with the distances (m) between each pair or combination of coordinates respectively. If `dist_lcp' is computed, `dist_euclid', the Euclidean distances (m) between the \code{origin} and \code{destination}, is also returned for comparison.
