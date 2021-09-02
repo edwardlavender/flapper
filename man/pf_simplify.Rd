@@ -16,6 +16,7 @@ pf_simplify(
   summarise_pr = NULL,
   max_n_copies = NULL,
   sample_method = c("random", "weighted", "max"),
+  max_n_paths = NULL,
   add_origin = TRUE,
   verbose = TRUE
 )
@@ -38,6 +39,8 @@ pf_simplify(
 \item{max_n_copies}{(optional) For \code{return = "path"}, \code{max_n_copies} is an integer that specifies the maximum number of copies of a sampled cell that are retained at each time stamp. Each copy represents a different route to that cell. By default, all copies (i.e. routes to that cell are retained) via \code{max_n_copies = NULL}. However, in cases where there are a large number of paths through a landscape, the function can run into vector memory limitations during path assembly, so \code{max_n_copies} may need to be set. In this case, at each time step, if there are more than \code{max_n_copies} paths to a given cell, then a subset of these (\code{max_n_copies}) are sampled, according to the \code{sample_method} argument.}
 
 \item{sample_method}{(optional) For \code{return = "path"}, if \code{max_n_copies} is supplied, \code{sample_method} is a character that defines the sampling method. Currently supported options are: \code{"random"}, which implements random sampling; \code{"weighted"}, which implements weighted sampling, with random samples taken according to their probability at the current time step; and \code{"max"}, which selects for the top \code{max_n_copies} most likely copies of a given cell according to the probability associated with movement into that cell from the previous location.}
+
+\item{max_n_paths}{(optional) For \code{return = "path"}, \code{max_n_paths} is an integer that specifies the maximum number of paths to be reconstructed. During path assembly, following the implementation of \code{max_n_copies} (if provided), \code{max_n_paths} are selected at random at each time step. This option is provided to improve the speed of path assembly in situations with large numbers of paths.}
 
 \item{add_origin}{For \code{return = "path"}, \code{add_origin} is a logical input that defines whether or not to include the origin in the returned dataframe.}
 
@@ -146,7 +149,15 @@ pf_loglik(paths_3a)
 pf_loglik(paths_3b)
 pf_loglik(paths_3c)
 
-#### Example (5): Retain/drop the origin, if specified
+#### Example (5): Set the maximum number of paths for reconstruction (for speed)
+# Reconstruct all paths
+unique(pf_simplify(dat_dcpf_histories)$path_id)
+# Reconstruct one path
+unique(pf_simplify(dat_dcpf_histories, max_n_paths = 1)$path_id)
+# Reconstruct (at most) five paths
+unique(pf_simplify(dat_dcpf_histories, max_n_paths = 5)$path_id)
+
+#### Example (6): Retain/drop the origin, if specified
 # For the example particle histories, an origin was specified
 dat_dcpf_histories$args$origin
 # This is included as 'timestep = 0' in the returned dataframe

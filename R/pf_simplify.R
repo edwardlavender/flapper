@@ -13,6 +13,7 @@
 #' @param summarise_pr (optional) For \code{return = "archive"}, \code{summarise_pf} is a function that summarises the probabilities of duplicate cell records for each time step (e.g., \code{\link[base]{mean}} or \code{\link[base]{max}}). If supplied, only one record of each sampled cell is returned per time step, with the associated probability calculated from \code{summarise_pf}. This option is useful for deriving maps of the `probability of use' across an area based on particle histories because it ensures that `probability of use' scores depend on the number of time steps during which an individual could have occupied a location, rather than the total number of samples of that location (see \code{\link[flapper]{pf_plot_map}}).
 #' @param max_n_copies (optional) For \code{return = "path"}, \code{max_n_copies} is an integer that specifies the maximum number of copies of a sampled cell that are retained at each time stamp. Each copy represents a different route to that cell. By default, all copies (i.e. routes to that cell are retained) via \code{max_n_copies = NULL}. However, in cases where there are a large number of paths through a landscape, the function can run into vector memory limitations during path assembly, so \code{max_n_copies} may need to be set. In this case, at each time step, if there are more than \code{max_n_copies} paths to a given cell, then a subset of these (\code{max_n_copies}) are sampled, according to the \code{sample_method} argument.
 #' @param sample_method (optional) For \code{return = "path"}, if \code{max_n_copies} is supplied, \code{sample_method} is a character that defines the sampling method. Currently supported options are: \code{"random"}, which implements random sampling; \code{"weighted"}, which implements weighted sampling, with random samples taken according to their probability at the current time step; and \code{"max"}, which selects for the top \code{max_n_copies} most likely copies of a given cell according to the probability associated with movement into that cell from the previous location.
+#' @param max_n_paths (optional) For \code{return = "path"}, \code{max_n_paths} is an integer that specifies the maximum number of paths to be reconstructed. During path assembly, following the implementation of \code{max_n_copies} (if provided), \code{max_n_paths} are selected at random at each time step. This option is provided to improve the speed of path assembly in situations with large numbers of paths.
 #' @param add_origin For \code{return = "path"}, \code{add_origin} is a logical input that defines whether or not to include the origin in the returned dataframe.
 #' @param verbose A logical input that defines whether or not to print messages to the console to monitor function progress.
 #'
@@ -114,7 +115,15 @@
 #' pf_loglik(paths_3b)
 #' pf_loglik(paths_3c)
 #'
-#' #### Example (5): Retain/drop the origin, if specified
+#' #### Example (5): Set the maximum number of paths for reconstruction (for speed)
+#' # Reconstruct all paths
+#' unique(pf_simplify(dat_dcpf_histories)$path_id)
+#' # Reconstruct one path
+#' unique(pf_simplify(dat_dcpf_histories, max_n_paths = 1)$path_id)
+#' # Reconstruct (at most) five paths
+#' unique(pf_simplify(dat_dcpf_histories, max_n_paths = 5)$path_id)
+#'
+#' #### Example (6): Retain/drop the origin, if specified
 #' # For the example particle histories, an origin was specified
 #' dat_dcpf_histories$args$origin
 #' # This is included as 'timestep = 0' in the returned dataframe
@@ -207,6 +216,7 @@ pf_simplify <- function(archive,
                         summarise_pr = NULL,
                         max_n_copies = NULL,
                         sample_method = c("random", "weighted", "max"),
+                        max_n_paths = NULL,
                         add_origin = TRUE,
                         verbose = TRUE){
 
@@ -538,6 +548,11 @@ pf_simplify <- function(archive,
           history_for_pair <- history_for_pair %>% dplyr::slice_sample(n = max_n_copies, weight_by = .data$pr_current)
         } else if(sample_method == "max"){
           history_for_pair <- history_for_pair %>% dplyr::slice(1:max_n_copies)
+        }
+      }
+      if(!is.null(max_n_paths)){
+        if(nrow(history_for_pair) > max_n_paths){
+          history_for_pair <- history_for_pair %>% dplyr::slice_sample(n = max_n_paths)
         }
       }
       history_for_pair[, paste0("id_", t+1)]  <- history_for_pair$id_current.y
