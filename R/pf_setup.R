@@ -35,6 +35,7 @@ pf_setup_movement_pr <- function(distance,...) {
 #'
 #' @param root A string that defines the directory in which files are loaded.
 #' @param type A character that defines the source of the files (\code{type = "acs"} refers to an AC* algorithm and \code{type = "dc"} refers to the DC algorithm).
+#' @param use_absolute_paths A logical variable that defines whether to return relative paths (\code{FALSE}) or absolute paths (\code{TRUE}) (see \code{\link[tools]{file_path_as_absolute}}).
 #' @param ... Additional arguments passed to \code{\link[base]{list.files}} (excluding \code{full.names}).
 #'
 #' @details This function requires the \code{\link[stringr]{stringr}} package.
@@ -78,7 +79,7 @@ pf_setup_movement_pr <- function(distance,...) {
 #' @author Edward Lavender
 #' @export
 
-pf_setup_record <- function(root, type = c("acs", "dc"),...){
+pf_setup_record <- function(root, type = c("acs", "dc"), use_absolute_paths = FALSE,...){
   if(!requireNamespace("stringr", quietly = TRUE)){
     stop("This function requires the 'stringr' package. Please install it before continuing with install.packages('stringr').")
   }
@@ -118,7 +119,9 @@ pf_setup_record <- function(root, type = c("acs", "dc"),...){
     files <- files %>% dplyr::arrange(.data$arc_id)
   }
   files <- list.files(root, full.names = TRUE,...)[files$index]
-  files <- sapply(files, function(f) tools::file_path_as_absolute(f))
-  names(files) <- NULL
+  if(use_absolute_paths) {
+    files <- sapply(files, function(f) tools::file_path_as_absolute(f))
+    names(files) <- NULL
+  }
   return(files)
 }

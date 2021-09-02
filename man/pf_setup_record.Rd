@@ -4,12 +4,14 @@
 \alias{pf_setup_record}
 \title{List `record' files from an AC/DC algorithm for PF}
 \usage{
-pf_setup_record(root, type = c("acs", "dc"), ...)
+pf_setup_record(root, type = c("acs", "dc"), use_absolute_paths = FALSE, ...)
 }
 \arguments{
 \item{root}{A string that defines the directory in which files are loaded.}
 
 \item{type}{A character that defines the source of the files (\code{type = "acs"} refers to an AC* algorithm and \code{type = "dc"} refers to the DC algorithm).}
+
+\item{use_absolute_paths}{A logical variable that defines whether to return relative paths (\code{FALSE}) or absolute paths (\code{TRUE}) (see \code{\link[tools]{file_path_as_absolute}}).}
 
 \item{...}{Additional arguments passed to \code{\link[base]{list.files}} (excluding \code{full.names}).}
 }
