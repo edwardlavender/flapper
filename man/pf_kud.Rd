@@ -57,7 +57,7 @@ grid <- methods::as(grid, "SpatialPixelsDataFrame")
 #### Example (1): Implement function using default options
 ## Implementation based on particles
 pp <- par(mfrow = c(1, 2))
-pf_kud(pf_simplify(dat_dcpf_histories, summarise_pr = max, return = "archive"),
+pf_kud(pf_simplify(dat_dcpf_histories, summarise_pr = TRUE, return = "archive"),
        bathy = bathy, sample_size = 100,
        estimate_ud = kud_around_coastline, grid = grid)
 ## Implementation based on paths

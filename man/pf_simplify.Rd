@@ -13,7 +13,7 @@ pf_simplify(
   varlist = NULL,
   use_all_cores = FALSE,
   return = c("path", "archive"),
-  summarise_pr = NULL,
+  summarise_pr = FALSE,
   max_n_copies = NULL,
   sample_method = c("random", "weighted", "max"),
   max_n_paths = NULL,
@@ -34,7 +34,7 @@ pf_simplify(
 
 \item{return}{A character (\code{return = "path"} or \code{return = "archive"}) that defines the type of object that is returned (see Details).}
 
-\item{summarise_pr}{(optional) For \code{return = "archive"}, \code{summarise_pf} is a function that summarises the probabilities of duplicate cell records for each time step (e.g., \code{\link[base]{mean}} or \code{\link[base]{max}}). If supplied, only one record of each sampled cell is returned per time step, with the associated probability calculated from \code{summarise_pf}. This option is useful for deriving maps of the `probability of use' across an area based on particle histories because it ensures that `probability of use' scores depend on the number of time steps during which an individual could have occupied a location, rather than the total number of samples of that location (see \code{\link[flapper]{pf_plot_map}}).}
+\item{summarise_pr}{(optional) For \code{return = "archive"}, \code{summarise_pf} logical input that defines whether or not to summarise the probabilities of duplicate cell records for each time step. If supplied, only one record of each sampled cell is returned per time step, with the associated probability calculated as the sum of the normalised probabilities of all samples for that cell. This option is useful for deriving maps of the `probability of use' across an area based on particle histories because it ensures that `probability of use' scores depend on the number of time steps during which an individual could have occupied a location, rather than the total number of samples of that location (see \code{\link[flapper]{pf_plot_map}}).}
 
 \item{max_n_copies}{(optional) For \code{return = "path"}, \code{max_n_copies} is an integer that specifies the maximum number of copies of a sampled cell that are retained at each time stamp. Each copy represents a different route to that cell. By default, all copies (i.e. routes to that cell are retained) via \code{max_n_copies = NULL}. However, in cases where there are a large number of paths through a landscape, the function can run into vector memory limitations during path assembly, so \code{max_n_copies} may need to be set. In this case, at each time step, if there are more than \code{max_n_copies} paths to a given cell, then a subset of these (\code{max_n_copies}) are sampled, according to the \code{sample_method} argument.}
 
@@ -55,7 +55,7 @@ This function is designed to simplify the \code{\link[flapper]{pf_archive-class}
 \details{
 The implementation of this function depends on how \code{\link[flapper]{pf}} has been implemented and the \code{return} argument. Under the default options in \code{\link[flapper]{pf}}, the fast Euclidean distances method is used to sample sequential particle positions, in which case the history of each particle through the landscape is not retained and has to be assembled afterwards. In this case, \code{\link[flapper]{pf_simplify}} calculates the distances between all combinations of cells at each time step, using either a Euclidean distances or shortest distances algorithm according to the input to \code{calc_distance}. Distances are converted to probabilities using the `intrinsic' probabilities associated with each location and the movement models retained in \code{archive} from the call to \code{\link[flapper]{pf}} to identify possible movement paths between cells at each time step. If the fast Euclidean distances method has not been used, then pairwise cell movements are retained by \code{\link[flapper]{pf}}. In this case, the function simply recalculates distances between sequential cell pairs and the associated cell probabilities, which are then processed according to the \code{return} argument.
 
-Following the identification of pairwise cell movements, if \code{return = "archive"}, the function selects all of the unique cells at each time step that were connected to cells at the next time step. (For cells that were selected multiple times at a given time step, due to sampling with replacement in \code{\link[flapper]{pf}}, if \code{summarise_pr} is supplied, only one sample (e.g., the probable sample) is retained: in maps of the `probability of use' across an area (see \code{\link[flapper]{pf_plot_map}}), this ensures that cell scores depend on the number of time steps when the individual could have occupied a given cell, rather than the total number of samples of a location.) Otherwise, if \code{return = "path"}, pairwise cell movements are assembled into complete movement paths.
+Following the identification of pairwise cell movements, if \code{return = "archive"}, the function selects all of the unique cells at each time step that were connected to cells at the next time step. (For cells that were selected multiple times at a given time step, due to sampling with replacement in \code{\link[flapper]{pf}}, if \code{summarise_pr} is supplied, only one sample is retained: in maps of the `probability of use' across an area (see \code{\link[flapper]{pf_plot_map}}), this ensures that cell scores depend on the number of time steps when the individual could have occupied a given cell, rather than the total number of samples of a location.) Otherwise, if \code{return = "path"}, pairwise cell movements are assembled into complete movement paths.
 }
 \examples{
 #### Example particle histories
@@ -193,7 +193,7 @@ table(duplicated(out_dcpf_6b$history[[1]]$id_current))
 # Now, there is only one (the most likely) record of sampled cells
 # ... at each time step.
 out_dcpf_6c <- pf_simplify(out_dcpf_6b,
-                           summarise_pr = max,
+                           summarise_pr = TRUE,
                            return = "archive")
 head(out_dcpf_6c$history[[1]])
 table(duplicated(out_dcpf_6c$history[[1]]$id_current))

@@ -54,7 +54,7 @@ For either implementation, raw scores can be transformed or scaled to facilitate
 # ... using pf_simplify() with return = "archive"
 dat_dcpf_histories_connected <-
   pf_simplify(dat_dcpf_histories,
-             summarise_pr = max,
+             summarise_pr = TRUE,
              return = "archive")
 ## Path based implementation
 # The example data 'dat_dcpf_paths' contains a sample of paths reconstructed

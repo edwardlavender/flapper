@@ -22,7 +22,7 @@
 #'   }
 #' }
 #'
-#' \item{method}{A character that defines whether or not \code{history} was derived directly from \code{\link[flapper]{pf}} (\code{method = "pf"}), in which case \code{history} contains all of the particles sampled at each time step, or via \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with \code{return = "archive"} (\code{method = "pf_simplify"}), in which case \code{history} contains the subset of particles at each time step that were re-sampled at the next time step; for particles that were sampled multiple times on a given time step, this only contains the most probable sample (see \code{\link[flapper]{pf_simplify}}).}
+#' \item{method}{A character that defines whether or not \code{history} was derived directly from \code{\link[flapper]{pf}} (\code{method = "pf"}), in which case \code{history} contains all of the particles sampled at each time step, or via \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with \code{return = "archive"} (\code{method = "pf_simplify"}), in which case \code{history} contains the subset of particles at each time step that were re-sampled at the next time step; for implementations with \code{summarise_pr = TRUE}, for particles that were sampled multiple times on a given time step, this only one sample with an adjusted probability score that accounts for the number of times that a location was sampled (see \code{\link[flapper]{pf_simplify}}).}
 #'
 #' \item{args}{A named list that records the function arguments passed to \code{\link[flapper]{pf}}. This is as inputted to \code{\link[flapper]{pf}}, but with the `calc_distance_graph' elements added if unsupplied and applicable.}
 #'
