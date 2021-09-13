@@ -340,8 +340,9 @@ following functions:
     (see above);
   - `coa()` implements the arithmetic version of the mean-position
     algorithm to calculate COAs;
-  - `kud_around_coastline()` facilitates the estimation of home ranges
-    (e.g., from estimated COAs) in areas of complex coastline;
+  - `kud_around_coastline()` and `kud_around_coastline_fast()`
+    facilitate the estimation of home ranges (e.g., from estimated COAs)
+    in areas of complex coastline;
 
 ### The `flapper` family of algorithms
 

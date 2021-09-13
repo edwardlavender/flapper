@@ -112,7 +112,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
     \item \link{coa_setup_delta_t} informs decisions as to an appropriate time interval over which to calculate COAs;
     \item \link{make_matrix_detections} summarises matrices over time intervals (see above);
     \item \link{coa} implements the arithmetic version of the mean-position algorithm to calculate COAs;
-    \item \link{kud_around_coastline} facilitates the estimation of home ranges (e.g., from estimated COAs) in areas of complex coastline;
+    \item \link{kud_around_coastline} and \code{kud_around_coastline_fast} facilitate the estimation of home ranges (e.g., from estimated COAs) in areas of complex coastline;
   }
   \item The `flapper` family of algorithms
   \itemize{

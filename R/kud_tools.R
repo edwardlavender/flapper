@@ -1,17 +1,23 @@
 ######################################
 ######################################
-#### kud_around_coastline()
+#### kud_around_coastline_*()
 
 #' @title Process a kernel utilisation distribution around a barrier
-#' @description Given an animal movement path over a gridded surface, this function estimates a `raw' kernel utilisation distribution (from \code{\link[adehabitatHR]{kernelUD}}) and then processes the distribution to account for barriers to movement, such as coastline. To implement the function, the movement path(s) should be supplied as a SpatialPointsDataFrame and the grid over which estimation is implemented as a SpatialPixelsDataFrame with values 0 and 1 defining unsuitable and suitable habitat respectively.
+#' @description Given an animal movement path over a gridded surface, \code{\link[flapper]{kud_around_coastline}} estimates a `raw' kernel utilisation distribution (from \code{\link[adehabitatHR]{kernelUD}}) and then processes the distribution to account for barriers to movement, such as coastline. \code{\link[flapper]{kud_around_coastline_fast}} is a bare-bones implementation of this function for iterative applications. To implement these functions, the movement path(s) should be supplied as a SpatialPointsDataFrame and the grid over which estimation is implemented as a SpatialPixelsDataFrame with values 0 and 1 defining unsuitable and suitable habitat respectively.
 #'
-#' @param xy A \code{\link[sp]{SpatialPointsDataFrame}} object that defines the movement path(s). This should contain a column that defines the individual ID(s) as a factor.
+#' @param xy A \code{\link[sp]{SpatialPointsDataFrame}} object that defines the movement path(s). This should contain a column that defines the individual ID(s) as a factor.  \code{\link[flapper]{kud_around_coastline_fast}} can only handle one individual.
 #' @param grid A \code{\link[sp]{SpatialPixelsDataFrame}} object that defines the grid over which estimation is implemented and binary habitat suitability (0, unsuitable; or 1, suitable).
 #' @param ... Additional arguments passed to \code{\link[adehabitatHR]{kernelUD}}.
 #'
-#' @details Utilisation distributions (UDs) are bivariate probability distributions that describe the probability (density) of locating an individual in any given area at a randomly chosen time. These can be estimated using the \code{\link[adehabitatHR]{kernelUD}} function. The algorithms implemented by this function can incorporate simple barriers, but restrictions on the shapes of barriers mean that in many real-world settings (e.g., in areas with complex coastline) barriers cannot be implemented. As a result, a pragmatic (if somewhat unsatisfactory) approach is to post-process the raw utilisation distribution by removing areas in which movement is impossible and then re-normalise the distribution (so that probabilities sum to one). This function achieves this by implementing the estimation over a grid, which defines whether (1) or not (0) an area is `habitat'. After the estimation of the raw UD across the grid, probability density scores are combined (multiplied) with the habitat suitability score (0, 1) and then renormalised (by dividing by the total score across suitable areas).
+#' @details Utilisation distributions (UDs) are bivariate probability distributions that describe the probability (density) of locating an individual in any given area at a randomly chosen time. These can be estimated using the \code{\link[adehabitatHR]{kernelUD}} function. The algorithms implemented by \code{\link[adehabitatHR]{kernelUD}} function can incorporate simple barriers, but restrictions on the shapes of barriers mean that in many real-world settings (e.g., in areas with complex coastline) barriers cannot be implemented. As a result, a pragmatic (if somewhat unsatisfactory) approach is to post-process the raw utilisation distribution by removing areas in which movement is impossible and then re-normalise the distribution (so that probabilities sum to one). These functions achieve this by implementing the estimation over a grid, which defines whether (1) or not (0) an area is `habitat'. After the estimation of the raw UD across the grid, probability density scores are combined (multiplied) with the habitat suitability score (0, 1) and then renormalised (by dividing by the total score across suitable areas).
 #'
-#' @return The function returns an object of class `estUDm'. This is a list, with one component per animal, of \code{\link[adehabitatHR]{estUD-class}} objects. The `h' slot of the output (\code{output@h}) has been modified so that the method (`meth') is given as `specified'.
+#' To implement these routines, \code{\link[flapper]{kud_around_coastline}} is typically the preferable option. \code{\link[flapper]{kud_around_coastline}} is a bare-bones implementation of the routines within \code{\link[flapper]{kud_around_coastline}} that has is designed to be (marginally) faster (e.g., for iterative applications). This function skips checks on user inputs, assuming that \code{xy} and \code{grid} have been correctly specified (as a \code{\link[sp]{SpatialPointsDataFrame}} for a specific individual and a \code{\link[sp]{SpatialPixelsDataFrame}} respectively), implements the estimation and returns a \code{\link[raster]{raster}} rather than an `estUDm' object (see Value).
+#'
+#' @return
+#' \itemize{
+#'   \item \code{\link[flapper]{kud_around_coastline}} returns an object of class `estUDm'. This is a list, with one component per animal, of \code{\link[adehabitatHR]{estUD-class}} objects. The `h' slot of the output (\code{output@h}) has been modified so that the method (`meth') is given as `specified'.
+#'   \item \code{\link[flapper]{kud_around_coastline_fast}} returns an object of class `RasterLayer'.
+#' }
 #'
 #' @examples
 #' #### Set up
@@ -124,6 +130,11 @@
 #'
 #' @source This forum is a useful resource: http://r-sig-geo.2731867.n2.nabble.com/Walruses-and-adehabitatHR-class-estUDm-exclusion-of-non-habitat-pixels-and-summary-over-all-animals-td6497315.html.
 #' @author Edward Lavender
+#' @name kud_around_coastline
+NULL
+
+#### kud_around_coastline()
+#' @rdname kud_around_coastline
 #' @export
 
 kud_around_coastline <- function(xy, grid,...) {
@@ -176,3 +187,38 @@ kud_around_coastline <- function(xy, grid,...) {
   ## Return
   return(ud_ade)
 }
+
+
+#### kud_around_coastline_fast
+#' @rdname kud_around_coastline
+#' @export
+
+kud_around_coastline_fast <- function(xy, grid,...) {
+
+  ## Define raw UD
+  ud <- adehabitatHR::kernelUD(xy, grid = grid,...)
+
+  ## Define SpatialGridDataFrames:
+  # This assumes xy is a SpatialPointsDataFrame
+  ud <- adehabitatHR::estUDm2spixdf(ud)
+  sp::fullgrid(ud) <- TRUE
+  sp::fullgrid(grid) <- TRUE
+
+  ## Exclude areas of 'unsuitable habitat' and renormalise
+  # ... by multiplying the value of the UD by the habitat (0, 1) and
+  # ... dividing by the total value of the UD
+  ud_vals_renorm <- lapply(1:ncol(ud), function(i) {
+    ud[[i]] * grid[[1]] / sum(ud[[i]] * grid[[1]])
+  })
+  ud_vals_renorm <- as.data.frame(ud_vals_renorm)
+
+  ## Add to UD as data slot
+  ud@data <- ud_vals_renorm
+
+  ## Coerce object to raster
+  ud_ade <- raster::raster(ud)
+
+  ## Return
+  return(ud_ade)
+}
+
