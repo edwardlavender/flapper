@@ -1,5 +1,45 @@
 ########################################
 ########################################
+#### pf_access_history
+
+#' @title Access the `history' element of a \code{\link[flapper]{pf_archive-class}} object
+#' @description This function accesses and simplifies the `history' list in a \code{\link[flapper]{pf_archive-class}} object.
+#' @param archive A \code{\link[flapper]{pf_archive-class}} object.
+#' @param bathy (optional) A \code{\link[raster]{raster}} that defines the grid across the area over which particle filtering was applied. If unsupplied, this is extracted from \code{archive} if available.
+#' @details From the `history' element of a \code{\link[flapper]{pf_archive-class}} object, this function extracts particle samples as a dataframe with columns for time steps, cell IDs, cell probabilities and coordinates (if \code{bathy} is available).
+#' @return The function returns a dataframe that defines, for each time step (`timestep'), particle samples (`cell_id'), associated probabilities (`cell_pr') and, if \code{bathy} is available, cell coordinates (`cell_x', `cell_y' and `cell_z').
+#' @examples
+#' pf_access_history(dat_dcpf_histories)
+#' @author Edward Lavender
+#' @export
+
+pf_access_history <- function(archive,
+                              bathy = NULL
+){
+  check_class(input = archive, to_class = "pf_archive")
+  if(is.null(bathy)) bathy <- archive$args$bathy
+  history <- lapply(1:length(archive$history), function(t){
+    elm <- archive$history[[t]]
+    if(!rlang::has_name(elm, "timestep")) elm$timestep <- t
+    elm <- elm[, c("timestep", "id_current", "pr_current")]
+  })
+  history <- do.call(rbind, history)
+  colnames(history) <- c("timestep", "cell_id", "cell_pr")
+  if(!is.null(bathy)){
+    history[, c("cell_x", "cell_y")] <- raster::extract(bathy, history$cell_id)
+    history$cell_z <- raster::extract(bathy, history$cell_id)
+  }
+  cols <- c("timestep", "cell_id", "cell_x", "cell_y", "cell_z", "cell_pr")
+  history[, cols[cols %in% colnames(history)]]
+  history <-
+    history %>%
+    dplyr::arrange(.data$timestep, .data$cell_id, .data$cell_pr)
+  return(history)
+}
+
+
+########################################
+########################################
 #### pf_plot_history()
 
 #' @title Plot particle histories from a PF algorithm

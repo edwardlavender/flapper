@@ -84,6 +84,30 @@ buffer_and_crop <- function(to_buffer,
 
 ######################################
 ######################################
+#### xy_from_clicks()
+
+#' @title Get location coordinates from mouse click(s)
+#' @description This function defines a two-column matrix of x, y coordinates from clicked locations on a map.
+#' @return The function returns a two-column matrix with coordinates.
+#' @examples
+#' \dontrun{
+#' raster::plot(dat_gebco)
+#' xy <- xy_from_click()
+#' graphics::points(xy, col = "red")
+#' }
+#' @author Edward Lavender
+#' @export
+
+xy_from_click <- function(){
+  cat("Please click locations on the map and press [Esc] when you are done...\n")
+  xy <- graphics::locator()
+  xy <- matrix(c(xy$x, xy$y), ncol = 2, byrow = FALSE)
+  return(xy)
+}
+
+
+######################################
+######################################
 #### crop_from_click()
 
 #' @title Interactively crop a \code{\link[raster]{raster}}

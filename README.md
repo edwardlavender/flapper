@@ -222,6 +222,7 @@ ecological investigations and space use algorithms:
   - `buffer_and_crop()` buffers a spatial object (e.g., receiver
     locations) and uses this buffered object to crop another (e.g., the
     local bathymetry);
+  - `xy_from_click()` gets location coordinates from mouse clicks;
   - `crop_from_click()` crops a raster to an area defined by mouse
     clicks;
   - `cells_from_val()` returns the cells (or a raster of the cells) of a
@@ -340,9 +341,9 @@ following functions:
     (see above);
   - `coa()` implements the arithmetic version of the mean-position
     algorithm to calculate COAs;
-  - `kud_around_coastline()` and `kud_around_coastline_fast()`
-    facilitate the estimation of home ranges (e.g., from estimated COAs)
-    in areas of complex coastline;
+  - `kud_habitat()`, `kud_around_coastline()` and
+    `kud_around_coastline_fast()` facilitate the estimation of home
+    ranges (e.g., from estimated COAs) in areas of complex coastline;
 
 ### The `flapper` family of algorithms
 
@@ -425,7 +426,8 @@ process provided by the `pf*()` family of functions:
     between them;
   - `pf_setup_record()` creates an ordered list of input files;
   - `pf()` implements the particle filtering routine;
-  - `pf_plot_history()` plot simulated particle histories;
+  - `pf_access_history()` accesses particle histories;
+  - `pf_plot_history()` plots simulated particle histories;
   - `pf_animate_history()` animates simulated particle histories;
   - `pf_simplify()` assembles movement paths from particle histories;
   - `pf_plot_map()` maps the ‘probability of use’ across an area based

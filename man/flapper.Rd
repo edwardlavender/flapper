@@ -38,6 +38,7 @@ Some functions facilitate the acquisition, assembly, processing and checking of 
 Some functions facilitate spatial operations that support ecological investigations and space use algorithms:
 \itemize{
   \item \link{buffer_and_crop} buffers a spatial object (e.g., receiver locations) and uses this buffered object to crop another (e.g., the local bathymetry);
+  \item \link{xy_from_click} gets location coordinates from mouse clicks;
   \item \link{crop_from_click} crops a \code{\link[raster]{raster}} to an area defined by mouse clicks;
   \item \link{cells_from_val} returns the cells (or a \code{\link[raster]{raster}} of the cells) of a \code{\link[raster]{raster}} that are equal to a specified value or lie within a specified range of values;
   \item \link{invert_poly} inverts a polygon (e.g, to define the `sea' from a polygon of the `land');
@@ -112,7 +113,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
     \item \link{coa_setup_delta_t} informs decisions as to an appropriate time interval over which to calculate COAs;
     \item \link{make_matrix_detections} summarises matrices over time intervals (see above);
     \item \link{coa} implements the arithmetic version of the mean-position algorithm to calculate COAs;
-    \item \link{kud_around_coastline} and \code{kud_around_coastline_fast} facilitate the estimation of home ranges (e.g., from estimated COAs) in areas of complex coastline;
+    \item \link{kud_habitat}, \link{kud_around_coastline} and \code{kud_around_coastline_fast} facilitate the estimation of home ranges (e.g., from estimated COAs) in areas of complex coastline;
   }
   \item The `flapper` family of algorithms
   \itemize{
@@ -147,6 +148,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
       \item \link{pf_setup_movement_pr} provides a simple movement model that defines the probability of movement between locations given the distance between them;
       \item \link{pf_setup_record} creates an ordered list of input files;
       \item \link{pf} implements the PF routine, building on the AC, DC and ACDC algorithms to form the ACPF, DCPF and ACDCPF algorithms;
+      \item \link{pf_access_history} accesses particle histories;
       \item \link{pf_plot_history} plots simulated particle histories;
       \item \link{pf_animate_history} animates simulated particle histories;
       \item \link{pf_simplify} assembles movement paths from particle histories;

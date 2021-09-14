@@ -117,12 +117,14 @@ pf_kud_1(out_dcpf_particles_1,
          sample_size = 500,
          estimate_ud = kud_around_coastline_fast, grid = grid)
 ## Implementation based on paths
+\dontrun{
 pf_kud_1(out_dcpf_paths,
          bathy = bathy,
          sample_size = 500,
          estimate_ud = kud_around_coastline_fast, grid = grid)
 prettyGraphics::add_sp_path(x = out_dcpf_paths$cell_x, y = out_dcpf_paths$cell_y,
                             length = 0.01)
+}
 par(pp)
 
 #### Example (2): Implement pf_kud_2() using default options
@@ -149,6 +151,7 @@ pf_kud_1(out_dcpf_particles_1,
          chunks = 2L,
          cl = parallel::makeCluster(2L))
 ## Implementation based on paths
+\dontrun{
 cl <- parallel::makeCluster(2L)
 parallel::clusterEvalQ(cl = cl, library(raster))
 pf_kud_1(out_dcpf_paths,
@@ -157,6 +160,7 @@ pf_kud_1(out_dcpf_paths,
          estimate_ud = flapper::kud_around_coastline_fast, grid = grid,
          chunks = 2L,
          cl = cl)
+}
 par(pp)
 
 #### Example (4): For improved speed with pf_kud_2(), use sample_size

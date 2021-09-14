@@ -1,5 +1,33 @@
 ######################################
 ######################################
+#### kud_habitat()
+
+#' @title Define a `habitat' grid for kernel smoothing
+#' @description This function defines a `habitat' grid for kernel smoothing (e.g., via \code{\link[flapper]{kud_around_coastline}}).
+#' @param map A \code{\link[raster]{raster}} that defines grid properties.
+#' @param mask,mask_inside Mask options passed to \code{\link[flapper]{mask_io}}.
+#' @param plot,... A logical input that defines whether or not to plot the habitat grid, alongside any additional arguments passed to \code{\link[sp]{plot.SpatialPixelsDataFrame}}.
+#' @return The function returns a \code{\link[sp]{SpatialPixelsDataFrame}} object that defines `habitat' (1) versus `non-habitat' (0).
+#' @examples
+#' kud_habitat(map = dat_gebco, mask_inside = FALSE)
+#' kud_habitat(map = dat_gebco, mask = dat_coast, mask_inside = TRUE)
+#' @seealso \code{\link[flapper]{kud_around_coastline}}
+#' @author Edward Lavender
+#' @export
+
+kud_habitat <- function(map, mask = map, mask_inside = FALSE, plot = TRUE,...){
+  par_param <- graphics::par()
+  area <- raster::setValues(map, 1)
+  if(!is.null(mask)) area <- mask_io(area, mask = mask, mask_inside = mask_inside, updatevalue = 0)
+  grid <- methods::as(area, "SpatialPixelsDataFrame")
+  if(plot) sp::plot(grid,...)
+  on.exit(graphics::par(par_param))
+  return(grid)
+}
+
+
+######################################
+######################################
 #### kud_around_coastline_*()
 
 #' @title Process a kernel utilisation distribution around a barrier
