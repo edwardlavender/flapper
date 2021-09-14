@@ -430,8 +430,8 @@ process provided by the `pf*()` family of functions:
   - `pf_simplify()` assembles movement paths from particle histories;
   - `pf_plot_map()` maps the ‘probability of use’ across an area based
     on sampled particles or reconstructed paths;
-  - `pf_kud()` applies a kernel smoother to sampled particles or
-    reconstructed paths;
+  - `pf_kud_1()` and `pf_kud_2()` apply kernel smoothers to sampled
+    particles or reconstructed paths;
   - `pf_loglik()` calculates the log-likelihood of reconstructed paths,
     given the movement model;
   - `pf_plot_1d()` plots the depth time series from observed and
