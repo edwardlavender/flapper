@@ -474,7 +474,9 @@ pf_kud_1 <- function(xpf,
 
   #### Plot KUD
   cat_to_console("... Plotting KUD...")
-  if(plot) prettyGraphics::pretty_map(add_rasters = list(x = kud))
+  ext <- raster::extent(bathy)
+  if(plot) prettyGraphics::pretty_map(add_rasters = list(x = kud),
+                                      xlim = ext[1:2], ylim = ext[3:4])
 
   #### Return kud
   t_end <- Sys.time()
@@ -530,6 +532,7 @@ pf_kud_2 <- function(xpf,
     crs <- sp::CRS(as.character(NA))
   }
   message("CRS taken as: '", crs, "'.")
+  blank <- raster::setValues(bathy, 0)
 
 
   ######################################
@@ -579,6 +582,7 @@ pf_kud_2 <- function(xpf,
     if(!inherits(ud, "RasterLayer")){
       ud <- raster::raster(ud)
     }
+    ud <- raster::resample(ud, bathy)
     if(!is.null(mask)) ud <- raster::mask(ud, mask)
 
 
@@ -615,7 +619,6 @@ pf_kud_2 <- function(xpf,
     #### Combine KUDs across paths
     ## Convert KUDs to rasterStack
     cat_to_console("... Processing KUD(s)...")
-    blank <- raster::setValues(bathy, 0)
     ud_by_path <- lapply(ud_by_path, function(ud){
       ud <- raster::raster(ud)
       ud <- raster::resample(ud, blank)
@@ -624,13 +627,16 @@ pf_kud_2 <- function(xpf,
     })
     ud_by_path <- raster::stack(ud_by_path)
     ud <- raster::calc(ud_by_path, mean)
-    ## Renormalise KUDs
-    ud <- ud/raster::cellStats(ud, "sum")
   }
+
+  #### Renormalise KUDs
+  ud <- ud/raster::cellStats(ud, "sum")
 
   #### Visualise KUD
   cat_to_console("... Plotting KUD...")
-  if(plot) prettyGraphics::pretty_map(add_rasters = list(x = ud))
+  ext <- raster::extent(bathy)
+  if(plot) prettyGraphics::pretty_map(add_rasters = list(x = ud),
+                                      xlim = ext[1:2], ylim = ext[3:4])
 
   #### Return KUD
   t_end <- Sys.time()
