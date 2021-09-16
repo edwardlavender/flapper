@@ -97,6 +97,7 @@ pf_plot_map <- function(xpf,
       }
       return(elm)
     })
+    n <- length(dat)
     dat <- do.call(rbind, dat)
     colnames(dat) <- c("cell_id", "cell_pr")
     dat$path_id <- 1L
@@ -104,6 +105,7 @@ pf_plot_map <- function(xpf,
     ## pf_path implementation
   } else if(inherits(xpf, "pf_path")){
     dat <- xpf[, c("cell_id", "cell_pr", "path_id")]
+    n <- length(which(dat$path_id == dat$path_id[1]))
   }
 
   #### Calculate cell scores (the frequency with which each cell was sampled, weighted by the probability)
@@ -116,7 +118,6 @@ pf_plot_map <- function(xpf,
   # ... (ideally weighted by the overall likelihood of the path).
   # ... For path based implementations, this approach is equivalent (but faster than)
   # ... to defining a stack of rasters, one for each path, and then calculating the average/a weighed average.
-  n <- length(which(dat$path_id == dat$path_id[1]))
   wt_freq <-
     dat %>%
     dplyr::group_by(.data$path_id, .data$cell_id) %>%
