@@ -156,7 +156,7 @@ get_detection_centroids <- function(xy,
     if(length(xy_buf) == 1) {
       xy_buf <- raster::crop(xy_buf, boundaries)
     } else {
-      xy_buf <- lapply(1:length(xy_buf), function(i) raster::crop(xy_buf[i], boundaries))
+      xy_buf <- lapply(1:length(xy_buf), function(i) raster::crop(xy_buf[i, ], boundaries))
       xy_buf <- do.call(raster::bind, xy_buf)
     }
   }
@@ -164,7 +164,7 @@ get_detection_centroids <- function(xy,
     if(length(xy_buf) == 1) {
       xy_buf <- rgeos::gDifference(xy_buf, coastline)
     } else {
-      xy_buf <- lapply(1:length(xy_buf), function(i) rgeos::gDifference(xy_buf[i], coastline))
+      xy_buf <- lapply(1:length(xy_buf), function(i) rgeos::gDifference(xy_buf[i, ], coastline))
       xy_buf <- do.call(raster::bind, xy_buf)
     }
   }
