@@ -18,6 +18,9 @@ dat_acoustics <- readRDS("dat_acoustics.rds")
 dat_sentinel  <- readRDS("dat_sentinel.rds")
 dat_archival  <- readRDS("dat_archival.rds")
 
+#### Processing
+rownames(dat_moorings) <- dat_moorings$receiver_id
+
 
 #####################################
 #####################################
