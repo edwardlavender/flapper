@@ -361,7 +361,7 @@ pf_kud_1 <- function(xpf,
   }
   message("CRS taken as: '", crs, "'.")
   if(plot_by_time & !is.null(cl)) {
-    warning("'plot_by_time' ignored for chunks > 1L.", immediate. = TRUE, call. = FALSE)
+    warning("'plot_by_time' ignored for 'cl' != NULL.", immediate. = TRUE, call. = FALSE)
     plot_by_time <- FALSE
   }
 
@@ -468,9 +468,9 @@ pf_kud_1 <- function(xpf,
     kud_stack <- raster::stack(kud_by_chunk)
     kud <- raster::calc(kud_stack, sum, na.rm = TRUE)
   }
-  kud <- kud/raster::cellStats(kud, "sum")
   ## Mask KUD
   if(!is.null(mask)) kud <- raster::mask(kud, mask)
+  kud <- kud/raster::cellStats(kud, "sum")
 
   #### Plot KUD
   cat_to_console("... Plotting KUD...")
@@ -619,7 +619,7 @@ pf_kud_2 <- function(xpf,
     #### Combine KUDs across paths
     ## Convert KUDs to rasterStack
     cat_to_console("... Processing KUD(s)...")
-    ud_by_path <- lapply(ud_by_path, function(ud){
+    ud_by_path <- pbapply::pblapply(ud_by_path, function(ud){
       ud <- raster::raster(ud)
       ud <- raster::resample(ud, blank)
       if(!is.null(mask)) ud <- raster::mask(ud, mask)

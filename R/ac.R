@@ -7,11 +7,10 @@
 #' @param step A number that defines the time step length (s) between consecutive detections. The series are rounded to the nearest \code{step} to ensure alignment (see Details).
 #' @param plot_ts A logical input that defines whether or not to the plot detection  time series before the algorithm is initiated.
 #' @param bathy A \code{\link[raster]{raster}} that defines a grid across the area within which the individual could have moved. The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acs_setup_centroids}}).
-#' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see also \code{\link[flapper]{acs_setup_centroids}}).
+#' @param detection_centroids A list of detection centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.
 #' @param detection_kernels A named list of detection probability kernels, from \code{\link[flapper]{acs_setup_detection_kernels}} and created using consistent parameters as specified for other \code{acs_setup_*} functions and here (i.e., see the \code{overlaps}, \code{calc_detection_pr} and \code{map} arguments in \code{\link[flapper]{acs_setup_detection_kernels}}).
 #' @param detection_kernels_overlap (optional) A named list, from \code{\link[flapper]{get_detection_centroids_overlap}}, that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers. If \code{detection_kernels_overlap} and \code{detection_time_window} (below) are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids; if unsupplied, receiver detection probability kernels are assumed not to overlap.
 #' @param detection_time_window (optional) A number that defines the maximum duration (s) between consecutive detections at different receivers such that they can be said to have occurred at `effectively the same time'. This indicates that the same transmission was detected by multiple receivers. If \code{detection_kernels_overlap} (above) and \code{detection_time_window} are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids, by up-weighting overlapping areas between receivers that detected the transmission and down-weighting overlapping areas between receivers that did not detect the transmission (see Details in \code{\link[flapper]{acs_setup_detection_kernels}}). Note that the timing of detections is affected by \code{step} (see Details).
-#' @param acc_centroids A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.
 #' @param mobility A number that defines the distance (m) that an individual could move in the time steps between sequential detections (see also \code{\link[flapper]{acs_setup_centroids}}).
 #' @param normalise A logical variable that defines whether or not to normalise the map of possible locations at each time step. In both cases, at each time step the possible locations of the individual are scaled so that the most probable locations have a score of 1 and other scores vary between 0--1. If \code{normalise = FALSE}, these scores are simply summed at each time step, in which case scores on the final map can be interpreted as the number of time steps when the individual could have been in any given location. In contrast, if \code{normalise = TRUE}, at each time step scores are normalised so that they sum to one; the consequence is that time steps with detections, when uncertainty in the individual's location concentrates in the detection centroid around a receiver, are weighted more strongly than time steps between detections, when the uncertainty in the individual's location is spread across a larger area. The final surface can be normalised within \code{\link[flapper]{acdc_simplify}}, with in each cell (0--1) providing a measure of the relative potential use of each location.
 #' @param save_record_spatial An integer vector that defines the time steps for which to save a record of the spatial information from each time step. \code{save_record_spatial = 0L} suppresses the return of this information and \code{save_record_spatial = NULL} returns this information for all time steps. If the algorithm is applied chunk-wise, this spatial information must be returned for at least the first time step (the default) to aggregate maps across chunks (see \code{\link[flapper]{acdc_simplify}}). This information can also be used to plot time-specific results of the algorithm using \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}}.
@@ -25,21 +24,21 @@
 #'
 #' @details The acoustic-centroid (AC) algorithm is an approach which uses acoustic detections to infer the possible locations of tagged animals within an area over some time interval. The locational information provided by acoustic detections is represented by acoustic centroids, which are areas around receivers that define where an individual could have been at each time point given the spatiotemporal pattern of detections at receivers, a model of detection probability and a movement parameter.
 #'
-#' In outline, the crux of the approach is the recognition that acoustic detections typically occur irregularly. Each detection anchors our knowledge of the location of an individual around a particular receiver (assuming that all detections are true detections). As time passes between acoustic detections, our uncertainty about the geographical location of an individual expands around the receiver at which it was detected before shrinking towards the receiver at which it was next detected.
+#' In outline, the crux of the approach is the recognition that acoustic detections typically occur irregularly, but we can consider a sequence of regular time steps between any pair of detections. Each detection anchors our knowledge of the location of an individual around a particular receiver (assuming that all detections are true detections). As time passes between pairs of detections, our uncertainty in the geographical location of an individual expands around the receiver at which the individual was detected before shrinking towards the receiver at which it was next detected. The dynamics of this process are captured by the expansion, contraction and intersection of pairs of acoustic centroids.
 #'
-#' More specifically, when an individual is detected, it must be within some radius---say 800 m---of that receiver termed the detection centroids. With a more-refined model of detection probability, it may be possible to predict more precisely where the individual is likely to have been within this centroid. (In situations with depth data, the ACDC algorithm further restricts the set of locations by incorporating information on the animal's depth via depth contours.) Moving forward in time, we can consider a number of regular time steps before the next detection. During this time, our uncertainty about where the individual could have been gets larger, because it could have moved further away from the receiver, which is described by the expansion of `acoustic centroids'. Assuming that detections and intermediate time steps are perfectly aligned and that the acoustic centroids expand at a constant rate, acoustic centroids reach their maximum size at the halfway point between acoustic detections. After that, the individual must have started to move towards the receiver at which it was next detected, so the acoustic centroids start to shrink towards that receiver. If the individual was detected by different receivers, the overlap between the centroids of these two receivers at the halfway point defines the set of positions in which the individual could have been at this time. Thereafter, our uncertainty in the individual's location is given by the overlap between the expansion of this centroid region and the contraction of the centroid around the receiver at which it was next detected. Thus, when the individual is detected again, our uncertainty about where it could have been collapses to the detection radius around the next receiver, possibly weighted by a model of detection probability around this receiver. The rate of change in centroid size depends a movement parameter that describes the maximum swimming speed.
+#' More specifically, at each time step, we can consider the boundaries of the individual's location from perspective of (a) the receiver at which the individual was detected and (b) the receiver at which the individual is next detected. When an individual is detected, it must be within some radius---say 800 m---of that receiver termed the `detection centroid'. From the perspective of the receiver at which the individual is next detected, the boundaries of the individual's location are wider in line with the time between detections and the movement speed of the animal. The intersection of these two areas describes the boundaries of the individual's possible location. (In most cases, this is simply the detection centroid around the first receiver.) With a more-refined model of detection probability, it may be possible to predict more precisely where the individual is likely to have been within this area. (In situations with depth data, the ACDC algorithm further restricts the set of locations by incorporating information on the animal's depth via depth contours.) Moving forward in time, we can consider a number of regular time steps before the next detection. During this time, from the perspective of the receiver at which the individual was detected, our uncertainty about the boundaries of the individual's possible location expands, because it could have moved further away from the receiver; meanwhile, from the perspective of the receiver at which the individual was next detected, our uncertainty about the boundaries of the individual's possible location shrinks, as the individual must have been located within the detection centroid of that receiver by the time of the detection. This process is described by the expansion and contraction of `acoustic centroids'. At each time step, the intersection of the two centroids defines the boundaries of the individual's possible location, possibly weighted by a detection probability (given the lack of detections during this time). These dynamics recognise that as time passes between detections the individual could have moved away from the receiver at which it was last detected but only at a rate and in a direction that fits with the receiver at which the individual was next detected. Thus, when the individual is detected again, our uncertainty about where it could have been collapses to the detection centroid around the next receiver (and its overlap with the acoustic centroid around the following receiver*), possibly weighted by a model of detection probability. Throught this process, the rate of change in centroid size depends a movement parameter that describes the maximum swimming speed. (*Note that there is a theoretical possibility of a minor mismatch here in some circumstances if detection centroids are large relative to mobility because some areas identified at the time of the penultimate time step before the next detection may be too far away from the intersecting region between the next two receivers at the time of the next detection; however, this can be resolved via the integration of a movement model into this process with \code{\link[flapper]{pf}}).
 #'
-#' In reality, there is likely to be a mismatch between the timing of detections and the intermediate time steps between detections, which may be poorly approximated the constant expansion and contraction of acoustic centroids. For example, if there are five regular time steps between two detections but the second detection only occurs some time after the fifth time step, then the centroids will expand to their maximum size by the third time step and shrink back to the size of the detection centroid slightly prematurely at the fifth time step. The simplest solution to this issue is to round the acoustic time steps to the resolution of the intermediate time steps (specified by \code{step}). This results in a small loss of precision, but assuming that \code{step} is relatively small, the effect should be negligible. In any case, clocks on different receivers are unlikely to be perfectly synced throughout a study. This solution is also computationally preferable to an alternative approach in which the expansion and contraction of centroids varies through time, depending on the gaps between observations and other time-specific variables such as behavioural state. However, the latter approach may be implemented in due course.
+#' This discussion assumes that the timing of detections and intermediate time steps between detections are perfectly aligned. In reality, there is likely to be a mismatch between the timing of detections and the intermediate time steps between detections, which may be poorly approximated the constant expansion and contraction of acoustic centroids. For example, if we consider the situation where two consecutive detections are recorded at the same receiver, if there are five regular time steps between two detections but the second detection only occurs some time after the fifth time step, then the centroids will expand to their maximum size by the third time step and shrink back to the size of the detection centroid slightly prematurely at the fifth time step. The simplest solution to this issue is to round the acoustic time steps to the resolution of the intermediate time steps (specified by \code{step}). This results in a small loss of precision, but assuming that \code{step} is relatively small, the effect should be negligible. In any case, clocks on different receivers are unlikely to be perfectly synced throughout a study. This solution is also computationally preferable to an alternative approach in which the expansion and contraction of centroids varies through time, depending on the gaps between observations and other time-specific variables such as behavioural state. However, the latter approach may be implemented in due course.
 #'
 #' The end result is a map that shows where the individual could have spent more or less (or no) time over the time interval under consideration. The main limitation of this approach is that reconstructs where the individual could have been, but not where it was. However, particle filtering can be used to extent this approach via the incorporate a movement model.
 #'
 #' @return The function returns an \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
 #'
-#' @seealso This function calls \code{\link[flapper]{.acs_pl}} and \code{\link[flapper]{.acs}} to implement the AC algorithm. \code{\link[flapper]{acs_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acs_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results. The AC algorithm can be extended to incorporate depth contours via \code{\link[flapper]{acdc}}. Particle filtering can be used to reconstruct movement paths.
+#' @seealso This function calls \code{\link[flapper]{.acs_pl}} and \code{\link[flapper]{.acs}} to implement the AC algorithm. \code{\link[flapper]{acs_setup_centroids}} defines the detection centroids required by this function. \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results. The AC algorithm can be extended to incorporate depth contours via \code{\link[flapper]{acdc}}. Particle filtering can be used to reconstruct movement paths.
 #'
 #' @examples
 #' #### Step (1) Implement setup_acdc_*() steps
-#' # ... Define acoustic centroids required for AC algorithm (see setup_acdc_centroids())
+#' # ... Define detection centroids required for AC algorithm (see setup_acdc_centroids())
 #'
 #' #### Step (2) Prepare movement time series for algorithm
 #' # Focus on an example individual for speed
@@ -52,9 +51,8 @@
 #' out_ac <- ac(acoustics = acc,
 #'              step = 120,
 #'              bathy = dat_gebco,
-#'              detection_range = 425,
-#'              mobility = 200,
-#'              acc_centroids = dat_centroids
+#'              detection_centroids = dat_centroids,
+#'              mobility = 200
 #'              )
 #'
 #' #### Subsequent examples follow the implementation given in acdc().
@@ -66,11 +64,10 @@ ac <- function(acoustics,
                step,
                bathy,
                plot_ts = TRUE,
-               detection_range,
+               detection_centroids,
                detection_kernels = NULL,
                detection_kernels_overlap = NULL,
                detection_time_window = 5,
-               acc_centroids,
                mobility,
                normalise = FALSE,
                save_record_spatial = 1L,
@@ -86,7 +83,7 @@ ac <- function(acoustics,
   t_onset <- Sys.time()
   message(paste0("flapper::ac() called (@ ", t_onset, ")..."))
   # Check for missing inputs
-  for(arg in c(acoustics, step, bathy, detection_range, acc_centroids, mobility)) 1L
+  for(arg in c(acoustics, step, bathy, detection_centroids, mobility)) 1L
   # Pass inputs to .acs_pl()
     out <-
       .acs_pl(
@@ -95,14 +92,13 @@ ac <- function(acoustics,
         step = step,
         plot_ts = plot_ts,
         bathy = bathy,
-        detection_range = detection_range,
+        detection_centroids = detection_centroids,
         detection_kernels = detection_kernels,
         detection_kernels_overlap = detection_kernels_overlap,
         detection_time_window = detection_time_window,
         mobility = mobility,
         calc_depth_error = NULL,
         normalise = normalise,
-        acc_centroids = acc_centroids,
         save_record_spatial = save_record_spatial,
         write_record_spatial_for_pf = write_record_spatial_for_pf,
         verbose = verbose,
@@ -117,11 +113,10 @@ ac <- function(acoustics,
                        step = step,
                        bathy = bathy,
                        plot_ts = plot_ts,
-                       detection_range = detection_range,
+                       detection_centroids = detection_centroids,
                        detection_kernels = detection_kernels,
                        detection_kernels_overlap = detection_kernels_overlap,
                        detection_time_window = detection_time_window,
-                       acc_centroids = acc_centroids,
                        mobility = mobility,
                        normalise = normalise,
                        save_record_spatial = save_record_spatial,

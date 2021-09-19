@@ -40,7 +40,7 @@ The function uses a Pythagorean approximation to estimate the \eqn{distance} tha
 
 where \eqn{depth_{t + 1}} for the final (\eqn{n^{th}}) observation is defined as \eqn{depth_{t = n}} and thus \eqn{distance_{t = n} = mobility}.
 
-*If the horizontal distances that an individual could travel are not very variable, then the benefits of a single mobility parameter are likely to outweigh the costs. On the other hand, substantial variation in the horizontal distances that an individual could travel may suggest that pre-processed acoustic centroids are inappropriate; in this situation, the correct centroids could be computed on-the-fly within the ACDC algorithm, but this is not currently implemented. However, the particle filtering algorithms can account for this by the incorporation of movement models within/between acoustic centroids.
+*If the horizontal distances that an individual could travel are not very variable, then the benefits of a single mobility parameter are likely to outweigh the costs. On the other hand, substantial variation in the horizontal distances that an individual could travel may suggest that a constant mobility parameter is inappropriate; in this situation, the correct centroids could be computed on-the-fly within the ACDC algorithm, but this is not currently implemented. However, the particle filtering algorithms can account for this by the incorporation of movement models within/between acoustic centroids.
 }
 \examples{
 #### Example (1) Explore mobility for single individual
@@ -81,7 +81,7 @@ graphics::par(pp)
 
 }
 \seealso{
-\code{\link[flapper]{acs_setup_mobility}}, \code{\link[flapper]{acs_setup_n_centroids}},  \code{\link[flapper]{acs_setup_centroids}} and \code{\link[flapper]{acs_setup_detection_kernels}} are used to set up the AC and ACDC algorithms as implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}.
+\code{\link[flapper]{acs_setup_mobility}}, \code{\link[flapper]{acs_setup_centroids}} and \code{\link[flapper]{acs_setup_detection_kernels}} are used to set up the AC and ACDC algorithms as implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}.
 }
 \author{
 Edward Lavender

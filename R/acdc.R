@@ -9,11 +9,10 @@
 #' @param archival A dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; and a POSIXct vector of time stamps when observations were made, named `timestamp'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Both acoustic and archival time series are rounded to the resolution of \code{archival} observations to ensure alignment (see Details).
 #' @param plot_ts A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.
 #' @param bathy A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acs_setup_centroids}}).
-#' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see \code{\link[flapper]{ac}}).
+#' @param detection_centroids A list of detection centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.
 #' @param detection_kernels A named list of detection probability kernels (see \code{\link[flapper]{ac}}).
 #' @param detection_kernels_overlap (optional) A named list of detection probability kernel overlaps (see \code{\link[flapper]{ac}}).
 #' @param detection_time_window A number that defines the detection time window (see \code{\link[flapper]{ac}}).
-#' @param acc_centroids A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.
 #' @param mobility The mobility parameter (see \code{\link[flapper]{ac}}).
 #' @param calc_depth_error A function that returns the depth errors around a vector of depths. The function should accept vector of depths (from \code{archival$depth}) and return a matrix, with one row for each (lower and upper) error and one one column for each depth (if the error varies with depth). For each depth, the two numbers are added to the observed depth to define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been shallower that observed) and the second positive (i.e., the individual could have been deeper than observed). The appropriate form for \code{calc_depth_error} depends on the species (pelagic versus demersal/benthic species), the measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations). For example, for a pelagic species, the constant function \code{calc_depth_error = function(...) matrix(c(-2.5, Inf)} implies that the individual could have occupied bathymetric cells that are deeper than the observed depth + (-2.5) m and shallower than Inf m (i.e. the individual could have been in any location in which the depth was deeper than the shallow depth limit for the individual). In contrast, for a benthic species, the constant function \code{calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m.
 #'
@@ -34,11 +33,11 @@
 
 #' @return The function returns an \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
 #'
-#' @seealso This function calls \code{\link[flapper]{.acs_pl}} and \code{\link[flapper]{.acs}} to implement the ACDC algorithm. The AC component can be implemented via  \code{\link[flapper]{ac}} and the DC component via \code{\link[flapper]{dc}}. \code{\link[flapper]{acs_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acs_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results. Particle filtering can be used to reconstruct movement paths.
+#' @seealso This function calls \code{\link[flapper]{.acs_pl}} and \code{\link[flapper]{.acs}} to implement the ACDC algorithm. The AC component can be implemented via  \code{\link[flapper]{ac}} and the DC component via \code{\link[flapper]{dc}}. \code{\link[flapper]{acs_setup_centroids}} defines the detection centroids required by this function.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results. Particle filtering can be used to reconstruct movement paths.
 #'
 #' @examples
 #' #### Step (1) Implement setup_acdc_*() steps
-#' # ... Define acoustic centroids required for ACDC algorithm (see setup_acdc_centroids())
+#' # ... Define detection centroids required for ACDC algorithm (see setup_acdc_centroids())
 #'
 #' #### Step (2) Prepare movement time series for algorithm
 #' # Focus on an example individual
@@ -63,10 +62,9 @@
 #' out_acdc <- acdc(acoustics = acc,
 #'                  archival = arc,
 #'                  bathy = dat_gebco,
-#'                  detection_range = 425,
+#'                  detection_centroids = dat_centroids,
 #'                  mobility = 200,
-#'                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-#'                  acc_centroids = dat_centroids
+#'                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
 #'                  )
 #' # The function returns a list with four elements
 #' # ... archive contains the results of the algorithm, implemented by the back-end
@@ -78,10 +76,9 @@
 #' out_acdc <- acdc(acoustics = acc,
 #'                  archival = arc,
 #'                  bathy = dat_gebco,
-#'                  detection_range = 425,
+#'                  detection_centroids = dat_centroids,
 #'                  mobility = 200,
 #'                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-#'                  acc_centroids = dat_centroids,
 #'                  con = tempdir()
 #'                  )
 #' acdc_log <- readLines(paste0(tempdir(), "/acdc_log.txt"))
@@ -94,10 +91,9 @@
 #' out_acdc <- acdc(acoustics = acc,
 #'                  archival = arc,
 #'                  bathy = dat_gebco,
-#'                  detection_range = 425,
+#'                  detection_centroids = dat_centroids,
 #'                  mobility = 200,
 #'                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-#'                  acc_centroids = dat_centroids,
 #'                  save_record_spatial = NULL
 #'                  )
 #'
@@ -108,10 +104,9 @@
 #' out_acdc <- acdc(acoustics = acc,
 #'                  archival = arc,
 #'                  bathy = dat_gebco,
-#'                  detection_range = 425,
+#'                  detection_centroids = dat_centroids,
 #'                  mobility = 200,
 #'                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-#'                  acc_centroids = dat_centroids,
 #'                  con = tempdir(),
 #'                  cl = parallel::makeCluster(2L)
 #'                  )
@@ -141,10 +136,9 @@
 #' out_acdc <- acdc(acoustics = acc,
 #'                  archival = arc,
 #'                  bathy = dat_gebco,
-#'                  detection_range = 425,
+#'                  detection_centroids = dat_centroids,
 #'                  mobility = 200,
 #'                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-#'                  acc_centroids = dat_centroids,
 #'                  con = tempdir(),
 #'                  cl = parallel::makeCluster(2L),
 #'                  split = "2 hours"
@@ -159,10 +153,9 @@
 #' out_acdc <- acdc(acoustics = acc_ls,
 #'                  archival = arc,
 #'                  bathy = dat_gebco,
-#'                  detection_range = 425,
+#'                  detection_centroids = dat_centroids,
 #'                  mobility = 200,
 #'                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-#'                  acc_centroids = dat_centroids,
 #'                  con = tempdir(),
 #'                  cl = parallel::makeCluster(2L)
 #'                  )
@@ -197,10 +190,9 @@
 #'     acdc_out <- acdc(acoustics = acc,
 #'                      archival = dat_archival,
 #'                      bathy = dat_gebco,
-#'                      detection_range = 425,
+#'                      detection_centroids = dat_centroids,
 #'                      mobility = 200,
 #'                      calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-#'                      acc_centroids = dat_centroids,
 #'                      save_record_spatial = 1:10L,
 #'                      con = dir_id
 #'                      )
@@ -232,9 +224,8 @@ acdc <- function(acoustics,
                  archival,
                  plot_ts = TRUE,
                  bathy,
-                 detection_range,
+                 detection_centroids,
                  detection_kernels = NULL, detection_kernels_overlap = NULL, detection_time_window = 5,
-                 acc_centroids,
                  mobility,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                  normalise = FALSE,
@@ -251,7 +242,7 @@ acdc <- function(acoustics,
   t_onset <- Sys.time()
   message(paste0("flapper::acdc() called (@ ", t_onset, ")..."))
   # Check for missing inputs
-  for(arg in c(acoustics, archival, bathy, detection_range, acc_centroids, mobility)) 1L
+  for(arg in c(acoustics, archival, bathy, detection_centroids, mobility)) 1L
   # Check archival names
   check_names(input = archival, req = "timestamp")
   out <-
@@ -261,11 +252,10 @@ acdc <- function(acoustics,
       step = as.numeric(difftime(archival$timestamp[2], archival$timestamp[1], units = "s")),
       plot_ts = plot_ts,
       bathy = bathy,
-      detection_range = detection_range,
+      detection_centroids = detection_centroids,
       detection_kernels = detection_kernels,
       detection_kernels_overlap = detection_kernels_overlap,
       detection_time_window = detection_time_window,
-      acc_centroids= acc_centroids,
       mobility = mobility,
       calc_depth_error = calc_depth_error,
       normalise = normalise,
@@ -283,11 +273,10 @@ acdc <- function(acoustics,
                      archival = archival,
                      plot_ts = plot_ts,
                      bathy = bathy,
-                     detection_range = detection_range,
+                     detection_centroids = detection_centroids,
                      detection_kernels = detection_kernels,
                      detection_kernels_overlap = detection_kernels_overlap,
                      detection_time_window = detection_time_window,
-                     acc_centroids = acc_centroids,
                      mobility = mobility,
                      calc_depth_error = calc_depth_error,
                      normalise = normalise,

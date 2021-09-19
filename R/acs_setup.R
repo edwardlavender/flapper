@@ -18,7 +18,7 @@
 #'
 #' where \eqn{depth_{t + 1}} for the final (\eqn{n^{th}}) observation is defined as \eqn{depth_{t = n}} and thus \eqn{distance_{t = n} = mobility}.
 #'
-#' *If the horizontal distances that an individual could travel are not very variable, then the benefits of a single mobility parameter are likely to outweigh the costs. On the other hand, substantial variation in the horizontal distances that an individual could travel may suggest that pre-processed acoustic centroids are inappropriate; in this situation, the correct centroids could be computed on-the-fly within the ACDC algorithm, but this is not currently implemented. However, the particle filtering algorithms can account for this by the incorporation of movement models within/between acoustic centroids.
+#' *If the horizontal distances that an individual could travel are not very variable, then the benefits of a single mobility parameter are likely to outweigh the costs. On the other hand, substantial variation in the horizontal distances that an individual could travel may suggest that a constant mobility parameter is inappropriate; in this situation, the correct centroids could be computed on-the-fly within the ACDC algorithm, but this is not currently implemented. However, the particle filtering algorithms can account for this by the incorporation of movement models within/between acoustic centroids.
 #'
 #' @return The function returns a numeric vector of distances and, if \code{plot = TRUE}, a histogram of those distances.
 #'
@@ -59,7 +59,7 @@
 #' # ... beneficial to include a movement model to join locations within/
 #' # ... between acoustic centroids for some applications via particle filtering.
 #'
-#' @seealso \code{\link[flapper]{acs_setup_mobility}}, \code{\link[flapper]{acs_setup_n_centroids}},  \code{\link[flapper]{acs_setup_centroids}} and \code{\link[flapper]{acs_setup_detection_kernels}} are used to set up the AC and ACDC algorithms as implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}.
+#' @seealso \code{\link[flapper]{acs_setup_mobility}}, \code{\link[flapper]{acs_setup_centroids}} and \code{\link[flapper]{acs_setup_detection_kernels}} are used to set up the AC and ACDC algorithms as implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}.
 #'
 #' @author Edward Lavender
 #' @export
@@ -109,161 +109,21 @@ acs_setup_mobility <- function(depth,
 
 ######################################
 ######################################
-#### acs_setup_n_centroids()
-
-#' @title Suggest the number of centroids for the AC* algorithm(s)
-#' @description The acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms require a list of acoustic centroids from \code{\link[flapper]{acs_setup_centroids}}. The number of centroids that is required depends on (a) the duration between detections; (b) the distances among receivers; (c) the area of interest; and (d) other considerations such as the spatial extent of the study area. This function implements three methods to facilitate a sensible choice of the number of centroids for the AC* algorithm(s) (see Details). This ensures that the number of centroids is sufficient to cover requirements but not so large that the centroids become slow to compute and unwieldy. The function requires a time series of detections, the time step length, the deployment details of passive acoustic telemetry receivers, a mobility parameter and a Spatial* or Raster* layer that defines the boundaries of the study site. Given these inputs, the function returns suggested bounds for the number of centroids.
-#'
-#' @param detections For Method One, \code{detections} is a POSIXct vector of time stamps when detections were made (for a particular individual).
-#' @param step For Method One, \code{step} is the duration (s) between sequential time steps inbetween acoustic detections. For the ACDC algorithm, this is the duration between sequential archival observations.
-#' @param hist,... For Method One, \code{hist} is a logical value that defines whether or not to plot the distribution of gaps across the detection time series as a histogram and \code{...} includes any additional arguments passed to \code{\link[prettyGraphics]{pretty_hist}}.
-#' @param moorings For Method Two, \code{moorings} is a dataframe that defines passive acoustic telemetry receiver locations and deployment periods. This must contain the following columns: `receiver_id', a unique identifier of each receiver; `receiver_lat' and `receiver_long', the latitude and longitude of each receiver in decimal degrees; and `receiver_start_date' and `receiver_end_date', the start and end time of each receiver's deployment period (see \code{\link[flapper]{dat_moorings}} for an example).
-#' @param mobility For Methods Two and Three, \code{mobility} is a number that defines the distance (m) that an individual could move in the time period in the time steps between acoustic observations (see also \code{\link[flapper]{acs_setup_centroids}}).
-#' @param double For Method Two, \code{double} is a logical variable that defines whether or not to double the minimum number of centroids (see Details).
-#' @param boundaries For Method Three, a Spatial* or Raster* object that defines the study site, from which area boundaries can be extracted (via \code{\link[raster]{extent}}).
-#'
-#' @details
-#' \subsection{Method (1)}{The first method provides a reasonable upper bound for the number of centroids. This method is based on the gaps between detections. During this time, acoustic centroids increase in size, reflecting the increasing uncertainty in the location of an individual, until the half way point between detections. At this point, uncertainty in the individual's location is maximised and the acoustic centroids reach their maximum size. Thereafter, uncertainty in the individual's location and the size of the acoustic centroids decrease towards the receiver at which the individual was next detected. Under this perspective, the minimum number of centroids is the number required such that the centroids continue to increase in size until the halfway point between the two most temporally distance detections. For example, if the time steps between acoustic detections are two-minutes in duration, the minimum number of centroids is one quarter of the duration (minutes) of the longest gap between acoustic detections. To implement this method, a time series of \code{detections} (for the individual and time period for which the AC* algorithm(s) will be implemented) and the time \code{step} length need to be provided. This method provides a sensible upper bound for the number of centroids, since it allows centroids to continue to expand to their maximum possible size, given the data and the assumptions of the algorithm. However, even with modest gaps between detections and a modest movement capacity, this may suggest a very large area, and it may take a long time to compute the requisite number of centroids using \code{\link[flapper]{acs_setup_centroids}}. Moreover, in practice, the area of interest may be smaller.}
-#'
-#' \subsection{Method (2)}{The second method provides a reasonable lower bound for the number of centroids. This method is based on the locations of receivers and the assumption that, when an individual is detected by two different receivers, at the halfway point between detections, its potential location is described by the intersection of the acoustic centroid around the receiver at which it was previously detected and the centroid around the receiver at which it is next detected (evaluated at the halfway point between detections). Under this perspective, the minimum centroid size is half of the distance between the furthest two receivers that were operational at the same time and the minimum centroid number is this size over the animal's mobility†. (This could be restricted to the subset of receivers at which the individual was detected sequentially but this is not implemented.) In practice, it is advisable to double this minimum number to ensure a reasonable degree of overlap between the centroids of the two receivers. To implement this method, a dataframe that contains receiver locations and deployment periods (\code{moorings}) must be supplied, along with the \code{mobility} parameter that describes how far an individual could move in any archival time step. This method provides a sensible lower bound for the number of centroids that is array-specific. However, it does not account for the full span of movements that are possible under the AC* algorithm(s).}
-#'
-#' \subsection{Method (3)}{The final method provides an alternative suggestion for the number of centroids based on the minimum number that is required for the largest centroid around each receiver to fill the study area. This method requires the locations of receivers and a Spatial* or Raster* layer that defines the study area, the boundaries of which are approximated as a bounding box with four vertices and transformed to degrees latitude/longitude. For each receiver, the function calculates the distance to each of the four boundary coordinates. The longest distance between a receiver and a boundary of the study area is used to define the number of centroids required for the largest centroid to fill the study area†. In many settings, this method may be most suitable because it accounts for the full span of movements that are possible under the AC* algorithm(s) while focusing on a specific area.}
-#'
-#' \subsection{Other considerations}{In practice, the most appropriate number of centroids is likely to be a compromise between these minimum and maximum values that depends on other considerations, particularly the spatial scale of the study, the effect of boundaries on the final centroid size and, perhaps in some cases, the geographical range of the species. For acoustic time series that are followed by a long tail of archival observations after final acoustic detection, both methods may underestimate the number of centroids required to capture the increasing uncertainty in the individual's location over this time. However, in this case, it is advisable to use the depth-contour (DC) algorithm (see \code{\link[flapper]{dc}}) at some point after the last acoustic detection since the influence of that observation on putative patterns of space use will decay through time and the DC algorithm is more computationally efficient. If in doubt, opt to make more, rather than fewer centroids: if there are too few centroids, the AC* algorithm(s) can fail to converge if centroids around receivers with sequential detections do not overlap.}
-#'
-#' †Both Methods Two and Three assume that the detection range is the same as the \code{mobility}. In practice, this is unlikely to be the case, but if the detection range is even approximately equal to \code{mobility} then the difference is negligible.
-#'
-#' @return The function prints a table with the suggested number of centroids and the maximum radius size from each method. Invisibly, the function returns an integer vector with three suggested values for the number of centroids from methods (1), (2) and (3). The parameters used to generate these suggestions (i.e., \code{detections}, \code{moorings}, \code{mobility}, \code{double} and \code{boundaries}) are also included in a `param' attribute.
-#'
-#' @seealso This function is designed to facilitate an informed choice for the `n_timesteps' argument in \code{\link[flapper]{acs_setup_centroids}}. \code{\link[flapper]{acs_setup_mobility}} can also guide the implementation of this function. This underpins the AC and ACDC algorithms, which are implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}.
-#'
-#' @examples
-#' n_timesteps <-
-#'   acs_setup_n_centroids(detections = dat_acoustics$timestamp[dat_acoustics$individual_id == 25],
-#'                          step = 120,
-#'                          moorings = dat_moorings,
-#'                          mobility = 200,
-#'                          double = TRUE,
-#'                          boundaries = dat_gebco)
-#' utils::str(n_timesteps)
-#'
-#' @author Edward Lavender
-#' @export
-
-acs_setup_n_centroids <- function(detections,
-                                   step,
-                                   hist = TRUE,...,
-                                   moorings,
-                                   mobility,
-                                   double = TRUE,
-                                   boundaries){
-
-  #### Checks
-  # verbose = TRUE
-  # t_onset <- Sys.time()
-  # cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
-  # cat_to_console(paste0("flapper::acs_setup_n_centroids() called (@ ", t_onset, ")..."))
-  # Check moorings contains required information
-  check_names(input = moorings,
-              req = c("receiver_id",
-                      "receiver_start_date", "receiver_end_date",
-                      "receiver_lat", "receiver_long"),
-              extract_names = colnames,
-              type = all)
-
-  #### Method (1): Determine the maximum gap between detections
-  # cat_to_console("... Implementing Mpproach (1)...")
-  # Calculate the duration of gaps
-  gaps <- Tools4ETS::serial_difference(detections, units = "s")
-  gaps <- as.numeric(gaps)
-  max_gap <- max(gaps, na.rm = TRUE)
-  # Visualise the distribution of gaps
-  if(hist) {
-    prettyGraphics::pretty_hist(gaps,...)
-    graphics::abline(v = max_gap, col = "red", lty = 3)
-  }
-  # The minimum number of time steps under this method is max_gap/2/step
-  minimum_n_timesteps_1 <- ceiling(max_gap/2/step)
-
-  #### Method (2): Determine the number of timesteps to overlap centroids between receivers
-  # cat_to_console("... Implementing Method (2)...")
-
-  ## Identify time intervals over which receivers were deployed
-  moorings$interval <- lubridate::interval(moorings$receiver_start_date, moorings$receiver_end_date)
-
-  ## Define the minimum number of timesteps for each combination of receivers
-  # ... that was deployed for an overlapping interval
-  minimum_n_timesteps_2 <-
-    sapply(unique(moorings$interval), function(interval){
-      # Identify receivers whose deployment periods overlapped with this interval
-      moorings_tmp <- moorings
-      moorings_tmp$overlap <- lubridate::int_overlaps(interval, moorings_tmp$interval)
-      moorings_tmp <- moorings_tmp[which(moorings_tmp$overlap), ]
-      dist_btw_receivers_m <- dist_btw_receivers(moorings_tmp, f = function(x) x*1000)
-      # Calculate the minimum number of timesteps for intervals to overlap
-      minimum_n_timesteps <- max(dist_btw_receivers_m$dist/mobility)
-      # Double the overlap so that the centroids would fully overlap
-      if(double) minimum_n_timesteps <- minimum_n_timesteps*2
-      return(minimum_n_timesteps)
-    })
-  # Across all receivers deployment combinations, calculate the minimum overlap
-  # ... which the the maximum of the minimum overlaps across all receivers
-  minimum_n_timesteps_2 <- max(minimum_n_timesteps_2)
-
-  #### Method (3): The number of time steps for the centroids to fill the area
-  # cat_to_console("... Implementing Method (3)...")
-  rxy <- as.matrix(moorings[, c("receiver_long", "receiver_lat")])
-  ext <- raster::extent(boundaries)
-  if(is.na(raster::crs(boundaries))) stop("The 'boundaries' CRS is NA.")
-  ext <- sp::SpatialPoints(ext, proj4string = raster::crs(boundaries))
-  ext <- sp::spTransform(ext, sp::CRS("+proj=longlat +datum=WGS84 +no_defs"))
-  dist_from_rxy_to_boundaries <- raster::pointDistance(ext, rxy, lonlat = TRUE)
-  minimum_n_timesteps_3 <- ceiling(max(dist_from_rxy_to_boundaries)/mobility)
-
-  #### Return suggestions
-  # Collect suggestions
-  minimum_n_timesteps <- c(minimum_n_timesteps_1, minimum_n_timesteps_2, minimum_n_timesteps_3)
-  minimum_n_timesteps <- as.integer(ceiling(minimum_n_timesteps))
-  attributes(minimum_n_timesteps)$method <- 1:3
-  attributes(minimum_n_timesteps)$param <- list(detections = detections,
-                                                moorings = moorings,
-                                                mobility = mobility,
-                                                double = double)
-  # Print results
-  cat("Results -------------------------------\n")
-  results <- data.frame(method = c(1, 2, 3),
-                        n_centroids = minimum_n_timesteps,
-                        radius = minimum_n_timesteps * mobility)
-  rownames(results) <- NULL
-  print(results)
-  cat("---------------------------------------\n")
-  # Close function and return outputs
-  t_end <- Sys.time()
-  # duration <- difftime(t_end, t_onset, units = "mins")
-  # cat_to_console(paste0("... flapper::acs_setup_n_centroids() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
-  return(invisible(minimum_n_timesteps))
-}
-
-
-######################################
-######################################
 #### acs_setup_centroids()
 
-#' @title Setup the acoustic centroids required for the AC* algorithm(s)
-#' @description This function produces the acoustic centroids required by the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms.
+#' @title Setup the detection centroids required for the AC* algorithm(s)
+#' @description This function produces the detection centroids required by the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms.
 #' @param xy A \code{\link[sp]{SpatialPointsDataFrame}} object that defines receiver IDs and locations. The \code{data} slot must include a dataframe with a column that provides a unique, integer identifier for each receiver (`receiver_id'). The coordinate reference system should be the Universal Transverse Mercator system with distances in metres (to match \code{detection_range}, see below).
 #' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver.
-#' @param mobility A number that defines the distance that an individual could move in the time period between archival observations.
-#' @param n_timesteps An integer that defines the number of timesteps after a hypothetical detection for which centroids will be created, where the duration of each timestep is given by the duration between archival observations (see \code{\link[flapper]{acs_setup_n_centroids}}).
-#' @param coastline (optional) A \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines the coastline in an area. If provided, acoustic centroids are processed to remove any areas on land. Algorithm speed declines with the complexity of the coastline.
+#' @param coastline (optional) A \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines the coastline in an area. If provided, detection centroids are processed to remove any areas on land. Algorithm speed declines with the complexity of the coastline.
 #' @param boundaries (optional) An \code{\link[raster]{extent}} object that defines the boundaries of an area within which individuals are assumed to have remained. If provided, acoustic centroids are processed to remain within this area.
+#' @param ... Additional arguments passed to \code{\link[flapper]{get_detection_centroids}} and, ultimately, \code{\link[rgeos]{gBuffer}}, except \code{byid} which is necessarily \code{TRUE}.
 #' @param plot A logical input that defines whether or not to produce a plot of the area, including receivers, the coastline and the area boundaries (if provided), and acoustic centroids. This is useful for checking purposes but it can reduce algorithm speed.
-#' @param cl (optional) A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. The connection to the cluster is closed within the function.
 #' @param verbose A logical input that defines whether or not to print messages to the console to relay function progress.
 #'
-#' @details Given only a detection at a particular receiver at a particular time, the detection range of the receiver and the movement speed of the animal, an acoustic centroid defines the possible locations of a detected individual at that time or a subsequent time. More specifically, when an individual is located at a receiver, its location must be within some radius of that receiver defined by the maximum detection distance. This radius expands with the duration since detection. This function defines, for each receiver, a list of acoustic centroids that reflect the possible locations of an individual were it to have been detected from 0 to \code{n_timesteps} ago at that receiver, accounting for the coastline and within a defined area if necessary. Using the observed detection data, the AC (\code{\link[flapper]{ac}}) and ACDC (\code{\link[flapper]{acdc}}) algorithms pull the relevant centroids out of this list, which substantially saves computation time because acoustic centroids are not computed on-the-fly. These centroids are processed within these algorithms (e.g., if an individual is detected at two different receivers, then at the halfway point between detections its location must be within the intersection of the relevant centroids for these two receivers) and combine them with other information to reconstruct where an individual could have been over time.
+#' @details Given a detection at a particular receiver at a particular time, the detection centroid defines the boundaries of the area around a receiver within which the individual must have been located (from the perspective of that receiver).
 #'
-#' @return The function returns a list of \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects, with one element for all numbers from 1 to the maximum receiver number (\code{xy$receiver_id}). Any list elements that do not correspond to receivers contain a \code{NULL} element. List elements that correspond to receivers contain a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object containing all the centroids for that receiver.
+#' @return The function returns a list of \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects, with one element for all numbers from 1 to the maximum receiver number (\code{xy$receiver_id}). Any list elements that do not correspond to receivers contain a \code{NULL} element. List elements that correspond to receivers contain a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object containing the detection centroid for that receiver.
 #'
 #' @examples
 #' #### Define data for acs_setup_centroids()
@@ -284,9 +144,7 @@ acs_setup_n_centroids <- function(detections,
 #' #### Example (1): Define a list of centroids with specified parameters
 #' # ... (Argument values are small to reduce computation time for examples)
 #' centroids <- acs_setup_centroids(xy = xy_utm,
-#'                                   detection_range = 500,
-#'                                   mobility = 250,
-#'                                   n_timesteps = 3
+#'                                  detection_range = 500
 #'                                  )
 #' # A list of SpatialPolygonsDataFrames is returned
 #' # with elements from 1:max(xy_utm$receiver_id)
@@ -294,19 +152,15 @@ acs_setup_n_centroids <- function(detections,
 #' # Otherwise a SpatialPolygonsDataFrame is returned with all the centroids for that receiver
 #' centroids
 #'
-#' #### Example (2): Visualise the acoustic centroids produced via plot = TRUE
+#' #### Example (2): Visualise the centroids produced via plot = TRUE
 #' centroids <- acs_setup_centroids(xy = xy_utm,
 #'                                   detection_range = 500,
-#'                                   mobility = 250,
-#'                                   n_timesteps = 3,
 #'                                   plot = TRUE
 #'                                   )
 #'
 #' #### Example (3): Remove areas of the centroids that overlap with coastline
 #' centroids <- acs_setup_centroids(xy = xy_utm,
 #'                                   detection_range = 500,
-#'                                   mobility = 250,
-#'                                   n_timesteps = 3,
 #'                                   plot = TRUE,
 #'                                   coastline = dat_coast
 #'                                   )
@@ -320,47 +174,26 @@ acs_setup_n_centroids <- function(detections,
 #'                         )
 #' centroids <- acs_setup_centroids(xy = xy_utm,
 #'                                   detection_range = 500,
-#'                                   mobility = 250,
-#'                                   n_timesteps = 3,
 #'                                   plot = TRUE,
 #'                                   coastline = dat_coast,
 #'                                   boundaries = boundaries
 #'                                   )
 #'
-#' #### Example (5): Implement the algorithm in parallel
-#' centroids <- acs_setup_centroids(xy = xy_utm,
-#'                                   detection_range = 500,
-#'                                   mobility = 250,
-#'                                   n_timesteps = 3,
-#'                                   plot = TRUE,
-#'                                   coastline = dat_coast,
-#'                                   boundaries = boundaries,
-#'                                   cl = parallel::makeCluster(2L)
-#'                                   )
-#'
-#' #### Example (6): Acoustic centroids can be saved to file using rlist::list.save()
-#' # rlist::list.save(centroids, paste0(tempdir(), "/centroids.RData"))
-
 #' @author Edward Lavender
 #' @export
 #'
 
-acs_setup_centroids <- function(
-  xy,
-  detection_range,
-  mobility,
-  n_timesteps = 250,
-  coastline = NULL,
-  boundaries = NULL,
-  plot = FALSE,
-  cl = NULL,
-  verbose = TRUE
-){
+acs_setup_centroids <- function(xy,
+                                detection_range,
+                                coastline = NULL,
+                                boundaries = NULL,
+                                plot = FALSE,
+                                verbose = TRUE,...){
 
   #### Initiate function
   t_onset <- Sys.time()
   cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
-  cat_to_console(paste0("flapper::acs_setup_centroids() called (@ ", t_onset, ")..."))
+  cat_to_console(paste0("flapper::acs_setup_detection_centroids() called (@ ", t_onset, ")..."))
 
   #### Function checks
   cat_to_console("... Checking user inputs...")
@@ -376,6 +209,9 @@ acs_setup_centroids <- function(
     message("Argument 'xy$receiver_id' contains duplicate elements. 'xy' has been simplified to contain only unique receiver IDs.")
     xy <- xy[!duplicated(xy$receiver_id), ]
   }
+  if(!all(rownames(xy@data) == as.character(rs))){
+    warning("'rownames(xy@data) overwritten with xy$receiver_id.", immediate. = TRUE, call. = FALSE)
+  }
   if(!is.null(coastline)){
     check_class(input = coastline, to_class = "SpatialPolygonsDataFrame")
     if(length(coastline) != 1)
@@ -385,6 +221,7 @@ acs_setup_centroids <- function(
     coastline <- raster::crop(coastline, boundaries)
     if(is.null(coastline)) message("No coastline within defined boundaries. \n")
   }
+  check...("byid",...)
 
   #### Plot map of area
   if(plot){
@@ -398,79 +235,41 @@ acs_setup_centroids <- function(
     if(!is.null(boundaries)) raster::lines(boundaries, col = "red", lty = 3)
   }
 
-  #### Define a list of acoustic centroids for each receiver
-  cat_to_console("... Building a nested list of acoustic centroids...")
-  ## Define a sequence of centroid radii
-  # Around each receiver, we'll create a polygon of for each radius
-  radius_seq <- seq(detection_range, length.out = n_timesteps, by = mobility)
-  ## Define a list of receivers, with a list of centroids for each receiver
-  centroids_by_receiver <- pbapply::pblapply(1:length(rs), cl = NULL, function(i){
-      centroids_for_receiver <- lapply(radius_seq, function(radius){
-        # Define a buffer around the current receiver of appropriate radius
-        poly <- rgeos::gBuffer(xy[i, ], width = radius)
-        # Remove any areas beyond specified boundaries
-        # (We will remove coastline later, for speed)
-        if(!is.null(boundaries)) poly <- raster::crop(poly, boundaries)
-        # Return acoustic centroid
-        return(poly)
-      })
-    # Define names of the rasters for each receiver based on radius
-    names(centroids_for_receiver) <- paste0("s_", radius_seq)
-    return(centroids_for_receiver)
-    })
-  ## Process list of acoustic centroids for each receiver
-  # Add NULL elements to the list for any receivers in the range 1:max(rs) that are not in rs
-  # This means we can use receiver numbers to go straight to the correct element in the list in AC* algorithm(s).
-  names(centroids_by_receiver) <- rs
-  centroids_by_receiver <- lapply(as.integer(1:max(rs)), function(i){
-    if(i %in% rs){
-      return(centroids_by_receiver[[as.character(i)]])
-    } else{
-      return(NULL)
-    }
-  })
+  #### Make centroids
+  cat_to_console("... Making centroids...")
+  centroids <- get_detection_centroids(xy = xy,
+                                       detection_range = detection_range,
+                                       boundaries = boundaries,
+                                       coastline = coastline,
+                                       plot = FALSE,
+                                       byid = TRUE,...)
+  centroids <- sp::spChFIDs(centroids, as.character(rs))
+  xyd <- data.frame(xy)
+  rownames(xyd) <- as.character(xy$receiver_id)
+  centroids <- sp::SpatialPolygonsDataFrame(centroids, xyd)
 
-  #### Convert nested list of polygons to a SpatialPolygonsDataFrame
-  # ... with one element for each receiver and each dataframe containing all the polygons for that receiver
-  cat_to_console("... Converting the nested list of acoustic centroids to a SpatialPolygonsDataFrame...")
-  if(is.null(centroids_by_receiver)) {
-    stop("There are no acoustic centroids within defined spatial boundaries.")
-  }
-  spdf_ls <- pbapply::pblapply(centroids_by_receiver, cl = cl, function(element){
-    if(!is.null(element)){
-      ## Bind all the sub-elements in each element together into a SpatialPolygons object
-      sp_for_receiver <- raster::bind(element)
-      ## Crop to coastline
-      # This step requires that coastline is a single feature SPDF (hence the checks above)
-      # This is the slow step:
-      # ... But it is much faster to implement at this stage using byid = TRUE, rather than earlier
-      # ... on a centroid-by-centroid basis
-      if(!is.null(coastline)) {
-        # Cut centroids around coastline
-        sp_for_receiver <- rgeos::gDifference(sp_for_receiver, coastline, byid = TRUE)
-        # Re-set names
-        sp_for_receiver <- sp::spChFIDs(sp_for_receiver, as.character(1:length(sp_for_receiver)))
-      }
-      ## Define a SpatialPolygonsDataFrame
-      spdf_for_receiver <-
-        sp::SpatialPolygonsDataFrame(sp_for_receiver,
-                                     data.frame(id = as.character(1:length(sp_for_receiver))))
-      return(spdf_for_receiver)
-    }
-  })
-  if(!is.null(cl)) parallel::stopCluster(cl)
-
-  #### Visualise centroids
+  #### Add centroids to map
   if(plot){
     cat_to_console("... Plotting centroids on map...")
-    pbapply::pblapply(spdf_ls, function(spdf) if(!is.null(spdf)) raster::lines(spdf, col = "dimgrey", lwd = 0.75))
+    raster::lines(centroids, col = "royalblue")
   }
 
-  #### Return list of SpatialPolygonsDataFrames
+  #### Define a list, with one element for each centroid
+  cat_to_console("... Processing centroids...")
+  centroids <- lapply(1:max(rs), function(i){
+    if(i %in% rs){
+      out <- centroids[centroids$receiver_id == i, ]
+    } else {
+      out <- NULL
+    }
+    return(out)
+  })
+
+  #### Return centroids
   t_end <- Sys.time()
   total_duration <- difftime(t_end, t_onset, units = "mins")
-  cat_to_console(paste0("... flapper::acs_setup_centroids() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
-  return(spdf_ls)
+  cat_to_console(paste0("... flapper::acs_setup_detection_centroids() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+  return(centroids)
 }
 
 
@@ -487,7 +286,7 @@ acs_setup_centroids <- function(
 #'
 #' @param xy A \code{\link[sp]{SpatialPointsDataFrame}} that defines receiver IDs, locations and deployment dates. The \code{data} slot must include a dataframe with the following columns: an unique, integer identifier for each receiver (`receiver_id') and receiver deployment \code{\link[base]{Dates}} (`receiver_start_date' and `receiver_end_date'). For receiver locations, the coordinate reference system should be the Universal Transverse Mercator system with distances in metres (as for \code{map}, below).
 #' @param services (optional) A dataframe that defines receiver IDs and servicing \code{\link[base]{Dates}} (times during the deployment period of a receiver when it was not active due to servicing). If provided, this must contain the following columns: an integer identifier for serviced receivers (named ‘receiver_id’) and two columns that define the time of the service(s) (‘service_start_date’ and ‘service_end_date’) (see \code{\link[flapper]{make_matrix_receivers}}).
-#' @param centroids The list of acoustic centroids, with one element for each number from \code{1:max(xy$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.
+#' @param centroids The list of detection centroids, with one element for each number from \code{1:max(xy$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.
 #' @param overlaps (optional) A named list, from \code{\link[flapper]{get_detection_centroids_overlap}}, that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers. If provided, this speeds up detection probability calculations in overlapping regions by focusing on only the subset of receivers with overlapping detection probability kernels. If there are no overlapping receivers, \code{FALSE} can be supplied instead to suppress these calculations.
 #' @param calc_detection_pr A function that takes in a vector of distances and returns a vector of detection probabilities (around a receiver). Detection probability should decline to 0 after the \code{detection_range} distance from a receiver (see \code{\link[flapper]{acs_setup_centroids}}).
 #' @param map A (blank) \code{\link[raster]{raster}} on which receiver locations and detection probability kernels are represented. As for \code{xy}, the coordinate reference system should be the Universal Transverse Mercator system with distances in metres. Resolution needs to be sufficiently high such that detection probability can be represented effectively, given \code{calc_detection_pr}, but sufficiently low for convenient run times. For the \code{\link[flapper]{acdc}} algorithm, this should have the same properties as \code{bathy}.
@@ -576,10 +375,10 @@ acs_setup_centroids <- function(
 #'
 #' #### Example (1): Implement function using default options
 #' kernels <- acs_setup_detection_kernels(xy = xy,
-#'                                         centroids = dat_centroids,
-#'                                         overlaps = overlaps,
-#'                                         calc_detection_pr = calc_dpr,
-#'                                         map = map_blank)
+#'                                        centroids = dat_centroids,
+#'                                        overlaps = overlaps,
+#'                                        calc_detection_pr = calc_dpr,
+#'                                        map = map_blank)
 #'
 #' # Examine list elements
 #' summary(kernels)
@@ -666,14 +465,15 @@ acs_setup_centroids <- function(
 #' })
 #' graphics::par(pp)
 #'
-#' @seealso This is one of a number of functions used to set up the AC and ACDC algorithms implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}: \code{\link[flapper]{acs_setup_mobility}}, \code{\link[flapper]{acs_setup_n_centroids}}, \code{\link[flapper]{acs_setup_centroids}} and \code{\link[flapper]{acs_setup_detection_kernels}}. This function is supported by \code{\link[flapper]{make_matrix_receivers}}, which defines receiver activity statuses; \code{\link[flapper]{acs_setup_centroids}}, which defines acoustic centroids; and \code{\link[flapper]{get_detection_centroids_overlap}}, which defines detection centroid overlaps
+#' @seealso This is one of a number of functions used to set up the AC and ACDC algorithms implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}: \code{\link[flapper]{acs_setup_mobility}}, \code{\link[flapper]{acs_setup_centroids}} and \code{\link[flapper]{acs_setup_detection_kernels}}. This function is supported by \code{\link[flapper]{make_matrix_receivers}}, which defines receiver activity statuses; \code{\link[flapper]{acs_setup_centroids}}, which defines acoustic centroids; and \code{\link[flapper]{get_detection_centroids_overlap}}, which defines detection centroid overlaps
 #' @author Edward Lavender
 #' @export
 #'
 
 acs_setup_detection_kernels <-
   function(xy, services = NULL,
-           centroids, overlaps = NULL,
+           centroids,
+           overlaps = NULL,
            calc_detection_pr,
            map,
            coastline = NULL, boundaries = NULL,
@@ -734,8 +534,6 @@ acs_setup_detection_kernels <-
     map <- raster::setValues(map, 0)
     if(!is.null(boundaries)) map <- raster::crop(map, boundaries)
     if(!is.null(coastline)) map <- raster::mask(map, coastline)
-    # pull out detection centroids (for loop speed)
-    centroids <- lapply(centroids, function(elm) if(!is.null(elm)) elm[1, ])
     # cluster: not currently implemented due to issues with raster temporary files
     # if(is.null(cl) & !is.null(varlist)) {
     #   warning("cl = NULL but varlist is not NULL: varlist ignored.",

@@ -10,11 +10,10 @@
   step = 120,
   plot_ts = TRUE,
   bathy,
-  detection_range,
+  detection_centroids,
   detection_kernels = NULL,
   detection_kernels_overlap = NULL,
   detection_time_window = 5,
-  acc_centroids,
   mobility,
   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
   normalise = FALSE,
@@ -39,15 +38,13 @@
 
 \item{bathy}{A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC algorithm) across the area within which the individual could have moved (see \code{\link[flapper]{.acs}}).}
 
-\item{detection_range}{A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see \code{\link[flapper]{.acs}})}
+\item{detection_centroids}{A list of detection centroids (see \code{\link[flapper]{.acs}}).}
 
 \item{detection_kernels}{A named list of detection probability kernels (see \code{\link[flapper]{.acs}}).}
 
 \item{detection_kernels_overlap}{A named list of detection probability kernel overlaps, directly from \code{\link[flapper]{get_detection_centroids_overlap}}. This must contain an element named `list_by_receiver' with the data for each receiver.}
 
 \item{detection_time_window}{A number that defines the detection time window (see \code{\link[flapper]{.acs}})}
-
-\item{acc_centroids}{A list of acoustic centroids (see \code{\link[flapper]{.acs}}).}
 
 \item{mobility}{The mobility parameter (see \code{\link[flapper]{.acs}}).}
 
@@ -80,7 +77,7 @@ This function implements the acoustic-centroid (AC) and acoustic-centroid depth-
 
 }
 \seealso{
-The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call this function, which in turn calls \code{\link[flapper]{.acs}}. \code{\link[flapper]{acs_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acs_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results.
+The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call this function, which in turn calls \code{\link[flapper]{.acs}}. \code{\link[flapper]{acs_setup_centroids}} defines the detection centroids required by this function. \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results.
 }
 \author{
 Edward Lavender

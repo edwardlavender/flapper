@@ -10,11 +10,10 @@
 #' @param step A number that defines the time step length (s) between consecutive detections (see \code{\link[flapper]{.acs}}).
 #' @param plot_ts A logical input that defines whether or not to plot movement time series (see \code{\link[flapper]{.acs}}).
 #' @param bathy A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC algorithm) across the area within which the individual could have moved (see \code{\link[flapper]{.acs}}).
-#' @param detection_range A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see \code{\link[flapper]{.acs}})
+#' @param detection_centroids A list of detection centroids (see \code{\link[flapper]{.acs}}).
 #' @param detection_kernels A named list of detection probability kernels (see \code{\link[flapper]{.acs}}).
 #' @param detection_kernels_overlap A named list of detection probability kernel overlaps, directly from \code{\link[flapper]{get_detection_centroids_overlap}}. This must contain an element named `list_by_receiver' with the data for each receiver.
 #' @param detection_time_window A number that defines the detection time window (see \code{\link[flapper]{.acs}})
-#' @param acc_centroids A list of acoustic centroids (see \code{\link[flapper]{.acs}}).
 #' @param mobility The mobility parameter (see \code{\link[flapper]{.acs}}).
 #' @param calc_depth_error The depth error function (see \code{\link[flapper]{.acs}}).
 #' @param normalise A logical input that defines whether or not to normalise maps (see \code{\link[flapper]{.acs}}).
@@ -28,7 +27,7 @@
 #'
 #' @return The function returns an \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
 #'
-#' @seealso The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call this function, which in turn calls \code{\link[flapper]{.acs}}. \code{\link[flapper]{acs_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acs_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results.
+#' @seealso The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call this function, which in turn calls \code{\link[flapper]{.acs}}. \code{\link[flapper]{acs_setup_centroids}} defines the detection centroids required by this function. \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results.
 #'
 #' @examples
 #' # For examples, see ?ac and ?acdc which call this function directly.
@@ -43,9 +42,8 @@
   step = 120,
   plot_ts = TRUE,
   bathy,
-  detection_range,
+  detection_centroids,
   detection_kernels = NULL, detection_kernels_overlap = NULL, detection_time_window = 5,
-  acc_centroids,
   mobility,
   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
   normalise = FALSE,
@@ -135,8 +133,8 @@
       stop("'step' does not equal difftime(archival$timestamp[2], archival$timestamp[1], units = 's'.)")
     }
   }
-  # Check acoustic centroids have been supplied as a list
-  check_class(input = acc_centroids, to_class = "list", type = "stop")
+  # Check detection centroids have been supplied as a list
+  check_class(input = detection_centroids, to_class = "list", type = "stop")
   out$time <- rbind(out$time, data.frame(event = "initial_checks_passed", time = Sys.time()))
   # Check detection_kernels_overlap
   if(!is.null(detection_kernels_overlap)) {
@@ -161,6 +159,9 @@
     check_named_list(input = write_record_spatial_for_pf)
     check_names(input = write_record_spatial_for_pf, req = "filename")
     write_record_spatial_for_pf$filename <- check_dir(input = write_record_spatial_for_pf$filename, check_slash = TRUE)
+    if(length(list.files(write_record_spatial_for_pf$filename)) != 0L) {
+      warning("write_record_spatial_for_pf$filename' is not an empty directory.", immediate. = TRUE, call. = FALSE)
+    }
   }
 
   #### Study site rasters
@@ -417,11 +418,10 @@
                  round_ts = FALSE,
                  bathy = bathy,
                  map = map,
-                 detection_range = detection_range,
+                 detection_centroids = detection_centroids,
                  detection_kernels = detection_kernels,
                  detection_kernels_overlap = detection_kernels_overlap,
                  detection_time_window = detection_time_window,
-                 acc_centroids = acc_centroids,
                  mobility = mobility,
                  calc_depth_error = calc_depth_error,
                  normalise = normalise,
@@ -450,11 +450,10 @@
                    step = step,
                    bathy = bathy,
                    map = map,
-                   detection_range = detection_range,
+                   detection_centroids = detection_centroids,
                    detection_kernels = detection_kernels,
                    detection_kernels_overlap = detection_kernels_overlap,
                    detection_time_window = detection_time_window,
-                   acc_centroids = acc_centroids,
                    mobility = mobility,
                    calc_depth_error = calc_depth_error,
                    normalise = normalise,

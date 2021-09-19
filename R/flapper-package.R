@@ -112,8 +112,7 @@
 #'      \item The acoustic-centroid* (AC*) algorithms
 #'      \itemize{
 #'         \item \link{acs_setup_mobility} examines the assumption of a constant `mobility' parameter;
-#'         \item \link{acs_setup_n_centroids} suggests the number of acoustic centroids for the algorithm(s);
-#'         \item \link{acs_setup_centroids} defines the acoustic centroids for the algorithm(s);
+#'         \item \link{acs_setup_centroids} defines the detection centroids for the algorithm(s);
 #'         \item \link{acs_setup_detection_kernels} defines detection probability kernels for the algorithm(s);
 #'         \item \link{ac} and \link{acdc} implement the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms, via \link{.acs_pl} and \link{.acs};
 #'          }

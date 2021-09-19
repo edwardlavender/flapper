@@ -12,11 +12,10 @@
   plot_ts = TRUE,
   bathy,
   map = NULL,
-  detection_range,
+  detection_centroids,
   detection_kernels = NULL,
   detection_kernels_overlap = NULL,
   detection_time_window = 5,
-  acc_centroids,
   mobility,
   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
   normalise = FALSE,
@@ -45,15 +44,13 @@
 
 \item{map}{(optional) A blank \code{\link[raster]{raster}}, with the same properties (i.e., dimensions, resolution, extent and coordinate reference system) as the area/bathymetry raster (see \code{bathy}), but in which all values are 0. If \code{NULL}, this is computed internally, but supplying a pre-defined raster can be more computationally efficient if the function is applied iteratively (e.g., over different time windows).}
 
-\item{detection_range}{A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see also \code{\link[flapper]{acs_setup_centroids}}).}
+\item{detection_centroids}{A list of detection centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.}
 
 \item{detection_kernels}{A named list of detection probability kernels, from \code{\link[flapper]{acs_setup_detection_kernels}} and created using consistent parameters as specified for other \code{acs_setup_*} functions and here (i.e., see the \code{overlaps}, \code{calc_detection_pr} and \code{map} arguments in \code{\link[flapper]{acs_setup_detection_kernels}}).}
 
 \item{detection_kernels_overlap}{(optional) A named list (the `list_by_receiver' element from \code{\link[flapper]{get_detection_centroids_overlap}}), that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers. If \code{detection_kernels_overlap} and \code{detection_time_window} (below) are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids; if unsupplied, receiver detection probability kernels are assumed not to overlap.}
 
 \item{detection_time_window}{(optional) A number that defines the maximum duration (s) between consecutive detections at different receivers such that they can be said to have occurred at `effectively the same time'. This indicates that the same transmission was detected by multiple receivers. If \code{detection_kernels_overlap} (above) and \code{detection_time_window} are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids, by up-weighting overlapping areas between receivers that detected the transmission and down-weighting overlapping areas between receivers that did not detect the transmission (see Details in \code{\link[flapper]{acs_setup_detection_kernels}}). Note that the timing of detections is affected by \code{step} (see Details).}
-
-\item{acc_centroids}{A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.}
 
 \item{mobility}{A number that defines the distance (m) that an individual could move in the time steps between acoustic detections (see also \code{\link[flapper]{acs_setup_centroids}}).}
 
@@ -91,7 +88,7 @@ blank <- raster::raster(raster::extent(dat_gebco), res = c(75, 75))
 gebco <- raster::resample(dat_gebco, blank)
 
 #### Step (2) Implement setup_acdc_*() steps
-# ... Define acoustic centroids required for algorithm(s) (see acs_setup_centroids())
+# ... Define detection centroids required for algorithm(s) (see acs_setup_centroids())
 
 #### Step (3) Prepare movement time series for algorithm(s)
 # Add required columns to dataframes:
@@ -116,19 +113,17 @@ arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
 #### Example (1) Implement AC algorithm with default arguments
 out_acdc_1 <- flapper:::.acs(acoustics = acc,
                              bathy = gebco,
-                             detection_range = 425,
-                             mobility = 200,
-                             acc_centroids = dat_centroids
+                             detection_centroids = dat_centroids,
+                             mobility = 200
                              )
 
 #### Example (2) Implement ACDC algorithm with default arguments
 out_acdc_2 <- flapper:::.acs(acoustics = acc,
                              archival = arc,
                              bathy = gebco,
-                             detection_range = 425,
+                             detection_centroids = dat_centroids,
                              mobility = 200,
-                             calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                             acc_centroids = dat_centroids
+                             calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
                              )
 
 #### Example (3) Implement AC or ACDC algorithm with detection probability kernels
@@ -174,13 +169,12 @@ kernels <- acs_setup_detection_kernels(xy = xy,
 out_acdc_3 <- flapper:::.acs(acoustics = acc,
                              archival = arc,
                              bathy = gebco,
-                             detection_range = 425,
+                             detection_centroids = dat_centroids,
                              detection_kernels = kernels,
                              detection_kernels_overlap = overlaps$list_by_receiver,
                              detection_time_window = 10,
                              mobility = 200,
-                             calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                             acc_centroids = dat_centroids
+                             calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
                              )
 
 #### Example (4): Compare outputs with/without detection probability and normalisation
@@ -188,37 +182,34 @@ out_acdc_3 <- flapper:::.acs(acoustics = acc,
 out_acdc_4a <- flapper:::.acs(acoustics = acc,
                               archival = arc,
                               bathy = gebco,
-                              detection_range = 425,
+                              detection_centroids = dat_centroids,
                               mobility = 200,
-                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                              acc_centroids = dat_centroids
+                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
                               )
 out_acdc_4b <- flapper:::.acs(acoustics = acc,
                               archival = arc,
                               bathy = gebco,
-                              detection_range = 425, normalise = TRUE,
+                              detection_centroids = dat_centroids,
+                              normalise = TRUE,
                               mobility = 200,
-                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                              acc_centroids = dat_centroids
+                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
                               )
 ## With detection kernels
 out_acdc_4c <- flapper:::.acs(acoustics = acc,
                               archival = arc,
                               bathy = gebco,
-                              detection_range = 425,
+                              detection_centroids = dat_centroids,
                               detection_kernels = kernels,
                               mobility = 200,
-                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                              acc_centroids = dat_centroids
+                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
                               )
 out_acdc_4d <- flapper:::.acs(acoustics = acc,
                               archival = arc,
                               bathy = gebco,
-                              detection_range = 425,
+                               detection_centroids = dat_centroids,
                               detection_kernels = kernels, normalise = TRUE,
                               mobility = 200,
-                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                              acc_centroids = dat_centroids
+                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
                               )
 ## Comparison of final maps
 pp <- par(mfrow = c(2, 2))
@@ -232,10 +223,9 @@ par(pp)
 out_acdc_5 <- flapper:::.acs(acoustics = acc,
                              archival = arc,
                              bathy = gebco,
-                             detection_range = 425,
+                             detection_centroids = dat_centroids,
                              mobility = 200,
                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                             acc_centroids = dat_centroids,
                              verbose = TRUE,
                              con = paste0(tempdir(), "/", "acdc_log.txt")
                              )
@@ -249,10 +239,9 @@ utils::tail(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
 out_acdc_6 <- flapper:::.acs(acoustics = acc,
                              archival = arc,
                              bathy = gebco,
-                             detection_range = 425,
+                             detection_centroids = dat_centroids,
                              mobility = 200,
                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                             acc_centroids = dat_centroids,
                              save_record_spatial = NULL,
                              verbose = TRUE,
                              con = paste0(tempdir(), "/", "acdc_log.txt")
@@ -261,7 +250,7 @@ out_acdc_6 <- flapper:::.acs(acoustics = acc,
 
 }
 \seealso{
-The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call \code{\link[flapper]{.acs_pl}} which in turn calls this function. \code{\link[flapper]{acs_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acs_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results.
+The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call \code{\link[flapper]{.acs_pl}} which in turn calls this function. \code{\link[flapper]{acs_setup_centroids}} defines the detection centroids required by this function.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results.
 }
 \author{
 Edward Lavender

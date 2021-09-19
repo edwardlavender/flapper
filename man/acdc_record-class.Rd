@@ -24,7 +24,6 @@ For the AC* algorithms, \code{record$dat} contains the following information:
   \item `time_btw_dets' provides the time (s) between these acoustic detections;
   \item `archival_timestamp' defines the time stamp of archival observations between acoustic detections (if applicable);
   \item `archival_depth' defines the depth (m) of the individual each archival time step (if applicable);
-  \item `centroid_radius' refers to the size of radius (m) of the acoustic centroid at that time (which depends principally on the time since the last acoustic detection and the time until the next acoustic detection and is a metric of centroid size, bearing-in-mind that the actual centroids can be non-circular);
   }
 
 For the DC algorithm, \code{record$dat} contains the \code{archival} data for the time step, as inputted, with the following additional columns:
@@ -44,14 +43,11 @@ For the DC algorithm, \code{record$dat} contains the \code{archival} data for th
 }
 For the AC* algorithms, this list also includes information on the acoustic centroids:
 \itemize{
-  \item `centroid' is a \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the acoustic contour at that time step, which depends on the time since the previous detection, the time until the next detection, the mobility parameter and any spatial masks (i.e., the coastline and specified boundaries);
+  \item `centroid' is a \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the acoustic centroid at that time step, which depends on the time since the previous detection, the time until the next detection, the spatial arrangement of receivers, the mobility parameter and any spatial masks (i.e., the coastline and specified boundaries);
 }
-If the receiver at which the individual was detected at the current and next time step differs, after halfway between the archival time steps between these points, the `spatial' list will also contain the following elements:
+If the receiver at which the individual was detected at the current and next time step differs, the `spatial' list also contains the following elements:
 \itemize{
-  \item `centroid_previous' is a \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the previous acoustic centroid (i.e., at the `current' receiver);
-  \item `centroid_next' is a \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the acoustic centroid from the perspective of the `next' receiver at which the individual is detected;
-  \item `centroid_overlap' is the overlap between the centroids around the current and next receiver, within which the individual must have been located at the halfway point between detections;
-  \item `centroid_overlap_expanded' is the expanded version of the centroid overlap that is intersected with the acoustic centroid around the next receiver to determine the individual's plausible location(s);
+  \item `centroid_2' is a \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location from the perspective of the receiver at which the individual was next detected;
 }
 
 For \code{save_record_spatial = 0L} or elements outside of the specified input to \code{save_record_spatial}, `spatial' is simply an empty list.

@@ -21,7 +21,7 @@ acs_setup_detection_kernels(
 
 \item{services}{(optional) A dataframe that defines receiver IDs and servicing \code{\link[base]{Dates}} (times during the deployment period of a receiver when it was not active due to servicing). If provided, this must contain the following columns: an integer identifier for serviced receivers (named ‘receiver_id’) and two columns that define the time of the service(s) (‘service_start_date’ and ‘service_end_date’) (see \code{\link[flapper]{make_matrix_receivers}}).}
 
-\item{centroids}{The list of acoustic centroids, with one element for each number from \code{1:max(xy$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.}
+\item{centroids}{The list of detection centroids, with one element for each number from \code{1:max(xy$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.}
 
 \item{overlaps}{(optional) A named list, from \code{\link[flapper]{get_detection_centroids_overlap}}, that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers. If provided, this speeds up detection probability calculations in overlapping regions by focusing on only the subset of receivers with overlapping detection probability kernels. If there are no overlapping receivers, \code{FALSE} can be supplied instead to suppress these calculations.}
 
@@ -125,10 +125,10 @@ overlaps <-
 
 #### Example (1): Implement function using default options
 kernels <- acs_setup_detection_kernels(xy = xy,
-                                        centroids = dat_centroids,
-                                        overlaps = overlaps,
-                                        calc_detection_pr = calc_dpr,
-                                        map = map_blank)
+                                       centroids = dat_centroids,
+                                       overlaps = overlaps,
+                                       calc_detection_pr = calc_dpr,
+                                       map = map_blank)
 
 # Examine list elements
 summary(kernels)
@@ -217,7 +217,7 @@ graphics::par(pp)
 
 }
 \seealso{
-This is one of a number of functions used to set up the AC and ACDC algorithms implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}: \code{\link[flapper]{acs_setup_mobility}}, \code{\link[flapper]{acs_setup_n_centroids}}, \code{\link[flapper]{acs_setup_centroids}} and \code{\link[flapper]{acs_setup_detection_kernels}}. This function is supported by \code{\link[flapper]{make_matrix_receivers}}, which defines receiver activity statuses; \code{\link[flapper]{acs_setup_centroids}}, which defines acoustic centroids; and \code{\link[flapper]{get_detection_centroids_overlap}}, which defines detection centroid overlaps
+This is one of a number of functions used to set up the AC and ACDC algorithms implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}: \code{\link[flapper]{acs_setup_mobility}}, \code{\link[flapper]{acs_setup_centroids}} and \code{\link[flapper]{acs_setup_detection_kernels}}. This function is supported by \code{\link[flapper]{make_matrix_receivers}}, which defines receiver activity statuses; \code{\link[flapper]{acs_setup_centroids}}, which defines acoustic centroids; and \code{\link[flapper]{get_detection_centroids_overlap}}, which defines detection centroid overlaps
 }
 \author{
 Edward Lavender

@@ -159,7 +159,7 @@ file.size(paste0(tempdir(), "/dat_dcpf_histories.rds"))/1e6
 
 #####################################
 #### dat_acdc_contours:
-# ... an example dataset of acoustic centroids required for ACDC algorithm
+# ... an example dataset of detection centroids required for ACDC algorithm
 # ... useful for demonstrating the acdc algorithm
 
 ## Define data for setup_acdc()
@@ -179,12 +179,9 @@ xy_utm <-
 ## Define a list of centroids with specified parameters
 dat_centroids <- acs_setup_centroids(xy = xy_utm,
                                      detection_range = 425,
-                                     mobility = 200,
-                                     n_timesteps = 25,
                                      coastline = dat_coast,
                                      boundaries = raster::extent(dat_gebco),
                                      plot = TRUE,
-                                     cl = parallel::makeCluster(11L),
                                      verbose = TRUE)
 # Check size (Mb) of file prior to inclusion in package
 saveRDS(dat_centroids, paste0(tempdir(), "/dat_centroids.rds"))
@@ -220,10 +217,9 @@ par(pp)
 dat_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_range = 425,
+                 detection_centroids = dat_centroids,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                 acc_centroids = dat_centroids,
                  save_record_spatial = 1:50,
                  progress = 3L,
                  verbose = TRUE,

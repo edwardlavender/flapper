@@ -34,8 +34,7 @@ acc <- dat_acoustics[dat_acoustics$individual_id == 25, ][1:5, ]
 out_ac <- ac(acoustics = acc,
              step = 120,
              bathy = dat_gebco,
-             detection_range = 425,
-             acc_centroids = dat_centroids,
+             detection_centroids = dat_centroids,
              mobility = 250,
              write_record_spatial_for_pf = list(filename = root))
 # List the files for pf()

@@ -2,18 +2,16 @@
 % Please edit documentation in R/acs_setup.R
 \name{acs_setup_centroids}
 \alias{acs_setup_centroids}
-\title{Setup the acoustic centroids required for the AC* algorithm(s)}
+\title{Setup the detection centroids required for the AC* algorithm(s)}
 \usage{
 acs_setup_centroids(
   xy,
   detection_range,
-  mobility,
-  n_timesteps = 250,
   coastline = NULL,
   boundaries = NULL,
   plot = FALSE,
-  cl = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  ...
 )
 }
 \arguments{
@@ -21,28 +19,24 @@ acs_setup_centroids(
 
 \item{detection_range}{A number that defines the maximum detection range (m) at which an individual could be detected from a receiver.}
 
-\item{mobility}{A number that defines the distance that an individual could move in the time period between archival observations.}
-
-\item{n_timesteps}{An integer that defines the number of timesteps after a hypothetical detection for which centroids will be created, where the duration of each timestep is given by the duration between archival observations (see \code{\link[flapper]{acs_setup_n_centroids}}).}
-
-\item{coastline}{(optional) A \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines the coastline in an area. If provided, acoustic centroids are processed to remove any areas on land. Algorithm speed declines with the complexity of the coastline.}
+\item{coastline}{(optional) A \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines the coastline in an area. If provided, detection centroids are processed to remove any areas on land. Algorithm speed declines with the complexity of the coastline.}
 
 \item{boundaries}{(optional) An \code{\link[raster]{extent}} object that defines the boundaries of an area within which individuals are assumed to have remained. If provided, acoustic centroids are processed to remain within this area.}
 
 \item{plot}{A logical input that defines whether or not to produce a plot of the area, including receivers, the coastline and the area boundaries (if provided), and acoustic centroids. This is useful for checking purposes but it can reduce algorithm speed.}
 
-\item{cl}{(optional) A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. The connection to the cluster is closed within the function.}
-
 \item{verbose}{A logical input that defines whether or not to print messages to the console to relay function progress.}
+
+\item{...}{Additional arguments passed to \code{\link[flapper]{get_detection_centroids}} and, ultimately, \code{\link[rgeos]{gBuffer}}, except \code{byid} which is necessarily \code{TRUE}.}
 }
 \value{
-The function returns a list of \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects, with one element for all numbers from 1 to the maximum receiver number (\code{xy$receiver_id}). Any list elements that do not correspond to receivers contain a \code{NULL} element. List elements that correspond to receivers contain a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object containing all the centroids for that receiver.
+The function returns a list of \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects, with one element for all numbers from 1 to the maximum receiver number (\code{xy$receiver_id}). Any list elements that do not correspond to receivers contain a \code{NULL} element. List elements that correspond to receivers contain a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object containing the detection centroid for that receiver.
 }
 \description{
-This function produces the acoustic centroids required by the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms.
+This function produces the detection centroids required by the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms.
 }
 \details{
-Given only a detection at a particular receiver at a particular time, the detection range of the receiver and the movement speed of the animal, an acoustic centroid defines the possible locations of a detected individual at that time or a subsequent time. More specifically, when an individual is located at a receiver, its location must be within some radius of that receiver defined by the maximum detection distance. This radius expands with the duration since detection. This function defines, for each receiver, a list of acoustic centroids that reflect the possible locations of an individual were it to have been detected from 0 to \code{n_timesteps} ago at that receiver, accounting for the coastline and within a defined area if necessary. Using the observed detection data, the AC (\code{\link[flapper]{ac}}) and ACDC (\code{\link[flapper]{acdc}}) algorithms pull the relevant centroids out of this list, which substantially saves computation time because acoustic centroids are not computed on-the-fly. These centroids are processed within these algorithms (e.g., if an individual is detected at two different receivers, then at the halfway point between detections its location must be within the intersection of the relevant centroids for these two receivers) and combine them with other information to reconstruct where an individual could have been over time.
+Given a detection at a particular receiver at a particular time, the detection centroid defines the boundaries of the area around a receiver within which the individual must have been located (from the perspective of that receiver).
 }
 \examples{
 #### Define data for acs_setup_centroids()
@@ -63,9 +57,7 @@ xy_utm <-
 #### Example (1): Define a list of centroids with specified parameters
 # ... (Argument values are small to reduce computation time for examples)
 centroids <- acs_setup_centroids(xy = xy_utm,
-                                  detection_range = 500,
-                                  mobility = 250,
-                                  n_timesteps = 3
+                                 detection_range = 500
                                  )
 # A list of SpatialPolygonsDataFrames is returned
 # with elements from 1:max(xy_utm$receiver_id)
@@ -73,19 +65,15 @@ centroids <- acs_setup_centroids(xy = xy_utm,
 # Otherwise a SpatialPolygonsDataFrame is returned with all the centroids for that receiver
 centroids
 
-#### Example (2): Visualise the acoustic centroids produced via plot = TRUE
+#### Example (2): Visualise the centroids produced via plot = TRUE
 centroids <- acs_setup_centroids(xy = xy_utm,
                                   detection_range = 500,
-                                  mobility = 250,
-                                  n_timesteps = 3,
                                   plot = TRUE
                                   )
 
 #### Example (3): Remove areas of the centroids that overlap with coastline
 centroids <- acs_setup_centroids(xy = xy_utm,
                                   detection_range = 500,
-                                  mobility = 250,
-                                  n_timesteps = 3,
                                   plot = TRUE,
                                   coastline = dat_coast
                                   )
@@ -99,26 +87,11 @@ boundaries <- raster::extent(min(xy_utm_coords[, 1]),
                         )
 centroids <- acs_setup_centroids(xy = xy_utm,
                                   detection_range = 500,
-                                  mobility = 250,
-                                  n_timesteps = 3,
                                   plot = TRUE,
                                   coastline = dat_coast,
                                   boundaries = boundaries
                                   )
 
-#### Example (5): Implement the algorithm in parallel
-centroids <- acs_setup_centroids(xy = xy_utm,
-                                  detection_range = 500,
-                                  mobility = 250,
-                                  n_timesteps = 3,
-                                  plot = TRUE,
-                                  coastline = dat_coast,
-                                  boundaries = boundaries,
-                                  cl = parallel::makeCluster(2L)
-                                  )
-
-#### Example (6): Acoustic centroids can be saved to file using rlist::list.save()
-# rlist::list.save(centroids, paste0(tempdir(), "/centroids.RData"))
 }
 \author{
 Edward Lavender

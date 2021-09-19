@@ -9,11 +9,10 @@ acdc(
   archival,
   plot_ts = TRUE,
   bathy,
-  detection_range,
+  detection_centroids,
   detection_kernels = NULL,
   detection_kernels_overlap = NULL,
   detection_time_window = 5,
-  acc_centroids,
   mobility,
   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
   normalise = FALSE,
@@ -37,15 +36,13 @@ acdc(
 
 \item{bathy}{A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acs_setup_centroids}}).}
 
-\item{detection_range}{A number that defines the maximum detection range (m) at which an individual could be detected from a receiver (see \code{\link[flapper]{ac}}).}
+\item{detection_centroids}{A list of detection centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.}
 
 \item{detection_kernels}{A named list of detection probability kernels (see \code{\link[flapper]{ac}}).}
 
 \item{detection_kernels_overlap}{(optional) A named list of detection probability kernel overlaps (see \code{\link[flapper]{ac}}).}
 
 \item{detection_time_window}{A number that defines the detection time window (see \code{\link[flapper]{ac}}).}
-
-\item{acc_centroids}{A list of acoustic centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.}
 
 \item{mobility}{The mobility parameter (see \code{\link[flapper]{ac}}).}
 
@@ -82,7 +79,7 @@ In outline, the crux of the approach is the recognition that acoustic detections
 }
 \examples{
 #### Step (1) Implement setup_acdc_*() steps
-# ... Define acoustic centroids required for ACDC algorithm (see setup_acdc_centroids())
+# ... Define detection centroids required for ACDC algorithm (see setup_acdc_centroids())
 
 #### Step (2) Prepare movement time series for algorithm
 # Focus on an example individual
@@ -107,10 +104,9 @@ arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
 out_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_range = 425,
+                 detection_centroids = dat_centroids,
                  mobility = 200,
-                 calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                 acc_centroids = dat_centroids
+                 calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
                  )
 # The function returns a list with four elements
 # ... archive contains the results of the algorithm, implemented by the back-end
@@ -122,10 +118,9 @@ summary(out_acdc)
 out_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_range = 425,
+                 detection_centroids = dat_centroids,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                 acc_centroids = dat_centroids,
                  con = tempdir()
                  )
 acdc_log <- readLines(paste0(tempdir(), "/acdc_log.txt"))
@@ -138,10 +133,9 @@ file.remove(paste0(tempdir(), "/acdc_log.txt"))
 out_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_range = 425,
+                 detection_centroids = dat_centroids,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                 acc_centroids = dat_centroids,
                  save_record_spatial = NULL
                  )
 
@@ -152,10 +146,9 @@ out_acdc <- acdc(acoustics = acc,
 out_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_range = 425,
+                 detection_centroids = dat_centroids,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                 acc_centroids = dat_centroids,
                  con = tempdir(),
                  cl = parallel::makeCluster(2L)
                  )
@@ -185,10 +178,9 @@ lapply(out_acdc$ts_by_chunk,
 out_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_range = 425,
+                 detection_centroids = dat_centroids,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                 acc_centroids = dat_centroids,
                  con = tempdir(),
                  cl = parallel::makeCluster(2L),
                  split = "2 hours"
@@ -203,10 +195,9 @@ acc_ls <- split(acc, acc$chunk)
 out_acdc <- acdc(acoustics = acc_ls,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_range = 425,
+                 detection_centroids = dat_centroids,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                 acc_centroids = dat_centroids,
                  con = tempdir(),
                  cl = parallel::makeCluster(2L)
                  )
@@ -241,10 +232,9 @@ acdc_out_by_id <-
     acdc_out <- acdc(acoustics = acc,
                      archival = dat_archival,
                      bathy = dat_gebco,
-                     detection_range = 425,
+                     detection_centroids = dat_centroids,
                      mobility = 200,
                      calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                     acc_centroids = dat_centroids,
                      save_record_spatial = 1:10L,
                      con = dir_id
                      )
@@ -270,7 +260,7 @@ summary(acdc_out_by_id)
 
 }
 \seealso{
-This function calls \code{\link[flapper]{.acs_pl}} and \code{\link[flapper]{.acs}} to implement the ACDC algorithm. The AC component can be implemented via  \code{\link[flapper]{ac}} and the DC component via \code{\link[flapper]{dc}}. \code{\link[flapper]{acs_setup_centroids}} defines the acoustic centroids required by this function. This is supported by \code{\link[flapper]{acs_setup_n_centroids}} which suggests a suitable number of centroids.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results. Particle filtering can be used to reconstruct movement paths.
+This function calls \code{\link[flapper]{.acs_pl}} and \code{\link[flapper]{.acs}} to implement the ACDC algorithm. The AC component can be implemented via  \code{\link[flapper]{ac}} and the DC component via \code{\link[flapper]{dc}}. \code{\link[flapper]{acs_setup_centroids}} defines the detection centroids required by this function.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results. Particle filtering can be used to reconstruct movement paths.
 }
 \author{
 Edward Lavender

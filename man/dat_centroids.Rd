@@ -3,14 +3,14 @@
 \docType{data}
 \name{dat_centroids}
 \alias{dat_centroids}
-\title{Example acoustic centroids from \code{\link[flapper]{acs_setup_centroids}}}
+\title{Example detection centroids from \code{\link[flapper]{acs_setup_centroids}}}
 \format{
-A list with 57 elements, one for each receiver from 1:max(\code{\link[flapper]{dat_moorings}$receiver_id}). Each element contains a SpatialPolygonsDataFrame with the acoustic centroids for that receiver, under a detection range of 425 m, a mobility parameter of 200 m, 25 time steps and within the boundaries defined by \code{\link[flapper]{dat_coast}} and \code{\link[flapper]{dat_gebco}}.
+A list with 57 elements, one for each receiver from 1:max(\code{\link[flapper]{dat_moorings}$receiver_id}). Each element contains a SpatialPolygonsDataFrame with the detection centroid for that receiver, under a detection range of 425 m and within the boundaries defined by \code{\link[flapper]{dat_coast}} and \code{\link[flapper]{dat_gebco}}.
 }
 \usage{
 dat_centroids
 }
 \description{
-A list of acoustic centroids created by \code{\link[flapper]{acs_setup_centroids}}. This is included principally to streamline function examples.
+A list of detection centroids created by \code{\link[flapper]{acs_setup_centroids}}. This is included principally to streamline function examples.
 }
 \keyword{datasets}
