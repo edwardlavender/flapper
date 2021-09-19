@@ -175,7 +175,7 @@ coa_setup_delta_t <- function(acoustics,
   cat_to_console("... Calculating detection statistics across time intervals....")
   # Calculate the total number of detections at each receiver in each interval across the whole study
   if(nrow(dat) == 1){
-    acoustics$intervals <- dat$interval
+    acoustics$intervals <- factor(dat$interval)
   } else {
     acoustics$intervals <- cut(acoustics$timestamp, breaks = dat$interval)
   }
