@@ -364,6 +364,11 @@ pf_kud_1 <- function(xpf,
     warning("'plot_by_time' ignored for 'cl' != NULL.", immediate. = TRUE, call. = FALSE)
     plot_by_time <- FALSE
   }
+  if(chunks <= 1L & !is.null(cl)){
+    warning("'cl' supplied but 'chunks <= 1L': ignoring 'cl'.", immediate. = TRUE, call. = FALSE)
+    if(inherits(cl, "cluster")) parallel::stopCluster(cl)
+    cl <- NULL
+  }
 
   #### Define a dataframe of particle locations through time
   cat_to_console("... Processing sampled locations...")
