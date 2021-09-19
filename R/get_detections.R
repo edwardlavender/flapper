@@ -90,10 +90,11 @@ get_detection_pr <- function(distance = 1:1000,
 #'
 #' @param xy A \code{\link[sp]{SpatialPoints-class}} or \code{\link[sp]{SpatialPointsDataFrame-class}} object that defines receiver locations. The coordinate reference system should be the Universe Transverse Mercator coordinate reference system.
 #' @param detection_range A number that defines the detection range (m) of receivers.
+#' @param resolution A number that defines the number of linear segments used to approximate the detection centroid (see the \code{quadsegs} argument in \code{\link[rgeos]{gBuffer}}).
 #' @param boundaries An \code{\link[raster]{extent}} object (on an object from which this can be extracted) that defines the boundaries of the study area.
 #' @param coastline (optional) A \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines barriers (such as the coastline) that block receivers from surveying areas within their detection range.
 #' @param plot A logical input that defines whether or not to plot receivers, their centroids, and the buffer (if specified).
-#' @param ... Additional arguments passed to \code{\link[rgeos]{gBuffer}}, such as \code{byid} and/or \code{quadsegs}.
+#' @param ... Additional arguments passed to \code{\link[rgeos]{gBuffer}}, such as \code{byid}.
 #'
 #' @return The function returns a \code{\link[sp]{SpatialPolygons-class}} object of the detection centroids around receivers that represents the area they survey under the assumption of a constant detection range, accounting for any barriers to detection. By default, this will contain a single feature, which is suitable for the calculation of the total area surveyed by receivers (see \code{\link[flapper]{get_detection_area_sum}}) because it accounts for the overlap in the detection ranges of receivers. However, if \code{byid = TRUE} is passed via \code{...} to \code{\link[rgeos]{gBuffer}}, the returned object will have a feature for each pair of coordinates in \code{xy} (i.e., receiver). This is less appropriate for calculating the area surveyed by receivers, since areas surveyed by multiple receivers will be over-counted, but it is suitable when the centroids for particular receivers are required (e.g., to extract environmental conditions within a specific receiver's detection range) (see \code{\link[flapper]{get_detection_centroids_envir}}).
 #'
@@ -141,15 +142,16 @@ get_detection_pr <- function(distance = 1:1000,
 
 get_detection_centroids <- function(xy,
                                     detection_range = 425,
+                                    resolution = 1000,
                                     boundaries = NULL, coastline = NULL,
                                     plot = TRUE,...){
 
   #### Checks
   # Check xy is a SpatialPoints object or similar
   check_class(input = xy, to_class = c("SpatialPoints", "SpatialPointsDataFrame"), type = "stop")
-
+  check...("spgeom", "width", "quadsegs",...)
   #### Define buffers around receivers equal to detection radius
-  xy_buf <- rgeos::gBuffer(xy, width = detection_range,...)
+  xy_buf <- rgeos::gBuffer(xy, width = detection_range, quadsegs = resolution,...)
 
   #### Clip around boundaries/coastline (if applicable)
   if(!is.null(boundaries)){
