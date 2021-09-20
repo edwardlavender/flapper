@@ -114,6 +114,7 @@ pf_plot_1d <- function(paths,
 #' @description This function is a simple wrapper for \code{\link[prettyGraphics]{pretty_map}} that maps the paths reconstructed by a particle filtering (PF) algorithm over a surface.
 #' @param paths A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the x and y coordinates that define the trajectory of each path (`cell_x' and `cell_y').
 #' @param bathy A \code{\link[raster]{raster}} of the surface over which movement was reconstructed.
+#' @param add_bathy A named list, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the bathymetry surface.
 #' @param add_paths A named list, passed to \code{\link[prettyGraphics]{add_sp_path}}, to customise the appearance of the paths.
 #' @param prompt A logical input that defines whether or not plot each path on a separate plot, sequentially, with a pause between plots (\code{prompt = TRUE}), or all paths on a single plot (\code{prompt = FALSE}).
 #' @param ... Additional arguments, passed to \code{\link[prettyGraphics]{pretty_map}}, for plot customisation.
@@ -149,12 +150,14 @@ pf_plot_1d <- function(paths,
 
 pf_plot_2d <- function(paths,
                        bathy,
+                       add_bathy = list(),
                        add_paths = list(),
                        prompt = FALSE,...){
   check_names(input = paths, req = c("path_id", "cell_x", "cell_y"))
-  if(!prompt) prettyGraphics::pretty_map(add_rasters = list(x = bathy),...)
+  add_bathy$x <- bathy
+  if(!prompt) prettyGraphics::pretty_map(add_rasters = add_bathy,...)
   lapply(split(paths, paths$path_id), function(d){
-    if(prompt) prettyGraphics::pretty_map(add_rasters = list(x = bathy),...)
+    if(prompt) prettyGraphics::pretty_map(add_rasters = add_bathy,...)
     add_paths$x <- d$cell_x
     add_paths$y <- d$cell_y
     do.call(prettyGraphics::add_sp_path, add_paths)

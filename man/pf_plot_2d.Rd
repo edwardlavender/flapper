@@ -4,12 +4,21 @@
 \alias{pf_plot_2d}
 \title{Map two-dimensional paths from a PF algorithm}
 \usage{
-pf_plot_2d(paths, bathy, add_paths = list(), prompt = FALSE, ...)
+pf_plot_2d(
+  paths,
+  bathy,
+  add_bathy = list(),
+  add_paths = list(),
+  prompt = FALSE,
+  ...
+)
 }
 \arguments{
 \item{paths}{A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the x and y coordinates that define the trajectory of each path (`cell_x' and `cell_y').}
 
 \item{bathy}{A \code{\link[raster]{raster}} of the surface over which movement was reconstructed.}
+
+\item{add_bathy}{A named list, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the bathymetry surface.}
 
 \item{add_paths}{A named list, passed to \code{\link[prettyGraphics]{add_sp_path}}, to customise the appearance of the paths.}
 
