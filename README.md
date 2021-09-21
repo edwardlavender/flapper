@@ -297,8 +297,8 @@ of individuals:
     periods of tagged individuals and receivers;
   - `get_detection_days()` calculates the total number of days during
     which each individual was detected (termed ‘detection days’);
-  - `get_detection_clump_lengths()` calculates detection ‘clump’
-    lengths;
+  - `get_detection_clumps()` identifies detection ‘clumps’ and
+    calculates their lengths;
   - `get_detection_overlaps()` identifies ‘overlapping’ detections;
   - `get_residents()` identifies ‘resident’ individuals;
   - `make_matrix_cooccurence()` computes a detection history similarity

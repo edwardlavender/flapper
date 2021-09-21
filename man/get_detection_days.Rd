@@ -59,7 +59,7 @@ utils::head(dat_acoustics)
 
 }
 \seealso{
-\code{\link[flapper]{get_detection_clump_lengths}}, \code{\link[flapper]{get_residents}}
+\code{\link[flapper]{get_detection_clumps}}, \code{\link[flapper]{get_residents}}
 }
 \author{
 Edward Lavender

@@ -1049,7 +1049,7 @@ get_detection_centroids_envir <- function(xy,
 #'
 #' utils::head(dat_acoustics)
 #'
-#' @seealso \code{\link[flapper]{get_detection_clump_lengths}}, \code{\link[flapper]{get_residents}}
+#' @seealso \code{\link[flapper]{get_detection_clumps}}, \code{\link[flapper]{get_residents}}
 #' @author Edward Lavender
 #' @export
 #'
@@ -1130,18 +1130,21 @@ get_detection_days <- function(acoustics,
 
 ######################################
 ######################################
-#### get_detection_clump_lengths()
+#### get_detection_clums()
 
-#' @title Get detection clump lengths
+#' @title Get detection clumps
 #' @importFrom rlang .data
-#' @description This function gets the frequency distribution of the duration of unique, uninterrupted series of detections (`clumps') over a given time interval--for example, the number of occasions when detections clumped into periods of one, two, three, ..., n days in duration without gaps longer than one day in length.
+#' @description This function identifies unique, uninterrupted series of detections (`clumps') over a given time interval--for example, occasions when detections clumped into periods of one, two, three, ..., n days in duration without gaps longer than one day in length. A dataframe identifying each clump and the associated start time or the frequency distribution of the duration of clumps is returned.
 #' @param acoustics A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). At a minimum, this should contain a POSIXct vector of time stamps when detections were made named `timestamp'.
 #' @param fct (optional) A character that defines the name of a column in \code{acoustics} that distinguishes acoustic time series for different individuals.
-#' @param interval A character that defines the time interval. This must be supported by \code{\link[lubridate]{round_date}}. The default is \code{"days"}, in which case the function gets the frequency distribution of the duration of clump lengths in units of days, with detections within the same clump occurring within one day of each other.
+#' @param interval A character that defines the time interval. This must be supported by \code{\link[lubridate]{round_date}}. The default is \code{"days"}, in which case the function identifies clumps in units of days, with detections within the same clump occurring within one day of each other.
+#' @param summarise A logical input that defines whether or not to summarise detection clumps in terms of the frequency distribution of clump lengths (see Value).
 #'
-#' @details Detection clumps provide a means to assess residency within an array by determining how long individuals tended to spend around receivers.
+#' @details Detection clumps (and, more specifically, the frequency distribution of the duration of clump lengths) provide a means to assess residency within an array by determining how long individuals tended to spend around receivers.
 #'
-#' @return The function returns a dataframe that defines the frequency distribution of the duration of detection clumps (i.e., the number of occasions when detection clumps lasted different lengths of time). This includes the following columns: (1) `n_interval', the duration of the clump, in units of \code{interval}; (2) `n_occasions', the number of occasions when detections clumped into windows of that duration; and, if \code{fct} is supplied, a column that distinguishes each individual.
+#' @return For implementations with \code{summarise = FALSE}, the function returns a dataframe that defines, for each \code{fct}, the number of intervals in a given clump (`n_intervals') and start time of the clump (`timestamp').
+#'
+#' For implementations with \code{summarise = TRUE}, the function returns a dataframe that defines the frequency distribution of the duration of detection clumps (i.e., the number of occasions when detection clumps lasted different lengths of time). This includes the following columns: (1) `n_interval', the duration of the clump, in units of \code{interval}; (2) `n_occasions', the number of occasions when detections clumped into windows of that duration; (3) `eg_occasions', the time stamp of an example clump of the specified duration; and, if \code{fct} is supplied, a column that distinguishes each individual.
 #'
 #' @examples
 #' #### Define a hypothetical series of detections
@@ -1175,32 +1178,36 @@ get_detection_days <- function(acoustics,
 #'
 #' #### Example (1): Implement function with default options
 #' # ... (for one individual, with a daily time interval)
-#' get_detection_clump_lengths(eg)
+#' get_detection_clumps(eg)
 #'
 #' #### Example (2): Implement function for multiple individuals
 #' # Use a factor to distinguish IDs. As an example:
 #' eg$individual_id <- 1L
-#' get_detection_clump_lengths(eg, fct = "individual_id")
+#' get_detection_clumps(eg, fct = "individual_id")
 #'
 #' #### Example (3): Change the time interval
 #' ## E.g. Use an hourly interval:
 #' # There are 17 unique clumps in this dataset, each comprising a single hour
 #' eg$timestamp <- as.POSIXct(eg$timestamp)
-#' get_detection_clump_lengths(eg, interval = "hours")
+#' get_detection_clumps(eg, interval = "hours")
 #' ## E.g. Use a monthly interval
 #' # There is a single 'three-month' clump of detections for this individual
 #' # ... when viewed at a monthly timescale:
-#' get_detection_clump_lengths(eg, interval = "months")
+#' get_detection_clumps(eg, interval = "months")
+#'
+#' #### Example (4): Identify the timing of each clump with summarise = FALSE
+#' get_detection_clumps(eg, summarise = FALSE)
 #'
 #' @seealso \code{\link[flapper]{get_detection_days}}, \code{\link[flapper]{get_residents}}
 #' @author Edward Lavender
 #' @export
 
 
-get_detection_clump_lengths <-
+get_detection_clumps <-
   function(acoustics,
            fct = NULL,
-           interval = "days"){
+           interval = "days",
+           summarise = TRUE){
 
     #### Checks
     check_names(input = acoustics, req = c("timestamp", fct), type = all)
@@ -1229,20 +1236,30 @@ get_detection_clump_lengths <-
         # ... gives a dataframe with a unique identifier for each group of
         # ... consecutive detections and the number of times in that group
         # ... with detections (e.g., 1 day, 2 days etc.)
-        tmp <- data.frame(grp = data.table::rleid(bool), bool = bool)
+        tmp <- data.frame(grp = data.table::rleid(bool), bool = bool, timestamp = times)
         tmp <-
           tmp %>%
           dplyr::filter(.data$bool) %>%
           dplyr::group_by(.data$grp) %>%
-          dplyr::summarise(n = dplyr::n(), .groups = "drop_last")
-        # Get the frequency distribution of the lengths of strings of consecutive detections
-        # This shows the number of occasions when strings of consecutive detections
-        # ... of a certain length were made
-        # ... e.g., 15 occasions when the number of intervals in a string of consecutive detections
-        # ... was only one, 5 occasions when consecutive detections lasted for two days (etc.)
-        out <- table(tmp$n)
-        out <- data.frame(n_intervals = as.integer(names(out)), n_occasions = as.numeric(out))
-        out <- out %>% dplyr::arrange(.data$n_intervals)
+          dplyr::mutate(n = dplyr::n()) %>%
+          dplyr::slice(1L)
+        if(!summarise){
+          out <- data.frame(n_intervals = tmp$n,
+                            timestamp   = tmp$timestamp)
+          out <- out %>% dplyr::arrange(.data$timestamp)
+        } else {
+          # Get the frequency distribution of the lengths of strings of consecutive detections
+          # This shows the number of occasions when strings of consecutive detections
+          # ... of a certain length were made
+          # ... e.g., 15 occasions when the number of intervals in a string of consecutive detections
+          # ... was only one, 5 occasions when consecutive detections lasted for two days (etc.)
+          out <- table(tmp$n)
+          out <- data.frame(n_intervals = as.integer(names(out)),
+                            n_occasions = as.numeric(out))
+          out$eg_occasions <- tmp$timestamp[match(out$n_intervals, tmp$n)]
+          out <- out %>% dplyr::arrange(.data$n_intervals)
+        }
+
         if(!is.null(fct)) out[, fct] <- d[1, fct]
         return(out)
       })
@@ -1464,7 +1481,7 @@ get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5){
 #' # Compare results to abacus plot
 #' prettyGraphics::pretty_plot(dat_acoustics$timestamp, dat_acoustics$individual_id)
 #'
-#' @seealso \code{\link[flapper]{get_detection_days}}, \code{\link[flapper]{get_detection_clump_lengths}}
+#' @seealso \code{\link[flapper]{get_detection_days}}, \code{\link[flapper]{get_detection_clumps}}
 #' @references Lavender, et al. (in review). Movement patterns of a Critically Endangered elasmobranch (\emph{Dipturus intermedius}) in a Marine Protected Area. Aquatic Conservation: Marine and Freshwater Ecosystems.
 #'
 #' @author Edward Lavender
