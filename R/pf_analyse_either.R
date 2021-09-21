@@ -512,7 +512,7 @@ pf_kud_2 <- function(xpf,
     if(show) cat(paste(..., "\n"))
   }
   t_onset <- Sys.time()
-  cat_to_console(paste0("flapper::pf_kud_1() called (@ ", t_onset, ")..."))
+  cat_to_console(paste0("flapper::pf_kud_2() called (@ ", t_onset, ")..."))
   cat_to_console("... Setting up function...")
   check_class(input = xpf, to_class = c("pf_archive", "pf_path"))
   if(inherits(xpf, "pf_path")){
