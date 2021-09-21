@@ -9,6 +9,7 @@ pf_plot_map(
   map,
   transform = NULL,
   scale = c("original", "max", "sum"),
+  plot = TRUE,
   add_rasters = list(),
   ...
 )
@@ -22,15 +23,17 @@ pf_plot_map(
 
 \item{scale}{A character that defines how \code{\link[raster]{raster}} values are scaled: \code{"original"} uses the original values; \code{"max"} scales values by the maximum value (so that, if \code{transform = NULL}, they lie between zero and one; and \code{"sum"} scales values by their sum so that they sum to one.}
 
-\item{add_rasters}{A named list, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the plotted surface.}
+\item{plot}{A logical input that defines whether or not to plot the map.}
+
+\item{add_rasters}{If \code{plot = TRUE}, \code{add_rasters} is a named list, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the plotted surface.}
 
 \item{...}{Additional arguments passed to \code{\link[prettyGraphics]{pretty_map}}.}
 }
 \value{
-The function invisibly returns a \code{\link[raster]{raster}}, in which each cell contains the `probability of use' score  and produces a plot of this surface.
+The function invisibly returns a \code{\link[raster]{raster}}, in which each cell contains the `probability of use' score  and (optionally) produces a plot of this surface.
 }
 \description{
-This function creates a plot of the `probability of use' across an area based on (a) particles sampled or (b) paths reconstructed by a particle filtering (PF) algorithm. To implement the function, an (a) \code{\link[flapper]{pf_archive-class}} object that contains connected particles (locations) sampled by \code{\link[flapper]{pf}} and processed by \code{\link[flapper]{pf_simplify}} or (b) \code{\link[flapper]{pf_path-class}} object that contains reconstructed paths must be supplied. The function extracts sampled locations and, for each location, calculates `the probability of use' for that location over the time series (see Details). This is plotted and returned (invisibly) as a \code{\link[raster]{raster}}.
+This function creates a \code{\link[raster]{raster}} of the `probability of use' across an area based on (a) particles sampled or (b) paths reconstructed by a particle filtering (PF) algorithm. To implement the function, an (a) \code{\link[flapper]{pf_archive-class}} object that contains connected particles (locations) sampled by \code{\link[flapper]{pf}} and processed by \code{\link[flapper]{pf_simplify}} or (b) \code{\link[flapper]{pf_path-class}} object that contains reconstructed paths must be supplied. The function extracts sampled locations and, for each location, calculates `the probability of use' for that location over the time series (see Details). This is (optionally) plotted and returned (invisibly) as a \code{\link[raster]{raster}}.
 }
 \details{
 For particle-based implementations, this function is designed to be implemented for the subset of sampled particles that formed continuous paths from the start to the end of the time series (see \code{\link[flapper]{pf_simplify}}). At each time step, only one record of each location (derived by summarising the probabilities of multiple samples of the same location with the \code{summarise_pf} argument in \code{\link[flapper]{pf_simplify}}) should be passed to \code{\link[flapper]{pf_plot_map}} to ensure that cell scores depend on the number of time steps when the individual could have occupied a given cell, rather than the total number of samples of a location. For each location, the 'probability of use' is calculated as the sum of the number of times (time steps) that the location was sampled, weighted by the associated probabilities of each sample, over the total number of time steps. The benefit of this approach is that all particles that were part of paths from the start to the end of the time series are incorporated in the resultant map. However, this comes at the cost of simplifying cell probabilities for duplicate records and ignoring variation in the overall likelihood of different movement paths.

@@ -3,12 +3,13 @@
 #### pf_plot_map()
 
 #' @title Plot `probability of use' from a PF algorithm
-#' @description This function creates a plot of the `probability of use' across an area based on (a) particles sampled or (b) paths reconstructed by a particle filtering (PF) algorithm. To implement the function, an (a) \code{\link[flapper]{pf_archive-class}} object that contains connected particles (locations) sampled by \code{\link[flapper]{pf}} and processed by \code{\link[flapper]{pf_simplify}} or (b) \code{\link[flapper]{pf_path-class}} object that contains reconstructed paths must be supplied. The function extracts sampled locations and, for each location, calculates `the probability of use' for that location over the time series (see Details). This is plotted and returned (invisibly) as a \code{\link[raster]{raster}}.
+#' @description This function creates a \code{\link[raster]{raster}} of the `probability of use' across an area based on (a) particles sampled or (b) paths reconstructed by a particle filtering (PF) algorithm. To implement the function, an (a) \code{\link[flapper]{pf_archive-class}} object that contains connected particles (locations) sampled by \code{\link[flapper]{pf}} and processed by \code{\link[flapper]{pf_simplify}} or (b) \code{\link[flapper]{pf_path-class}} object that contains reconstructed paths must be supplied. The function extracts sampled locations and, for each location, calculates `the probability of use' for that location over the time series (see Details). This is (optionally) plotted and returned (invisibly) as a \code{\link[raster]{raster}}.
 #' @param xpf A \code{\link[flapper]{pf_archive-class}} object (from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with \code{return = "archive"}) or a \code{\link[flapper]{pf_path-class}} object (from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} with \code{return = "path"}).
 #' @param map A \code{\link[raster]{raster}} that defines a grid across the area of interest.
 #' @param transform (optional) A function to transform cell weights (e.g, \code{\link[base]{log}}).
 #' @param scale A character that defines how \code{\link[raster]{raster}} values are scaled: \code{"original"} uses the original values; \code{"max"} scales values by the maximum value (so that, if \code{transform = NULL}, they lie between zero and one; and \code{"sum"} scales values by their sum so that they sum to one.
-#' @param add_rasters A named list, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the plotted surface.
+#' @param plot A logical input that defines whether or not to plot the map.
+#' @param add_rasters If \code{plot = TRUE}, \code{add_rasters} is a named list, passed to \code{\link[prettyGraphics]{pretty_map}}, to customise the appearance of the plotted surface.
 #' @param ... Additional arguments passed to \code{\link[prettyGraphics]{pretty_map}}.
 #'
 #' @details For particle-based implementations, this function is designed to be implemented for the subset of sampled particles that formed continuous paths from the start to the end of the time series (see \code{\link[flapper]{pf_simplify}}). At each time step, only one record of each location (derived by summarising the probabilities of multiple samples of the same location with the \code{summarise_pf} argument in \code{\link[flapper]{pf_simplify}}) should be passed to \code{\link[flapper]{pf_plot_map}} to ensure that cell scores depend on the number of time steps when the individual could have occupied a given cell, rather than the total number of samples of a location. For each location, the 'probability of use' is calculated as the sum of the number of times (time steps) that the location was sampled, weighted by the associated probabilities of each sample, over the total number of time steps. The benefit of this approach is that all particles that were part of paths from the start to the end of the time series are incorporated in the resultant map. However, this comes at the cost of simplifying cell probabilities for duplicate records and ignoring variation in the overall likelihood of different movement paths.
@@ -17,7 +18,7 @@
 #'
 #' For either implementation, raw scores can be transformed or scaled to facilitate comparisons.
 #'
-#' @return The function invisibly returns a \code{\link[raster]{raster}}, in which each cell contains the `probability of use' score  and produces a plot of this surface.
+#' @return The function invisibly returns a \code{\link[raster]{raster}}, in which each cell contains the `probability of use' score  and (optionally) produces a plot of this surface.
 #'
 #' @examples
 #' #### Prepare data
@@ -72,6 +73,7 @@ pf_plot_map <- function(xpf,
                         map,
                         transform = NULL,
                         scale = c("original", "max", "sum"),
+                        plot = TRUE,
                         add_rasters = list(),...){
   #### Check inputs
   check_class(input = xpf, to_class = c("pf_archive", "pf_path"))
@@ -145,9 +147,11 @@ pf_plot_map <- function(xpf,
   p <- raster::mask(p, map)
 
   #### Plot map and return outputs
-  if(!is.null(add_rasters)) add_rasters$x <- p
-  prettyGraphics::pretty_map(x = p,
-                             add_rasters = add_rasters,...)
+  if(plot){
+    if(!is.null(add_rasters)) add_rasters$x <- p
+    prettyGraphics::pretty_map(x = p,
+                               add_rasters = add_rasters,...)
+  }
   return(invisible(p))
 }
 
