@@ -143,7 +143,7 @@ lcp_graph_surface <- function(surface, cost, verbose = TRUE){
 
   #### Make graph
   cat_to_console("... Constructing graph object...")
-  makegraph_param <- list(df = edges, directed = TRUE, coords = coord)
+  makegraph_param <- list(df = edges, directed = FALSE, coords = coord)
   graph <- do.call(cppRouting::makegraph, makegraph_param)
   t_end <- Sys.time()
   total_duration <- difftime(t_end, t_onset, units = "mins")
@@ -295,7 +295,7 @@ lcp_from_point <- function(origin,
 
     #### Make graph
     cat_to_console("... Constructing graph object...")
-    makegraph_param <- list(df = edges, directed = TRUE, coords = coord)
+    makegraph_param <- list(df = edges, directed = FALSE, coords = coord)
     graph <- do.call(cppRouting::makegraph, makegraph_param)
   }
 
@@ -1231,7 +1231,7 @@ lcp_over_surface <-
 
       #### Make graph
       cat_to_console("... ... Constructing graph object...")
-      makegraph_param <- list(df = edges, directed = TRUE, coords = coord)
+      makegraph_param <- list(df = edges, directed = FALSE, coords = coord)
       out$cppRouting_param <- list(makegraph_param = makegraph_param)
       graph <- do.call(cppRouting::makegraph, makegraph_param)
       out$time <- rbind(out$time, data.frame(event = "graph_defined", time = Sys.time()))
@@ -1291,12 +1291,22 @@ lcp_over_surface <-
 
         ## Process paths dataframe
         # Define columns
+        connections <- factor(paste0(origin_cell, "-", destination_cell))
         colnames(path_lcp_cells)   <- c("origin", "destination", "cell")
         path_lcp_cells$origin      <- as.integer(path_lcp_cells$origin)
         path_lcp_cells$destination <- as.integer(path_lcp_cells$destination)
         path_lcp_cells$cell        <- as.integer(path_lcp_cells$cell)
         path_lcp_cells$path <- paste0(path_lcp_cells$origin, "-", path_lcp_cells$destination)
         path_lcp_cells$path <- factor(path_lcp_cells$path, levels = unique(path_lcp_cells$path))
+        if(any(!(connections %in% path_lcp_cells$path))){
+          problematic_connections <- as.character(connections[!(connections %in% path_lcp_cells$path)])
+          warning(paste0("LCPs could not be resolved for ",
+                         length(problematic_connections),
+                         " unique origin-destination pairs: ",
+                         paste0(problematic_connections, collapse = ", "),
+                         ". These connections are not included in function outputs."),
+                  immediate. = TRUE, call. = FALSE)
+        }
         # Define a unique identifier for each path (that distinguishes even duplicated paths)
         pos_start <- which(path_lcp_cells$destination == path_lcp_cells$cell)
         if(length(pos_start) >= 2){
@@ -1517,8 +1527,11 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
                                verbose = verbose,...)
   # Extract xy coordinates for LCP between each origin and destination pairs
   paths_lc_xy <- paths_lc$path_lcp$coordinates
+  names(paths_lc_xy) <- sapply(paths_lc_xy, function(xy) paste0("(", paste0(xy[1, ], collapse = ","), "), ",
+                                                                "(", paste0(xy[nrow(xy), ], collapse = ","), ")")
+                               )
   # Reformat to add back duplicate paths
-  names(paths_lc_xy) <- paths_xy_sbt$pair
+  paths_xy <- paths_xy[paths_xy$pair %in% names(paths_lc_xy), ]
   paths_lc_xy <- lapply(split(paths_xy, 1:nrow(paths_xy)), function(d){
     paths_lc_xy[d$pair]
   })
@@ -1534,7 +1547,7 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
   #### Join all coordinates for each path into a single element of a list
   cat_to_console("... Processing least-cost paths...")
   n <- length(which(paths_xy$path_id == min(paths_xy$path_id)))
-  paths_lc_xyz_by_path <- lapply(seq(1, nrow(paths_xy), by = n), function(start){
+  paths_lc_xyz_by_path <- pbapply::pblapply(seq(1, nrow(paths_xy), by = n), function(start){
     # Get coordinates
     xyz <- do.call(rbind, paths_lc_xy[start:(start + n-1)])
     # Add z coordinates
