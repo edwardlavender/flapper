@@ -126,6 +126,9 @@ lcp_graph_surface <- function(surface, cost, verbose = TRUE){
   }
   t_onset <- Sys.time()
   cat_to_console(paste0("flapper::lcp_graph_surface() called (@ ", t_onset, ")..."))
+  op <- options()
+  options(scipen = 999)
+  on.exit(options(op), add = TRUE)
   cells <- 1:raster::ncell(surface)
   surface_df <- data.frame(cell = cells, value = as.vector(surface))
 
@@ -259,6 +262,9 @@ lcp_from_point <- function(origin,
   }
   t_onset <- Sys.time()
   cat_to_console(paste0("flapper::lcp_from_point() called (@ ", t_onset, ")..."))
+  op <- options()
+  options(scipen = 999)
+  on.exit(options(op), add = TRUE)
   cells <- 1:raster::ncell(surface)
   surface_df <- data.frame(cell = cells, value = as.vector(surface))
   origin_cell <- raster::cellFromXY(surface, origin)
@@ -862,6 +868,9 @@ lcp_over_surface <-
                      verbose = TRUE)
 
     #### Checks
+    op <- options()
+    options(scipen = 999)
+    on.exit(options(op), add = TRUE)
     if(check){
       cat_to_console("... Checking user inputs...")
       # Check origin/destination coordinates are inputted as matrices
