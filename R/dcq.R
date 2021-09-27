@@ -193,7 +193,11 @@ dcq <- function(archival_ls,
         one_page <- FALSE
       }
     }
-    if(one_page) pp <- graphics::par(mfrow = prettyGraphics::par_mf(length(area_use_ls)))
+    if(one_page) {
+      par_param <- graphics::par(no.readonly = TRUE)
+      pp <- graphics::par(mfrow = prettyGraphics::par_mf(length(area_use_ls)))
+      on.exit(graphics::par(par_param), add = TRUE)
+    }
 
     ## Define zlim, if requested
     if(is.logical(fix_zlim)) {
@@ -232,9 +236,6 @@ dcq <- function(archival_ls,
       # Updates (e.g., re-add coastline)
       if(!is.null(after_plot)) after_plot()
     })
-
-    ## Reset graphics window
-    if(one_page) graphics::par(pp)
   }
 
   #### Return outputs
