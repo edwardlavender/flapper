@@ -132,6 +132,11 @@
     if(!all.equal(step, step_est)){
       stop("'step' does not equal difftime(archival$timestamp[2], archival$timestamp[1], units = 's'.)")
     }
+    acoustics_tmp_df <- do.call(rbind, acoustics_tmp)
+    if(any(c(min(acoustics_tmp_df$timestamp) < min(archival$timestamp),
+           max(acoustics_tmp_df$timestamp) > max(archival$timestamp)))){
+      stop("Archival observations do not span the time range of acoustic observations.", call. = FALSE)
+    }
   }
   # Check detection centroids have been supplied as a list
   check_class(input = detection_centroids, to_class = "list", type = "stop")
