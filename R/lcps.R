@@ -1395,7 +1395,7 @@ lcp_over_surface <-
 #'
 #' This function can also be useful for visualising movement paths (e.g., via \code{\link[flapper]{pf_plot_3d}}).
 #'
-#' @return The function returns a dataframe or a list depending on the input to \code{calc_distance}. If \code{calc_distance = FALSE}, the function returns a dataframe that defines, for each path (`path_id'), for each time step (`timestep'), a vector of the cell coordinates (`cell_x', `cell_y', `cell_z') on the \code{surface} that define the shortest path from the location at the previous time step to the location at the current time step. Thus, the first row contains the individual's initial location and subsequent rows for that time step (\code{timestep = 2}, since movement is considered from the location at the `previous' time step to the location at the `current' time step) include the sequential locations of an individual, were it to have moved along the shortest path, to the location at the next time step.  If \code{keep_cols = TRUE}, coordinate columns are suffixed by `.x' and the coordinates for each time step (as inputted) are included (with the `.y' suffix) along with any other columns in the inputted dataframe (\code{paths}).
+#' @return The function returns a dataframe or a list depending on the input to \code{calc_distance}. If \code{calc_distance = FALSE}, the function returns a dataframe that defines, for each path (`path_id'), for each time step (`timestep'), a vector of the cell coordinates (`cell_x', `cell_y', `cell_z') on the \code{surface} that define the shortest path from the location at the previous time step to the location at the current time step. Thus, the first row contains the individual's initial location and subsequent rows for that time step (\code{timestep = 2} if the first time step is defined as \code{timestep =  1}, since movement is considered from the location at the `previous' time step to the location at the `current' time step) include the sequential locations of an individual, were it to have moved along the shortest path, to the location at the next time step.  If \code{keep_cols = TRUE}, coordinate columns are suffixed by `.x' and the coordinates for each time step (as inputted) are included (with the `.y' suffix) along with any other columns in the inputted dataframe (\code{paths}).
 #'
 #' If \code{calc_distance = TRUE}, a named list is returned with two elements. The `path_lcp' element contains the dataframe of interpolated path coordinates, as described above, with an extra `dist' column that defines the distance over the surface between sequential positions along the path. The `dist_lcp' element contains a dataframe, exactly as inputted via \code{paths}, but with the total distance along each shortest path (from the `previous' location to the `current' location) included as a `dist' column (this is simply the sum of the distances provided in \code{path_lcp$dist}) for all movements within each timestep for each path.
 #'
@@ -1419,8 +1419,6 @@ lcp_over_surface <-
 #' # With calc_distance = FALSE, we get a dataframe with sequential locations
 #' utils::head(paths_interp_1)
 #'
-#' \dontrun{
-#'
 #' #### Example (2): Keep the original columns in 'paths'
 #' # ... via keep_cols = TRUE
 #' paths_interp_2 <- lcp_interp(paths = paths_1,
@@ -1441,7 +1439,7 @@ lcp_over_surface <-
 #' # The 'path_lcp' element contains the paths, as described above, with an
 #' # ... additional 'dist' column for the distances between sequential locations
 #' # ... along each shortest path (i.e., time step)
-#' utils::head(paths_interp_3$dist_lcp)
+#' utils::head(paths_interp_3$path_lcp)
 #'
 #' #### Example (4): Using lcp_interp() for post-hoc evaluation and adjustment
 #' # ... of movement model outputs for the DCPF algorithm
@@ -1476,7 +1474,7 @@ lcp_over_surface <-
 #' # Re-implement algorithm
 #' dcpf_args <- dat_dcpf_histories$args
 #' dcpf_args$calc_distance <- "lcp"
-#' dcpf_history <- do.call(dcpf, dcpf_args)
+#' dcpf_history <- do.call(pf, dcpf_args)
 #' paths <- pf_simplify(dcpf_history)
 #' # Interpolate paths
 #' paths_interp_4 <- lcp_interp(paths, surface)
@@ -1488,7 +1486,6 @@ lcp_over_surface <-
 #'         paths$cell_pr)
 #' )
 #'
-#' }
 #'
 #' @author Edward Lavender
 #' @export
@@ -1510,19 +1507,24 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
   cat_to_console("... Processing paths...")
   paths_xy <- lapply(split(paths, paths$path_id), function(d){
     d <- data.frame(d)
-    d$cell_x_previous = dplyr::lag(d$cell_x)
-    d$cell_y_previous = dplyr::lag(d$cell_y)
-    d$cell_x_current = d$cell_x
-    d$cell_y_current = d$cell_y
+    d$cell_id_previous <- dplyr::lag(d$cell_id)
+    d$cell_x_previous  <- dplyr::lag(d$cell_x)
+    d$cell_y_previous  <- dplyr::lag(d$cell_y)
+    d$cell_id_current  <- d$cell_id
+    d$cell_x_current   <- d$cell_x
+    d$cell_y_current   <- d$cell_y
     return(d)
   }) %>% dplyr::bind_rows()
-  paths_xy <- paths_xy[stats::complete.cases(paths_xy), ]
+  paths_xy <- paths_xy[which(!is.na(paths_xy$cell_x_previous)), ]
+
+  #### Assign origin/destination pair IDs
+  # Assign IDs based on cell IDs (rather than origin-destination coordinates) to avoid rounding issues
+  # ... when deriving the corresponding IDs for reconstructed paths (see below)
+  paths_xy$pair <- paste0(paths_xy$cell_id_previous, "-", paths_xy$cell_id_current)
 
   #### Get non-duplicate pairs for speed
-  paths_xy$pair <- paste0("(", paths_xy$cell_x_previous, ",", paths_xy$cell_y_previous, "), ",
-                          "(", paths_xy$cell_x_current, ",", paths_xy$cell_y_current, ")")
   paths_xy$dup <- duplicated(paths_xy$pair)
-  paths_xy_sbt <- paths_xy[!paths_xy$dup, ]
+  paths_xy_sbt <- paths_xy[which(!paths_xy$dup), ]
 
   #### Calculate least-cost paths between coordinates
   cat_to_console("... Calculating least-cost paths via flapper::lcp_over_surface()...")
@@ -1536,50 +1538,49 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
                                verbose = verbose,...)
   # Extract xy coordinates for LCP between each origin and destination pairs
   paths_lc_xy <- paths_lc$path_lcp$coordinates
-  names(paths_lc_xy) <- sapply(paths_lc_xy, function(xy) paste0("(", paste0(xy[1, ], collapse = ","), "), ",
-                                                                "(", paste0(xy[nrow(xy), ], collapse = ","), ")")
-                               )
+  names(paths_lc_xy) <- sapply(paths_lc_xy, function(xy) paste0(raster::cellFromXY(surface, xy[1, ]), "-",
+                                                                raster::cellFromXY(surface, xy[nrow(xy), ])))
   # Reformat to add back duplicate paths
   paths_xy <- paths_xy[paths_xy$pair %in% names(paths_lc_xy), ]
   paths_lc_xy <- lapply(split(paths_xy, 1:nrow(paths_xy)), function(d){
     paths_lc_xy[d$pair]
   })
-  # Add cell coordinate and time steps to dataframe
+
+  #### Define a dataframe of LCP coordinates
+  # Define skeleton dataframe with path IDs, time steps and cell coordinates
   paths_lc_xy <- lapply(1:length(paths_lc_xy), function(i){
     xy <- paths_lc_xy[[i]]
     xy <- data.frame(xy)
     colnames(xy) <- c("cell_x", "cell_y")
+    xy$path_id <- paths_xy$path_id[i]
     xy$timestep <- paths_xy$timestep[i]
     return(xy)
   })
-
-  #### Join all coordinates for each path into a single element of a list
-  cat_to_console("... Processing least-cost paths...")
-  n <- length(which(paths_xy$path_id == min(paths_xy$path_id)))
-  paths_lc_xyz_by_path <- pbapply::pblapply(seq(1, nrow(paths_xy), by = n), function(start){
-    # Get coordinates
-    xyz <- do.call(rbind, paths_lc_xy[start:(start + n-1)])
-    # Add z coordinates
-    xyz$cell_z <- raster::extract(surface, xyz[, c("cell_x", "cell_y")])
-    # Define path ID
-    xyz$path_id <- (start + n-1)/n
-    if(calc_distance){
-      xyz$dist <- dist_btw_points_3d(dplyr::lag(xyz$cell_x), xyz$cell_x,
-                                     dplyr::lag(xyz$cell_y), xyz$cell_y,
-                                     dplyr::lag(xyz$cell_z), xyz$cell_z)
-    }
-    return(xyz)
-  })
-
-  #### Define a list of coordinates for each path
-  paths_lc_xyz <- do.call(rbind, paths_lc_xyz_by_path)
+  paths_lc_xyz <- do.call(rbind, paths_lc_xy)
+  # Add z coordinates
+  paths_lc_xyz$cell_z <- raster::extract(surface, paths_lc_xyz[, c("cell_x", "cell_y")])
+  # Calculate distances
+  if(calc_distance){
+    paths_lc_xyz <-
+      paths_lc_xyz %>%
+      dplyr::arrange(.data$path_id, .data$timestep) %>%
+      dplyr::group_by(.data$path_id) %>%
+      dplyr::mutate(dist = dist_btw_points_3d(dplyr::lag(.data$cell_x), .data$cell_x,
+                                              dplyr::lag(.data$cell_y), .data$cell_y,
+                                              dplyr::lag(.data$cell_z), .data$cell_z)
+      ) %>%
+      as.data.frame()
+  }
+  # Organise columns
   cols <- c("path_id", "timestep", "cell_x", "cell_y", "cell_z", "dist")
   if(!calc_distance) cols <- cols[!("dist" == cols)]
   paths_lc_xyz <- paths_lc_xyz[, cols]
   if(keep_cols){
     paths_lc_xyz <- dplyr::left_join(paths_lc_xyz, out$paths, by = c("path_id", "timestep"))
   }
+  # Add to outputs
   out$path_lcp <- paths_lc_xyz
+
   #### Summarise distances
   if(calc_distance){
     cat_to_console("... Summarising distances for each least-cost path...")
@@ -1588,11 +1589,11 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
       dplyr::group_by(.data$path_id, .data$timestep) %>%
       dplyr::summarise(dist = sum(.data$dist, na.rm = TRUE)) %>%
       as.data.frame()
-    dists$key <- paste0(dists$path_id, "-", dists$timestep)
-    out$paths$key    <- paste0(out$paths$path_id, "-", out$paths$timestep)
+    dists$key      <- paste0(dists$path_id, "-", dists$timestep)
+    out$paths$key  <- paste0(out$paths$path_id, "-", out$paths$timestep)
     out$paths$dist <- dists$dist[match(out$paths$key, dists$key)]
     out$paths$key  <- NULL
-    out$dist_lcp <- out$paths
+    out$dist_lcp   <- out$paths
     out$paths <- NULL
   }
 

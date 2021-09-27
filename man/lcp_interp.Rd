@@ -27,7 +27,7 @@ lcp_interp(
 \item{verbose}{A logical input that defines whether or not to print messages to the console to monitor function progress.}
 }
 \value{
-The function returns a dataframe or a list depending on the input to \code{calc_distance}. If \code{calc_distance = FALSE}, the function returns a dataframe that defines, for each path (`path_id'), for each time step (`timestep'), a vector of the cell coordinates (`cell_x', `cell_y', `cell_z') on the \code{surface} that define the shortest path from the location at the previous time step to the location at the current time step. Thus, the first row contains the individual's initial location and subsequent rows for that time step (\code{timestep = 2}, since movement is considered from the location at the `previous' time step to the location at the `current' time step) include the sequential locations of an individual, were it to have moved along the shortest path, to the location at the next time step.  If \code{keep_cols = TRUE}, coordinate columns are suffixed by `.x' and the coordinates for each time step (as inputted) are included (with the `.y' suffix) along with any other columns in the inputted dataframe (\code{paths}).
+The function returns a dataframe or a list depending on the input to \code{calc_distance}. If \code{calc_distance = FALSE}, the function returns a dataframe that defines, for each path (`path_id'), for each time step (`timestep'), a vector of the cell coordinates (`cell_x', `cell_y', `cell_z') on the \code{surface} that define the shortest path from the location at the previous time step to the location at the current time step. Thus, the first row contains the individual's initial location and subsequent rows for that time step (\code{timestep = 2} if the first time step is defined as \code{timestep =  1}, since movement is considered from the location at the `previous' time step to the location at the `current' time step) include the sequential locations of an individual, were it to have moved along the shortest path, to the location at the next time step.  If \code{keep_cols = TRUE}, coordinate columns are suffixed by `.x' and the coordinates for each time step (as inputted) are included (with the `.y' suffix) along with any other columns in the inputted dataframe (\code{paths}).
 
 If \code{calc_distance = TRUE}, a named list is returned with two elements. The `path_lcp' element contains the dataframe of interpolated path coordinates, as described above, with an extra `dist' column that defines the distance over the surface between sequential positions along the path. The `dist_lcp' element contains a dataframe, exactly as inputted via \code{paths}, but with the total distance along each shortest path (from the `previous' location to the `current' location) included as a `dist' column (this is simply the sum of the distances provided in \code{path_lcp$dist}) for all movements within each timestep for each path.
 }
@@ -61,8 +61,6 @@ paths_interp_1 <- lcp_interp(paths = paths_1,
 # With calc_distance = FALSE, we get a dataframe with sequential locations
 utils::head(paths_interp_1)
 
-\dontrun{
-
 #### Example (2): Keep the original columns in 'paths'
 # ... via keep_cols = TRUE
 paths_interp_2 <- lcp_interp(paths = paths_1,
@@ -83,7 +81,7 @@ utils::head(paths_interp_3$dist_lcp)
 # The 'path_lcp' element contains the paths, as described above, with an
 # ... additional 'dist' column for the distances between sequential locations
 # ... along each shortest path (i.e., time step)
-utils::head(paths_interp_3$dist_lcp)
+utils::head(paths_interp_3$path_lcp)
 
 #### Example (4): Using lcp_interp() for post-hoc evaluation and adjustment
 # ... of movement model outputs for the DCPF algorithm
@@ -118,7 +116,7 @@ graphics::abline(0, 1, lty = 3)
 # Re-implement algorithm
 dcpf_args <- dat_dcpf_histories$args
 dcpf_args$calc_distance <- "lcp"
-dcpf_history <- do.call(dcpf, dcpf_args)
+dcpf_history <- do.call(pf, dcpf_args)
 paths <- pf_simplify(dcpf_history)
 # Interpolate paths
 paths_interp_4 <- lcp_interp(paths, surface)
@@ -130,7 +128,6 @@ utils::head(
         paths$cell_pr)
 )
 
-}
 
 }
 \author{
