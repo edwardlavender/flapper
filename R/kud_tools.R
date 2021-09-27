@@ -16,12 +16,12 @@
 #' @export
 
 kud_habitat <- function(map, mask = map, mask_inside = FALSE, plot = TRUE,...){
-  par_param <- graphics::par()
+  par_param <- graphics::par(no.readonly = TRUE)
   area <- raster::setValues(map, 1)
   if(!is.null(mask)) area <- mask_io(area, mask = mask, mask_inside = mask_inside, updatevalue = 0)
   grid <- methods::as(area, "SpatialPixelsDataFrame")
   if(plot) sp::plot(grid,...)
-  on.exit(graphics::par(par_param))
+  on.exit(graphics::par(par_param), add = TRUE)
   return(grid)
 }
 
