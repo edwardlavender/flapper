@@ -1,3 +1,61 @@
+######################################
+######################################
+#### pf_access_history_from_file()
+
+#' @title List `history' files from a PF algorithm
+#' @description This function creates an ordered list of `history' files derived from the particle filtering (PF) algorithm (\code{\link[flapper]{pf}}). This is applicable if \code{\link[flapper]{pf}} is implemented with the \code{write_history} argument specified.
+#'
+#' @param root A string that defines the directory in which files are located.
+#' @param use_absolute_paths A logical variable that defines whether to return relative paths (\code{FALSE}) or absolute paths (\code{TRUE}) (see \code{\link[tools]{file_path_as_absolute}}).
+#' @param ... Additional arguments passed to \code{\link[base]{list.files}} (excluding \code{full.names}).
+#'
+#' @details This function requires the \code{\link[stringr]{stringr}} package.
+#'
+#' @return The function returns an ordered list of file paths.
+#'
+#' @examples
+#' #### Example (1): Example with default arguments
+#' # Define a directory in which to save files from PF
+#' root <- paste0(tempdir(), "/pf/")
+#' dir.create(root)
+#' # Implement the PF algorithm with write_history specified
+#' # ... For speed, we will implement the algorithm using pre-defined data
+#' pf_args <- dat_dcpf_histories$args
+#' pf_args$calc_distance_euclid_fast <- TRUE
+#' pf_args$write_history             <- list(file = root)
+#' do.call(pf, pf_args)
+#' # List the files
+#' files <- pf_access_history_files(root)
+#' utils::head(files)
+#'
+#' @seealso This function is designed to list outputs from \code{\link[flapper]{pf}} (see the \code{write_history} argument).
+#' @author Edward Lavender
+#' @export
+
+pf_access_history_files <- function(root, use_absolute_paths = FALSE,...){
+  if(!requireNamespace("stringr", quietly = TRUE)){
+    stop("This function requires the 'stringr' package. Please install it before continuing with install.packages('stringr').")
+  }
+  check...("full.names",...)
+  check_dir(input = root)
+  files <- list.files(root,...)
+  if(!grepl("pf_", files[1], fixed = TRUE)){
+    stop("File naming structure is unrecognised.", immediate. = TRUE)
+  }
+  files <- data.frame(index = 1:length(files), name = files)
+  files$pf_id <- stringr::str_split_fixed(files$name, "_", 2)[, 2]
+  files$pf_id <- substr(files$pf_id, 1, nchar(files$pf_id) - 4)
+  files$pf_id <- as.integer(as.character(files$pf_id))
+  files <- files %>% dplyr::arrange(.data$pf_id)
+  files <- list.files(root, full.names = TRUE,...)[files$index]
+  if(use_absolute_paths) {
+    files <- sapply(files, function(f) tools::file_path_as_absolute(f))
+    names(files) <- NULL
+  }
+  return(files)
+}
+
+
 ########################################
 ########################################
 #### pf_access_history

@@ -424,6 +424,7 @@ process provided by the `pf*()` family of functions:
     between them;
   - `pf_setup_record()` creates an ordered list of input files;
   - `pf()` implements the particle filtering routine;
+  - `pf_access_history_files()` lists particle histories saved to file;
   - `pf_access_history()` accesses particle histories;
   - `pf_plot_history()` plots simulated particle histories;
   - `pf_animate_history()` animates simulated particle histories;

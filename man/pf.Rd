@@ -20,6 +20,7 @@ pf(
   resample = NULL,
   update_history = NULL,
   update_history_from_time_step = 1L,
+  write_history = NULL,
   cl = NULL,
   use_all_cores = FALSE,
   seed = NULL,
@@ -57,6 +58,8 @@ pf(
 \item{update_history}{(optional) A list that defines particle histories from an earlier implementation of \code{\link[flapper]{pf}} (i.e., the `history' element of a \code{\link[flapper]{pf_archive-class}} object). If provided, the function attempts to continue paths from an earlier time step (see \code{update_history_from_time_step}). This can be useful if the algorithm fails to converge on its initial implementation because the algorithm can be re-started part-way through the time series.}
 
 \item{update_history_from_time_step}{If \code{update_history} is provided, \code{update_history_from_time_step} is an integer that defines the time step (i.e., element in \code{update_history}) from which to restart the algorithm. If provided, the algorithm continues from this point, by taking the starting positions for \code{n} particles from \code{update_history[[update_history_from_time_step]]$id_current}.}
+
+\item{write_history}{(optional) A named list, passed to \code{\link[base]{saveRDS}}, to save a dataframe of the sampled particles at each time step to file. The `file' argument should be the directory in which to save files. Files are named by time steps as `pf_1', `pf_2' and so on.}
 
 \item{cl, use_all_cores}{Parallelisation options. These can be implemented for the approaches that consider particles iteratively (i.e., \code{calc_distance = "euclid"} with \code{calc_distance_euclid_fast = FALSE}, or \code{calc_distance = "lcp"}). The algorithm can be parallelised within time steps over (1) particles via \code{cl} (an integer defining the number of child processes (ignored on Windows) or a cluster object created by \code{\link[parallel]{makeCluster}} (see \code{\link[pbapply]{pblapply}})) or (2) within particles for the calculation of shortest distances (if \code{calc_distance = "lcp"}) via a logical input (\code{TRUE}) to \code{use_all_cores}. For \code{calc_distance = "euclid"}, parallelisation is typically only beneficial for relatively large numbers of particles, because the substantial computation overhead associated with parallelisation across paths at each time step is substantial. For \code{calc_distance = "lcp"}, \code{use_all_cores = TRUE} is typically a better option for parallelisation; however, this may only be beneficial if \code{mobility} relatively large. At present, parallelisation is not very effective, especially if a cluster is supplied, and may be slower.}
 
@@ -485,6 +488,22 @@ if(interactive()){
 }
 
 }
+
+#### Example (11): Write a dataframe of sampled particles to file at each time step
+# Define directory in which to save files
+root <- paste0(tempdir(), "/pf/")
+dir.create(root)
+# Implement PF, writing the history of particle samples at each time step
+out_11 <- pf(record = record,
+             origin  = xy,
+             write_history = list(file = root))
+# Read the record into R
+history_from_file <- lapply(pf_access_history_files(root), readRDS)
+# Show that the history recorded in 'out_11' is the same as that recorded by the saved files
+length(out_11$history); length(history_from_file)
+identical(out_11$history, history_from_file)
+cbind(out_11$history[[1]],
+      history_from_file[[1]])
 
 }
 \seealso{
