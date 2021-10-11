@@ -540,6 +540,7 @@ pf <- function(record,
   if(!is.null(data)){
     if(!inherits(data, "data.frame")) stop("'data' must be a data.frame")
     if(length(record) != nrow(data)) stop("The number of records (`length(record)`) does not equal the number of observations in 'data' (`nrow(data)`).")
+    data <- data.table::as.data.table(data)
   } else data_1 <- data_t_next <- NULL
 
   ## Define blank list to store path histories
@@ -626,8 +627,8 @@ pf <- function(record,
   if(is.null(update_history)) {
     cat_to_cf("... Determining the set of possible starting locations (t = 1)...")
     cells_at_time_current <- raster::Which(x = record_1 > 0, cells = TRUE, na.rm = TRUE)
-    cells_at_time_current <- data.frame(id_current = cells_at_time_current,
-                                        pr_current = raster::extract(record_1, cells_at_time_current))
+    cells_at_time_current <- data.table::data.table(id_current = cells_at_time_current,
+                                                    pr_current = raster::extract(record_1, cells_at_time_current))
     # Adjust cell probabilities by distance from origin, if applicable, using mobility model
     if(!is.null(origin)){
       # Re-define origin on record_1 grid for consistency
@@ -750,10 +751,10 @@ pf <- function(record,
         pr_all[is.na(pr_all)] <- 0
         if(calc_distance == "euclid" & !is.null(mobility)) pr_all <- raster::extend(pr_all, boundaries, 0)
         # Define a dataframe of probabilities
-        pr_all <- data.frame(id_previous = NA,
-                             pr_previous = NA,
-                             id_current = 1:n_cell,
-                             pr_current = as.vector(pr_all))
+        pr_all <- data.table::data.table(id_previous = NA,
+                                         pr_previous = NA,
+                                         id_current = 1:n_cell,
+                                         pr_current = as.vector(pr_all))
         cells_from_current_to_next <- pr_all[pr_all$pr_current > 0, ]
 
         ## Other distance methods (point-by-point)
@@ -787,7 +788,10 @@ pf <- function(record,
           pr_j <- pr_j * record_sbt
           pr_j[is.na(pr_j)] <- 0
           if(calc_distance == "euclid" & !is.null(mobility)) pr_j <- raster::extend(pr_j, boundaries, 0)
-          pr_j <- data.frame(id_current = cell_j$id_current, pr_current = cell_j$pr_current, id_next = 1:n_cell, pr_next = as.vector(pr_j))
+          pr_j <- data.table::data.table(id_current = cell_j$id_current,
+                                         pr_current = cell_j$pr_current,
+                                         id_next = 1:n_cell,
+                                         pr_next = as.vector(pr_j))
           pr_j <- pr_j[pr_j$pr_next > 0, ]
           if(nrow(pr_j) > 0) out <- NULL else out <- pr_j
           return(pr_j)
