@@ -13,6 +13,7 @@ Imports:
     Tools4ETS
 Suggests:
     plyr, tidyr, stringr, 
+    fasterRaster,
     glatos,
     plotly, animation, scales, viridis,
     circular, 
@@ -21,6 +22,7 @@ Suggests:
 Remotes: 
     github::edwardlavender/prettyGraphics, 
     github::edwardlavender/Tools4ETS,
+    github::adamlilith/fasterRaster,
     url::https://gitlab.oceantrack.org/GreatLakes/glatos/-/archive/master/glatos-master.zip
 Depends: R (>= 4.0)
 License: GPL-3

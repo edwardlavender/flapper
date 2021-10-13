@@ -124,3 +124,47 @@ pf_setup_record <- function(root, type = c("acs", "dc"), use_absolute_paths = FA
   }
   return(files)
 }
+
+
+######################################
+######################################
+#### pf_setup_optimisers()
+
+#' @title Optimisation settings for \code{\link[flapper]{pf}}
+#' @description This function defines optimisation settings for \code{\link[flapper]{pf}}. These settings control under-the-hood implememtation routines in \code{\link[flapper]{pf}} that may improve computation time if adjusted.
+#'
+#' @param use_extract (not yet implemented)
+#' @param use_calc_distance_euclid_backend_grass A logical input that defines whether or not to use GRASS as the backend for Euclidean distances calculations in \code{\link[flapper]{pf}}. The default is \code{FALSE}, in which case \code{\link[raster]{distanceFromPoints}} is used for these calculations. If \code{TRUE}, the \code{\link[fasterRaster]{fasterRaster}} package is required and \code{\link[fasterRaster]{fasterVectToRastDistance}} is used instead.
+#' @param use_grass_dir If \code{use_calc_distance_euclid_backend_grass = TRUE}, \code{use_grass_dir} is a character that defines the directory where GRASS is installed on your system and should be supplied.
+#'
+#' @details \code{\link[flapper]{pf}} is a computationally intensive routine. To reduce computation time, the most effective approaches are to minimise data volume and reduce the size (dimensions and/or resolution) of the grid over which particle filtering is implemented; use the `fast Euclidean distances' method for distance calculations; and minimise the number of particles. For small numbers of particles, it may be faster to specify the \code{mobility} parameter; for large numbers of particles, it is probably faster to set \code{mobility = NULL}. Following optimisation of these settings, \code{\link[flapper]{pf_setup_optimisers}} facilitates the adjustment of under-the-hood implementation routines which may further reduce computation time in some settings.
+#'
+#' @return The function returns \code{pf_optimiser} S3 class object, which is simply a named list of optimisation options that can be passed to \code{\link[flapper]{pf}} via the \code{optimisers} argument.
+#'
+#' @examples
+#' #### Example (1): The default implementation
+#' pf_setup_optimisers()
+#'
+#' #### Example (2): Use GRASS for Euclidean distance calculations
+#' # Specification for GRASS-7.4.4 on MacOS
+#' pf_setup_optimisers(use_calc_distance_euclid_backend_grass = TRUE,
+#'                     use_grass_dir = "/Applications/GRASS-7.4.4.app/Contents/Resources")
+#' # This list should be passed to the 'optimisers' argument in pf().
+#'
+#' @seealso \code{\link[flapper]{pf}}
+#' @author Edward Lavender
+#' @export
+
+pf_setup_optimisers <- function(use_extract = FALSE,
+                                use_calc_distance_euclid_backend_grass = FALSE,
+                                use_grass_dir = NULL){
+  out <- list(use_extract = use_extract,
+              use_calc_distance_euclid_backend_grass = use_calc_distance_euclid_backend_grass,
+              use_grass_dir = use_grass_dir)
+  if(use_calc_distance_euclid_backend_grass & is.null(use_grass_dir)){
+    warning("'use_calc_distance_euclid_backend_grass' specified but 'use_grass_dir' is NULL.",
+            immediate. = TRUE, call. = FALSE)
+  }
+  class(out) <- c(class(out), "pf_optimiser")
+  return(out)
+}

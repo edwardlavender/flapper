@@ -118,7 +118,7 @@ necessary to download and install the appropriate version of `Rtools`
 before proceeding by following the instructions
 [here](https://cran.r-project.org/bin/windows/Rtools/).
 
-Three packages
+Four packages
 ([prettyGraphics](https://github.com/edwardlavender/prettyGraphics),
 [Tools4ETS](https://github.com/edwardlavender/Tools4ETS) and
 [glatos](https://gitlab.oceantrack.org/GreatLakes/glatos)) are required
@@ -129,6 +129,7 @@ it is safer to install them sequentially as follows:
 
     devtools::install_github("edwardlavender/prettyGraphics") # required
     devtools::install_github("edwardlavender/Tools4ETS")      # currently required
+    devtools::install_github("adamlilith/fasterRaster")       # suggested
     devtools::install_url(                                    # suggested
       "https://gitlab.oceantrack.org/GreatLakes/glatos/repository/master/archive.zip",
        build_opts = c("--no-resave-data", "--no-manual")) 
@@ -423,6 +424,7 @@ process provided by the `pf*()` family of functions:
     the probability of movement between locations given the distance
     between them;
   - `pf_setup_record()` creates an ordered list of input files;
+  - `pf_setup_optimisers()` controls optimisation settings;
   - `pf()` implements the particle filtering routine;
   - `pf_access_history_files()` lists particle histories saved to file;
   - `pf_access_history()` accesses particle histories;

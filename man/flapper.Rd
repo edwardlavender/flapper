@@ -146,6 +146,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
     \itemize{
       \item \link{pf_setup_movement_pr} provides a simple movement model that defines the probability of movement between locations given the distance between them;
       \item \link{pf_setup_record} creates an ordered list of input files;
+      \item \link{pf_setup_optimisers} controls optimisation settings;
       \item \link{pf} implements the PF routine, building on the AC, DC and ACDC algorithms to form the ACPF, DCPF and ACDCPF algorithms;
       \item \link{pf_access_history_files} lists particle histories saved to file;
       \item \link{pf_access_history} accesses particle histories;

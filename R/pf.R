@@ -29,6 +29,7 @@
 #' @param seed (optional) An integer to define the seed for reproducible simulations (see \code{\link[base]{set.seed}}).
 #' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console; otherwise, they are written to file (see below).
 #' @param con If \code{verbose = TRUE}, \code{con} is character string that defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}). Otherwise, \code{con} defines the full pathway to a .txt file (which can be created on-the-fly) into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging.
+#' @param optimisers A named list of optimisation controls from \code{\link[flapper]{pf_setup_optimisers}}.
 #'
 #' @details
 #' \subsection{Background}{This function implements a widely applicable particle simulation and filtering based approach to refine maps of possible locations of an individual through time via the incorporation of a movement model that facilitates the reconstruction of movement paths. Within \code{\link[flapper]{flapper}}, the acoustic-centroid (AC), depth-contour (DC) and acoustic-centroid depth-contour (ACDC) algorithms, which define the possible locations of an individual through time based on acoustic centroids and/or depth contours, can be passed through a this process, resulting in the DCPF, ACPF and ACDCPF algorithms.
@@ -481,7 +482,8 @@ pf <- function(record,
                write_history = NULL,
                cl = NULL, use_all_cores = FALSE,
                seed = NULL,
-               verbose = TRUE, con = ""){
+               verbose = TRUE, con = "",
+               optimisers = pf_setup_optimisers()){
 
   #### Set up function
   t_onset <- Sys.time()
@@ -530,11 +532,15 @@ pf <- function(record,
                              cl = cl,
                              use_all_cores = use_all_cores,
                              seed = seed,
-                             verbose = verbose
+                             verbose = verbose,
+                             optimisers = optimisers
                  )
   )
 
   #### Checks
+
+  ## Check optimisers
+  check_class(input = optimisers, to_class = "pf_optimiser", type = "stop")
 
   ## Check data and define data_1 and data_t_next if unsupplied
   if(!is.null(data)){
@@ -553,9 +559,10 @@ pf <- function(record,
     if(!file.exists(record_1)) stop(paste0("record[[1]] ('", record_1, "') does not exist."))
     record_1     <- raster::raster(record_1)
   }
-  n_cell  <- raster::ncell(record_1)
-  proj    <- raster::crs(record_1)
-  boundaries <- raster::extent(record_1)
+  n_cell       <- raster::ncell(record_1)
+  all_cells    <- 1:n_cell
+  proj         <- raster::crs(record_1)
+  boundaries   <- raster::extent(record_1)
   record_1_sbt <- record_1
   ## Check origin
   if(!is.null(origin)) if(!inherits(origin, "matrix")) stop("'origin' coordinates must be supplied as a matrix.")
@@ -589,6 +596,12 @@ pf <- function(record,
     if(is.null(mobility_from_origin)) bathy_sbt_1 <- bathy
     if(is.null(mobility)) bathy_sbt <- bathy
   } else {
+    if(optimisers$use_calc_distance_euclid_backend_grass){
+      if(!requireNamespace("fasterRaster", quietly = TRUE)){
+        stop("'The 'fasterRaster' package is required if optimisers$use_calc_distance_euclid_backend_grass = TRUE.")
+      }
+      if(is.null(optimisers$use_grass_dir)) stop("For 'optimisers$use_calc_distance_euclid_backend_grass' distances method, 'optimisers$use_grass_dir' must be specified.")
+    }
     if(use_all_cores){
       warning("use_all_cores = TRUE ignored for calc_distance = 'euclid'.",
               call. = FALSE, immediate. = TRUE)
@@ -646,7 +659,15 @@ pf <- function(record,
           record_1_sbt <- raster::crop(record_1, buf)
           record_1_sbt <- raster::mask(record_1, buf)
         }
-        dist_1 <- raster::distanceFromPoints(record_1_sbt, origin)
+        if(!optimisers$use_calc_distance_euclid_backend_grass){
+          dist_1 <- raster::distanceFromPoints(record_1_sbt, origin)
+        } else {
+          dist_1 <- fasterRaster::fasterVectToRastDistance(rast = record_1_sbt,
+                                                           vect = sp::SpatialPointsDataFrame(coords = origin,
+                                                                                             data = data.frame(id = 1:nrow(origin)),
+                                                                                             proj4string = proj),
+                                                           grassDir = optimisers$use_grass_dir)
+        }
         # if(!is.null(mobility_from_origin)) dist_1 <- raster::extend(dist_1, boundaries, NA)
       } else if(calc_distance == "lcp"){
         if(!is.null(mobility_from_origin)) bathy_sbt_1 <- raster::mask(bathy, buf)
@@ -743,7 +764,15 @@ pf <- function(record,
           record_sbt  <- raster::mask(record_sbt, buf)
         }
         # Get distances around cells
-        dist_all <- raster::distanceFromPoints(record_sbt, cell_all_xy)
+        if(!optimisers$use_calc_distance_euclid_backend_grass){
+          dist_all <- raster::distanceFromPoints(record_sbt, cell_all_xy)
+        } else {
+          dist_all <- fasterRaster::fasterVectToRastDistance(rast = record_sbt,
+                                                             vect = sp::SpatialPointsDataFrame(coords = cell_all_xy,
+                                                                                               data = data.frame(id = 1:nrow(cell_all_xy)),
+                                                                                               proj4string = proj),
+                                                             grassDir = optimisers$use_grass_dir)
+        }
         # if(!is.null(mobility)) dist_all <- raster::extend(dist_all, boundaries, NA)
         # Get probabilities based on distance and combine with layer of possible locations for next time step
         pr_all <- raster::calc(dist_all, function(x) calc_movement_pr(x, data_t_next))
@@ -774,7 +803,15 @@ pf <- function(record,
               record_sbt <- raster::crop(record_at_time_next, buf)
               record_sbt <- raster::mask(record_sbt, buf)
             }
-            dist_j <- raster::distanceFromPoints(record_sbt, cell_j_xy)
+            if(!optimisers$use_calc_distance_euclid_backend_grass){
+              dist_j <- raster::distanceFromPoints(record_sbt, cell_j_xy)
+            } else {
+              dist_j <- fasterRaster::fasterVectToRastDistance(rast = record_sbt,
+                                                               vect = sp::SpatialPointsDataFrame(coords = cell_j_xy,
+                                                                                                 data = data.frame(id = 1L),
+                                                                                                 proj4string = proj),
+                                                               grassDir = optimisers$use_grass_dir)
+            }
           } else if(calc_distance == "lcp"){
             if(!is.null(mobility)) bathy_sbt <- raster::mask(bathy, buf)
             dist_j <- lcp_from_point(origin = cell_j_xy,
