@@ -5,13 +5,13 @@
 \title{Optimisation settings for \code{\link[flapper]{pf}}}
 \usage{
 pf_setup_optimisers(
-  use_extract = FALSE,
+  use_raster_operations = TRUE,
   use_calc_distance_euclid_backend_grass = FALSE,
   use_grass_dir = NULL
 )
 }
 \arguments{
-\item{use_extract}{(not yet implemented)}
+\item{use_raster_operations}{(experimental) A logical input that defines whether or not to use \code{\link[raster]{raster}} operations, where applicable (e.g., \code{\link[raster]{calc}}), which are memory-safe, or to extract \code{\link[raster]{raster}} values into a \code{\link[data.table]{data.table}} and perform arithmetic operations on the \code{\link[data.table]{data.table}}. This option is only implemented for the `fast Euclidean distances' method in \code{\link[flapper]{pf}}. Trials suggest that \code{use_raster_operations = FALSE} does not improve computation time.}
 
 \item{use_calc_distance_euclid_backend_grass}{A logical input that defines whether or not to use GRASS as the backend for Euclidean distances calculations in \code{\link[flapper]{pf}}. The default is \code{FALSE}, in which case \code{\link[raster]{distanceFromPoints}} is used for these calculations. If \code{TRUE}, the \code{\link[fasterRaster]{fasterRaster}} package is required and \code{\link[fasterRaster]{fasterVectToRastDistance}} is used instead.}
 
@@ -24,7 +24,7 @@ The function returns \code{pf_optimiser} S3 class object, which is simply a name
 This function defines optimisation settings for \code{\link[flapper]{pf}}. These settings control under-the-hood implememtation routines in \code{\link[flapper]{pf}} that may improve computation time if adjusted.
 }
 \details{
-\code{\link[flapper]{pf}} is a computationally intensive routine. To reduce computation time, the most effective approaches are to minimise data volume and reduce the size (dimensions and/or resolution) of the grid over which particle filtering is implemented; use the `fast Euclidean distances' method for distance calculations; and minimise the number of particles. For small numbers of particles, it may be faster to specify the \code{mobility} parameter; for large numbers of particles, it is probably faster to set \code{mobility = NULL}. Following optimisation of these settings, \code{\link[flapper]{pf_setup_optimisers}} facilitates the adjustment of under-the-hood implementation routines which may further reduce computation time in some settings.
+\code{\link[flapper]{pf}} is a computationally intensive routine. To reduce computation time, the most effective approaches are to minimise data volume and reduce the size (dimensions and/or resolution) of the grid over which particle filtering is implemented; use the `fast Euclidean distances' method for distance calculations; and minimise the number of particles. For small numbers of particles, it may be faster to specify the \code{mobility} parameter; for large numbers of particles, it is probably faster to set \code{mobility = NULL}. Adjusting \code{\link{raster}{rasterOptions}} such as \code{chunksize} and/or \code{maxmemory} may help in some circumstances too. Following optimisation of these settings, \code{\link[flapper]{pf_setup_optimisers}} facilitates the adjustment of under-the-hood implementation routines which may further reduce computation time in some settings.
 }
 \examples{
 #### Example (1): The default implementation

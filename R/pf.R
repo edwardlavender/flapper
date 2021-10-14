@@ -3,6 +3,7 @@
 #### pf()
 
 #' @title The particle filtering routine
+#' @importFrom data.table :=
 #' @description This function implements a simulation-based particle filtering process for the reconstruction of animal movement paths. This extends the AC, DC and ACDC algorithms in \code{\link[flapper]{flapper}} (\code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}), which determine the possible locations of an individual through time based on acoustic detections and/or depth contours, by the incorporation of a movement model that connects a subset of the animal's possible locations between time steps into movement paths.
 #'
 #' To implement this approach, a list of \code{\link[raster]{raster}} layers that record the possible locations of the individual at each time step (or a list pointers to these layers) needs to be supplied. A starting location (\code{origin}) can be supplied to constrain the initial set of sampled locations of the individual. At each time step, \code{n} possible locations (`particles') are sampled (with replacement) from the set of possible locations. For each (\code{1:n}) particle, a movement model is used to simulate where the individual could have moved to at the next time step, if it was in any of those locations. In the current framework, the probability of movement into surrounding cells depends on the distance to those cells, which can be represented as using Euclidean or least-cost distances depending on the distance method (\code{calc_distance}), and user-defined movement models (\code{calc_movement_pr_from_origin} and \code{calc_movement_pr}) that link distances to movement probabilities at each time step.
@@ -634,14 +635,24 @@ pf <- function(record,
     write_history$file <- check_dir(input = write_history$file, check_slash = TRUE)
     write_history_dir <- write_history$file
   }
+  # Global variables for data.table
+  id_current <- dist <- pr_current <- pr_current_adj <- NULL
 
 
   #### For first time step define set of cells that the individual could have occupied
   if(is.null(update_history)) {
     cat_to_cf("... Determining the set of possible starting locations (t = 1)...")
-    cells_at_time_current <- raster::Which(x = record_1 > 0, cells = TRUE, na.rm = TRUE)
-    cells_at_time_current <- data.table::data.table(id_current = cells_at_time_current,
-                                                    pr_current = raster::extract(record_1, cells_at_time_current))
+    if(optimisers$use_raster_operations){
+      cells_at_time_current <- raster::Which(x = record_1 > 0, cells = TRUE, na.rm = TRUE)
+      cells_at_time_current <-
+        data.table::data.table(id_current = cells_at_time_current,
+                               pr_current = raster::extract(record_1, cells_at_time_current))
+    } else {
+      cells_at_time_current <-
+        data.table::data.table(id_current = all_cells,
+                               pr_current = as.vector(record_1))
+    }
+
     # Adjust cell probabilities by distance from origin, if applicable, using mobility model
     if(!is.null(origin)){
       # Re-define origin on record_1 grid for consistency
@@ -680,12 +691,19 @@ pf <- function(record,
       }
       # Convert distances to movement probabilities and combine with location probabilities
       if(!is.null(data)) data_1 <- data[1, , drop = FALSE]
-      pr_1 <- raster::calc(dist_1, function(x) calc_movement_pr_from_origin(x, data_1))
-      pr_1 <- pr_1 * record_1_sbt
-      pr_1[is.na(pr_1)] <- 0
-      if(calc_distance == "euclid" & !is.null(mobility_from_origin)) pr_1 <- raster::extend(pr_1, boundaries, 0)
-      cells_at_time_current$pr_current  <- raster::extract(pr_1, cells_at_time_current$id)
+      if(optimisers$use_raster_operations){
+        pr_1 <- raster::calc(dist_1, function(x) calc_movement_pr_from_origin(x, data_1))
+        pr_1 <- pr_1 * record_1_sbt
+        if(calc_distance == "euclid" & !is.null(mobility_from_origin)) pr_1 <- raster::extend(pr_1, boundaries, 0)
+        cells_at_time_current[, pr_current := raster::extract(pr_1, cells_at_time_current$id)]
+      } else {
+        if(calc_distance == "euclid" & !is.null(mobility_from_origin)) dist_1 <- raster::extend(dist_1, boundaries, 0)
+        cells_at_time_current[, dist := as.vector(dist_1)]
+        cells_at_time_current[, pr_current := calc_movement_pr_from_origin(pr_current, data_1)]
+        cells_at_time_current[, pr_current := pr_current * as.vector(record_1)]
+      }
     }
+    cells_at_time_current[is.na(pr_current), pr_current := 0]
   } else {
     cat_to_cf("... Using update_history...")
     cat_to_cf(paste0("... Determining the set of possible starting locations for update (t = ",
@@ -720,18 +738,18 @@ pf <- function(record,
     if(!is.null(resample)) {
       if(length(unique(cells_at_time_current_sbt$id_current)) < resample){
         cat_to_cf("... ... ... ... Resampling candidate starting positions for the current time step...")
-        cells_at_time_current$pr_current_adj <- cells_at_time_current$pr_current
-        cells_at_time_current$pr_current_adj[cells_at_time_current$pr_current_adj != 0] <- 1
+        cells_at_time_current[, pr_current_adj := pr_current]
+        cells_at_time_current[pr_current_adj != 0, pr_current_adj := 1]
         cells_at_time_current_sbt <- cells_at_time_current[sample(x = 1:length(cells_at_time_current$id_current),
                                                                   size = n,
                                                                   prob = cells_at_time_current$pr_current_adj,
                                                                   replace = TRUE), ]
-        cells_at_time_current$pr_current_adj <- NULL
+        cells_at_time_current[, pr_current_adj := NULL]
       }
     }
     cells_at_time_current_sbt$timestep  <- t
     rownames(cells_at_time_current_sbt) <- NULL
-    history[[t]] <- cells_at_time_current_sbt
+    history[[t]] <- as.data.frame(cells_at_time_current_sbt)
     # Write history to file (if specified)
     if(!is.null(write_history)){
       write_history$object   <- history[[t]]
@@ -749,7 +767,6 @@ pf <- function(record,
       record_at_time_next <- record[[t + 1]]
       if(read_records) record_at_time_next <- raster::raster(record_at_time_next)
       record_sbt <- record_at_time_next
-      cells_at_time_next <- raster::Which(record_at_time_next > 0, na.rm = TRUE)
       if(!is.null(data)) data_t_next <- data[t + 1, , drop = FALSE]
 
       ## Fast euclidean distances method
@@ -775,16 +792,26 @@ pf <- function(record,
         }
         # if(!is.null(mobility)) dist_all <- raster::extend(dist_all, boundaries, NA)
         # Get probabilities based on distance and combine with layer of possible locations for next time step
-        pr_all <- raster::calc(dist_all, function(x) calc_movement_pr(x, data_t_next))
-        pr_all <- pr_all * record_sbt
-        pr_all[is.na(pr_all)] <- 0
-        if(calc_distance == "euclid" & !is.null(mobility)) pr_all <- raster::extend(pr_all, boundaries, 0)
-        # Define a dataframe of probabilities
-        pr_all <- data.table::data.table(id_previous = NA,
-                                         pr_previous = NA,
-                                         id_current = 1:n_cell,
-                                         pr_current = as.vector(pr_all))
-        cells_from_current_to_next <- pr_all[pr_all$pr_current > 0, ]
+        if(optimisers$use_raster_operations){
+          pr_all <- raster::calc(dist_all, function(x) calc_movement_pr(x, data_t_next))
+          pr_all <- pr_all * record_sbt
+          if(calc_distance == "euclid" & !is.null(mobility)) pr_all <- raster::extend(pr_all, boundaries, 0)
+          pr_all <- data.table::data.table(id_previous = NA,
+                                           pr_previous = NA,
+                                           id_current = all_cells,
+                                           pr_current = as.vector(pr_all))
+        } else {
+          if(calc_distance == "euclid" & !is.null(mobility)) dist_all <- raster::extend(dist_all, boundaries, 0)
+          pr_all <- data.table::data.table(id_previous = NA,
+                                           pr_previous = NA,
+                                           id_current = all_cells,
+                                           dist = as.vector(dist_all))
+          pr_all[, pr_current := calc_movement_pr(dist, data_t_next)]
+          pr_all[, pr_current := pr_current * as.vector(record_at_time_next)]
+          pr_all[, dist := NULL]
+        }
+        cells_from_current_to_next <- pr_all[which(pr_all$pr_current > 0), ]
+
 
         ## Other distance methods (point-by-point)
       } else {
@@ -823,14 +850,13 @@ pf <- function(record,
           }
           pr_j <- raster::calc(dist_j, function(x) calc_movement_pr(x, data_t_next))
           pr_j <- pr_j * record_sbt
-          pr_j[is.na(pr_j)] <- 0
           if(calc_distance == "euclid" & !is.null(mobility)) pr_j <- raster::extend(pr_j, boundaries, 0)
           pr_j <- data.table::data.table(id_current = cell_j$id_current,
                                          pr_current = cell_j$pr_current,
                                          id_next = 1:n_cell,
                                          pr_next = as.vector(pr_j))
-          pr_j <- pr_j[pr_j$pr_next > 0, ]
-          if(nrow(pr_j) > 0) out <- NULL else out <- pr_j
+          pr_j <- pr_j[which(pr_j$pr_next > 0), ]
+          if(nrow(pr_j) == 0) pr_j <- NULL
           return(pr_j)
         })
         cells_from_current_to_next <- compact(cells_from_current_to_next)
@@ -838,7 +864,7 @@ pf <- function(record,
       }
 
       ## Processing
-      if(length(cells_from_current_to_next) == 0L){
+      if(nrow(cells_from_current_to_next) == 0L){
         message("Unable to sample any cells at time ", t, " for the next location for any of the ", n, " particles. Either (1) the algorithm has been 'unlucky' and all n = ", n, " particles up to this point have led to 'dead ends', (2) the mobility model ('mobility') is too limiting and/or (3) the depth error parameter from 'calc_depth_error' is too small. The function will now stop, returning outputs up until this point.")
         out_pf$history <- history
         class(out_pf) <- c(class(out_pf), "pf_archive")

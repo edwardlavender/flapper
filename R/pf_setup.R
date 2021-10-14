@@ -133,11 +133,11 @@ pf_setup_record <- function(root, type = c("acs", "dc"), use_absolute_paths = FA
 #' @title Optimisation settings for \code{\link[flapper]{pf}}
 #' @description This function defines optimisation settings for \code{\link[flapper]{pf}}. These settings control under-the-hood implememtation routines in \code{\link[flapper]{pf}} that may improve computation time if adjusted.
 #'
-#' @param use_extract (not yet implemented)
+#' @param use_raster_operations (experimental) A logical input that defines whether or not to use \code{\link[raster]{raster}} operations, where applicable (e.g., \code{\link[raster]{calc}}), which are memory-safe, or to extract \code{\link[raster]{raster}} values into a \code{\link[data.table]{data.table}} and perform arithmetic operations on the \code{\link[data.table]{data.table}}. This option is only implemented for the `fast Euclidean distances' method in \code{\link[flapper]{pf}}. Trials suggest that \code{use_raster_operations = FALSE} does not improve computation time.
 #' @param use_calc_distance_euclid_backend_grass A logical input that defines whether or not to use GRASS as the backend for Euclidean distances calculations in \code{\link[flapper]{pf}}. The default is \code{FALSE}, in which case \code{\link[raster]{distanceFromPoints}} is used for these calculations. If \code{TRUE}, the \code{\link[fasterRaster]{fasterRaster}} package is required and \code{\link[fasterRaster]{fasterVectToRastDistance}} is used instead.
 #' @param use_grass_dir If \code{use_calc_distance_euclid_backend_grass = TRUE}, \code{use_grass_dir} is a character that defines the directory where GRASS is installed on your system and should be supplied.
 #'
-#' @details \code{\link[flapper]{pf}} is a computationally intensive routine. To reduce computation time, the most effective approaches are to minimise data volume and reduce the size (dimensions and/or resolution) of the grid over which particle filtering is implemented; use the `fast Euclidean distances' method for distance calculations; and minimise the number of particles. For small numbers of particles, it may be faster to specify the \code{mobility} parameter; for large numbers of particles, it is probably faster to set \code{mobility = NULL}. Following optimisation of these settings, \code{\link[flapper]{pf_setup_optimisers}} facilitates the adjustment of under-the-hood implementation routines which may further reduce computation time in some settings.
+#' @details \code{\link[flapper]{pf}} is a computationally intensive routine. To reduce computation time, the most effective approaches are to minimise data volume and reduce the size (dimensions and/or resolution) of the grid over which particle filtering is implemented; use the `fast Euclidean distances' method for distance calculations; and minimise the number of particles. For small numbers of particles, it may be faster to specify the \code{mobility} parameter; for large numbers of particles, it is probably faster to set \code{mobility = NULL}. Adjusting \code{\link{raster}{rasterOptions}} such as \code{chunksize} and/or \code{maxmemory} may help in some circumstances too. Following optimisation of these settings, \code{\link[flapper]{pf_setup_optimisers}} facilitates the adjustment of under-the-hood implementation routines which may further reduce computation time in some settings.
 #'
 #' @return The function returns \code{pf_optimiser} S3 class object, which is simply a named list of optimisation options that can be passed to \code{\link[flapper]{pf}} via the \code{optimisers} argument.
 #'
@@ -155,10 +155,10 @@ pf_setup_record <- function(root, type = c("acs", "dc"), use_absolute_paths = FA
 #' @author Edward Lavender
 #' @export
 
-pf_setup_optimisers <- function(use_extract = FALSE,
+pf_setup_optimisers <- function(use_raster_operations = TRUE,
                                 use_calc_distance_euclid_backend_grass = FALSE,
                                 use_grass_dir = NULL){
-  out <- list(use_extract = use_extract,
+  out <- list(use_raster_operations = use_raster_operations,
               use_calc_distance_euclid_backend_grass = use_calc_distance_euclid_backend_grass,
               use_grass_dir = use_grass_dir)
   if(use_calc_distance_euclid_backend_grass & is.null(use_grass_dir)){
