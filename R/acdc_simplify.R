@@ -42,7 +42,7 @@ acdc_simplify <- function(archive,
   #### Simplify extract outputs the algorithm has only been implemented for a single chunk
   if(length(archive$archive) == 1){
 
-    out$map <- archive$archive[[1]]$map
+    out$map    <- archive$archive[[1]]$map
     out$record <- archive$archive[[1]]$record
 
     #### Otherwise aggregate information across chunks
@@ -53,6 +53,9 @@ acdc_simplify <- function(archive,
 
     #### Process spatial elements so that 'map_cumulative' elements are carried forward (summed) across chunks, if necessary
     try_update_spatial <- TRUE
+    if(!raster::inMemory(maps[[1]])){
+      if(!file.exists(maps[[1]]@file@name)) try_update_spatial <- FALSE
+    }
     if(!is.null(archive$args)){
       if(isTRUE(archive$args$save_record_spatial == 0)) try_update_spatial <- FALSE
     }
@@ -121,9 +124,11 @@ acdc_simplify <- function(archive,
       })
     }
 
-    #### Sum the adjusted maps across chunks
-    out$map <- raster::brick(maps)
-    out$map <- raster::calc(out$map, sum, na.rm = TRUE)
+    #### Sum chunk-specific maps across chunks
+    if(raster::inMemory(maps[[1]]) | file.exists(maps[[1]]@file@name)){
+      out$map <- raster::brick(maps)
+      out$map <- raster::calc(out$map, sum, na.rm = TRUE)
+    }
 
     #### Flatten record list across chunks
     out$record <- purrr::flatten(out$record)
@@ -131,8 +136,13 @@ acdc_simplify <- function(archive,
   }
 
   #### Mask and normalise the final map
-  if(!is.null(mask)) out$map <- raster::mask(out$map, mask)
-  if(normalise) out$map <- out$map/raster::cellStats(out$map, "sum")
+  if(!is.null(out$map)){
+    if(raster::inMemory(out$map) | file.exists(out$map@file@name)){
+      if(!is.null(mask)) out$map <- raster::mask(out$map, mask)
+      if(normalise) out$map <- out$map/raster::cellStats(out$map, "sum")
+    }
+  }
+  if(is.null(out$map)) warning("out$map could not be processed.", call. = FALSE, immediate. = TRUE)
 
   #### Return outputs
   class(out) <- c(class(out), "acdc_record")
