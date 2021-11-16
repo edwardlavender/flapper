@@ -3,10 +3,11 @@
 #### pf_access_history_from_file()
 
 #' @title List `history' files from a PF algorithm
-#' @description This function creates an ordered list of `history' files derived from the particle filtering (PF) algorithm (\code{\link[flapper]{pf}}). This is applicable if \code{\link[flapper]{pf}} is implemented with the \code{write_history} argument specified.
+#' @description This function creates an ordered vector (or list) of `history' files derived from the particle filtering (PF) algorithm (\code{\link[flapper]{pf}}). This is applicable if \code{\link[flapper]{pf}} is implemented with the \code{write_history} argument specified.
 #'
 #' @param root A string that defines the directory in which files are located.
 #' @param use_absolute_paths A logical variable that defines whether to return relative paths (\code{FALSE}) or absolute paths (\code{TRUE}) (see \code{\link[tools]{file_path_as_absolute}}).
+#' @param use_list A logical variable that defines whether or not return a vector (\code{use_list = FALSE}) or a list (\code{use_list = TRUE}).
 #' @param ... Additional arguments passed to \code{\link[base]{list.files}} (excluding \code{full.names}).
 #'
 #' @details This function requires the \code{\link[stringr]{stringr}} package.
@@ -32,7 +33,7 @@
 #' @author Edward Lavender
 #' @export
 
-pf_access_history_files <- function(root, use_absolute_paths = FALSE,...){
+pf_access_history_files <- function(root, use_absolute_paths = FALSE, use_list = FALSE,...){
   if(!requireNamespace("stringr", quietly = TRUE)){
     stop("This function requires the 'stringr' package. Please install it before continuing with install.packages('stringr').")
   }
@@ -52,6 +53,7 @@ pf_access_history_files <- function(root, use_absolute_paths = FALSE,...){
     files <- sapply(files, function(f) tools::file_path_as_absolute(f))
     names(files) <- NULL
   }
+  if(use_list) files <- as.list(files)
   return(files)
 }
 
@@ -93,6 +95,120 @@ pf_access_history <- function(archive,
     history %>%
     dplyr::arrange(.data$timestep, .data$cell_id, .data$cell_pr)
   return(history)
+}
+
+
+########################################
+########################################
+#### pf_access_particles_unique()
+
+#' @title Access the cells sampled by PF
+#' @description Given a list of particle histories (or a list of file paths), this function accesses the unique particles (cells) sampled by a particle filtering (PF) algorithm (\code{\link[flapper]{pf}}).
+#'
+#' @param history A \code{\link[flapper]{pf_archive-class}} class object from \code{\link[flapper]{pf}}, the list of particle histories (the `history' element of a \code{\link[flapper]{pf_archive-class}} object) from \code{\link[flapper]{pf}} or a list of file paths to particle histories.
+#' @param use_memory_safe If \code{history} is a record of file paths, \code{use_memory_safe} is a logical variable that defines whether or not to use the `memory-safe(r)' method to access unique cell samples. If specified, the function sequentially loads each file and re-defines the vector of unique particles at each time step as the unique combination of previous (unique) samples and the samples from the current time step. This may be slow. Alternatively, under the default \code{use_memory_safe = FALSE} option, the function loads each file (in parallel if specified), retaining all sampled particles, before selecting the unique particles (once) at the end of this process. This option should be faster.
+#' @param cl,varlist Parallelisation options implemented if (a) particle histories are contained in memory or (b) particle histories are supplied as a list of file paths with \code{use_memory_safe = FALSE}. \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is closed within the function. \code{varlist} is a character vector of names of objects to export that is passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. Exported objects must be located in the global environment.
+#'
+#' @return The function returns a vector of the unique particles sampled by the PF algorithm.
+#'
+#' @examples
+#' #### Example (1): Access unique particles when 'history' exists in memory
+#' # Access unique particles from a pf_archive object
+#' pf_access_particles_unique(dat_dcpf_histories)
+#' # Access unique particles from a list of particle histories
+#' pf_access_particles_unique(dat_dcpf_histories$history)
+#' # Supply a cluster to speed up the algorithm (for very large lists)
+#' pf_access_particles_unique(dat_dcpf_histories$history,
+#'                            cl = parallel::makeCluster(2L))
+#'
+#' #### Example (2): Access unique particles when 'history' is a list of file paths
+#'
+#' ## Write example particle histories to file (to load)
+#' root <- paste0(tempdir(), "/pf/")
+#' dir.create(root)
+#' pf_args <- dat_dcpf_histories$args
+#' pf_args$calc_distance_euclid_fast <- TRUE
+#' pf_args$write_history <- list(file = root)
+#' out_pf <- do.call(pf, pf_args)
+#'
+#' ## Access particle histories using default options (use_memory_safe = FALSE)
+#' # Access particle histories via pf_access_history_files()
+#' pf_access_particles_unique(pf_access_history_files(root, use_list = TRUE))
+#' # Supply a cluster to speed up the algorithm (for very large lists)
+#' pf_access_particles_unique(pf_access_history_files(root, use_list = TRUE),
+#'                            cl = parallel::makeCluster(2L))
+#'
+#' ## Access particle histories using the 'memory_safe' option
+#' # For large lists, this is likely to be slower
+#' # ... but it may be the only option in some cases.
+#' pf_access_particles_unique(pf_access_history_files(root, use_list = TRUE),
+#'                            use_memory_safe = TRUE)
+#'
+#' @seealso \code{\link[flapper]{pf}} implements particle filtering.
+#' @author Edward Lavender
+#' @export
+
+pf_access_particles_unique <- function(history,
+                                       use_memory_safe = FALSE,
+                                       cl = NULL, varlist = NULL){
+
+  #### Setup
+  check_class(input = history, to_class = "list")
+  if(inherits(history, "pf_archive")) history <- history$history
+  history_1   <- history[[1]]
+  read_history <- FALSE
+  if(inherits(history_1, "character")){
+    read_history <- TRUE
+    if(!file.exists(history_1)) stop(paste0("history[[1]] ('", history_1, "') does not exist."))
+    history_1 <- readRDS(history_1)
+  }
+  if(is.null(cl) & !is.null(varlist)) {
+    warning("'cl' is NULL but 'varlist' is not: 'varlist' ignored.",
+            immediate. = TRUE, call. = FALSE)
+    varlist <- FALSE
+  }
+
+  #### Access unique cells (from file)
+  if(read_history){
+
+    ## Memory-safe(r) option: load files sequentially, selecting unique cells at each step
+    if(use_memory_safe){
+      if(!is.null(cl)) {
+        warning("'cl' is not implemented for loading files when use_memory_safe = TRUE.",
+                immediate. = TRUE, call. = FALSE)
+        cl <- varlist <- NULL
+      }
+      cells <- unique(history_1$id_current)
+      for(i in 2:length(history)){
+        cells <- unique(c(cells, readRDS(history[[i]])$id_current))
+      }
+
+      ## Faster option: load all cells for each time step, selecting unique cells at the end
+    } else {
+      if(!is.null(cl) & is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
+      cells_by_time <-
+        pbapply::pblapply(history,
+                          cl = cl,
+                          function(f) readRDS(f)$id_current)
+      if(!is.null(cl)) parallel::stopCluster(cl = cl)
+      cells <- unlist(cells_by_time)
+      cells <- unique(cells)
+
+    }
+
+    #### Access unique cells (in memory)
+  } else {
+
+    if(!is.null(cl) & is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
+    cells <- pbapply::pblapply(history, cl = cl, function(d) d$id_current)
+    if(!is.null(cl)) parallel::stopCluster(cl = cl)
+    cells <- unlist(cells)
+    cells <- unique(cells)
+
+  }
+
+  #### Return unique cells
+  return(cells)
 }
 
 

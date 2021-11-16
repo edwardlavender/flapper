@@ -4,12 +4,19 @@
 \alias{pf_access_history_files}
 \title{List `history' files from a PF algorithm}
 \usage{
-pf_access_history_files(root, use_absolute_paths = FALSE, ...)
+pf_access_history_files(
+  root,
+  use_absolute_paths = FALSE,
+  use_list = FALSE,
+  ...
+)
 }
 \arguments{
 \item{root}{A string that defines the directory in which files are located.}
 
 \item{use_absolute_paths}{A logical variable that defines whether to return relative paths (\code{FALSE}) or absolute paths (\code{TRUE}) (see \code{\link[tools]{file_path_as_absolute}}).}
+
+\item{use_list}{A logical variable that defines whether or not return a vector (\code{use_list = FALSE}) or a list (\code{use_list = TRUE}).}
 
 \item{...}{Additional arguments passed to \code{\link[base]{list.files}} (excluding \code{full.names}).}
 }
@@ -17,7 +24,7 @@ pf_access_history_files(root, use_absolute_paths = FALSE, ...)
 The function returns an ordered list of file paths.
 }
 \description{
-This function creates an ordered list of `history' files derived from the particle filtering (PF) algorithm (\code{\link[flapper]{pf}}). This is applicable if \code{\link[flapper]{pf}} is implemented with the \code{write_history} argument specified.
+This function creates an ordered vector (or list) of `history' files derived from the particle filtering (PF) algorithm (\code{\link[flapper]{pf}}). This is applicable if \code{\link[flapper]{pf}} is implemented with the \code{write_history} argument specified.
 }
 \details{
 This function requires the \code{\link[stringr]{stringr}} package.
