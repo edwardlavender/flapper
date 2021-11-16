@@ -17,6 +17,7 @@ Suggests:
     glatos,
     plotly, animation, scales, viridis,
     circular, 
+    Rfast,
     httr, jsonlite,
     rmarkdown, knitr
 Remotes: 

@@ -151,6 +151,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
       \item \link{pf_access_history_files} lists particle histories saved to file;
       \item \link{pf_access_history} accesses particle histories;
       \item \link{pf_access_particles_unique} accesses unique particle samples;
+      \item \link{pf_access_distance_matrix} calculates distances between unique particle samples;
       \item \link{pf_plot_history} plots simulated particle histories;
       \item \link{pf_animate_history} animates simulated particle histories;
       \item \link{pf_simplify} assembles movement paths from particle histories;
