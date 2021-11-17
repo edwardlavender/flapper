@@ -45,8 +45,6 @@ This function implements a stepwise approach to calculate distances between all 
 }
 
 The resultant matrix can be passed to \code{\link[flapper]{pf_simplify}} to streamline distance calculations and/or integrate shortest distances in particle processing/movement path reconstruction. In both cases, the stepwise approach implemented by this function helps to minimise the computation time required for distance calculations because (a) only distances between relevant locations are calculated (once) and (b) any Euclidean distances that exceed \code{mobility} can be ignored when it comes to shortest-distance calculations.
-
-Note that this function requires the \code{\link[Rfast]{Rfast-package}}.
 }
 \examples{
 #### Example (1): Implement function with the default options

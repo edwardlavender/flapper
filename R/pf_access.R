@@ -236,7 +236,6 @@ pf_access_particles_unique <- function(history,
 #'
 #' The resultant matrix can be passed to \code{\link[flapper]{pf_simplify}} to streamline distance calculations and/or integrate shortest distances in particle processing/movement path reconstruction. In both cases, the stepwise approach implemented by this function helps to minimise the computation time required for distance calculations because (a) only distances between relevant locations are calculated (once) and (b) any Euclidean distances that exceed \code{mobility} can be ignored when it comes to shortest-distance calculations.
 #'
-#' Note that this function requires the \code{\link[Rfast]{Rfast-package}}.
 #'
 #' @return The function returns a \code{\link[Matrix]{dgCMatrix-class}} sparse matrix with one row and one column for each pairwise cell combination in \code{bathy}. By default cells are empty (value zero). For the unique, pairwise cells in \code{archive} (that are less than \code{mobility} apart, if applicable), cell values represent the Euclidean or shortest distance between those cells in metres.
 #'
@@ -303,8 +302,6 @@ pf_access_distance_matrix <- function(archive,
     if(show) cat(paste(..., "\n"))
   }
   cat_to_cf(paste0("flapper::pf_access_distance_matrix() called (@ ", t_onset, ")..."))
-  if(!requireNamespace("Rfast", quietly = TRUE))
-    stop("This function requires the Rfast package.", call. = FALSE)
 
   #### Get distance parameters
   check_class(input = archive, to_class = "pf_archive")
@@ -333,27 +330,11 @@ pf_access_distance_matrix <- function(archive,
   cat_to_cf("... Getting unique particle samples...")
   cells <- pf_access_particles_unique(archive)
 
-  #### Get cell pairs
-  cat_to_cf("... Getting pairwise particle combinations...")
-  if(requireNamespace("tidyr", quietly = TRUE)){
-    pairs <- tidyr::expand_grid(cell_1 = cells, cell_2 = cells)
-  } else {
-    pairs <- expand.grid(cell_1 = cells, cell_2 = cells)
-  }
-
-  #### Get unique cell pairs
-  cat_to_cf("... Processing pairwise particle samples...")
-  ## Drop (inverse) duplicates
-  # Sort each row
-  pairs <- Rfast::rowSort(as.matrix(pairs))
-  pairs <- data.frame(pairs)
-  colnames(pairs) <- c("cell_1", "cell_2")
-  # Define cell pairs and drop duplicates, accounting for inverse duplicates
-  pairs <-
-    pairs %>%
-    dplyr::mutate(pair = paste0(.data$cell_1, "-", .data$cell_2)) %>%
-    dplyr::filter(!duplicated(.data$pair)) %>%
-    dplyr::mutate(index = dplyr::row_number())
+  #### Get (unique) cell pairs
+  cat_to_cf("... Getting (unique) pairwise particle combinations...")
+  pairs <- combn(cells, 2)
+  pairs <- data.frame(cell_1 = pairs[1, ],
+                      cell_2 = pairs[2, ])
 
   #### Get Euclidean distances between unique cells
   cat_to_cf("... Calculating Euclidean distances...")
@@ -387,11 +368,11 @@ pf_access_distance_matrix <- function(archive,
     ## Update pairs
     pairs$dist[pairs_for_lcp$index] <- pairs_for_lcp$dist_lcp
     cat_to_cf("... Filtering by 'mobility'...")
-    if(!is.null(mobility)) pairs <- pairs %>% dplyr::filter(!is.na(.data$dist))
 
   }
 
   #### Make (sparse) matrix
+  pairs <- pairs %>% dplyr::filter(!is.na(.data$dist))
   mat <- Matrix::Matrix(nrow = bathy_n_cell,
                         ncol = bathy_n_cell,
                         data = 0,
