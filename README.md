@@ -429,8 +429,6 @@ process provided by the `pf*()` family of functions:
   - `pf_access_history_files()` lists particle histories saved to file;
   - `pf_access_history()` accesses particle histories;
   - `pf_access_particles_unique()` accesses unique particle samples;
-  - `pf_access_distance_matrix()` calculates distances between unique
-    particle samples;
   - `pf_plot_history()` plots simulated particle histories;
   - `pf_animate_history()` animates simulated particle histories;
   - `pf_simplify()` assembles movement paths from particle histories;
