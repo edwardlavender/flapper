@@ -840,11 +840,12 @@ get_id_rec_overlap <- function(ids,
 #' xy <- sp::spTransform(xy, proj_utm)
 #'
 #' #### Example (1): Extract all depth values within each receiver's centroid
-#' depths_by_centroid <- get_detection_centroids_envir(xy = xy,
-#'                                                     detection_range = 425,
-#'                                                     coastline = dat_coast,
-#'                                                     envir = dat_gebco
-#'                                                     )
+#' depths_by_centroid <-
+#'   get_detection_centroids_envir(xy = xy,
+#'                                 detection_range = 425,
+#'                                 coastline = dat_coast,
+#'                                 envir = dat_gebco
+#'                                 )
 #' # The function returns a list of dataframes, one for each receiver
 #' # ... with the cell IDs and the value of the environmental variable
 #' utils::str(depths_by_centroid)
@@ -861,12 +862,13 @@ get_id_rec_overlap <- function(ids,
 #'
 #' #### Example (2): Extract a random sample of values
 #' # (We'll keep the values small for speed)
-#' depths_by_centroid <- get_detection_centroids_envir(xy = xy,
-#'                                                    detection_range = 425,
-#'                                                    coastline = dat_coast,
-#'                                                    envir = dat_gebco,
-#'                                                    sample_size = 2
-#'                                                    )
+#' depths_by_centroid <-
+#'   get_detection_centroids_envir(xy = xy,
+#'                                 detection_range = 425,
+#'                                 coastline = dat_coast,
+#'                                 envir = dat_gebco,
+#'                                 sample_size = 2
+#'                                 )
 #' utils::str(depths_by_centroid)
 #'
 #' #### Example (3) Extract a random sample of values with weighted probabilities
@@ -881,13 +883,14 @@ get_id_rec_overlap <- function(ids,
 #'     return(dpr)
 #'   }
 #' # Implement sampling with replacement according to detection probability
-#' depths_by_centroid <- get_detection_centroids_envir(xy = xy,
-#'                                                 detection_range = 425,
-#'                                                 coastline = dat_coast,
-#'                                                 envir = dat_gebco,
-#'                                                 sample_size = 2,
-#'                                                 sample_probs = calc_detection_pr,
-#'                                                 )
+#' depths_by_centroid <-
+#'   get_detection_centroids_envir(xy = xy,
+#'                                 detection_range = 425,
+#'                                 coastline = dat_coast,
+#'                                 envir = dat_gebco,
+#'                                 sample_size = 2,
+#'                                 sample_probs = calc_detection_pr
+#'                                 )
 #' # Each element of the outputted list includes the 'cell' and 'envir' column
 #' # ... as well as 'dist' and 'prob' that define the distance of that cell
 #' # ... from the location in xy and the corresponding detection probability
@@ -895,29 +898,30 @@ get_id_rec_overlap <- function(ids,
 #' utils::str(depths_by_centroid)
 #'
 #' #### Example (4) Sampling without replacement via sample_replace = FALSE
-#' depths_by_centroid <- get_detection_centroids_envir(xy = xy,
-#'                                                 detection_range = 425,
-#'                                                 coastline = dat_coast,
-#'                                                 envir = dat_gebco,
-#'                                                 sample_size = 2,
-#'                                                 sample_probs = calc_detection_pr,
-#'                                                 sample_replace = FALSE
-#'                                                 )
+#' depths_by_centroid <-
+#'   get_detection_centroids_envir(xy = xy,
+#'                                 detection_range = 425,
+#'                                 coastline = dat_coast,
+#'                                 envir = dat_gebco,
+#'                                 sample_size = 2,
+#'                                 sample_probs = calc_detection_pr,
+#'                                 sample_replace = FALSE
+#'                                 )
 #' utils::str(depths_by_centroid)
 #'
 #' #### Example (5) Parallelise the algorithm via cl and varlist arguments
 #' \dontrun{
-#' depths_by_centroid <- get_detection_centroids_envir(xy = xy,
-#'                                                 detection_range = 425,
-#'                                                 coastline = dat_coast,
-#'                                                 envir = dat_gebco,
-#'                                                 sample_size = 2,
-#'                                                 sample_probs = calc_detection_pr,
-#'                                                 sample_replace = FALSE,
-#'                                                 cl = parallel::makeCluster(2L),
-#'                                                 varlist = c("dat_gebco",
-#'                                                             "calc_detection_pr")
-#'                                                 )
+#' depths_by_centroid <-
+#'   get_detection_centroids_envir(xy = xy,
+#'                                 detection_range = 425,
+#'                                 coastline = dat_coast,
+#'                                 envir = dat_gebco,
+#'                                 sample_size = 2,
+#'                                 sample_probs = calc_detection_pr,
+#'                                 sample_replace = FALSE,
+#'                                 cl = parallel::makeCluster(2L),
+#'                                 varlist = c("dat_gebco","calc_detection_pr")
+#'                                 )
 #' utils::str(depths_by_centroid)
 #' }
 #'
