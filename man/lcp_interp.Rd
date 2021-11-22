@@ -114,10 +114,11 @@ graphics::abline(0, 1, lty = 3)
 
 ## Alternatively, we could re-implement the algorithm using shortest distances
 # Re-implement algorithm
-dcpf_args <- dat_dcpf_histories$args
+dcpf_args               <- dat_dcpf_histories$args
 dcpf_args$calc_distance <- "lcp"
-dcpf_history <- do.call(pf, dcpf_args)
-paths <- pf_simplify(dcpf_history)
+dcpf_args$n             <- 100
+dcpf_history            <- do.call(pf, dcpf_args)
+paths                   <- pf_simplify(dcpf_history)
 # Interpolate paths
 paths_interp_4 <- lcp_interp(paths, surface)
 # Show the probabilities reported by the DCPF algorithm are the same as those

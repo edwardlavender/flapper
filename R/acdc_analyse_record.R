@@ -87,8 +87,9 @@ acdc_access_timesteps <- function(record){
 
 acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"), select = NULL){
   check_class_acdc_record(record)
+  type <- match.arg(type)
   maps <- lapply(record$record, function(record_elm){
-    lapply(record_elm$spatial, function(spatial_elm) spatial_elm$map_cumulative)
+    lapply(record_elm$spatial, function(spatial_elm) spatial_elm[[type]])
   })
   maps <- unlist(maps)
   if(!is.null(select)) maps <- maps[select]

@@ -142,12 +142,14 @@ dcpf_1 <- pf(record = lapply(dc_1$archive[[1]]$record, function(elm) elm$spatial
              bathy = surface,
              calc_movement_pr =
                function(distance,...) {
-                 pr <- stats::plogis(10 + distance * -0.05)
-                 pr[distance > 500] <- 0
+                 pr <- stats::plogis(5 + distance * -0.05)
+                 pr[distance > 200] <- 0
                  return(pr)
                },
+             mobility = 200,
              n = 10L,
-             seed = 2)
+             seed = 5)
+
 # The function returns a list with particle histories and arguments
 summary(dcpf_1)
 utils::str(dcpf_1)

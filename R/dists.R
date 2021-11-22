@@ -1,5 +1,23 @@
 ########################################
 ########################################
+#### raster:::..planedist2()
+
+#' @title Calculate a matrix of Euclidean distances between points
+#' @param p1 A coordinate matrix.
+#' @param p2 A coordinate matrix.
+#' @details This function assumes that coordinates are in planar space.
+#' @source This function is an internal function in the \code{\link[raster]{raster}} package (https://rdrr.io/rforge/raster/src/R/pointdistance.R). It is defined separately in \code{\link[flapper]{flapper}} for stability.
+#' @keywords internal
+
+.planedist2 <- function(p1, p2){
+  z0 <- complex(, p1[, 1], p1[, 2])
+  z1 <- complex(, p2[, 1], p2[, 2])
+  outer(z0, z1, function(z0, z1) Mod(z0 - z1))
+}
+
+
+########################################
+########################################
 #### dist_btw_receivers()
 
 #' @title Compute Euclidean distances between receivers

@@ -179,8 +179,6 @@
 #'            seed = 1)
 #' # Algorithm duration during testing ~0.04 minutes
 #'
-#' \dontrun{
-#'
 #' #### Example (4): Implement algorithm using shortest distances
 #' # Note the need for a surface with equal resolution if this option is implemented.
 #' # To speed up the initial stages of the algorithm, you can supply the graph
@@ -361,9 +359,12 @@
 #'                        timestep = 1:nrow(path_sim))
 #' path_sim$cell_z <- raster::extract(dat_gebco_planar, path_sim$cell_id)
 #' prettyGraphics::pretty_plot(path_sim$cell_z, type = "l")
+#' # Check simulated movements on the scale of the grid
+#' sp::spDists(raster::xyFromCell(dat_gebco_planar, path_sim$cell_id),
+#'             segments = TRUE)
 #' # Simulate 'observed' depth time series given some error
 #' # ... For illustration, we will make the error smaller in this example
-#' cde <- function(...) c(-2.5, 2.5)
+#' cde <- function(...) matrix(c(-2.5, 2.5), nrow = 2)
 #' depth_obs <- runif(length(path_sim$cell_z),
 #'                    path_sim$cell_z + cde(path_sim$cell_z)[1],
 #'                    path_sim$cell_z + cde(path_sim$cell_z)[2])
@@ -383,7 +384,8 @@
 #' # We will assume that the origin was known.
 #' # ... We will mostly use the default options.
 #' history_dcpf <-
-#'   pf(record = lapply(dc_out$archive$record, function(r) r$spatial[[1]]$map_timestep),
+#'   pf(record = acdc_access_maps(acdc_simplify(dc_out, type = "dc"),
+#'                                type = "map_timestep"),
 #'      origin = origin_sim,
 #'      calc_distance = "euclid",
 #'      mobility = 200,
@@ -394,17 +396,14 @@
 #' # ... The green area shows areas of the requisite depth at that time step and the
 #' # ... particles show sampled locations at that time step. The simulated path
 #' # ... is shown in black.
-#' plot_history <- FALSE
-#' if(plot_history){
-#'   pp <- graphics::par(mfrow = c(3, 4))
-#'   pf_plot_history(history_dcpf,
-#'                   add_particles = list(pch = 21),
-#'                   add_paths = list(x = path_sim$cell_x, path_sim$cell_y, length = 0.05),
-#'                   xlim = range(path_sim$cell_x), ylim = range(path_sim$cell_y),
-#'                   crop_spatial = TRUE,
-#'                   prompt = FALSE)
-#'   graphics::par(pp)
-#' }
+#' pp <- graphics::par(mfrow = c(3, 4))
+#' pf_plot_history(history_dcpf,
+#'                 add_particles = list(pch = 21),
+#'                 add_paths = list(x = path_sim$cell_x, path_sim$cell_y, length = 0.05),
+#'                 xlim = range(path_sim$cell_x), ylim = range(path_sim$cell_y),
+#'                 crop_spatial = TRUE,
+#'                 prompt = FALSE)
+#' graphics::par(pp)
 #'
 #' ## Assemble paths
 #' path_dcpf <- pf_simplify(history_dcpf, bathy = dat_gebco_planar)
@@ -416,11 +415,13 @@
 #' # ... of the movement model
 #' require(rlang)
 #' path_dcpf <-
-#'   path_dcpf %>% dplyr::group_by(.data$path_id) %>%
-#'   dplyr::mutate(cell_x2 = dplyr::lead(.data$cell_x),
-#'                 cell_y2 = dplyr::lead(.data$cell_y),
+#'   path_dcpf %>%
+#'   dplyr::group_by(.data$path_id) %>%
+#'   dplyr::mutate(cell_x2 = dplyr::lag(.data$cell_x),
+#'                 cell_y2 = dplyr::lag(.data$cell_y),
 #'                 dist_1 = sqrt((.data$cell_x2 - .data$cell_x)^2 +
 #'                                 (.data$cell_y2 -.data$ cell_y)^2))
+#' path_dcpf
 #' range(path_dcpf$dist_1, na.rm =TRUE)
 #'
 #' ## Visualise paths
@@ -438,8 +439,6 @@
 #'   pf_plot_2d(path_dcpf, area, add_paths = list(length = 0.05),
 #'              add_additional = add_paths_sim,
 #'              prompt = TRUE)
-#' }
-#'
 #' }
 #'
 #' #### Example (11): Write a dataframe of sampled particles to file at each time step
@@ -861,6 +860,12 @@ pf <- function(record,
         })
         cells_from_current_to_next <- compact(cells_from_current_to_next)
         cells_from_current_to_next <- do.call(rbind, cells_from_current_to_next)
+        if(is.null(cells_from_current_to_next)){
+          cells_from_current_to_next <- data.table::data.table(id_current = integer(),
+                                                               pr_current = numeric(),
+                                                               id_next = integer(),
+                                                               pr_next = numeric())
+        }
       }
 
       ## Processing

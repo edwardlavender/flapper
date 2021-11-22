@@ -6,17 +6,20 @@
 \usage{
 pf_simplify(
   archive,
-  calc_distance = NULL,
+  max_n_particles = NULL,
+  max_n_particles_sampler = c("random", "weighted", "max"),
   bathy = NULL,
+  calc_distance = NULL,
   calc_distance_graph = NULL,
+  write_history = NULL,
   cl = NULL,
   varlist = NULL,
   use_all_cores = FALSE,
   return = c("path", "archive"),
   summarise_pr = FALSE,
   max_n_copies = NULL,
-  sample_method = c("random", "weighted", "max"),
-  max_n_paths = NULL,
+  max_n_copies_sampler = c("random", "weighted", "max"),
+  max_n_paths = 100L,
   add_origin = TRUE,
   verbose = TRUE
 )
@@ -24,11 +27,17 @@ pf_simplify(
 \arguments{
 \item{archive}{A \code{\link[flapper]{pf_archive-class}} object from \code{\link[flapper]{pf}}.}
 
+\item{max_n_particles}{(optional) An integer that defines the maximum number of particles to selected at each time step. If supplied, particle samples are thinned, with \code{max_n_particles} retained at each time step (in a method specified by \code{max_n_particles_sampler}), prior to processing. This reduces computation time but may lead to failures in path building (if the subset of sample particles cannot be connected into any movement paths).}
+
+\item{max_n_particles_sampler}{If \code{max_n_particles} is supplied, \code{max_n_particles_sampler} is a character that defines the sampling method. Currently supported options are: \code{"random"}, which implements random sampling; \code{"weighted"}, which implements weighted sampling, with random samples taken according to their probability at the current time step; and \code{"max"}, which selects the top \code{max_n_particles} most likely particles.}
+
+\item{bathy}{(optional) \code{bathy} is \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. \code{bathy} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in x, y and z directions (m). If \code{calc_distance = "lcp"}, the surface's resolution is taken to define the distance between horizontally and vertically connected cells and must be the same in both x and y directions. Any cells with NA values (e.g., due to missing data) are treated as `impossible' to move though by the algorithm (see \code{\link[flapper]{lcp_over_surface}}). If unsupplied, \code{bathy} can be extracted from \code{archive}, if available.}
+
 \item{calc_distance}{A character that defines the method used to calculate distances between sequential combinations of particles (see \code{\link[flapper]{pf}}). Currently supported options are Euclidean distances (\code{"euclid"}) or shortest (least-cost) distances ("lcp"). Note that \code{calc_distance} does not need to be the same method as used for \code{\link[flapper]{pf}}: it is often computationally beneficial to implement \code{\link[flapper]{pf}} using Euclidean distances and then, for the subset of sampled particles, implement \code{\link[flapper]{pf_simplify}} with \code{calc_distance = "lcp"} to re-compute distances using the shortest-distances algorithm, along with the adjusted probabilities. However, for large paths, the quickest option is to implement both functions using \code{calc_distance = "euclid"} and then interpolate shortest paths only for the set of returned paths (see \code{\link[flapper]{lcp_interp}}). If \code{calc_distance = NULL}, the method saved in \code{archive} is used.}
 
-\item{bathy}{(optional) If \code{calc_distance = "lcp"}, \code{bathy} is \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. \code{bathy} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in x, y and z directions (m). The surface's resolution is taken to define the distance between horizontally and vertically connected cells and must be the same in both x and y directions. Any cells with NA values (e.g., due to missing data) are treated as `impossible' to move though by the algorithm (see \code{\link[flapper]{lcp_over_surface}}).}
-
 \item{calc_distance_graph}{(optional) If \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in \code{bathy}. If unsupplied, this is taken from \code{archive$args$calc_distance_graph}, if available, or computed via \code{\link[flapper]{lcp_graph_surface}}.}
+
+\item{write_history}{A named list of arguments, passed to \code{\link[base]{saveRDS}}, to write `intermediate' files. The `file' argument should be the directory in which to write files. This argument is currently only implemented for \code{\link[flapper]{pf_archive-class}} objects derived with \code{calc_distance = TRUE} and \code{calc_distance_euclid_fast = TRUE} via \code{\link[flapper]{pf}} for which connected cell pairs need to be derived (i.e., not following a previous implementation of \code{\link[flapper]{pf_simplify}}. If supplied, two directories are created in `file' (1/ and 2/), in which dataframes of the pairwise distances between connected cells and the subset of those  that formed continuous paths from the start to the end of the time series are written, respectively. Files are named by time steps as `pf_1', `pf_2' and so on. Files for each time step are written and re-read from this directory during particle processing. This helps to minimise vector memory requirements because the information for all time steps does not have to be retained in memory at once.}
 
 \item{cl, varlist, use_all_cores}{Parallelisation options for the first stage of the algorithm, which identifies connected cell pairs, associated distances and movement probabilities. The first parallelisation option is to parallelise the algorithm over time steps via \code{cl}. This is a cluster object created by \code{\link[parallel]{makeCluster}} or an integer defining the number of child processes (ignored on Windows) (see \code{\link[pbapply]{pblapply}}). If \code{cl} is supplied, \code{varlist} may be required. This is a character vector of object names to export (see \code{\link[parallel]{clusterExport}}). Exported objects must be located in the global environment. The second parallelisation option is to parallelise shortest distance calculations within time steps via a logical input (\code{TRUE}) to \code{use_all_cores} that is passed to \code{\link[cppRouting]{get_distance_matrix}}. This option is only implemented for \code{calc_distance = "lcp"}.}
 
@@ -36,11 +45,11 @@ pf_simplify(
 
 \item{summarise_pr}{(optional) For \code{return = "archive"}, \code{summarise_pf} is a function or a logical input that defines whether or not (and how) to summarise the probabilities of duplicate cell records for each time step. If a function is supplied, only one record of each sampled cell is returned per time step, with the associated probability calculated from the probabilities of each sample of that cell using the supplied function. For example, \code{summarise_pr = max} returns the most probable sample. Alternatively, if a logical input (\code{summarise_pr = TRUE}) is supplied, only one record of each sampled cell is returned per time step, with the associated probability calculated as the sum of the normalised probabilities of all samples for that cell, rescaled so that the maximum probability takes a score of one. Specifying \code{summarise_pr} is useful for deriving maps of the `probability of use' across an area based on particle histories because it ensures that `probability of use' scores depend on the number of time steps during which an individual could have occupied a location, rather than the total number of samples of that location (see \code{\link[flapper]{pf_plot_map}}). Both \code{summarise_pr = NULL} and \code{summarise_pr = FALSE} suppress this argument.}
 
-\item{max_n_copies}{(optional) For \code{return = "path"}, \code{max_n_copies} is an integer that specifies the maximum number of copies of a sampled cell that are retained at each time stamp. Each copy represents a different route to that cell. By default, all copies (i.e. routes to that cell are retained) via \code{max_n_copies = NULL}. However, in cases where there are a large number of paths through a landscape, the function can run into vector memory limitations during path assembly, so \code{max_n_copies} may need to be set. In this case, at each time step, if there are more than \code{max_n_copies} paths to a given cell, then a subset of these (\code{max_n_copies}) are sampled, according to the \code{sample_method} argument.}
+\item{max_n_copies}{(optional) For \code{return = "path"}, \code{max_n_copies} is an integer that specifies the maximum number of copies of a sampled cell that are retained at each time stamp. Each copy represents a different route to that cell. By default, all copies (i.e. routes to that cell are retained) via \code{max_n_copies = NULL}. However, in cases where there are a large number of paths through a landscape, the function can run into vector memory limitations during path assembly, so \code{max_n_copies} may need to be set. In this case, at each time step, if there are more than \code{max_n_copies} paths to a given cell, then a subset of these (\code{max_n_copies}) are sampled, according to the \code{max_n_copies_sampler} argument.}
 
-\item{sample_method}{(optional) For \code{return = "path"}, if \code{max_n_copies} is supplied, \code{sample_method} is a character that defines the sampling method. Currently supported options are: \code{"random"}, which implements random sampling; \code{"weighted"}, which implements weighted sampling, with random samples taken according to their probability at the current time step; and \code{"max"}, which selects for the top \code{max_n_copies} most likely copies of a given cell according to the probability associated with movement into that cell from the previous location.}
+\item{max_n_copies_sampler}{(optional) For \code{return = "path"}, if \code{max_n_copies} is supplied, \code{max_n_copies_sampler} is a character that defines the sampling method. Currently supported options are: \code{"random"}, which implements random sampling; \code{"weighted"}, which implements weighted sampling, with random samples taken according to their probability at the current time step; and \code{"max"}, which selects for the top \code{max_n_copies} most likely copies of a given cell according to the probability associated with movement into that cell from the previous location.}
 
-\item{max_n_paths}{(optional) For \code{return = "path"}, \code{max_n_paths} is an integer that specifies the maximum number of paths to be reconstructed. During path assembly, following the implementation of \code{max_n_copies} (if provided), \code{max_n_paths} are selected at random at each time step. This option is provided to improve the speed of path assembly in situations with large numbers of paths.}
+\item{max_n_paths}{(optional) For \code{return = "path"}, \code{max_n_paths} is an integer that specifies the maximum number of paths to be reconstructed. During path assembly, following the implementation of \code{max_n_copies} (if provided), \code{max_n_paths} are selected at random at each time step. This option is provided to improve the speed of path assembly in situations with large numbers of paths. \code{max_n_paths = NULL} computes all paths (if possible).}
 
 \item{add_origin}{For \code{return = "path"}, \code{add_origin} is a logical input that defines whether or not to include the origin in the returned dataframe.}
 
@@ -73,7 +82,8 @@ paths_1   <- pf_simplify(dat_dcpf_histories)
 require(magrittr)
 require(rlang)
 paths_1 <-
-  paths_1 \%>\% dplyr::group_by(.data$path_id) \%>\%
+  paths_1 \%>\%
+  dplyr::group_by(.data$path_id) \%>\%
   dplyr::mutate(cell_xp = dplyr::lag(.data$cell_x),
                 cell_yp = dplyr::lag(.data$cell_y),
                 cell_dist_chk = sqrt((.data$cell_xp - .data$cell_x)^2 +
@@ -104,18 +114,26 @@ pf_plot_2d(paths_1, dat_dcpf_histories$args$bathy,
 pf_plot_3d(paths_1, dat_dcpf_histories$args$bathy)
 
 #### Example (2): Re-calculate distances using another method
+# For this example, we need to increase the number of particles
+# ... for Euclidean-based sampling to generate viable paths
+# ... when we consider shortest distances
+set.seed(1)
+dcpf_args <- dat_dcpf_histories$args
+dcpf_args$calc_distance_euclid_fast <- TRUE
+dcpf_args$n <- 50
+out_dcpf_2a <- do.call(pf, dcpf_args)
 # Use shortest distances:
-paths_2a <- pf_simplify(dat_dcpf_histories, calc_distance = "lcp")
+paths_2a <- pf_simplify(out_dcpf_2a, calc_distance = "lcp")
 # Speed up shortest distance calculations by supplying the graph object:
-costs <- lcp_costs(dat_dcpf_histories$args$bathy)
-graph <- lcp_graph_surface(dat_dcpf_histories$args$bathy, costs$dist_total)
-paths_2b <- pf_simplify(dat_dcpf_histories,
+costs <- lcp_costs(out_dcpf_2a$args$bathy)
+graph <- lcp_graph_surface(out_dcpf_2a$args$bathy, costs$dist_total)
+paths_2b <- pf_simplify(out_dcpf_2a,
                           calc_distance = "lcp",
                           calc_distance_graph = graph)
 
 ## Demonstrate the LCP calculations are correct
 paths_2d_lcps <- lcp_interp(paths_2b,
-                            dat_dcpf_histories$args$bathy,
+                            out_dcpf_2a$args$bathy,
                             calc_distance = TRUE)
 head(cbind(paths_2b$dist, paths_2d_lcps$dist_lcp$dist))
 
@@ -137,21 +155,21 @@ unique(paths_3c$path_id)
 # ... more particles.
 paths_4a <- pf_simplify(dat_dcpf_histories,
                           max_n_copies = 5,
-                          sample_method = "random")
+                          max_n_copies_sampler = "random")
 paths_4b <- pf_simplify(dat_dcpf_histories,
                           max_n_copies = 5,
-                          sample_method = "weighted")
+                          max_n_copies_sampler = "weighted")
 paths_4c <- pf_simplify(dat_dcpf_histories,
                           max_n_copies = 5,
-                          sample_method = "max")
+                          max_n_copies_sampler = "max")
 # Compare retained paths
 pf_loglik(paths_3a)
 pf_loglik(paths_3b)
 pf_loglik(paths_3c)
 
 #### Example (5): Set the maximum number of paths for reconstruction (for speed)
-# Reconstruct all paths
-unique(pf_simplify(dat_dcpf_histories)$path_id)
+# Reconstruct all paths (note you may experience vector memory limitations)
+# unique(pf_simplify(dat_dcpf_histories, max_n_paths = NULL)$path_id)
 # Reconstruct one path
 unique(pf_simplify(dat_dcpf_histories, max_n_paths = 1)$path_id)
 # Reconstruct (at most) five paths
@@ -168,7 +186,7 @@ raster::xyFromCell(dat_dcpf_histories$args$bathy,
                    raster::cellFromXY(dat_dcpf_histories$args$bathy,
                                       dat_dcpf_histories$args$origin))
 head(paths_5a)
-# If specified, the origin is dropped with add_origin = FALS
+# If specified, the origin is dropped with add_origin = FALSE
 paths_5b <- pf_simplify(dat_dcpf_histories, add_origin = FALSE)
 head(paths_5b)
 
