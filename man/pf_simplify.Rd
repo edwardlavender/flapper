@@ -11,6 +11,12 @@ pf_simplify(
   bathy = NULL,
   calc_distance = NULL,
   calc_distance_graph = NULL,
+  calc_distance_limit = NULL,
+  calc_distance_barrier = NULL,
+  calc_distance_algorithm = "bi",
+  calc_distance_constant = 1,
+  mobility = NULL,
+  mobility_from_origin = mobility,
   write_history = NULL,
   cl = NULL,
   varlist = NULL,
@@ -31,15 +37,23 @@ pf_simplify(
 
 \item{max_n_particles_sampler}{If \code{max_n_particles} is supplied, \code{max_n_particles_sampler} is a character that defines the sampling method. Currently supported options are: \code{"random"}, which implements random sampling; \code{"weighted"}, which implements weighted sampling, with random samples taken according to their probability at the current time step; and \code{"max"}, which selects the top \code{max_n_particles} most likely particles.}
 
-\item{bathy}{(optional) \code{bathy} is \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. \code{bathy} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in x, y and z directions (m). If \code{calc_distance = "lcp"}, the surface's resolution is taken to define the distance between horizontally and vertically connected cells and must be the same in both x and y directions. Any cells with NA values (e.g., due to missing data) are treated as `impossible' to move though by the algorithm (see \code{\link[flapper]{lcp_over_surface}}). If unsupplied, \code{bathy} can be extracted from \code{archive}, if available.}
+\item{bathy}{A \code{\link[raster]{raster}} that defines the grid across the area within which the individual could have moved. \code{bathy} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in x and y directions. If \code{calc_distance = "lcp"}, the surface's resolution is taken to define the distance between horizontally and vertically connected cells and must be the same in both x and y directions. Any cells with NA values (e.g., due to missing data) are treated as `impossible' to move though by the algorithm (see \code{\link[flapper]{lcp_over_surface}}). If unsupplied, \code{bathy} can be extracted from \code{archive}, if available.}
 
-\item{calc_distance}{A character that defines the method used to calculate distances between sequential combinations of particles (see \code{\link[flapper]{pf}}). Currently supported options are Euclidean distances (\code{"euclid"}) or shortest (least-cost) distances ("lcp"). Note that \code{calc_distance} does not need to be the same method as used for \code{\link[flapper]{pf}}: it is often computationally beneficial to implement \code{\link[flapper]{pf}} using Euclidean distances and then, for the subset of sampled particles, implement \code{\link[flapper]{pf_simplify}} with \code{calc_distance = "lcp"} to re-compute distances using the shortest-distances algorithm, along with the adjusted probabilities. However, for large paths, the quickest option is to implement both functions using \code{calc_distance = "euclid"} and then interpolate shortest paths only for the set of returned paths (see \code{\link[flapper]{lcp_interp}}). If \code{calc_distance = NULL}, the method saved in \code{archive} is used.}
+\item{calc_distance}{A character that defines the method used to calculate distances between sequential combinations of particles (see \code{\link[flapper]{pf}}). Currently supported options are Euclidean distances (\code{"euclid"}) or shortest (least-cost) distances ("lcp"). In practice, Euclidean distances are calculated and then, for the subset of connections that meet specified criteria (see \code{calc_distance_limit}, \code{calc_distance_barrier}, \code{mobility_from_origin} and \code{mobility}), Euclidean distances are updated to shortest distances, if specified. Note that \code{calc_distance} does not need to be the same method as used for \code{\link[flapper]{pf}}: it is often computationally beneficial to implement \code{\link[flapper]{pf}} using Euclidean distances and then, for the subset of sampled particles, implement \code{\link[flapper]{pf_simplify}} with \code{calc_distance = "lcp"} to re-compute distances using the shortest-distances algorithm, along with the adjusted probabilities. However, for large paths, the quickest option is to implement both functions using \code{calc_distance = "euclid"} and then interpolate shortest paths only for the set of returned paths (see \code{\link[flapper]{lcp_interp}}). If \code{calc_distance = NULL}, the method saved in \code{archive} is used.}
 
 \item{calc_distance_graph}{(optional) If \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in \code{bathy}. If unsupplied, this is taken from \code{archive$args$calc_distance_graph}, if available, or computed via \code{\link[flapper]{lcp_graph_surface}}.}
 
+\item{calc_distance_limit}{(optional) If \code{calc_distance = "lcp"}, \code{calc_distance_limit} is a number that defines the lower Euclidean distance limit for shortest-distances calculations. If supplied, shortest distances are only calculated for cell connections that are more than a Euclidean distance of \code{calc_distance_limit} apart. In other words, if supplied, it is assumed that there exists a valid shortest path (shorter than the maximum distance imposed by the animal's mobility constraints) if the Euclidean distance between two points is less than \code{calc_distance_limit} (unless that segment crosses a barrier: see \code{calc_distance_barrier}). This option can improve the speed of distance calculations.}
+
+\item{calc_distance_barrier}{(optional) If \code{calc_distance = "lcp"}, \code{calc_distance_barrier} is a  simple feature geometry that defines a barrier, such as the coastline, to movement (see \code{\link[flapper]{segments_cross_barrier}}). The coordinate reference system for this object must match \code{bathy}. If supplied, shortest distances are only calculated for segments that cross a barrier (or exceed \code{calc_distance_limit}). This option can improve the speed of distance calculations.}
+
+\item{calc_distance_algorithm, calc_distance_constant}{Additional shortest-distance calculation options (see \code{\link[cppRouting]{get_distance_pair}}). \code{calc_distance_algorithm} is a character that defines the algorithm: \code{"Dijkstra"}, \code{"bi"}, \code{"A*"} or \code{"NBA"} are supported. \code{calc_distance_constant} is the numeric constant required to maintain the heuristic function admissible in the A* and NBA algorithms. For shortest distances (based on costs derived via \code{\link[flapper]{lcp_costs}}), the default (\code{calc_distance_constant = 1}) is appropriate.}
+
+\item{mobility, mobility_from_origin}{(optional) The mobility parameters (see \code{\link[flapper]{pf}}). If unsupplied, these can be extracted from \code{archive}, if available. However, even if \code{\link[flapper]{pf}} was implemented without these options, it is beneficial to specify mobility limits here (especially if \code{calc_distance = "lcp"}) because they restrict the number of calculations that are required (for example, for shortest distances, at each time step, distances are only calculated for the subset of particle connections below \code{mobility_from_origin} or \code{mobility} in distance).}
+
 \item{write_history}{A named list of arguments, passed to \code{\link[base]{saveRDS}}, to write `intermediate' files. The `file' argument should be the directory in which to write files. This argument is currently only implemented for \code{\link[flapper]{pf_archive-class}} objects derived with \code{calc_distance = TRUE} and \code{calc_distance_euclid_fast = TRUE} via \code{\link[flapper]{pf}} for which connected cell pairs need to be derived (i.e., not following a previous implementation of \code{\link[flapper]{pf_simplify}}. If supplied, two directories are created in `file' (1/ and 2/), in which dataframes of the pairwise distances between connected cells and the subset of those  that formed continuous paths from the start to the end of the time series are written, respectively. Files are named by time steps as `pf_1', `pf_2' and so on. Files for each time step are written and re-read from this directory during particle processing. This helps to minimise vector memory requirements because the information for all time steps does not have to be retained in memory at once.}
 
-\item{cl, varlist, use_all_cores}{Parallelisation options for the first stage of the algorithm, which identifies connected cell pairs, associated distances and movement probabilities. The first parallelisation option is to parallelise the algorithm over time steps via \code{cl}. This is a cluster object created by \code{\link[parallel]{makeCluster}} or an integer defining the number of child processes (ignored on Windows) (see \code{\link[pbapply]{pblapply}}). If \code{cl} is supplied, \code{varlist} may be required. This is a character vector of object names to export (see \code{\link[parallel]{clusterExport}}). Exported objects must be located in the global environment. The second parallelisation option is to parallelise shortest distance calculations within time steps via a logical input (\code{TRUE}) to \code{use_all_cores} that is passed to \code{\link[cppRouting]{get_distance_matrix}}. This option is only implemented for \code{calc_distance = "lcp"}.}
+\item{cl, varlist, use_all_cores}{Parallelisation options for the first stage of the algorithm, which identifies connected cell pairs, associated distances and movement probabilities. The first parallelisation option is to parallelise the algorithm over time steps via \code{cl}. This is a cluster object created by \code{\link[parallel]{makeCluster}} or an integer defining the number of child processes (ignored on Windows) (see \code{\link[pbapply]{pblapply}}). If \code{cl} is supplied, \code{varlist} may be required. This is a character vector of object names to export (see \code{\link[parallel]{clusterExport}}). Exported objects must be located in the global environment. The second parallelisation option is to parallelise shortest-distance calculations within time steps via a logical input (\code{TRUE}) to \code{use_all_cores} that is passed to \code{\link[cppRouting]{get_distance_matrix}}. This option is only implemented for \code{calc_distance = "lcp"}.}
 
 \item{return}{A character (\code{return = "path"} or \code{return = "archive"}) that defines the type of object that is returned (see Details).}
 
@@ -113,7 +127,9 @@ pf_plot_2d(paths_1, dat_dcpf_histories$args$bathy,
 # 3-d visualisation
 pf_plot_3d(paths_1, dat_dcpf_histories$args$bathy)
 
-#### Example (2): Re-calculate distances using another method
+#### Example (2): Re-calculate distances as shortest distances
+
+## Implement flapper::pf()
 # For this example, we need to increase the number of particles
 # ... for Euclidean-based sampling to generate viable paths
 # ... when we consider shortest distances
@@ -121,21 +137,82 @@ set.seed(1)
 dcpf_args <- dat_dcpf_histories$args
 dcpf_args$calc_distance_euclid_fast <- TRUE
 dcpf_args$n <- 50
-out_dcpf_2a <- do.call(pf, dcpf_args)
-# Use shortest distances:
-paths_2a <- pf_simplify(out_dcpf_2a, calc_distance = "lcp")
-# Speed up shortest distance calculations by supplying the graph object:
-costs <- lcp_costs(out_dcpf_2a$args$bathy)
-graph <- lcp_graph_surface(out_dcpf_2a$args$bathy, costs$dist_total)
-paths_2b <- pf_simplify(out_dcpf_2a,
-                          calc_distance = "lcp",
-                          calc_distance_graph = graph)
+out_dcpf_2 <- do.call(pf, dcpf_args)
+
+## Implement pf_simplify() using shortest distances
+paths_2 <- pf_simplify(out_dcpf_2, calc_distance = "lcp")
+# ... Duration: ~ 0.655 s
+system.time(
+  invisible(utils::capture.output(
+    pf_simplify(out_dcpf_2, calc_distance = "lcp")
+    ))
+  )
 
 ## Demonstrate the LCP calculations are correct
-paths_2d_lcps <- lcp_interp(paths_2b,
-                            out_dcpf_2a$args$bathy,
+paths_2_lcps <- lcp_interp(paths_2,
+                            out_dcpf_2$args$bathy,
                             calc_distance = TRUE)
-head(cbind(paths_2b$dist, paths_2d_lcps$dist_lcp$dist))
+head(cbind(paths_2$dist, paths_2_lcps$dist_lcp$dist))
+
+## Trial options for increasing speed of shortest-distance calculations
+# Speed up shortest-distance calculations via (a) the graph:
+# ... Duration: ~0.495 s
+# ... Note that you may achieve further speed improvements via
+# ... a simplified/contracted graph
+# ... ... see cppRouting::cppRouting::cpp_simplify()
+# ... ... see cppRouting::cpp_contract()
+costs <- lcp_costs(out_dcpf_2$args$bathy)
+graph <- lcp_graph_surface(out_dcpf_2$args$bathy, costs$dist_total)
+system.time(
+  invisible(utils::capture.output(
+    pf_simplify(out_dcpf_2,
+                calc_distance = "lcp",
+                calc_distance_graph = graph)
+  ))
+)
+# Speed up shortest-distance calculations via (b) the lower Euclid dist limit
+# ... Duration: ~0.493 s
+costs <- lcp_costs(out_dcpf_2$args$bathy)
+graph <- lcp_graph_surface(out_dcpf_2$args$bathy, costs$dist_total)
+system.time(
+  invisible(utils::capture.output(
+    pf_simplify(out_dcpf_2,
+                calc_distance = "lcp",
+                calc_distance_graph = graph,
+                calc_distance_limit = 100)
+  ))
+)
+# Speed up shortest-distance calculations via (c) the barrier
+# ... Duration: ~1.411 s (much slower in this example)
+coastline <- sf::st_as_sf(dat_coast)
+sf::st_crs(coastline) <- NA
+system.time(
+  invisible(utils::capture.output(
+    pf_simplify(out_dcpf_2,
+                calc_distance = "lcp",
+                calc_distance_graph = graph,
+                calc_distance_limit = 100,
+                calc_distance_barrier = coastline)
+  ))
+)
+# Speed up calculations via (d) mobility limits
+# ... (In the examples above, the mobility parameters
+# ... can be extracted from out_dcpf_2,
+# ... so specifying them directly here in this example makes
+# ... no material difference, but this is not necessarily the case
+# ... if pf() has been implemented without mobility parameters).
+system.time(
+  invisible(utils::capture.output(
+    pf_simplify(out_dcpf_2,
+                calc_distance = "lcp",
+                calc_distance_graph = graph,
+                calc_distance_limit = 100,
+                mobility = 200,
+                mobility_from_origin = 200)
+  ))
+)
+# Speed up calculations via (e) parallelisation
+# ... see the details in the documentation.
 
 #### Example (3): Restrict the number of routes to each cell at each time step
 # Implement approach for different numbers of copies

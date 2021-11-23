@@ -459,3 +459,95 @@ sim_surface <- function(blank,
   return(surface)
 }
 
+
+######################################
+######################################
+#### segments_cross_barrier()
+
+#' @title Determine if Euclidean path segments cross a barrier
+#' @description Given a sequence of `starting' and `ending' positions, this function determines whether or not the Euclidean path between each starting and ending position crosses a barrier.
+#'
+#' @param start A two-column matrix of coordinates that defines the `start' location of each segment.
+#' @param end A two-column matrix of coordinates that defines the `end' location of each segment.
+#' @param barrier A simple feature geometry that defines the barrier (see \code{\link[sf]{st_intersects}}).
+#'
+#' @details
+#'
+#' This function was motivated by the need to support internal routines in \code{\link[flapper]{pf_simplify}}.
+#'
+#' The number of observations in \code{start} and \code{end} must match.
+#'
+#' The coordinate reference system for \code{start}, \code{end} and \code{barrier} must match.
+#'
+#' The function requires the \code{\link[sfheaders]{sf_linestring}} and \code{\link[sf]{st_intersects}} functions.
+#'
+#' For speed in iterative applications, the function does not check whether or not these criteria are met.
+#'
+#' @return The function returns a one-column matrix, with each row corresponding to a row in \code{start}/\code{end}, with a logical value that defines whether or not the Euclidean path segment connecting those two locations crosses the \code{barrier} (\code{TRUE}) or not (\code{FALSE}).
+#'
+#' @examples
+#' ## Plot example area
+#' raster::plot(dat_gebco)
+#' raster::lines(dat_coast)
+#'
+#' ## Define example starting and ending locations
+#' start <- matrix(c(701854.9, 6260399,
+#'                   709202.5, 6258892), ncol = 2, byrow = TRUE)
+#' end <- matrix(c(706753.3, 6264261,
+#'                 709673.5, 6257102), ncol = 2, byrow = TRUE)
+#'
+#' ## Visualise segments
+#' # ... The first segment crosses the coastline (our barrier)
+#' # ... The second segment does not cross the coastline (our barrier)
+#' graphics::arrows(x0 = start[1, 1], y0 = start[1, 2],
+#'                  x1 = end[1, 1], y1 = end[1, 2])
+#' graphics::arrows(x0 = start[2, 1], y0 = start[2, 2],
+#'                  x1 = end[2, 1], y1 = end[2, 2])
+#'
+#' ## Implement function
+#' barrier <- sf::st_as_sf(dat_coast)
+#' sf::st_crs(barrier) <- NA
+#' segments_cross_barrier(start, end, barrier = barrier)
+#'
+#' @return Edward Lavender
+#' @export
+
+segments_cross_barrier <- function(start, end, barrier){
+
+  ## Define point boundaries
+  xlim <- range(c(start[, 1], end[, 1]))
+  ylim <- range(c(start[, 2], end[, 2]))
+  boundaries <- matrix(c(xlim[1], ylim[1],
+                         xlim[2], ylim[1],
+                         xlim[2], ylim[2],
+                         xlim[1], ylim[2]), ncol = 2, byrow = TRUE)
+  boundaries <- rbind(boundaries, boundaries[1, , drop = FALSE])
+  boundaries <- sf::st_polygon(list(boundaries))
+  # plot(boundaries)
+
+  ## Option (1): If the points' boundaries contain barrier(s),
+  # ... we will work out for each line whether or not it crosses the barrier
+  if(sf::st_intersects(boundaries, barrier, sparse = FALSE)){
+    # Define point matrices as dataframes
+    start <- data.frame(start[, 1:2])
+    end   <- data.frame(end[, 1:2])
+    colnames(start) <- colnames(end) <- c("x", "y")
+    # Assign line IDs
+    start$linestring_id <- end$linestring_id <- seq_len(nrow(start))
+    # Define lines
+    lines <-
+      dplyr::bind_rows(start, end) %>%
+      dplyr::arrange(.data$linestring_id)
+    lines <- sfheaders::sf_linestring(lines,
+                                      x = "x", y = "y",
+                                      linestring_id = "linestring_id")
+    # Get intersection
+    return(sf::st_intersects(lines, barrier, sparse = FALSE))
+
+  ## Option (2): If the points' boundaries do not enclose any barriers
+  # ... then none of the Euclidean paths can cross the barrier
+  } else {
+    return(matrix(FALSE, nrow = nrow(start), ncol = 1))
+  }
+
+}

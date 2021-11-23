@@ -13,7 +13,7 @@ Imports:
     Tools4ETS
 Suggests:
     plyr, tidyr, stringr, 
-    fasterRaster,
+    fasterRaster, sf, sfheaders,
     glatos,
     plotly, animation, scales, viridis,
     circular, 

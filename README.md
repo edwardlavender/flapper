@@ -238,6 +238,8 @@ ecological investigations and space use algorithms:
     code from the [greenbrown](http://greenbrown.r-forge.r-project.org)
     package);
   - `update_extent()`shrinks or inflates an extent object;
+  - `segments_cross_barrier()` determines if Euclidean path segments
+    cross a barrier;
 
 ## Distance calculations
 

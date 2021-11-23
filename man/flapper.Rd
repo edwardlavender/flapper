@@ -46,6 +46,7 @@ Some functions facilitate spatial operations that support ecological investigati
   \item \link{sim_surface} populates a \code{\link[raster]{raster}} with simulated values;
   \item \link{split_raster_equally} splits a \code{\link[raster]{raster}} into equal pieces (using code from the greenbrown (http://greenbrown.r-forge.r-project.org) package);
   \item \link{update_extent} shrinks or inflates an extent object;
+  \item \link{segments_cross_barrier} determines if Euclidean path segments cross a barrier;
 }
 }
 
