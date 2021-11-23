@@ -159,7 +159,7 @@ head(cbind(paths_2$dist, paths_2_lcps$dist_lcp$dist))
 # ... Duration: ~0.495 s
 # ... Note that you may achieve further speed improvements via
 # ... a simplified/contracted graph
-# ... ... see cppRouting::cppRouting::cpp_simplify()
+# ... ... see cppRouting::cpp_simplify()
 # ... ... see cppRouting::cpp_contract()
 costs <- lcp_costs(out_dcpf_2$args$bathy)
 graph <- lcp_graph_surface(out_dcpf_2$args$bathy, costs$dist_total)
