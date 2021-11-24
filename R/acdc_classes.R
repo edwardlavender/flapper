@@ -39,7 +39,7 @@
 #' \subsection{(ii) record$spatial}{If \code{save_record_spatial > 0}, then for those time steps specified by \code{save_record_spatial}, each element in `record' contains a `spatial' list, with one element for each secondary time stamp, that records spatial information pertaining to the possible locations of the individual at that time step. For all algorithms, each `spatial' list includes the following elements:
 #' \itemize{
 #'   \item `map_timestep' is a RasterLayer of all the positions that the individual could have occupied at that time step, given the algorithm;
-#'   \item `map_cumulative' is a RasterLayer of the cumulative of the number of times when the movement data were compatible with the individual being in that cell, under the specified algorithm, from all previous time steps up to the current time step (i.e., the sum of `map_timestep' across all time steps from the first time step to the current time step) (unless \code{normalise = TRUE} in which case the intepretation differs);
+#'   \item `map_cumulative' is a RasterLayer of the cumulative of the number of times when the movement data were compatible with the individual being in that cell, under the specified algorithm, from all previous time steps up to the current time step (i.e., the sum of `map_timestep' across all time steps from the first time step to the current time step) (unless \code{normalise = TRUE} in which case the interpretation differs);
 #' }
 #' For the AC* algorithms, this list also includes information on the acoustic centroids:
 #' \itemize{

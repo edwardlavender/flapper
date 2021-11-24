@@ -131,7 +131,7 @@ pf_setup_record <- function(root, type = c("acs", "dc"), use_absolute_paths = FA
 #### pf_setup_optimisers()
 
 #' @title Optimisation settings for \code{\link[flapper]{pf}}
-#' @description This function defines optimisation settings for \code{\link[flapper]{pf}}. These settings control under-the-hood implememtation routines in \code{\link[flapper]{pf}} that may improve computation time if adjusted.
+#' @description This function defines optimisation settings for \code{\link[flapper]{pf}}. These settings control under-the-hood implementation routines in \code{\link[flapper]{pf}} that may improve computation time if adjusted.
 #'
 #' @param use_raster_operations (experimental) A logical input that defines whether or not to use \code{\link[raster]{raster}} operations, where applicable (e.g., \code{\link[raster]{calc}}), which are memory-safe, or to extract \code{\link[raster]{raster}} values into a \code{\link[data.table]{data.table}} and perform arithmetic operations on the \code{\link[data.table]{data.table}}. This option is only implemented for the `fast Euclidean distances' method in \code{\link[flapper]{pf}}. Trials suggest that \code{use_raster_operations = FALSE} does not improve computation time.
 #' @param use_calc_distance_euclid_backend_grass A logical input that defines whether or not to use GRASS as the backend for Euclidean distances calculations in \code{\link[flapper]{pf}}. The default is \code{FALSE}, in which case \code{\link[raster]{distanceFromPoints}} is used for these calculations. If \code{TRUE}, the \code{\link[fasterRaster]{fasterRaster}} package is required and \code{\link[fasterRaster]{fasterVectToRastDistance}} is used instead.

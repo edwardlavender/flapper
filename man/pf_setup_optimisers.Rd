@@ -21,7 +21,7 @@ pf_setup_optimisers(
 The function returns \code{pf_optimiser} S3 class object, which is simply a named list of optimisation options that can be passed to \code{\link[flapper]{pf}} via the \code{optimisers} argument.
 }
 \description{
-This function defines optimisation settings for \code{\link[flapper]{pf}}. These settings control under-the-hood implememtation routines in \code{\link[flapper]{pf}} that may improve computation time if adjusted.
+This function defines optimisation settings for \code{\link[flapper]{pf}}. These settings control under-the-hood implementation routines in \code{\link[flapper]{pf}} that may improve computation time if adjusted.
 }
 \details{
 \code{\link[flapper]{pf}} is a computationally intensive routine. To reduce computation time, the most effective approaches are to minimise data volume and reduce the size (dimensions and/or resolution) of the grid over which particle filtering is implemented; use the `fast Euclidean distances' method for distance calculations; and minimise the number of particles. For small numbers of particles, it may be faster to specify the \code{mobility} parameter; for large numbers of particles, it is probably faster to set \code{mobility = NULL}. Adjusting \code{\link{raster}{rasterOptions}} such as \code{chunksize} and/or \code{maxmemory} may help in some circumstances too. Following optimisation of these settings, \code{\link[flapper]{pf_setup_optimisers}} facilitates the adjustment of under-the-hood implementation routines which may further reduce computation time in some settings.
