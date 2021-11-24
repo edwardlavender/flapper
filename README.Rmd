@@ -128,6 +128,7 @@ Often, Euclidean distances may not be a suitable representation of distance. Thi
 * `lcp_from_point()` calculates least-cost distances from a point on a raster to all of the other cells of a raster; 
 * `lcp_over_surface()` calculates shortest path(s) and/or the distances of the shortest path(s) over a surface between origin and destination coordinates;
 * `lcp_interp()` interpolates paths between sequential locations using least-cost paths analysis;
+* `lcp_comp()` compares Euclidean and shortest distance metrics for an area; 
 
 ## Detection statistics
 

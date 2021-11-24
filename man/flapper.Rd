@@ -68,6 +68,7 @@ Some functions facilitate distance calculations, including the calculation of di
     \item \link{lcp_from_point} calculates least-cost distances from a point on a \code{\link[raster]{raster}} to all of the other cells of a \code{\link[raster]{raster}};
     \item \link{lcp_over_surface} calculates the shortest path(s) and/or the distances of the shortest path(s) over a surface between origin and destination coordinates;
     \item \link{lcp_interp} interpolates paths between sequential locations using least-cost paths analysis;
+    \item \link{lcp_comp} compares Euclidean and shortest distance metrics for an area;
   }
 }
 }

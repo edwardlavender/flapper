@@ -1606,3 +1606,382 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
   return(out)
 
 }
+
+
+######################################
+######################################
+#### lcp_comp()
+
+#' @title Compare Euclidean and shortest distances
+#' @description This function compares Euclidean distances to shortest distances for randomly sampled pairs of points across a \code{\link[raster]{raster}}.
+#'
+#' @param surface A \code{\link[raster]{raster}} from which to sample locations and calculate distances. The \code{surface} must be planar with units of metres in x, y and z directions. The \code{\link[raster]{resolution}}  must be the same in both x and y directions (see \code{\link[flapper]{lcp_over_surface}}). If applicable, the \code{surface} should be masked by \code{barrier} (see \code{\link[flapper]{mask_io}}) prior to implementation of this function.
+#' @param barrier (optional) A simple features geometry that defines a barrier (see \code{\link[flapper]{segments_cross_barrier}}). If supplied, the function determines whether or not each sampled pair of coordinates crosses the barrier.
+#' @param distance A numeric vector of distances. If supplied, for each distance, \code{n} location pairs that are that approximately that distance apart (see \code{interval}) are sampled and, for each pair, Euclidean and shortest distances are calculated. If supplied, \code{mobility} should not be supplied (see below).
+#' @param interval If \code{distance} is supplied, \code{interval} is a number that defines the range of distances around each distance that are admissible. For example, if \code{distance = 50} (m) and \code{interval = 5}, \code{n} location pairs that are within 45--55 m of each other are sampled.
+#' @param mobility (optional) A number that defines the maximum distance between sampled locations. If supplied, \code{n} locations are sampled; the Euclidean distances between all combinations of locations are calculated; and for the location pairs for which the Euclidean distance is less than \code{mobility} (up to a maximum of \code{n_max} pairs), shortest distances are calculated. This method is potentially fast the \code{distance}-vector-based method that is implemented is \code{distance} is supplied, but the final number of locations cannot be predetermined. If supplied, \code{distance} should not be supplied (see above).
+#' @param n An integer that defines (a) the number of location pairs for each \code{distance} or (b) the initial number of sampled locations if \code{mobility} is supplied.
+#' @param n_max If \code{mobility} is supplied, \code{n_max} is an integer that defines the maximum number of location pairs for which shortest distances are calculated.
+#' @param graph (optional) A graph object that defines cell nodes and edge costs for connected cells within the surface (see \code{\link[flapper]{lcp_graph_surface}}). This is used for shortest-distance calculations.
+#' @param ... Additional arguments passed to \code{\link[cppRouting]{get_distance_pair}} for shortest-distance calculations (\code{algorithm}, \code{constant} and/or \code{allcores}).
+#' @param cl,varlist Parallelisation options for distance-based location sampling (i.e., if \code{distance != NULL}). \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}}. \code{varlist} is a character vector of object names to export (see \code{\link[parallel]{clusterExport}}). Exported objects must be located in the global environment.
+#' @param verbose A logical input that defines whether or not to print messages to the console to monitor function progress.
+#'
+#' @details This function was motivated by the need to determine the extent to which Euclidean distances are a suitable approximation of shortest distances in movement models for benthic animals.
+#'
+#' To address this issue, this function samples multiple pairs of points on a \code{\link[raster]{raster}} (\code{surface}) and compares the Euclidean and shortest distances between sampled locations.
+#'
+#' Two sampling methods are implemented. The first method (implemented if \code{distance} is supplied), samples \code{n} pairs of points for each distance that are approximately that distance apart. (Sampling across a grid is approximate because grid resolution is finite. The approximation is controlled by the \code{interval} parameter.) The advantage of this method is that the number of sampled location pairs for which Euclidean and shortest distances are compared is predetermined (by \code{n}), but the method can be slow if \code{n} is large. The second method (implemented if \code{mobility} is supplied), simply samples \code{n} locations and calculates the Euclidean distances between all combinations of sampled locations. Any location pairs that are more than \code{mobility} apart are then dropped and for the remaining location pairs (up to a maximum of \code{n_max} randomly sampled pairs) shortest distances are calculated. A potential advantage of this method is speed, but the number of location pairs below \code{mobility} for which Euclidean and shortest distances can be compared is not predetermined.
+#'
+#' Regardless of sampling method, the expectation for the analysis is that at short Euclidean distances, Euclidean distances are likely to approximate shortest distances well (unless there is a barrier, such as the coastline, in the way). At longer Euclidean distances, shortest distances are likely to become much longer than Euclidean distances. For some movement frameworks, especially the particle filtering (\code{\link[flapper]{pf}}) and processing (\code{\link[flapper]{pf_simplify}}) routines in \code{\link[flapper]{flapper}}, the Euclidean distance at which the shortest distances start to exceed the distance that an animal could move (over some time interval of interest) is an important parameter (termed \code{calc_distance_limit} in \code{\link[flapper]{pf_simplify}}). For sampled locations that are a Euclidean distance less than this threshold apart, it is reasonable to assume that there exists a `valid' shortest path over the \code{surface}, given the animal's mobility, without having to calculate that path; for sampled locations that are a Euclidean distance more than this threshold apart, this assumption is not valid. For areas with a clear-cut threshold, for Euclidean-based sampling frameworks (see \code{\link[flapper]{pf}}), it may be reasonable to reduce the animal's mobility to the threshold value to account for this difference; in other cases, it may be necessary to compute shortest distances for potentially problematic locations. Either way, an understanding of the extent to which Euclidean distances effectively approximate shortest distances at spatial scales relevant to an animal can help to minimise the number of shortest-distance calculations that are required within a movement modelling framework (which are much more computationally demanding than Euclidean-based calculations).
+#'
+#' @return The function returns a dataframe with sampled location pairs and the Euclidean and shortest distances between them. This contains the following columns:
+#' \itemize{
+#'   \item index -- A number that defines the row.
+#'   \item id -- If \code{distance} is specified, \code{id} is number that defines the sample (from \code{1:n} for each \code{distance}).
+#'   \item cell_x0, cell_y0, cell_x1, cell_y1 -- Numbers that define the coordinates of sampled locations.
+#'   \item cell_id0, cell_id1 -- Integers that define the cell IDs for sampled locations.
+#'   \item dist_sim -- If \code{distance} is specified, \code{dist_sim} is a number that defines the specified distance.
+#'   \item dist_euclid -- A number that defines the Euclidean distance from \code{(cell_x0, cell_y0)} to \code{(cell_x1, cell_y1)}.
+#'   \item dist_lcp -- A number that defines the shortest distance from \code{(cell_x0, cell_y0)} to \code{(cell_x1, cell_y1)}.
+#'   \item barrier -- If applicable, \code{barrier} is factor that defines whether (\code{"1"}) or not (\code{"0"}) the Euclidean line connecting \code{(cell_x0, cell_y0)} and \code{(cell_x1, cell_y1)} crosses the \code{barrier}.
+#' }
+#'
+#' @examples
+#' #### Define surface for examples
+#' # We will focus on a relatively small area for speed
+#' # The raster resolution should be equal in x and y directions
+#' bathy      <- dat_gebco
+#' boundaries <- raster::extent(700652.2, 708401.2, 6262905, 6270179)
+#' blank      <- raster::raster(boundaries, res = c(5, 5))
+#' bathy      <- raster::resample(bathy, blank)
+#' bathy      <- mask_io(bathy, dat_coast, mask_inside = TRUE)
+#' # raster::plot(bathy)
+#' # raster::lines(dat_coast)
+#'
+#' #### Define barrier to movement
+#' coastline <- raster::crop(dat_coast, raster::extent(bathy))
+#' coastline <- sf::st_as_sf(coastline)
+#'
+#' #### Define graph for shortest-distance calculations
+#' bathy_costs <- lcp_costs(bathy)                                 # ~0.38 mins
+#' bathy_graph <- lcp_graph_surface(bathy, bathy_costs$dist_total) # ~0.26 mins
+#'
+#' #### Example (1): Distance-vector-based implementation
+#'
+#' ## Implement function
+#' out_1 <- lcp_comp(surface = bathy,
+#'                   distance = c(50, 100),
+#'                   graph = bathy_graph,
+#'                   barrier = coastline)
+#'
+#' ## Examine outputs
+#' # The function returns a dataframe
+#' utils::str(out_1)
+#'
+#' ## Visualise sampled locations on map
+#' raster::plot(bathy)
+#' raster::lines(dat_coast)
+#' invisible(lapply(split(out_1, seq_len(nrow(out_1))), function(d){
+#'   arrows(x0 = d$cell_x0, y0 = d$cell_y0,
+#'          x1 = d$cell_x1, y1 = d$cell_y1, length = 0.01, lwd = 2)
+#' }))
+#'
+#' ## Compare simulated, Euclidean and shortest distances
+#' pp <- graphics::par(mfrow = c(1, 2))
+#' prettyGraphics::pretty_plot(out_1$dist_sim, out_1$dist_euclid,
+#'                             xlab = "Distance (simulated) [m]",
+#'                             ylab = "Distance (Euclidean)[m]")
+#' graphics::abline(0, 1)
+#' prettyGraphics::pretty_plot(out_1$dist_euclid, out_1$dist_lcp,
+#'                             xlab = "Distance (Euclidean) [m]",
+#'                             ylab = "Distance (shortest) [m]")
+#' graphics::abline(0, 1)
+#' graphics::par(pp)
+#'
+#' #### Example (2): Distance-vector-based implementation in parallel
+#' out_2 <- lcp_comp(surface = bathy,
+#'                   distance = c(50, 100),
+#'                   graph = bathy_graph,
+#'                   barrier = coastline,
+#'                   cl = parallel::makeCluster(2L)
+#'                   )
+#'
+#' #### Example (3): Mobility-based implementation
+#'
+#' ## Implement function for mobility = 500
+#' mob <- 500
+#' out_3 <- lcp_comp(surface = bathy,
+#'                   mobility = mob,
+#'                   n = 1000,
+#'                   graph = bathy_graph,
+#'                   barrier = coastline
+#'                   )
+#'
+#' ## Visualise sampled locations on map
+#' raster::plot(bathy)
+#' raster::lines(dat_coast)
+#' invisible(lapply(split(out_3, seq_len(nrow(out_3))), function(d){
+#'   arrows(x0 = d$cell_x0, y0 = d$cell_y0,
+#'          x1 = d$cell_x1, y1 = d$cell_y1, length = 0.01, lwd = 0.5)
+#' }))
+#'
+#' ## Compare Euclidean and shortest distances
+#' # Extract the data for the paths that do not versus do cross a barrier
+#' out_3_barrier0 <- out_3[out_3$barrier == 0, ]
+#' out_3_barrier1 <- out_3[out_3$barrier == 1, ]
+#' # Set up plotting window
+#' pp <- graphics::par(mfrow = c(1, 2), oma = c(3, 3, 3, 3), mar = c(4, 4, 4, 4))
+#' # Results for paths that do not cross a barrier
+#' # ... Visualisation
+#' prettyGraphics::pretty_plot(out_3_barrier0$dist_euclid, out_3_barrier0$dist_lcp,
+#'                             xlab = "Distance (Euclidean) [m]",
+#'                             ylab = "Distance (shortest) [m]",
+#'                             pch = ".")
+#' graphics::abline(0, 1, col = "red")
+#' graphics::abline(h = mob, col = "royalblue", lty = 3)
+#' # ... Euclidean distance parameter at which mobility is exceeded
+#' limit0 <- min(out_3_barrier0$dist_euclid[out_3_barrier0$dist_lcp > mob]); limit0
+#' graphics::abline(v = limit0, col = "royalblue", lty = 3)
+#' # Results for paths that cross a barrier
+#' # ... Visualisation
+#' prettyGraphics::pretty_plot(out_3_barrier1$dist_euclid, out_3_barrier1$dist_lcp,
+#'                             xlab = "Distance (Euclidean) [m]",
+#'                             ylab = "Distance (shortest) [m]",
+#'                             pch = ".")
+#' graphics::abline(0, 1, col = "red")
+#' graphics::abline(h = mob, col = "royalblue", lty = 3)
+#' # ... Euclidean distance parameter at which mobility is exceeded
+#' limit1 <- min(out_3_barrier1$dist_euclid[out_3_barrier1$dist_lcp > mob]); limit1
+#' graphics::abline(v = limit1, col = "royalblue", lty = 3)
+#' graphics::par(pp)
+#'
+#' ## Plot the difference between Euclidean and shortest distances with distance
+#' pp <- graphics::par(mfrow = c(1, 2), oma = c(3, 3, 3, 3), mar = c(4, 4, 4, 4))
+#' prettyGraphics::pretty_plot(out_3_barrier0$dist_euclid,
+#'                             out_3_barrier0$dist_lcp - out_3_barrier0$dist_euclid,
+#'                             xlab = "Distance (Euclidean) [m]",
+#'                             ylab = "Distance (shortest - Euclidean) [m]",
+#'                             pch = ".")
+#' prettyGraphics::pretty_plot(out_3_barrier1$dist_euclid,
+#'                             out_3_barrier1$dist_lcp - out_3_barrier1$dist_euclid,
+#'                             xlab = "Distance (Euclidean) [m]",
+#'                             ylab = "Distance (shortest - Euclidean) [m]",
+#'                             pch = ".")
+#' graphics::par(pp)
+#'
+#' @author Edward Lavender
+#' @export
+
+lcp_comp <- function(surface,
+                     barrier = NULL,
+                     distance = NULL,
+                     interval = raster::res(surface)[1],
+                     mobility = NULL,
+                     n = 10L, n_max = n,
+                     graph = NULL,...,
+                     cl = NULL, varlist = NULL, verbose = TRUE){
+
+  #### Initiate function
+  t_onset <- Sys.time()
+  cat_to_console <- function(..., show = verbose){
+    if(show) cat(paste(..., "\n"))
+  }
+  cat_to_console(paste0("flapper::lcp_comp() called (@ ", t_onset, ")..."))
+
+  #### Define parameters
+  cat_to_console("... Defining parameters...")
+  ## Check surface and barrier properties
+  if(!all.equal(raster::res(surface)[1], raster::res(surface)[2])){
+    stop("The resolution of the surface should be equal in the x and y directions. Consider calling raster::resample() before implementing this function.")
+  }
+  if(!is.null(barrier)){
+    crs_surface <- raster::crs(surface)
+    crs_barrier <- raster::crs(barrier)
+    crs_check   <- all.equal(crs_surface, crs_barrier)
+    if(isFALSE(crs_check)){
+      warning("The CRS of 'surface' and 'barrier' is not identical.",
+              immediate. = TRUE, call. = FALSE)
+      message("... details: ", crs_check, ".")
+      message("... surface CRS: '", crs_surface, "'.")
+      message("... barrier CRS: '", crs_barrier, "'.")
+    }
+  }
+  ## Check distances or mobility
+  if(is.null(distance) & is.null(mobility))
+    stop("Either 'distance' or 'mobility' must be supplied.", call. = FALSE)
+  if(!is.null(distance) & !is.null(mobility))
+    stop("Only one of 'distance' or 'mobility' must be supplied.", call. = FALSE)
+  ## Check cluster
+  if(!is.null(cl) & !is.null(mobility)){
+    warning("'cl' is not implemented if 'mobility' is supplied.",
+            immediate. = TRUE, call. = FALSE)
+    cl <- varlist <- NULL
+  }
+  if(is.null(cl) & !is.null(varlist)){
+    warning("'cl' is NULL but 'varlist' is not: 'varlist' ignored.",
+            immediate. = TRUE, call. = FALSE)
+    varlist <- NULL
+  }
+  ## Check dots
+  dots <- list(...)
+  if(length(dots) > 0L) {
+    dots_bool <- names(dots) %in% c("algorithm", "constant", "allcores")
+    if(!(all(dots_bool))){
+      issues <- names(dots)[!dots_bool]
+      stop(paste0("The following argument(s) passed via ... are not supported: ",
+                  paste(issues, collapse = ", "),
+                  ". The only supported arguments are 'algorithm', 'constant' and 'allcores' (see cppRouting::get_distance_pair())."),
+           call. = FALSE)
+    }
+  }
+
+  #### Define a list of location (start and end) samples, for each distance
+  if(!is.null(distance)){
+
+    cat_to_console("... Sampling n location pairs for each distance value...")
+    if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
+    points_by_dist <-
+      pbapply::pblapply(distance, cl = cl, function(step){
+
+        #### Sample n random locations within area
+        cat_to_console(paste0("... ... Sampling for distance = ", step, "..."))
+        cat_to_console("... ... ... Sampling starting locations...")
+        # step <- distance[1]
+        start_xy <- raster::sampleRandom(surface, n, xy = TRUE, na.rm = TRUE)[, 1:2]
+        colnames(start_xy) <- c("cell_x0", "cell_y0")
+
+        #### Define n ending locations
+        cat_to_console("... ... ... Sampling ending locations...")
+        points_for_dist_by_row <-
+          lapply(split(start_xy, seq_len(nrow(start_xy))), function(start_xyi){
+            start_xyi <- matrix(start_xyi, ncol = 2)
+            colnames(start_xyi) <- c("cell_x0", "cell_y0")
+            around <- raster::distanceFromPoints(surface, start_xyi)
+            around <- raster::mask(around, surface)
+            around_mask <- around <= (step - interval) | around >= (step + interval)
+            around  <- raster::mask(around, around_mask, maskvalue = 1)
+            end_xyi <- raster::sampleRandom(around, 1, xy = TRUE, na.rm = TRUE)[, 1:2, drop = FALSE]
+            colnames(end_xyi) <- c("cell_x1", "cell_y1")
+            if(nrow(end_xyi) == 0L) {
+              warning("There are no non-NA cells within ",
+                      step - interval, " and ", step + interval,
+                      " m of the current sampled location (",
+                      paste0(start_xyi, collapse = ", "), ").",
+                      immediate. = TRUE, call. = FALSE)
+              points_for_dist_for_row <- data.frame(dist_sim = numeric(),
+                                                    x0 = numeric(), y0 = numeric(),
+                                                    x1 = numeric(), y1 = numeric())
+            } else {
+              points_for_dist_for_row <- data.frame(dist_sim = step, start_xyi, end_xyi)
+            }
+            return(points_for_dist_for_row)
+          })
+
+        #### Define single dataframe with point samples for specified distance
+        points_for_dist <- dplyr::bind_rows(points_for_dist_by_row)
+        rownames(points_for_dist) <- NULL
+        return(points_for_dist)
+      })
+    if(!is.null(cl)) parallel::stopCluster(cl = cl)
+
+    #### Join dataframes
+    point_samples <- dplyr::bind_rows(points_by_dist)
+
+  } else {
+    cat_to_console("... Sampling n locations...")
+    xy  <- raster::sampleRandom(surface, n, xy = TRUE, na.rm = TRUE)[, 1:2]
+    cat_to_console("... Calculating Euclidean distances between sampled locations...")
+    mat <- .planedist2(xy, xy)
+    ind <- which(upper.tri(mat, diag = FALSE), arr.ind = TRUE)
+    cat_to_console("... Filtering by mobility...")
+    point_samples <-
+      data.frame(cell_x0 = xy[ind[, 1], 1],
+                 cell_y0 = xy[ind[, 1], 2],
+                 cell_x1 = xy[ind[, 2], 1],
+                 cell_y1 = xy[ind[, 2], 2],
+                 dist_euclid = mat[ind]) %>%
+      dplyr::filter(.data$dist_euclid <= mobility)
+    if(nrow(point_samples) == 0L)
+      stop("'No samples within 'mobility' drawn.", call. = FALSE)
+    if(nrow(point_samples) > n)
+      point_samples <- point_samples %>% dplyr::slice_sample(n = n_max)
+  }
+  #### Define a dataframe for Euclidean/LCP distances
+  cat_to_console("... Processing samples...")
+  # Get raster cells
+  point_samples$cell_id0  <-
+    raster::cellFromXY(surface, point_samples[, c("cell_x0", "cell_y0")])
+  point_samples$cell_id1  <-
+    raster::cellFromXY(surface, point_samples[, c("cell_x1", "cell_y1")])
+  # Get Euclidean distances on the grid
+  if(!rlang::has_name(point_samples, "dist_euclid")){
+    point_samples$dist_euclid <- raster::pointDistance(point_samples[, c("cell_x0", "cell_y0")],
+                                                       point_samples[, c("cell_x1", "cell_y1")],
+                                                       lonlat = FALSE)
+  }
+
+  #### Get segment overlaps with the coastline
+  if(!is.null(barrier)){
+    cat_to_console("... Determining barrier overlaps...")
+    point_samples$barrier <-
+      segments_cross_barrier(start = point_samples[, c("cell_x0", "cell_y0"), drop = FALSE],
+                             end = point_samples[, c("cell_x1", "cell_y1"), drop = FALSE],
+                             barrier = barrier)
+    point_samples$barrier <- factor(as.character(point_samples$barrier + 0), levels = c("0", "1"))
+  }
+
+  #### Get LCPs between coordinate pairs
+  cat_to_console("... Implementing shortest-distance calculations...")
+  # Define graph if unsupplied
+  if(is.null(graph)){
+    cat_to_console("... ... Defining surface graph...")
+    cat_to_console("... ... ... Defining cost surface via flapper::lcp_costs()...")
+    costs <- lcp_costs(surface)
+    cat_to_console("... ... ... Assembling graph via flapper::lcp_graph_surface()...")
+    graph <- lcp_graph_surface(surface = surface, cost = costs$dist_total)
+  }
+  # Define LCPs
+  cat_to_console(paste0("... ... Calculating shortest-distances via cppRouting::get_distance_pair() for ",
+                        nrow(point_samples), " location pair(s) ..."))
+  dist_lcp <-
+    tryCatch(
+      cppRouting::get_distance_pair(Graph = graph,
+                                    from = point_samples$cell_id0,
+                                    to = point_samples$cell_id1,...),
+      error = function(e) return(e)
+      )
+  if(inherits(dist_lcp, "error")){
+    warning("Error during shortest-distance calculations:",
+            immediate. = TRUE, call. = FALSE)
+    message(dist_lcp)
+    message("Returning the dataframe for diagnostics and closing the function...")
+    return(point_samples)
+  } else point_samples$dist_lcp <- dist_lcp
+
+  #### Tidy dataframe
+  cat_to_console("... Cleaning results...")
+  point_samples$index <- seq_len(nrow(point_samples))
+  if(!is.null(distance))
+    point_samples <-
+    point_samples %>%
+    dplyr::group_by(.data$dist_sim) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    data.frame()
+  cols <- c("index", "id",
+            "cell_x0", "cell_y0", "cell_x1", "cell_y1",
+            "cell_id0", "cell_id1",
+            "dist_sim",
+            "dist_euclid",
+            "dist_lcp",
+            "barrier")
+  point_samples <- point_samples[, cols[cols %in% colnames(point_samples)]]
+  rownames(point_samples) <- NULL
+
+  #### Return outputs
+  t_end <- Sys.time()
+  total_duration <- difftime(t_end, t_onset, units = "mins")
+  cat_to_console(paste0("... flapper::lcp_comp() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
+  return(point_samples)
+
+}

@@ -541,6 +541,7 @@ segments_cross_barrier <- function(start, end, barrier){
     lines <- sfheaders::sf_linestring(lines,
                                       x = "x", y = "y",
                                       linestring_id = "linestring_id")
+    sf::st_crs(lines) <- sf::st_crs(barrier)
     # Get intersection
     return(sf::st_intersects(lines, barrier, sparse = FALSE))
 

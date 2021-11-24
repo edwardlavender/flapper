@@ -274,6 +274,8 @@ calculation of shortest paths/distances:
     destination coordinates;
   - `lcp_interp()` interpolates paths between sequential locations using
     least-cost paths analysis;
+  - `lcp_comp()` compares Euclidean and shortest distance metrics for an
+    area;
 
 ## Detection statistics
 
