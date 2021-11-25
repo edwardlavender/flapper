@@ -13,6 +13,7 @@ pf_simplify(
   calc_distance_graph = NULL,
   calc_distance_limit = NULL,
   calc_distance_barrier = NULL,
+  calc_distance_barrier_limit = NULL,
   calc_distance_algorithm = "bi",
   calc_distance_constant = 1,
   mobility = NULL,
@@ -45,7 +46,9 @@ pf_simplify(
 
 \item{calc_distance_limit}{(optional) If \code{calc_distance = "lcp"}, \code{calc_distance_limit} is a number that defines the lower Euclidean distance limit for shortest-distances calculations. If supplied, shortest distances are only calculated for cell connections that are more than a Euclidean distance of \code{calc_distance_limit} apart. In other words, if supplied, it is assumed that there exists a valid shortest path (shorter than the maximum distance imposed by the animal's mobility constraints) if the Euclidean distance between two points is less than \code{calc_distance_limit} (unless that segment crosses a barrier: see \code{calc_distance_barrier}). This option can improve the speed of distance calculations.}
 
-\item{calc_distance_barrier}{(optional) If \code{calc_distance = "lcp"}, \code{calc_distance_barrier} is a  simple feature geometry that defines a barrier, such as the coastline, to movement (see \code{\link[flapper]{segments_cross_barrier}}). The coordinate reference system for this object must match \code{bathy}. If supplied, shortest distances are only calculated for segments that cross a barrier (or exceed \code{calc_distance_limit}). This option can improve the speed of distance calculations.}
+\item{calc_distance_barrier}{(optional) If \code{calc_distance = "lcp"}, \code{calc_distance_barrier} is a simple feature geometry that defines a barrier, such as the coastline, to movement (see \code{\link[flapper]{segments_cross_barrier}}). The coordinate reference system for this object must match \code{bathy}. If supplied, shortest distances are only calculated for segments that cross a barrier (or exceed \code{calc_distance_limit}). This option can improve the speed of distance calculations.}
+
+\item{calc_distance_barrier_limit}{(optional) If \code{calc_distance_barrier} is supplied, \code{calc_distance_barrier_limit} is the lower Euclidean limit for determining barrier overlaps. If supplied, barrier overlaps are only determined for cell connections that are more than \code{calc_distance_barrier_limit} apart. This option can reduce the number of cell connections for which barrier overlaps need to be determined (and ultimately the speed of distance calculations).}
 
 \item{calc_distance_algorithm, calc_distance_constant}{Additional shortest-distance calculation options (see \code{\link[cppRouting]{get_distance_pair}}). \code{calc_distance_algorithm} is a character that defines the algorithm: \code{"Dijkstra"}, \code{"bi"}, \code{"A*"} or \code{"NBA"} are supported. \code{calc_distance_constant} is the numeric constant required to maintain the heuristic function admissible in the A* and NBA algorithms. For shortest distances (based on costs derived via \code{\link[flapper]{lcp_costs}}), the default (\code{calc_distance_constant = 1}) is appropriate.}
 
