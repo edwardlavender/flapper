@@ -292,7 +292,64 @@ check_dir <- function(arg = deparse(substitute(input)),
   return(input)
 }
 
+#' @title Check coordinate reference systems match
+#' @description This function checks that coordinate reference systems (CRS) match.
+#'
+#' @param ... Objects of \code{\link[sp]{CRS-class}} or from which \code{\link[sp]{CRS-class}} object(s) can be extracted (via \code{\link[raster]{crs}}).
+#'
+#' @details The first (`baseline') CRS is compared against that for every other input. \code{NULL} inputs are ignored. For any mismatches, an instructive warning is returned alongside the details of each mismatch.
+#'
+#' @examples
+#' \dontrun{
+#' # The function can accept spatial objects
+#' check_crs(dat_gebco, dat_coast)
+#' check_crs(dat_gebco,
+#'           dat_coast,
+#'           raster::raster(matrix(1)))
+#'
+#' # The function can accept CRS objects
+#' check_crs(dat_gebco, sp::CRS(as.character(NA)))
+#'
+#' # The function can accept NULL elements
+#' check_crs(dat_gebco, NULL)
+#' }
+#'
+#' @author Edward Lavender
+#' @keywords internal
 
-#### End of code.
+
 ######################################
 ######################################
+#### check_crs()
+
+check_crs <- function(...){
+  # Extract dots
+  print(dots  <- list(...))
+  names(dots) <- as.character(match.call()[-1L])
+  # Extract CRS (if necessary)
+  dots  <- lapply(dots, function(dot){
+    if(!is.null(dot)){
+      if(inherits(dot, "CRS")) return(dot)
+      else return(raster::crs(dot))
+    }
+  })
+  dots <- compact(dots)
+  if(length(dots) > 1L){
+    # Extract CRS for the first element (the 'baseline')
+    crs_base <- dots[[1]]
+    # Compare baseline CRS to each remaining CRS
+    lapply(2:length(dots), function(i){
+      crs_arg   <- dots[[i]]
+      crs_check   <- all.equal(crs_base, crs_arg)
+      if(!isTRUE(crs_check)){
+        warning("The CRSs of '", names(dots)[1], "' and '", names(dots)[i], "' are not identical.",
+                immediate. = TRUE, call. = FALSE)
+        message("  -- details: ", crs_check, ".")
+        message("  -- ",  names(dots)[1], " CRS: '", crs_base, "'.")
+        message("  -- ",  names(dots)[2], " CRS: '", crs_arg, "'.\n")
+      }
+    })
+  }
+  return(invisible())
+}
+

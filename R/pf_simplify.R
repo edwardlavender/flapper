@@ -10,12 +10,13 @@
 #' @param bathy A \code{\link[raster]{raster}} that defines the grid across the area within which the individual could have moved. \code{bathy} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in x and y directions. If \code{calc_distance = "lcp"}, the surface's resolution is taken to define the distance between horizontally and vertically connected cells and must be the same in both x and y directions. Any cells with NA values (e.g., due to missing data) are treated as `impossible' to move though by the algorithm (see \code{\link[flapper]{lcp_over_surface}}). If unsupplied, \code{bathy} can be extracted from \code{archive}, if available.
 #' @param calc_distance A character that defines the method used to calculate distances between sequential combinations of particles (see \code{\link[flapper]{pf}}). Currently supported options are Euclidean distances (\code{"euclid"}) or shortest (least-cost) distances ("lcp"). In practice, Euclidean distances are calculated and then, for the subset of connections that meet specified criteria (see \code{calc_distance_limit}, \code{calc_distance_barrier}, \code{mobility_from_origin} and \code{mobility}), Euclidean distances are updated to shortest distances, if specified. Note that \code{calc_distance} does not need to be the same method as used for \code{\link[flapper]{pf}}: it is often computationally beneficial to implement \code{\link[flapper]{pf}} using Euclidean distances and then, for the subset of sampled particles, implement \code{\link[flapper]{pf_simplify}} with \code{calc_distance = "lcp"} to re-compute distances using the shortest-distances algorithm, along with the adjusted probabilities. However, for large paths, the quickest option is to implement both functions using \code{calc_distance = "euclid"} and then interpolate shortest paths only for the set of returned paths (see \code{\link[flapper]{lcp_interp}}). If \code{calc_distance = NULL}, the method saved in \code{archive} is used.
 #' @param calc_distance_graph (optional) If \code{calc_distance = "lcp"}, \code{calc_distance_graph} is a graph object that defines the distances between connected cells in \code{bathy}. If unsupplied, this is taken from \code{archive$args$calc_distance_graph}, if available, or computed via \code{\link[flapper]{lcp_graph_surface}}.
-#' @param calc_distance_limit (optional) If \code{calc_distance = "lcp"}, \code{calc_distance_limit} is a number that defines the lower Euclidean distance limit for shortest-distances calculations. If supplied, shortest distances are only calculated for cell connections that are more than a Euclidean distance of \code{calc_distance_limit} apart. In other words, if supplied, it is assumed that there exists a valid shortest path (shorter than the maximum distance imposed by the animal's mobility constraints) if the Euclidean distance between two points is less than \code{calc_distance_limit} (unless that segment crosses a barrier: see \code{calc_distance_barrier}). This option can improve the speed of distance calculations.
-#' @param calc_distance_barrier (optional) If \code{calc_distance = "lcp"}, \code{calc_distance_barrier} is a simple feature geometry that defines a barrier, such as the coastline, to movement (see \code{\link[flapper]{segments_cross_barrier}}). The coordinate reference system for this object must match \code{bathy}. If supplied, shortest distances are only calculated for segments that cross a barrier (or exceed \code{calc_distance_limit}). This option can improve the speed of distance calculations.
+#' @param calc_distance_limit (optional) If \code{calc_distance = "lcp"}, \code{calc_distance_limit} is a number that defines the lower Euclidean distance limit for shortest-distances calculations. If supplied, shortest distances are only calculated for cell connections that are more than a Euclidean distance of \code{calc_distance_limit} apart. In other words, if supplied, it is assumed that there exists a valid shortest path (shorter than the maximum distance imposed by the animal's mobility constraints) if the Euclidean distance between two points is less than \code{calc_distance_limit} (unless that segment crosses a barrier: see \code{calc_distance_barrier}). This option can improve the speed of distance calculations. However, if supplied, note that Euclidean and shortest distances (and resultant probabilities) may be mixed in function outputs. This argument is currently only implemented for \code{\link[flapper]{pf_archive-class}} objects derived with \code{calc_distance = TRUE} and \code{calc_distance_euclid_fast = TRUE} via \code{\link[flapper]{pf}} for which connected cell pairs need to be derived (i.e., not following a previous implementation of \code{\link[flapper]{pf_simplify}}).
+#' @param calc_distance_barrier (optional) If \code{calc_distance = "lcp"}, \code{calc_distance_barrier} is a simple feature geometry that defines a barrier, such as the coastline, to movement (see \code{\link[flapper]{segments_cross_barrier}}). The coordinate reference system for this object must match \code{bathy}. If supplied, shortest distances are only calculated for segments that cross a barrier (or exceed \code{calc_distance_limit}). This option can improve the speed of distance calculations. However, if supplied, note that Euclidean and shortest distances (and resultant probabilities) may be mixed in function outputs. All \code{calc_distance_barrier*} arguments are currently only implemented for \code{\link[flapper]{pf_archive-class}} objects derived with \code{calc_distance = TRUE} and \code{calc_distance_euclid_fast = TRUE} via \code{\link[flapper]{pf}} for which connected cell pairs need to be derived (i.e., not following a previous implementation of \code{\link[flapper]{pf_simplify}}).
 #' @param calc_distance_barrier_limit (optional) If \code{calc_distance_barrier} is supplied, \code{calc_distance_barrier_limit} is the lower Euclidean limit for determining barrier overlaps. If supplied, barrier overlaps are only determined for cell connections that are more than \code{calc_distance_barrier_limit} apart. This option can reduce the number of cell connections for which barrier overlaps need to be determined (and ultimately the speed of distance calculations).
+#' @param calc_distance_barrier_grid (optional) If \code{calc_distance_barrier} is supplied, \code{calc_distance_barrier_grid} is a \code{\link[raster]{raster}} that defines the distance to the barrier (see \code{\link[flapper]{segments_cross_barrier}}). The coordinate reference system must match \code{bathy}. If supplied, \code{mobility_from_origin} and \code{mobility} are also required. \code{calc_distance_barrier_grid} is used to reduce the wall time of the barrier-overlap routine (see \code{\link[flapper]{segments_cross_barrier}}).
 #' @param calc_distance_algorithm,calc_distance_constant Additional shortest-distance calculation options (see \code{\link[cppRouting]{get_distance_pair}}). \code{calc_distance_algorithm} is a character that defines the algorithm: \code{"Dijkstra"}, \code{"bi"}, \code{"A*"} or \code{"NBA"} are supported. \code{calc_distance_constant} is the numeric constant required to maintain the heuristic function admissible in the A* and NBA algorithms. For shortest distances (based on costs derived via \code{\link[flapper]{lcp_costs}}), the default (\code{calc_distance_constant = 1}) is appropriate.
 #' @param mobility,mobility_from_origin (optional) The mobility parameters (see \code{\link[flapper]{pf}}). If unsupplied, these can be extracted from \code{archive}, if available. However, even if \code{\link[flapper]{pf}} was implemented without these options, it is beneficial to specify mobility limits here (especially if \code{calc_distance = "lcp"}) because they restrict the number of calculations that are required (for example, for shortest distances, at each time step, distances are only calculated for the subset of particle connections below \code{mobility_from_origin} or \code{mobility} in distance).
-#' @param write_history A named list of arguments, passed to \code{\link[base]{saveRDS}}, to write `intermediate' files. The `file' argument should be the directory in which to write files. This argument is currently only implemented for \code{\link[flapper]{pf_archive-class}} objects derived with \code{calc_distance = TRUE} and \code{calc_distance_euclid_fast = TRUE} via \code{\link[flapper]{pf}} for which connected cell pairs need to be derived (i.e., not following a previous implementation of \code{\link[flapper]{pf_simplify}}. If supplied, two directories are created in `file' (1/ and 2/), in which dataframes of the pairwise distances between connected cells and the subset of those  that formed continuous paths from the start to the end of the time series are written, respectively. Files are named by time steps as `pf_1', `pf_2' and so on. Files for each time step are written and re-read from this directory during particle processing. This helps to minimise vector memory requirements because the information for all time steps does not have to be retained in memory at once.
+#' @param write_history A named list of arguments, passed to \code{\link[base]{saveRDS}}, to write `intermediate' files. The `file' argument should be the directory in which to write files. This argument is currently only implemented for \code{\link[flapper]{pf_archive-class}} objects derived with \code{calc_distance = TRUE} and \code{calc_distance_euclid_fast = TRUE} via \code{\link[flapper]{pf}} for which connected cell pairs need to be derived (i.e., not following a previous implementation of \code{\link[flapper]{pf_simplify}}). If supplied, two directories are created in `file' (1/ and 2/), in which dataframes of the pairwise distances between connected cells and the subset of those  that formed continuous paths from the start to the end of the time series are written, respectively. Files are named by time steps as `pf_1', `pf_2' and so on. Files for each time step are written and re-read from this directory during particle processing. This helps to minimise vector memory requirements because the information for all time steps does not have to be retained in memory at once.
 #' @param cl,varlist,use_all_cores Parallelisation options for the first stage of the algorithm, which identifies connected cell pairs, associated distances and movement probabilities. The first parallelisation option is to parallelise the algorithm over time steps via \code{cl}. This is a cluster object created by \code{\link[parallel]{makeCluster}} or an integer defining the number of child processes (ignored on Windows) (see \code{\link[pbapply]{pblapply}}). If \code{cl} is supplied, \code{varlist} may be required. This is a character vector of object names to export (see \code{\link[parallel]{clusterExport}}). Exported objects must be located in the global environment. The second parallelisation option is to parallelise shortest-distance calculations within time steps via a logical input (\code{TRUE}) to \code{use_all_cores} that is passed to \code{\link[cppRouting]{get_distance_matrix}}. This option is only implemented for \code{calc_distance = "lcp"}.
 #' @param return A character (\code{return = "path"} or \code{return = "archive"}) that defines the type of object that is returned (see Details).
 #' @param summarise_pr (optional) For \code{return = "archive"}, \code{summarise_pf} is a function or a logical input that defines whether or not (and how) to summarise the probabilities of duplicate cell records for each time step. If a function is supplied, only one record of each sampled cell is returned per time step, with the associated probability calculated from the probabilities of each sample of that cell using the supplied function. For example, \code{summarise_pr = max} returns the most probable sample. Alternatively, if a logical input (\code{summarise_pr = TRUE}) is supplied, only one record of each sampled cell is returned per time step, with the associated probability calculated as the sum of the normalised probabilities of all samples for that cell, rescaled so that the maximum probability takes a score of one. Specifying \code{summarise_pr} is useful for deriving maps of the `probability of use' across an area based on particle histories because it ensures that `probability of use' scores depend on the number of time steps during which an individual could have occupied a location, rather than the total number of samples of that location (see \code{\link[flapper]{pf_plot_map}}). Both \code{summarise_pr = NULL} and \code{summarise_pr = FALSE} suppress this argument.
@@ -296,6 +297,7 @@ pf_simplify <- function(archive,
                         calc_distance_limit = NULL,
                         calc_distance_barrier = NULL,
                         calc_distance_barrier_limit = NULL,
+                        calc_distance_barrier_grid = NULL,
                         calc_distance_algorithm = "bi", calc_distance_constant = 1,
                         mobility = NULL,
                         mobility_from_origin = mobility,
@@ -324,21 +326,11 @@ pf_simplify <- function(archive,
   if(is.null(bathy)) bathy <- archive$args$bathy
   if(is.null(bathy)) stop("'bathy' must be supplied via 'bathy' or 'archive$args$bathy' for this function.", call. = FALSE)
   if(!is.null(calc_distance_barrier)) {
-    crs_bathy   <- raster::crs(bathy)
-    crs_barrier <- raster::crs(calc_distance_barrier)
-    crs_check   <- all.equal(crs_bathy, crs_barrier)
-    if(!isTRUE(crs_check)){
-      warning("The CRS of 'bathy' and 'calc_distance_barrier' is not identical.",
-              immediate. = TRUE, call. = FALSE)
-      message("... details: ", crs_check, ".")
-      message("... bathy CRS:                 '", crs_bathy, "'.")
-      message("... calc_distance_barrier CRS: '", crs_barrier, "'.")
-    }
-    sf::st_crs(calc_distance_barrier) <- NA
+    check_crs(bathy, calc_distance_barrier, calc_distance_barrier_grid)
   } else{
-    if(!is.null(calc_distance_barrier_limit)) {
-      calc_distance_barrier_limit <- NULL
-      warning("'calc_distance_barrier' is NULL but 'calc_distance_barrier_limit' is not: 'calc_distance_barrier_limit' ignored.",
+    if(!is.null(calc_distance_barrier_limit) | !is.null(calc_distance_barrier_grid)){
+      calc_distance_barrier_limit <- calc_distance_barrier_grid <- NULL
+      warning("'calc_distance_barrier' is NULL; other 'calc_distance_barrier_*' arguments are ignored.",
               immediate. = TRUE, call. = FALSE)
     }
   }
@@ -378,6 +370,8 @@ pf_simplify <- function(archive,
   mobility_from_origin         <- archive$args$mobility_from_origin
   if(is.null(mobility) | is.null(mobility_from_origin))
     message("'mobility' and/or 'mobility_from_origin' taken as NULL.")
+  if(!is.null(calc_distance_barrier_grid) & (is.null(mobility_from_origin) | is.null(mobility)))
+    stop("'mobility_from_origin' and 'mobility' are required if 'calc_distance_barrier_grid' is specified.", call. = FALSE)
   if(!is.null(write_history)){
     check_named_list(input = write_history)
     check_names(input = write_history, req = "file")
@@ -517,12 +511,8 @@ pf_simplify <- function(archive,
                             )
 
           # Adjust distances according to mobility_from_origin or mobility
-          if((t - 1) == 1){
-            if(!is.null(mobility_from_origin))
-              tmp <- tmp %>% dplyr::filter(.data$dist_current <= mobility_from_origin)
-          } else {
-            if(!is.null(mobility)) tmp <- tmp %>% dplyr::filter(.data$dist_current <= mobility)
-          }
+          if((t - 1) == 1) mob <- mobility_from_origin else mob <- mobility
+          if(!is.null(mob)) tmp <- tmp %>% dplyr::filter(.data$dist_current <= mob)
 
           # Calculate LCPs (if specified)
           if(calc_distance == "lcp"){
@@ -554,15 +544,19 @@ pf_simplify <- function(archive,
               }
               if(length(index_for_barrier) > 0L){
                 index_in_barrier <-
-                  which(segments_cross_barrier(bathy_xy[tmp$id_previous[index_for_barrier], , drop = FALSE],
-                                               bathy_xy[tmp$id_current[index_for_barrier], , drop = FALSE],
-                                               calc_distance_barrier))
+                  which(segments_cross_barrier(start = bathy_xy[tmp$id_previous[index_for_barrier], , drop = FALSE],
+                                               end = bathy_xy[tmp$id_current[index_for_barrier], , drop = FALSE],
+                                               barrier = calc_distance_barrier,
+                                               distance = calc_distance_barrier_grid,
+                                               mobility = mob))
                 index_in_barrier <- index_for_barrier[index_in_barrier]
               } else {
                 index_in_barrier <-
-                  which(segments_cross_barrier(bathy_xy[tmp$id_previous, , drop = FALSE],
-                                               bathy_xy[tmp$id_current, , drop = FALSE],
-                                               calc_distance_barrier))
+                  which(segments_cross_barrier(start = bathy_xy[tmp$id_previous, , drop = FALSE],
+                                               end = bathy_xy[tmp$id_current, , drop = FALSE],
+                                               barrier = calc_distance_barrier,
+                                               distance = calc_distance_barrier_grid,
+                                               mobility = mob))
               }
             } else index_in_barrier <- integer(0)
             # ... Define index of segments for LCP calculations
@@ -738,7 +732,7 @@ pf_simplify <- function(archive,
     }
     len_history <- length(history)
     if(!is.null(write_history)) history[[len_history]] <- readRDS(history_files[[len_history]])
-    pb <- pbapply::startpb(min = 2, max = len_history - 2)
+    if(len_history > 5) pb <- pbapply::startpb(min = 2, max = len_history - 2)
     for(t in len_history:2){
       # t = len_history
       if(!is.null(write_history)) history[[t - 1]] <- readRDS(history_files[[t - 1]])
@@ -754,9 +748,9 @@ pf_simplify <- function(archive,
         do.call(saveRDS, write_history)
         history[[t + 1]] <- NA
       }
-      pbapply::setpb(pb, len_history - t)
+      if(len_history > 5) pbapply::setpb(pb, len_history - t)
     }
-    pbapply::closepb(pb)
+    if(len_history > 5) pbapply::closepb(pb)
 
   } else {
     if(!is.null(write_history)){
