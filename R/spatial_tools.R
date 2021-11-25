@@ -465,30 +465,44 @@ sim_surface <- function(blank,
 #### segments_cross_barrier()
 
 #' @title Determine if Euclidean path segments cross a barrier
-#' @description Given a sequence of `starting' and `ending' positions, this function determines whether or not the Euclidean path between each starting and ending position crosses a barrier.
+#' @description Given a sequence of `starting' and `ending' locations (\code{start} and \code{end}), this function determines whether or not the Euclidean path (`segment') between each location pair crosses a \code{barrier}.
 #'
 #' @param start A two-column matrix of coordinates that defines the `start' location of each segment.
 #' @param end A two-column matrix of coordinates that defines the `end' location of each segment.
 #' @param barrier A simple feature geometry that defines the barrier (see \code{\link[sf]{st_intersects}}).
+#' @param distance (optional) A \code{\link[raster]{raster}} that defines distances from the \code{barrier}. If supplied, \code{mobility} is required (see below).
+#' @param mobility (optional) If \code{distance} is supplied, \code{mobility} is a number that defines the distance threshold. Location pairs for which both locations are further than \code{mobility} from the \code{barrier} are assumed not to overlap with the \code{barrier}. If \code{start} and \code{end} are possible locations for an animal at a given pair of time steps, \code{mobility} is the distance that the individual could move between time steps (see \code{\link[flapper]{pf}}).
 #'
 #' @details
 #'
-#' This function was motivated by the need to support internal routines in \code{\link[flapper]{pf_simplify}}.
+#' This function was motivated by the need to support internal routines in \code{\link[flapper]{pf_simplify}}. Specifically, the function is used to minimise the number of shortest-distance calculations that are required by restricting calculations (if applicable) to particle pairs that require movement around a barrier, such as the coastline. (In these cases, Euclidean distances may be poor approximations of shortest distances that an aquatic animal must travel.)
 #'
-#' The number of observations in \code{start} and \code{end} must match.
+#' The function implements a three-step approach to derive barrier overlaps:
+#' \enumerate{
+#'   \item The function determines whether or not the minimum convex polygon (i.e., boundary box) around \code{start}/\code{end} intersects with \code{barrier}. If it does not, then no location segments can overlap with the barrier. This step is fast.
+#'   \item If the locations' minimum convex polygon intersects with the \code{barrier}, and if \code{distance} and \code{mobility} have been supplied, the function extracts the distance of each location in \code{start} and \code{end} from the \code{barrier}. Location pairs for which both locations are further than \code{mobility} from the \code{barrier} are dropped. This step is also fast.
+#'   \item For any remaining location pairs, the function links each \code{start} and \code{end} location and determines whether or not each linkage (`segment') intersects with the \code{barrier} using \code{\link[sf]{sf}} routines. This step can be slow for large numbers of locations (hence the first two filtering steps).
+#' }
 #'
-#' The coordinate reference system for \code{start}, \code{end} and \code{barrier} must match.
-#'
-#' The function requires the \code{\link[sfheaders]{sf_linestring}} and \code{\link[sf]{st_intersects}} functions.
+#' The following criteria apply to applications of this function:
+#' \enumerate{
+#'   \item The number of observations in \code{start} and \code{end} must match.
+#'   \item The coordinate reference system for \code{start}, \code{end} and \code{barrier} must match.
+#'   \item If \code{distance} is supplied, \code{mobility} must also be supplied.
+#'   \item The function requires the \code{\link[sfheaders]{sf_linestring}} and \code{\link[sf]{st_intersects}} functions.
+#' }
 #'
 #' For speed in iterative applications, the function does not check whether or not these criteria are met.
 #'
 #' @return The function returns a one-column matrix, with each row corresponding to a row in \code{start}/\code{end}, with a logical value that defines whether or not the Euclidean path segment connecting those two locations crosses the \code{barrier} (\code{TRUE}) or not (\code{FALSE}).
 #'
 #' @examples
-#' ## Plot example area
+#' #### Plot example area and define barrier
 #' raster::plot(dat_gebco)
 #' raster::lines(dat_coast)
+#' barrier <- sf::st_as_sf(dat_coast)
+#'
+#' #### Example (1): Implement function using barrier only
 #'
 #' ## Define example starting and ending locations
 #' start <- matrix(c(701854.9, 6260399,
@@ -505,14 +519,42 @@ sim_surface <- function(blank,
 #'                  x1 = end[2, 1], y1 = end[2, 2])
 #'
 #' ## Implement function
-#' barrier <- sf::st_as_sf(dat_coast)
-#' sf::st_crs(barrier) <- NA
 #' segments_cross_barrier(start, end, barrier = barrier)
+#'
+#' #### Example (2): Implement function using barrier with distance and mobility
+#'
+#' ## Define distances from barrier
+#' dat_dist <- raster::rasterize(dat_coast, dat_gebco)
+#' dat_dist <- raster::distance(dat_dist)
+#'
+#' ## Implement function for a specified mobility parameter
+#' segments_cross_barrier(start, end, barrier = barrier,
+#'                        distance = dat_dist, mobility = 500)
+#'
+#' #### Example (3): With many locations, supplying distance improves speed
+#'
+#' ## Sample a large number of random starting/ending locations
+#' start <- raster::sampleRandom(dat_gebco, size = 3000, xy = TRUE)[, 1:2]
+#' end   <- raster::sampleRandom(dat_gebco, size = 3000, xy = TRUE)[, 1:2]
+#'
+#' ## Compare the duration of the function without/with distance included
+#' # The first method without distance is much slower than the second method
+#' # (~0.714 s versus 0.131 s for 3000 locations)
+#' system.time(
+#'   int_1 <- segments_cross_barrier(start, end, barrier = barrier)
+#'   )
+#' system.time(
+#'   int_2 <- segments_cross_barrier(start, end, barrier = barrier,
+#'                                   distance = dat_dist, mobility = 500)
+#'   )
+#'
+#' ## The two approaches return identical solutions:
+#' identical(int_1, int_2)
 #'
 #' @return Edward Lavender
 #' @export
 
-segments_cross_barrier <- function(start, end, barrier){
+segments_cross_barrier <- function(start, end, barrier, distance = NULL, mobility = NULL){
 
   ## Define point boundaries
   xlim <- range(c(start[, 1], end[, 1]))
@@ -532,23 +574,43 @@ segments_cross_barrier <- function(start, end, barrier){
     start <- data.frame(start[, 1:2])
     end   <- data.frame(end[, 1:2])
     colnames(start) <- colnames(end) <- c("x", "y")
-    # Assign line IDs
-    start$linestring_id <- end$linestring_id <- seq_len(nrow(start))
-    # Define lines
-    lines <-
-      dplyr::bind_rows(start, end) %>%
-      dplyr::arrange(.data$linestring_id)
-    lines <- sfheaders::sf_linestring(lines,
-                                      x = "x", y = "y",
-                                      linestring_id = "linestring_id")
-    sf::st_crs(lines) <- sf::st_crs(barrier)
-    # Get intersection
-    return(sf::st_intersects(lines, barrier, sparse = FALSE))
+    # If 'distance' has been supplied, we will focus on the subset of lines
+    # ... for which at least one of the points is within 'mobility' of the barrier.
+    # ... This should reduce the number of spatial intersections that are
+    # ... required in many situations.
+    if(!is.null(distance)){
+      dat <- data.frame(index = seq_len(nrow(start)),
+                        dist_1 = raster::extract(distance, start),
+                        dist_2 = raster::extract(distance, end),
+                        int    = FALSE)
+      dat$bool <- (dat$dist_1 < mobility) | (dat$dist_2 < mobility)
+      dat_sbt  <- dat %>% dplyr::filter(.data$bool)
+      if(nrow(dat_sbt) > 0L){
+        start <- start[dat_sbt$index, , drop = FALSE]
+        end   <- end[dat_sbt$index, , drop = FALSE]
+      } else start <- data.frame()
+    }
+    if(nrow(start) > 0L){
+      # Assign line IDs
+      start$linestring_id <- end$linestring_id <- seq_len(nrow(start))
+      # Define lines
+      lines <-
+        dplyr::bind_rows(start, end) %>%
+        dplyr::arrange(.data$linestring_id)
+      lines <- sfheaders::sf_linestring(lines,
+                                        x = "x", y = "y",
+                                        linestring_id = "linestring_id")
+      sf::st_crs(lines) <- sf::st_crs(barrier)
+      int <- sf::st_intersects(lines, barrier, sparse = FALSE)
+      if(!is.null(distance)){
+        dat$int[dat_sbt$index] <- int
+        return(matrix(dat$int, ncol = 1))
+      } else return(int)
+
+    } else return(matrix(FALSE, nrow = nrow(end), ncol = 1))
 
   ## Option (2): If the points' boundaries do not enclose any barriers
   # ... then none of the Euclidean paths can cross the barrier
-  } else {
-    return(matrix(FALSE, nrow = nrow(start), ncol = 1))
-  }
+  } else return(matrix(FALSE, nrow = nrow(end), ncol = 1))
 
 }
