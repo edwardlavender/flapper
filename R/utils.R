@@ -324,7 +324,7 @@ check_dir <- function(arg = deparse(substitute(input)),
 
 check_crs <- function(...){
   # Extract dots
-  print(dots  <- list(...))
+  dots  <- list(...)
   names(dots) <- as.character(match.call()[-1L])
   # Extract CRS (if necessary)
   dots  <- lapply(dots, function(dot){
