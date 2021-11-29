@@ -15,6 +15,7 @@ pf_simplify(
   calc_distance_barrier = NULL,
   calc_distance_barrier_limit = NULL,
   calc_distance_barrier_grid = NULL,
+  calc_distance_restrict = FALSE,
   calc_distance_algorithm = "bi",
   calc_distance_constant = 1,
   mobility = NULL,
@@ -52,6 +53,8 @@ pf_simplify(
 \item{calc_distance_barrier_limit}{(optional) If \code{calc_distance_barrier} is supplied, \code{calc_distance_barrier_limit} is the lower Euclidean limit for determining barrier overlaps. If supplied, barrier overlaps are only determined for cell connections that are more than \code{calc_distance_barrier_limit} apart. This option can reduce the number of cell connections for which barrier overlaps need to be determined (and ultimately the speed of distance calculations).}
 
 \item{calc_distance_barrier_grid}{(optional) If \code{calc_distance_barrier} is supplied, \code{calc_distance_barrier_grid} is a \code{\link[raster]{raster}} that defines the distance to the barrier (see \code{\link[flapper]{segments_cross_barrier}}). The coordinate reference system must match \code{bathy}. If supplied, \code{mobility_from_origin} and \code{mobility} are also required. \code{calc_distance_barrier_grid} is used to reduce the wall time of the barrier-overlap routine (see \code{\link[flapper]{segments_cross_barrier}}).}
+
+\item{calc_distance_restrict}{(optional) If \code{calc_distance_limit} and/or \code{calc_distance_barrier} are supplied, \code{calc_distance_restrict} is a logical variable that defines whether (\code{TRUE}) or not (\code{FALSE}) to restrict further the particle pairs for which shortest distances are calculated. If \code{TRUE}, the subset of particles flagged by \code{calc_distance_limit} and \code{calc_distance_barrier} for shortest-distance calculations is further restricted to consider only those pairs of particles for which there is not a valid connection to or from those particles under the Euclidean distance metric. Either way, there is no reduction in the set of particles, only in the number of connections evaluated between those particles. This can improve the speed of distance calculations.}
 
 \item{calc_distance_algorithm, calc_distance_constant}{Additional shortest-distance calculation options (see \code{\link[cppRouting]{get_distance_pair}}). \code{calc_distance_algorithm} is a character that defines the algorithm: \code{"Dijkstra"}, \code{"bi"}, \code{"A*"} or \code{"NBA"} are supported. \code{calc_distance_constant} is the numeric constant required to maintain the heuristic function admissible in the A* and NBA algorithms. For shortest distances (based on costs derived via \code{\link[flapper]{lcp_costs}}), the default (\code{calc_distance_constant = 1}) is appropriate.}
 

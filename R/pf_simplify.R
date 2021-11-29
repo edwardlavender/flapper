@@ -14,6 +14,7 @@
 #' @param calc_distance_barrier (optional) If \code{calc_distance = "lcp"}, \code{calc_distance_barrier} is a simple feature geometry that defines a barrier, such as the coastline, to movement (see \code{\link[flapper]{segments_cross_barrier}}). The coordinate reference system for this object must match \code{bathy}. If supplied, shortest distances are only calculated for segments that cross a barrier (or exceed \code{calc_distance_limit}). This option can improve the speed of distance calculations. However, if supplied, note that Euclidean and shortest distances (and resultant probabilities) may be mixed in function outputs. All \code{calc_distance_barrier*} arguments are currently only implemented for \code{\link[flapper]{pf_archive-class}} objects derived with \code{calc_distance = TRUE} and \code{calc_distance_euclid_fast = TRUE} via \code{\link[flapper]{pf}} for which connected cell pairs need to be derived (i.e., not following a previous implementation of \code{\link[flapper]{pf_simplify}}).
 #' @param calc_distance_barrier_limit (optional) If \code{calc_distance_barrier} is supplied, \code{calc_distance_barrier_limit} is the lower Euclidean limit for determining barrier overlaps. If supplied, barrier overlaps are only determined for cell connections that are more than \code{calc_distance_barrier_limit} apart. This option can reduce the number of cell connections for which barrier overlaps need to be determined (and ultimately the speed of distance calculations).
 #' @param calc_distance_barrier_grid (optional) If \code{calc_distance_barrier} is supplied, \code{calc_distance_barrier_grid} is a \code{\link[raster]{raster}} that defines the distance to the barrier (see \code{\link[flapper]{segments_cross_barrier}}). The coordinate reference system must match \code{bathy}. If supplied, \code{mobility_from_origin} and \code{mobility} are also required. \code{calc_distance_barrier_grid} is used to reduce the wall time of the barrier-overlap routine (see \code{\link[flapper]{segments_cross_barrier}}).
+#' @param calc_distance_restrict (optional) If \code{calc_distance_limit} and/or \code{calc_distance_barrier} are supplied, \code{calc_distance_restrict} is a logical variable that defines whether (\code{TRUE}) or not (\code{FALSE}) to restrict further the particle pairs for which shortest distances are calculated. If \code{TRUE}, the subset of particles flagged by \code{calc_distance_limit} and \code{calc_distance_barrier} for shortest-distance calculations is further restricted to consider only those pairs of particles for which there is not a valid connection to or from those particles under the Euclidean distance metric. Either way, there is no reduction in the set of particles, only in the number of connections evaluated between those particles. This can improve the speed of distance calculations.
 #' @param calc_distance_algorithm,calc_distance_constant Additional shortest-distance calculation options (see \code{\link[cppRouting]{get_distance_pair}}). \code{calc_distance_algorithm} is a character that defines the algorithm: \code{"Dijkstra"}, \code{"bi"}, \code{"A*"} or \code{"NBA"} are supported. \code{calc_distance_constant} is the numeric constant required to maintain the heuristic function admissible in the A* and NBA algorithms. For shortest distances (based on costs derived via \code{\link[flapper]{lcp_costs}}), the default (\code{calc_distance_constant = 1}) is appropriate.
 #' @param mobility,mobility_from_origin (optional) The mobility parameters (see \code{\link[flapper]{pf}}). If unsupplied, these can be extracted from \code{archive}, if available. However, even if \code{\link[flapper]{pf}} was implemented without these options, it is beneficial to specify mobility limits here (especially if \code{calc_distance = "lcp"}) because they restrict the number of calculations that are required (for example, for shortest distances, at each time step, distances are only calculated for the subset of particle connections below \code{mobility_from_origin} or \code{mobility} in distance).
 #' @param write_history A named list of arguments, passed to \code{\link[base]{saveRDS}}, to write `intermediate' files. The `file' argument should be the directory in which to write files. This argument is currently only implemented for \code{\link[flapper]{pf_archive-class}} objects derived with \code{calc_distance = TRUE} and \code{calc_distance_euclid_fast = TRUE} via \code{\link[flapper]{pf}} for which connected cell pairs need to be derived (i.e., not following a previous implementation of \code{\link[flapper]{pf_simplify}}). If supplied, two directories are created in `file' (1/ and 2/), in which dataframes of the pairwise distances between connected cells and the subset of those  that formed continuous paths from the start to the end of the time series are written, respectively. Files are named by time steps as `pf_1', `pf_2' and so on. Files for each time step are written and re-read from this directory during particle processing. This helps to minimise vector memory requirements because the information for all time steps does not have to be retained in memory at once.
@@ -298,6 +299,7 @@ pf_simplify <- function(archive,
                         calc_distance_barrier = NULL,
                         calc_distance_barrier_limit = NULL,
                         calc_distance_barrier_grid = NULL,
+                        calc_distance_restrict = FALSE,
                         calc_distance_algorithm = "bi", calc_distance_constant = 1,
                         mobility = NULL,
                         mobility_from_origin = mobility,
@@ -325,30 +327,14 @@ pf_simplify <- function(archive,
   history <- archive$history
   if(is.null(bathy)) bathy <- archive$args$bathy
   if(is.null(bathy)) stop("'bathy' must be supplied via 'bathy' or 'archive$args$bathy' for this function.", call. = FALSE)
-  if(!is.null(calc_distance_barrier)) {
-    check_crs(bathy, calc_distance_barrier, calc_distance_barrier_grid)
-  } else{
-    if(!is.null(calc_distance_barrier_limit) | !is.null(calc_distance_barrier_grid)){
-      calc_distance_barrier_limit <- calc_distance_barrier_grid <- NULL
-      warning("'calc_distance_barrier' is NULL; other 'calc_distance_barrier_*' arguments are ignored.",
-              immediate. = TRUE, call. = FALSE)
-    }
-  }
-  if(!is.null(calc_distance_limit) & !is.null(calc_distance_barrier_limit)){
-    if(calc_distance_barrier_limit >= calc_distance_limit){
-      calc_distance_barrier_limit <- NULL
-      warning("'calc_distance_barrier_limit' >= 'calc_distance_limit': 'calc_distance_barrier_limit' ignored.",
-              immediate. = TRUE, call. = FALSE)
-    }
-  }
   bathy_xy <- raster::coordinates(bathy)
-  layers  <- archive$args$record
-  layers_1   <- layers[[1]]
+  layers   <- archive$args$record
+  layers_1 <- layers[[1]]
   read_layers <- FALSE
   if(inherits(layers_1, "character")){
     read_layers <- TRUE
     if(!file.exists(layers_1)) stop(paste0("archive$args$record[[1]] ('", layers_1, "') does not exist."), call. = FALSE)
-    layers_1     <- raster::raster(layers_1)
+    layers_1    <- raster::raster(layers_1)
   }
   raster_comparison <- tryCatch(raster::compareRaster(layers_1, bathy), error = function(e) return(e))
   if(inherits(raster_comparison, "error")){
@@ -363,11 +349,48 @@ pf_simplify <- function(archive,
     origin         <- bathy_xy[origin_cell_id, , drop = FALSE]
   }
   if(is.null(calc_distance)) calc_distance <- archive$args$calc_distance
-  calc_distance                <- match.arg(calc_distance, c("euclid", "lcp"))
+  calc_distance <- match.arg(calc_distance, c("euclid", "lcp"))
+  if(calc_distance == "lcp"){
+    if(!is.null(calc_distance_barrier)) {
+      check_crs(bathy, calc_distance_barrier, calc_distance_barrier_grid)
+    } else{
+      if(!is.null(calc_distance_barrier_limit) | !is.null(calc_distance_barrier_grid)){
+        calc_distance_barrier_limit <- calc_distance_barrier_grid <- NULL
+        warning("'calc_distance_barrier' is NULL; other 'calc_distance_barrier_*' arguments are ignored.",
+                immediate. = TRUE, call. = FALSE)
+      }
+    }
+    if(!is.null(calc_distance_limit) & !is.null(calc_distance_barrier_limit)){
+      if(calc_distance_barrier_limit >= calc_distance_limit){
+        calc_distance_barrier_limit <- NULL
+        warning("'calc_distance_barrier_limit' >= 'calc_distance_limit': 'calc_distance_barrier_limit' ignored.",
+                immediate. = TRUE, call. = FALSE)
+      }
+    }
+    if(calc_distance_restrict & is.null(calc_distance_limit) & is.null(calc_distance_barrier)){
+      warning("'calc_distance_restrict' is only implemented if 'calc_distance_limit' and/or 'calc_distance_barrier' are supplied.", immediate. = TRUE, call. = FALSE)
+      calc_distance_restrict <- FALSE
+    }
+  } else {
+    if(!all(is.null(c(calc_distance_graph,
+                      calc_distance_limit,
+                      calc_distance_barrier,
+                      calc_distance_barrier_limit,
+                      calc_distance_barrier_grid))) | calc_distance_restrict){
+      calc_distance_graph <-
+        calc_distance_limit <-
+        calc_distance_barrier <-
+        calc_distance_barrier_limit <-
+        calc_distance_barrier_grid <- NULL
+      calc_distance_restrict <- FALSE
+      warning("All other calc_distance_* arguments are ignored for calc_distance = 'euclid'.",
+              immediate. = TRUE, call. = FALSE)
+    }
+  }
   calc_movement_pr_from_origin <- archive$args$calc_movement_pr_from_origin
   calc_movement_pr             <- archive$args$calc_movement_pr
-  mobility                     <- archive$args$mobility
-  mobility_from_origin         <- archive$args$mobility_from_origin
+  if(is.null(mobility)) mobility <- archive$args$mobility
+  if(is.null(mobility_from_origin)) mobility_from_origin <- archive$args$mobility_from_origin
   if(is.null(mobility) | is.null(mobility_from_origin))
     message("'mobility' and/or 'mobility_from_origin' taken as NULL.")
   if(!is.null(calc_distance_barrier_grid) & (is.null(mobility_from_origin) | is.null(mobility)))
@@ -392,12 +415,16 @@ pf_simplify <- function(archive,
       varlist <- NULL
     }
   } else {
+    if(!inherits(cl, "cluster") && !is.null(varlist)){
+      warning("'cl' is an integer: input to 'varlist' ignored.", immediate. = TRUE, call. = FALSE)
+      varlist <- NULL
+    }
     if(use_all_cores) {
       warning("Both 'cl' and 'use_all_cores' supplied: 'use_all_cores' ignored.", immediate. = TRUE, call. = FALSE)
       use_all_cores <- FALSE
     }
   }
-  if(use_all_cores & calc_distance != "lcp") {
+  if(use_all_cores && calc_distance != "lcp") {
     warning("'use_all_cores' ignored: calc_distance != 'lcp'.", immediate. = TRUE, call. = FALSE)
     use_all_cores <- FALSE
   }
@@ -465,7 +492,7 @@ pf_simplify <- function(archive,
       layers <- append(raster::setValues(layers_1, 1), layers)
 
       #### Re-define history with cell pairs
-      if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
+      if(!is.null(cl) && !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
       history <- pbapply::pblapply(2:length(history), cl = cl, function(t){
 
         ## Get full suite of allowed cells from current time step
@@ -511,11 +538,13 @@ pf_simplify <- function(archive,
                             )
 
           # Adjust distances according to mobility_from_origin or mobility
-          if((t - 1) == 1) mob <- mobility_from_origin else mob <- mobility
+          if((t - 1) == 1)  mob <- mobility_from_origin else mob <- mobility
           if(!is.null(mob)) tmp <- tmp %>% dplyr::filter(.data$dist_current <= mob)
 
           # Calculate LCPs (if specified)
           if(calc_distance == "lcp"){
+            calc_distance_lcp <- TRUE
+
             # ... Identify segments that exceed the lower distance limit
             if(!is.null(calc_distance_limit)) {
               index_in_limit <- which(tmp$dist_current > calc_distance_limit)
@@ -561,50 +590,66 @@ pf_simplify <- function(archive,
             } else index_in_barrier <- integer(0)
             # ... Define index of segments for LCP calculations
             index_in_cond <- c(index_in_limit, index_in_barrier)
+            if(length(index_in_cond) > 0L) index_in_cond <- unique(index_in_cond)
+            # ... Drop elements for which the previous and current cells are
+            # ... ... already represented in 'tmp' with valid paths (that passed the checks above)
+            if(calc_distance_restrict){
+              if(length(index_in_cond) > 0L){
+                tmp$recalc <- FALSE
+                tmp$recalc[index_in_cond] <- TRUE
+                index_out_cond <- !tmp$recalc
+                # This indexing approach is faster than filtering and Rcpp pf_contains()
+                # Referring to all cells is also much faster than unique(tmp$id_previous[index_out_cond]))
+                tmp$recalc[index_in_cond][
+                  (tmp$id_previous[index_in_cond] %in% tmp$id_previous[index_out_cond]) &
+                    (tmp$id_current[index_in_cond] %in% tmp$id_current[index_out_cond])
+                ] <- FALSE
+                index_in_cond <- which(tmp$recalc)
+              }
+            }
             # ... Implement LCP calculations across selected or all segments as required
-            if(length(index_in_cond) > 0L){
-              index_in_cond <- unique(index_in_cond)
-              tmp$dist_current[index_in_cond] <-
-                cppRouting::get_distance_pair(Graph = calc_distance_graph,
-                                              from = tmp$id_previous[index_in_cond],
-                                              to = tmp$id_current[index_in_cond],
-                                              algorithm = calc_distance_algorithm,
-                                              constant = calc_distance_constant,
-                                              allcores = use_all_cores)
-            } else {
-              tmp$dist_current <-
-                cppRouting::get_distance_pair(Graph = calc_distance_graph,
-                                              from = tmp$id_previous,
-                                              to = tmp$id_current,
-                                              algorithm = calc_distance_algorithm,
-                                              constant = calc_distance_constant,
-                                              allcores = use_all_cores)
+            if(!is.null(calc_distance_limit) | !is.null(calc_distance_barrier)){
+              if(length(index_in_cond) == 0L) calc_distance_lcp <- FALSE
             }
+            if(calc_distance_lcp){
+              if(length(index_in_cond) > 0L){
+                tmp$dist_current[index_in_cond] <-
+                  cppRouting::get_distance_pair(Graph = calc_distance_graph,
+                                                from = tmp$id_previous[index_in_cond],
+                                                to = tmp$id_current[index_in_cond],
+                                                algorithm = calc_distance_algorithm,
+                                                constant = calc_distance_constant,
+                                                allcores = use_all_cores)
+              } else {
+                tmp$dist_current <-
+                  cppRouting::get_distance_pair(Graph = calc_distance_graph,
+                                                from = tmp$id_previous,
+                                                to = tmp$id_current,
+                                                algorithm = calc_distance_algorithm,
+                                                constant = calc_distance_constant,
+                                                allcores = use_all_cores)
+              }
 
-            # Repeat filtration based on mobility_from_origin or mobility (copied from above)
-            if((t - 1) == 1){
-              if(!is.null(mobility_from_origin))
-                tmp <- tmp %>% dplyr::filter(.data$dist_current <= mobility_from_origin)
-            } else {
-              if(!is.null(mobility)) tmp <- tmp %>% dplyr::filter(.data$dist_current <= mobility)
-            }
+              # Repeat filtration based on mobility_from_origin or mobility (copied from above)
+              if(!is.null(mob)) tmp <- tmp %>% dplyr::filter(.data$dist_current <= mob)
 
-            # Check there are remaining cells
-            # ... If Euclidean distances have been used for sampling
-            # ... it is not guaranteed that any particles will meet mobility_from_origin/mobility
-            # ... criteria under if Euclidean distances used for sampling and LCPs used here
-            if((t - 1) == 1){
-              if(!is.null(mobility_from_origin))
-                if(nrow(tmp) == 0)
-                  stop(paste0("No possible pairwise connections at time = ", t,
-                              " under shortest distances given 'mobility_from_origin'."),
-                       call. = FALSE)
-            } else {
-              if(!is.null(mobility))
-                if(nrow(tmp) == 0)
-                  stop(paste0("No possible pairwise connections at time = ", t,
-                              " under shortest distances given 'mobility'."),
-                       call. = FALSE)
+              # Check there are remaining cells
+              # ... If Euclidean distances have been used for sampling
+              # ... it is not guaranteed that any particles will meet mobility_from_origin/mobility
+              # ... criteria under if Euclidean distances used for sampling and LCPs used here
+              if((t - 1) == 1){
+                if(!is.null(mobility_from_origin))
+                  if(nrow(tmp) == 0)
+                    stop(paste0("No possible pairwise connections at time = ", t,
+                                " under shortest distances given 'mobility_from_origin'."),
+                         call. = FALSE)
+              } else {
+                if(!is.null(mobility))
+                  if(nrow(tmp) == 0)
+                    stop(paste0("No possible pairwise connections at time = ", t,
+                                " under shortest distances given 'mobility'."),
+                         call. = FALSE)
+              }
             }
           }
 
@@ -642,7 +687,7 @@ pf_simplify <- function(archive,
           return(NULL)
         } else return(tmp)
       })
-      if(!is.null(cl)) parallel::stopCluster(cl = cl)
+      if(!is.null(cl) && inherits(cl, "cluster")) parallel::stopCluster(cl = cl)
 
       # ... (2) Method for pf outputs not derived via calc_distance_euclid_fast
     } else {
@@ -717,7 +762,7 @@ pf_simplify <- function(archive,
         d <- d %>% dplyr::filter(.data$pr_current > 0)
         return(d)
       })
-      if(!is.null(cl)) parallel::stopCluster(cl = cl)
+      if(!is.null(cl) && inherits(cl, "cluster")) parallel::stopCluster(cl = cl)
     }
 
 
