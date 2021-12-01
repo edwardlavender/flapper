@@ -404,6 +404,14 @@ pf_simplify <- function(archive,
     write_history_dir_2 <- paste0(write_history_dir, "2/")
     dir.create(write_history_dir_1)
     dir.create(write_history_dir_2)
+    # Stop if write_history_dir_1/write_history_dir_2 are not empty
+    # ... because all files are read from these directories later
+    # ... which can lead to lists of the wrong length/contents if they
+    # ... are already populated (e.g., with testing files).
+    if(length(list.files(write_history_dir_1)) != 0L)
+      stop(paste0("'", write_history_dir_1, "' is not empty."), call. = FALSE)
+    if(length(list.files(write_history_dir_2)) != 0L)
+      stop(paste0("'", write_history_dir_2, "' is not empty."), call. = FALSE)
   }
   # Match samplers
   max_n_particles_sampler <- match.arg(max_n_particles_sampler)
