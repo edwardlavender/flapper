@@ -31,9 +31,8 @@ rownames(dat_moorings) <- dat_moorings$receiver_id
 dat_coast_fol <- readRDS(url("https://biogeo.ucdavis.edu/data/gadm3.6/Rsp/gadm36_GBR_0_sp.rds"))
 ## Open source bathymetry data
 # Define a buffered region around the receivers for which to obtain bathymetry data
-proj_wgs84  <- sp::CRS("+init=epsg:4326")
-proj_utm    <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
-                              "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+proj_wgs84  <- sp::CRS(SRS_string = "EPSG:4326")
+proj_utm    <- sp::CRS(SRS_string = "EPSG:32629")
 rxy_wgs84    <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 rxy_utm      <- sp::spTransform(rxy_wgs84, proj_utm)
 rxy_utm_buf  <- rgeos::gBuffer(rxy_utm, width = 1000)
@@ -121,11 +120,13 @@ prettyGraphics::pretty_map(add_rasters = list(x = surface),
                            verbose = FALSE)
 
 #### (A) Implement DC algorithm
+# Use save_args = TRUE for package examples
 dat_dc <- dc(archival = depth,
-           bathy = surface,
-           calc_depth_error = function(...) matrix(c(-30, 30), nrow = 2),
-           save_record_spatial = 0L
-           )
+             bathy = surface,
+             calc_depth_error = function(...) matrix(c(-30, 30), nrow = 2),
+             save_record_spatial = 0L,
+             save_args = TRUE
+             )
 
 #### Example (1): Implement algorithm using default options
 # Note that because the bathymetry data is very coarse, we have to
@@ -167,10 +168,9 @@ file.size(paste0(tempdir(), "/dat_dcpf_histories.rds"))/1e6
 ## Define data for setup_acdc()
 # Define coordinates of receivers as SpatialPoints with UTM CRS
 # CRS of receiver locations as recorded in dat_moorings
-proj_wgs84 <- sp::CRS("+init=epsg:4326")
+proj_wgs84  <- sp::CRS(SRS_string = "EPSG:4326")
 # CRS of receiver locations required
-proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
-                          "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+proj_utm    <- sp::CRS(SRS_string = "EPSG:32629")
 # Define SpatialPointsDataFrame object
 xy_wgs84 <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 xy_utm <- sp::spTransform(xy_wgs84, proj_utm)
@@ -179,11 +179,13 @@ xy_utm <-
                              dat_moorings[, "receiver_id", drop = FALSE])
 
 ## Define a list of centroids with specified parameters
+# Use reduced 'quadsegs' param to minimise file size
 dat_centroids <- acs_setup_centroids(xy = xy_utm,
                                      detection_range = 425,
                                      coastline = dat_coast,
                                      boundaries = raster::extent(dat_gebco),
                                      plot = TRUE,
+                                     quadsegs = 5,
                                      verbose = TRUE)
 # Check size (Mb) of file prior to inclusion in package
 saveRDS(dat_centroids, paste0(tempdir(), "/dat_centroids.rds"))
@@ -216,22 +218,25 @@ prettyGraphics::pretty_line(acc$timestamp, add = TRUE)
 par(pp)
 
 #### dat_acdc
+# Use save_args = FALSE to minimise space requirements
 dat_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
                  detection_centroids = dat_centroids,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                 save_record_spatial = 1:50,
+                 save_record_spatial = 1:3,
                  progress = 3L,
                  verbose = TRUE,
                  con = "",
-                 split = "2 hours"
+                 split = "2 hours",
+                 save_args = FALSE
                  )
 
 # Check size of file prior to inclusion in package
 saveRDS(dat_acdc, paste0(tempdir(), "/dat_acdc.rds"))
 file.size(paste0(tempdir(), "/dat_acdc.rds"))/1e6
+
 
 #####################################
 #####################################
@@ -239,6 +244,7 @@ file.size(paste0(tempdir(), "/dat_acdc.rds"))/1e6
 
 flapper_run_parallel <- FALSE # TRUE
 flapper_run_slow     <- FALSE # TRUE
+
 
 #####################################
 #####################################
@@ -263,6 +269,9 @@ usethis::use_data(dat_dcpf_paths, overwrite = TRUE)
 # global options
 usethis::use_data(flapper_run_parallel, overwrite = TRUE)
 usethis::use_data(flapper_run_slow, overwrite = TRUE)
+# check size of data directory
+sum(sapply(list.files("./data", full.names = TRUE), file.size))/1e6
+
 
 #### End of code.
 #####################################

@@ -42,10 +42,9 @@ Given a detection at a particular receiver at a particular time, the detection c
 #### Define data for acs_setup_centroids()
 ## Define coordinates of receivers as SpatialPointsDataFrame with UTM CRS
 # CRS of receiver locations as recorded in dat_moorings
-proj_wgs84 <- sp::CRS("+init=epsg:4326")
+proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
 # CRS of receiver locations required
-proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
-                          "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
 # Define SpatialPoints object
 xy_wgs84 <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 xy_utm <- sp::spTransform(xy_wgs84, proj_utm)

@@ -101,9 +101,8 @@ array <- sim_array(boundaries = raster::extent(dat_coast),
 ## Incorporate custom arrangements
 # Define receiver locations as a SpatialPoints object with a UTM CRS
 # ... to match other spatial datasets
-proj_wgs84 <- sp::CRS("+init=epsg:4326")
-proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
-                          "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
+proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
 xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
                         proj_wgs84)
 xy <- sp::spTransform(xy, proj_utm)

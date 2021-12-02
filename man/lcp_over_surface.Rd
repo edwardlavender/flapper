@@ -96,7 +96,7 @@ The function returns a warning produced by \code{\link[gdistance]{transition}} w
 
 #### Simulate a hypothetical landscape
 # Define a miniature, blank landscape with appropriate dimensions
-proj_utm <- sp::CRS("+proj=utm +zone=29 ellps=WGS84")
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 r <- raster::raster(nrows = 3, ncols = 3,
                     crs = proj_utm,
                     resolution = c(5, 5),

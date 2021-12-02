@@ -43,8 +43,8 @@
 #' @examples
 #' #### Estimate mobility from acoustic data using Euclidean distances
 #' ## (A) Define receiver coordinates as SPDF in UTM CRS
-#' proj <- sp::CRS("+init=epsg:4326")
-#' proj_utm <- sp::CRS("+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
+#' proj     <- sp::CRS(SRS_string = "EPSG:4326")
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 #' moorings <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj)
 #' moorings <- sp::spTransform(moorings, proj_utm)
 #' moorings <- sp::SpatialPointsDataFrame(moorings, data.frame(receiver_id = dat_moorings$receiver_id))

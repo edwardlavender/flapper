@@ -100,9 +100,8 @@ get_detection_pr <- function(distance = 1:1000,
 #'
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
-#' proj_wgs84 <- sp::CRS("+init=epsg:4326")
-#' proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
-#'                           "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
+#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
 #' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
 #'                         proj_wgs84)
 #' xy <- sp::spTransform(xy, proj_utm)
@@ -210,9 +209,8 @@ get_detection_centroids <- function(xy,
 #' @examples
 #' #### Define receiver centroids
 #' ## Define receiver locations as a SpatialPoints object with a UTM CRS
-#' proj_wgs84 <- sp::CRS("+init=epsg:4326")
-#' proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
-#'                           "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
+#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
 #' rownames(dat_moorings) <- dat_moorings$receiver_id
 #' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
 #'                         proj_wgs84)
@@ -430,9 +428,8 @@ get_detection_centroids_overlap <- function(centroids, services = NULL){
 #'
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
-#' proj_wgs84 <- sp::CRS("+init=epsg:4326")
-#' proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
-#'                           "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
+#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
 #' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
 #'                         proj_wgs84)
 #' xy <- sp::spTransform(xy, proj_utm)
@@ -496,9 +493,8 @@ get_detection_area_sum <- function(xy,
 #'
 #' @examples
 #' #### Define SpatialPointsDataFrame with receiver locations and deployment dates
-#' proj_wgs84 <- sp::CRS("+init=epsg:4326")
-#' proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
-#'                           "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
+#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
 #' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
 #'                         proj_wgs84)
 #' xy <- sp::spTransform(xy, proj_utm)
@@ -827,9 +823,8 @@ get_id_rec_overlap <- function(ids,
 #'
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
-#' proj_wgs84 <- sp::CRS("+init=epsg:4326")
-#' proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
-#'                           "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
+#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
 #' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
 #'                         proj_wgs84)
 #' xy <- sp::spTransform(xy, proj_utm)
@@ -1295,9 +1290,8 @@ get_detection_clumps <-
 #' ## Get detection centroid overlaps to include in function
 #' ## (see ?flapper::get_detection_centroid_overlaps)
 #' # Define receiver locations
-#' proj_wgs84 <- sp::CRS("+init=epsg:4326")
-#' proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
-#'                           "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
+#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
 #' rownames(dat_moorings) <- dat_moorings$receiver_id
 #' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
 #'                         proj_wgs84)

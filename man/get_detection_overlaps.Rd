@@ -41,9 +41,8 @@ utils::head(dat)
 ## Get detection centroid overlaps to include in function
 ## (see ?flapper::get_detection_centroid_overlaps)
 # Define receiver locations
-proj_wgs84 <- sp::CRS("+init=epsg:4326")
-proj_utm <- sp::CRS(paste("+proj=utm +zone=29 +datum=WGS84",
-                          "+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
+proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
 rownames(dat_moorings) <- dat_moorings$receiver_id
 xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
                         proj_wgs84)

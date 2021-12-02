@@ -169,7 +169,7 @@ dist_btw_points_3d <- function(x1, x2, y1, y2, z1, z2){
 #' @examples
 #' #### Simulate a hypothetical landscape
 #' # Define a miniature, blank landscape with known dimensions
-#' proj_utm <- sp::CRS("+proj=utm +zone=29 ellps=WGS84")
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 #' r <- raster::raster(nrows = 3, ncols = 3,
 #'                     crs = proj_utm,
 #'                     resolution = c(5, 5),

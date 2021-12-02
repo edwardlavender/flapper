@@ -182,11 +182,11 @@ lcp_graph_surface <- function(surface, cost, verbose = TRUE){
 #'
 #' @examples
 #' #### Step (1): Define example origin
-#' proj <- sp::CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-#' proj_utm <- sp::CRS("+proj=utm +zone=29 ellps=WGS84")
-#' origin <- matrix(c(-5.616, 56.388), ncol = 2)
-#' origin <- sp::SpatialPoints(origin, proj)
-#' origin <- sp::spTransform(origin, proj_utm)
+#' proj     <- sp::CRS(SRS_string = "EPSG:4326")
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+#' origin   <- matrix(c(-5.616, 56.388), ncol = 2)
+#' origin   <- sp::SpatialPoints(origin, proj)
+#' origin   <- sp::spTransform(origin, proj_utm)
 #'
 #' #### Step (2): Select and process surface
 #' # We will focus on an area within the dat_gebco bathymetry raster
@@ -389,7 +389,7 @@ lcp_from_point <- function(origin,
 #'
 #' #### Simulate a hypothetical landscape
 #' # Define a miniature, blank landscape with appropriate dimensions
-#' proj_utm <- sp::CRS("+proj=utm +zone=29 ellps=WGS84")
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 #' r <- raster::raster(nrows = 3, ncols = 3,
 #'                     crs = proj_utm,
 #'                     resolution = c(5, 5),

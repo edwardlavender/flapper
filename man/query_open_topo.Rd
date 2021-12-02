@@ -38,7 +38,7 @@ Open Topo Data is an elevation API. Further information, including on supported 
 \examples{
 \dontrun{
 #### Set up example spatial data with lat/long projection
-proj_wgs84 <- sp::CRS("+init=epsg:4326")
+proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
 dat_gebco_wgs84 <- raster::projectRaster(dat_gebco, crs = proj_wgs84)
 dat_coast_wgs84 <- sp::spTransform(dat_coast, proj_wgs84)
 
