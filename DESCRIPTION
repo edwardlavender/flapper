@@ -6,9 +6,9 @@ Author: Edward Lavender
 Maintainer: Edward Lavender <el72@st-andrews.ac.uk>
 Description: Algorithms which facilitate the use of passive acoustic telemetry (PAT) data for ecological inferences, especially those pertaining to animal space use. This includes functions for processing PAT data, spatial tools such as least-cost pathway calculations, new algorithms for inferring space use and simulations designed to evaluate the efficacy of algorithms for inferring space use. Package development has been motivated by the collection of PAT data for a Critically Endangered benthopelagic elasmobranch off the west coast of Scotland. 
 Imports:
-    methods, magrittr, data.table, dplyr, rlang, lubridate, 
-    purrr, pbapply,
-    Matrix, raster, rgeos, geosphere, Orcs, cppRouting, gdistance, sp, adehabitatHR,
+    magrittr, dplyr, rlang, lubridate, purrr, 
+    methods, data.table, Matrix, pbapply,
+    raster, rgeos, geosphere, Orcs, cppRouting, gdistance, sp, adehabitatHR,
     prettyGraphics, fields,
     Tools4ETS
 Suggests:
@@ -21,14 +21,14 @@ Suggests:
     rbenchmark,
     rmarkdown, knitr
 Remotes: 
-    github::edwardlavender/prettyGraphics, 
-    github::edwardlavender/Tools4ETS,
-    github::adamlilith/fasterRaster,
-    url::https://gitlab.oceantrack.org/GreatLakes/glatos/-/archive/master/glatos-master.zip
+    github::edwardlavender/prettyGraphics/, 
+    github::edwardlavender/Tools4ETS/,
+    github::adamlilith/fasterRaster/,
+    url::https://gitlab.oceantrack.org/GreatLakes/glatos/-/archive/master/glatos-master.zip/
 Depends: R (>= 4.0)
 License: GPL-3
-URL: http://github.com/edwardlavender/flapper
-BugReports: http://github.com/edwardlavender/flapper/issues
+URL: https://github.com/edwardlavender/flapper/
+BugReports: https://github.com/edwardlavender/flapper/issues/
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
