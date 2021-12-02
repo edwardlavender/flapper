@@ -259,72 +259,9 @@ Under the default options, the approach is implemented step-wise (i.e., step-by-
              detection_centroids <span class='op'>=</span> <span class='va'>dat_centroids</span>,
              mobility <span class='op'>=</span> <span class='fl'>200</span>
              <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>flapper::ac() called (@ 2021-12-02 11:49:01)...</span></div><div class='output co'>#&gt; flapper::.acs_pl() called (@ 2021-12-02 11:49:01)... 
-#&gt; ... Checking user inputs... 
-#&gt; ... ... acoustics$timestamp rounded to the nearest 120 second(s). </div><div class='output co'>#&gt; <span class='message'>acoustics$timestamp rounded to the nearest 120 second(s).</span></div><div class='output co'>#&gt; ... Processing movement time series... 
-#&gt; ... Plotting movement time series (for each chunk)... </div><div class='output co'>#&gt; ... Calling .acs() to implement ACDC algorithm on one chunk... 
-#&gt; flapper::.acs() called (@ 2021-12-02 11:49:02)... 
-#&gt;   |                                                                              |                                                                      |   0%... Initiating algorithm: moving over acoustic and internal ('archival') time steps... 
-#&gt; ... On acoustic time step ('timestep_detection') 1. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |===                                                                   |   4%... On acoustic time step ('timestep_detection') 2. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |======                                                                |   8%... On acoustic time step ('timestep_detection') 3. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |=========                                                             |  12%... On acoustic time step ('timestep_detection') 4. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt; ... ... On internal time step ('timestep_archival') 2. 
-#&gt; ... ... ... Acoustic centroid is expanding... 
-#&gt;   |                                                                              |============                                                          |  17%... On acoustic time step ('timestep_detection') 5. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |===============                                                       |  21%... On acoustic time step ('timestep_detection') 6. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |==================                                                    |  25%... On acoustic time step ('timestep_detection') 7. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt; ... ... On internal time step ('timestep_archival') 2. 
-#&gt; ... ... ... Acoustic centroid is expanding... 
-#&gt;   |                                                                              |====================                                                  |  29%... On acoustic time step ('timestep_detection') 8. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |=======================                                               |  33%... On acoustic time step ('timestep_detection') 9. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |==========================                                            |  38%... On acoustic time step ('timestep_detection') 10. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |=============================                                         |  42%... On acoustic time step ('timestep_detection') 11. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |================================                                      |  46%... On acoustic time step ('timestep_detection') 12. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |===================================                                   |  50%... On acoustic time step ('timestep_detection') 13. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |======================================                                |  54%... On acoustic time step ('timestep_detection') 14. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |=========================================                             |  58%... On acoustic time step ('timestep_detection') 15. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |============================================                          |  62%... On acoustic time step ('timestep_detection') 16. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |===============================================                       |  67%... On acoustic time step ('timestep_detection') 17. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |==================================================                    |  71%... On acoustic time step ('timestep_detection') 18. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |====================================================                  |  75%... On acoustic time step ('timestep_detection') 19. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |=======================================================               |  79%... On acoustic time step ('timestep_detection') 20. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |==========================================================            |  83%... On acoustic time step ('timestep_detection') 21. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |=============================================================         |  88%... On acoustic time step ('timestep_detection') 22. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |================================================================      |  92%... On acoustic time step ('timestep_detection') 23. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt; ... ... On internal time step ('timestep_archival') 2. 
-#&gt; ... ... ... Acoustic centroid is expanding... 
-#&gt; ... ... On internal time step ('timestep_archival') 3. 
-#&gt; ... ... ... Acoustic centroid is constant ... 
-#&gt;   |                                                                              |===================================================================   |  96%... On acoustic time step ('timestep_detection') 24. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. 
-#&gt;   |                                                                              |======================================================================| 100%
-#&gt; ... Movement over acoustic and internal ('archival') time steps has been completed. 
-#&gt; ... flapper::.acs() call completed (@ 2021-12-02 11:49:03) after ~0.02 minutes. 
-#&gt; ... flapper::.acs_pl() call completed (@ 2021-12-02 11:49:04) after ~0.04 minutes. </div><div class='output co'>#&gt; <span class='message'>flapper::ac() finished (@ 2021-12-02 11:49:04)...</span></div><div class='img'><img src='ac-1.png' alt='' width='700' height='433' /></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='message'>flapper::ac() called (@ 2021-12-02 14:34:37)...</span></div><div class='output co'>#&gt; flapper::.acs_pl() called (@ 2021-12-02 14:34:37)... 
+#&gt; ... Checking user inputs... </div><div class='output co'>#&gt; <span class='message'>Loading required package: raster</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: sp</span></div><div class='output co'>#&gt; <span class='message'>Error: package or namespace load failed for ‘raster’ in .doLoadActions(where, attach):</span>
+#&gt; <span class='message'> error in load action .__A__.1 for package raster: loadModule(module = "spmod", what = TRUE, env = ns, loadNow = TRUE): Unable to load module "spmod": object of type 'closure' is not subsettable</span></div><div class='output co'>#&gt; <span class='error'>Error in .requirePackage(package): unable to find required package ‘raster’</span></div><div class='input'>
 <span class='co'>#### Subsequent examples follow the implementation given in acdc().</span>
 
 </div></pre>

@@ -343,10 +343,10 @@ At each subsequent time step, this process repeats, with n possible locations of
              bathy <span class='op'>=</span> <span class='va'>surface</span>,
              calc_depth_error <span class='op'>=</span> <span class='va'>cde</span>,
              save_record_spatial <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 11:56:40)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:42:24)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Plotting movement time series (for each chunk)... </div><div class='img'><img src='pf-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Implementing algorithm over time steps... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 11:56:41) after ~0.01 minutes. </div><div class='input'><span class='co'># Extract time-specific maps</span>
+#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:42:24) after ~0 minutes. </div><div class='input'><span class='co'># Extract time-specific maps</span>
 <span class='co'># ... Either directly for single chunk implementations of dc()</span>
 <span class='va'>record</span> <span class='op'>&lt;-</span> <span class='va'>dc_out</span><span class='op'>$</span><span class='va'>archive</span><span class='op'>$</span><span class='va'>record</span>
 <span class='va'>record</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>record</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>r</span><span class='op'>)</span> <span class='va'>r</span><span class='op'>$</span><span class='va'>spatial</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>$</span><span class='va'>map_timestep</span><span class='op'>)</span>
@@ -416,7 +416,7 @@ At each subsequent time step, this process repeats, with n possible locations of
             calc_movement_pr <span class='op'>=</span> <span class='va'>pf_setup_movement_pr</span>,
             n <span class='op'>=</span> <span class='fl'>10L</span>,
             seed <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 11:56:42)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:42:26)... 
 #&gt; ... Setting up function... 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
 #&gt; ... Implementing algorithm iteratively over time steps... 
@@ -473,7 +473,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 11:56:43) after ~0.01 minutes. </div><div class='input'><span class='co'># The function returns a pf_archive-class object</span>
+#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:42:26) after ~0.01 minutes. </div><div class='input'><span class='co'># The function returns a pf_archive-class object</span>
 <span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='va'>out_1</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] "list"       "pf_archive"</div><div class='input'><span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>out_1</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; List of 3
@@ -1543,7 +1543,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/1.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/1.tif 
 #&gt; names      : X1 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1554,7 +1554,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/2.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/2.tif 
 #&gt; names      : X2 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1565,7 +1565,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/3.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/3.tif 
 #&gt; names      : X3 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1576,7 +1576,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/4.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/4.tif 
 #&gt; names      : X4 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1587,7 +1587,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/5.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/5.tif 
 #&gt; names      : X5 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1598,7 +1598,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/6.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/6.tif 
 #&gt; names      : X6 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1609,7 +1609,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/7.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/7.tif 
 #&gt; names      : X7 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1620,7 +1620,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/8.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/8.tif 
 #&gt; names      : X8 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1631,7 +1631,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/9.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/9.tif 
 #&gt; names      : X9 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1642,7 +1642,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/10.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/10.tif 
 #&gt; names      : X10 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1653,7 +1653,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/11.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/11.tif 
 #&gt; names      : X11 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1664,7 +1664,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/12.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/12.tif 
 #&gt; names      : X12 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1675,7 +1675,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/13.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/13.tif 
 #&gt; names      : X13 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1686,7 +1686,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/14.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/14.tif 
 #&gt; names      : X14 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1697,7 +1697,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/15.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/15.tif 
 #&gt; names      : X15 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1708,7 +1708,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/16.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/16.tif 
 #&gt; names      : X16 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1719,7 +1719,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/17.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/17.tif 
 #&gt; names      : X17 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1730,7 +1730,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; resolution : 5, 5  (x, y)
 #&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
 #&gt; crs        : NA 
-#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpPN9Ii5/dc_files/18.tif 
+#&gt; source     : /private/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T/RtmpoGmbum/dc_files/18.tif 
 #&gt; names      : X18 
 #&gt; values     : 0, 1  (min, max)
 #&gt; 
@@ -1746,7 +1746,7 @@ At each subsequent time step, this process repeats, with n possible locations of
             calc_movement_pr <span class='op'>=</span> <span class='va'>pf_setup_movement_pr</span>,
             n <span class='op'>=</span> <span class='fl'>10L</span>,
             seed <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 11:56:45)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:42:28)... 
 #&gt; ... Setting up function... 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
 #&gt; ... Implementing algorithm iteratively over time steps... 
@@ -1803,7 +1803,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 11:56:51) after ~0.11 minutes. </div><div class='input'>
+#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:42:35) after ~0.11 minutes. </div><div class='input'>
 <span class='co'>#### Example (3): Implement a blanket mobility restriction</span>
 <span class='co'># This can improve computational efficiency but offers no improvement</span>
 <span class='co'># ... in this example (e.g., due to relatively small raster, so the cost of</span>
@@ -1817,7 +1817,7 @@ At each subsequent time step, this process repeats, with n possible locations of
             mobility <span class='op'>=</span> <span class='fl'>250</span>,
             n <span class='op'>=</span> <span class='fl'>10L</span>,
            seed <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 11:56:51)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:42:35)... 
 #&gt; ... Setting up function... 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
 #&gt; ... Implementing algorithm iteratively over time steps... 
@@ -1874,7 +1874,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 11:56:52) after ~0.01 minutes. </div><div class='input'><span class='co'># Algorithm duration during testing ~0.04 minutes</span>
+#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:42:36) after ~0.01 minutes. </div><div class='input'><span class='co'># Algorithm duration during testing ~0.04 minutes</span>
 
 <span class='co'>#### Example (4): Implement algorithm using shortest distances</span>
 <span class='co'># Note the need for a surface with equal resolution if this option is implemented.</span>
@@ -1888,22 +1888,22 @@ At each subsequent time step, this process repeats, with n possible locations of
             calc_movement_pr <span class='op'>=</span> <span class='va'>pf_setup_movement_pr</span>,
             n <span class='op'>=</span> <span class='fl'>10L</span>,
             seed <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 11:56:52)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:42:36)... 
 #&gt; ... Setting up function... 
 #&gt; ... Setting up cost-surface for calc_distance = 'lcp'... 
-#&gt; flapper::lcp_costs() called (@ 2021-12-02 11:56:52)... 
+#&gt; flapper::lcp_costs() called (@ 2021-12-02 14:42:36)... 
 #&gt; ... Defining transition matrices... </div><div class='output co'>#&gt; <span class='warning'>Warning: transition function gives negative values</span></div><div class='output co'>#&gt; ... Calculating distance matrices... 
 #&gt; ... Assembling LCP costs... 
-#&gt; ... flapper::lcp_costs() call completed (@ 2021-12-02 11:56:54) after ~0.03 minutes. 
-#&gt; flapper::lcp_graph_surface() called (@ 2021-12-02 11:56:54)... 
+#&gt; ... flapper::lcp_costs() call completed (@ 2021-12-02 14:42:38) after ~0.04 minutes. 
+#&gt; flapper::lcp_graph_surface() called (@ 2021-12-02 14:42:38)... 
 #&gt; ... Defining nodes, edges and costs to make graph... 
 #&gt; ... Constructing graph object... 
-#&gt; ... flapper::lcp_graph_surface() call completed (@ 2021-12-02 11:56:56) after ~0.03 minutes. 
+#&gt; ... flapper::lcp_graph_surface() call completed (@ 2021-12-02 14:42:40) after ~0.03 minutes. 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
-#&gt; flapper::lcp_from_point() called (@ 2021-12-02 11:56:56)... 
+#&gt; flapper::lcp_from_point() called (@ 2021-12-02 14:42:40)... 
 #&gt; ... Calling cppRouting::get_distance_matrix() to get least-cost distances... 
 #&gt; ... Making raster of least-cost distances from origin ... 
-#&gt; ... flapper::lcp_from_point() call completed (@ 2021-12-02 11:56:56) after ~0 minutes. 
+#&gt; ... flapper::lcp_from_point() call completed (@ 2021-12-02 14:42:40) after ~0 minutes. 
 #&gt; ... Implementing algorithm iteratively over time steps... 
 #&gt; ... ... Time = 1... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
@@ -1958,7 +1958,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 11:57:25) after ~0.55 minutes. </div><div class='input'><span class='co'># This option is slower: algorithm duration during testing ~0.73 minutes</span>
+#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:43:09) after ~0.55 minutes. </div><div class='input'><span class='co'># This option is slower: algorithm duration during testing ~0.73 minutes</span>
 
 <span class='co'>#### Example (5): Implement algorithm using shortest distances with mobility restriction</span>
 <span class='va'>out_5</span> <span class='op'>&lt;-</span> <span class='fu'>pf</span><span class='op'>(</span>record <span class='op'>=</span> <span class='va'>record</span>,
@@ -1969,22 +1969,22 @@ At each subsequent time step, this process repeats, with n possible locations of
             mobility <span class='op'>=</span> <span class='fl'>250</span>,
             n <span class='op'>=</span> <span class='fl'>10L</span>,
             seed <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 11:57:25)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:43:09)... 
 #&gt; ... Setting up function... 
 #&gt; ... Setting up cost-surface for calc_distance = 'lcp'... 
-#&gt; flapper::lcp_costs() called (@ 2021-12-02 11:57:25)... 
+#&gt; flapper::lcp_costs() called (@ 2021-12-02 14:43:09)... 
 #&gt; ... Defining transition matrices... </div><div class='output co'>#&gt; <span class='warning'>Warning: transition function gives negative values</span></div><div class='output co'>#&gt; ... Calculating distance matrices... 
 #&gt; ... Assembling LCP costs... 
-#&gt; ... flapper::lcp_costs() call completed (@ 2021-12-02 11:57:27) after ~0.04 minutes. 
-#&gt; flapper::lcp_graph_surface() called (@ 2021-12-02 11:57:27)... 
+#&gt; ... flapper::lcp_costs() call completed (@ 2021-12-02 14:43:11) after ~0.04 minutes. 
+#&gt; flapper::lcp_graph_surface() called (@ 2021-12-02 14:43:11)... 
 #&gt; ... Defining nodes, edges and costs to make graph... 
 #&gt; ... Constructing graph object... 
-#&gt; ... flapper::lcp_graph_surface() call completed (@ 2021-12-02 11:57:29) after ~0.03 minutes. 
+#&gt; ... flapper::lcp_graph_surface() call completed (@ 2021-12-02 14:43:13) after ~0.03 minutes. 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
-#&gt; flapper::lcp_from_point() called (@ 2021-12-02 11:57:29)... 
+#&gt; flapper::lcp_from_point() called (@ 2021-12-02 14:43:13)... 
 #&gt; ... Calling cppRouting::get_distance_matrix() to get least-cost distances... 
 #&gt; ... Making raster of least-cost distances from origin ... 
-#&gt; ... flapper::lcp_from_point() call completed (@ 2021-12-02 11:57:29) after ~0 minutes. 
+#&gt; ... flapper::lcp_from_point() call completed (@ 2021-12-02 14:43:13) after ~0 minutes. 
 #&gt; ... Implementing algorithm iteratively over time steps... 
 #&gt; ... ... Time = 1... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
@@ -2039,7 +2039,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 11:58:00) after ~0.58 minutes. </div><div class='input'><span class='co'># Algorithm duration during testing ~0.63 minutes</span>
+#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:43:43) after ~0.57 minutes. </div><div class='input'><span class='co'># Algorithm duration during testing ~0.63 minutes</span>
 <span class='co'># With shortest distances, the mobility restriction makes more difference</span>
 <span class='co'># ... in improving the computation time, because calculations are more involved.</span>
 
@@ -2055,7 +2055,7 @@ At each subsequent time step, this process repeats, with n possible locations of
             n <span class='op'>=</span> <span class='fl'>10L</span>,
             cl <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/makeCluster.html'>makeCluster</a></span><span class='op'>(</span><span class='fl'>2L</span><span class='op'>)</span>,
             seed <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 11:58:00)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:43:43)... 
 #&gt; ... Setting up function... 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
 #&gt; ... Implementing algorithm iteratively over time steps... 
@@ -2094,22 +2094,22 @@ At each subsequent time step, this process repeats, with n possible locations of
             n <span class='op'>=</span> <span class='fl'>10L</span>,
             use_all_cores <span class='op'>=</span> <span class='cn'>TRUE</span>,
             seed <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 11:58:05)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:43:48)... 
 #&gt; ... Setting up function... 
 #&gt; ... Setting up cost-surface for calc_distance = 'lcp'... 
-#&gt; flapper::lcp_costs() called (@ 2021-12-02 11:58:05)... 
+#&gt; flapper::lcp_costs() called (@ 2021-12-02 14:43:48)... 
 #&gt; ... Defining transition matrices... </div><div class='output co'>#&gt; <span class='warning'>Warning: transition function gives negative values</span></div><div class='output co'>#&gt; ... Calculating distance matrices... 
 #&gt; ... Assembling LCP costs... 
-#&gt; ... flapper::lcp_costs() call completed (@ 2021-12-02 11:58:07) after ~0.04 minutes. 
-#&gt; flapper::lcp_graph_surface() called (@ 2021-12-02 11:58:07)... 
+#&gt; ... flapper::lcp_costs() call completed (@ 2021-12-02 14:43:51) after ~0.04 minutes. 
+#&gt; flapper::lcp_graph_surface() called (@ 2021-12-02 14:43:51)... 
 #&gt; ... Defining nodes, edges and costs to make graph... 
 #&gt; ... Constructing graph object... 
-#&gt; ... flapper::lcp_graph_surface() call completed (@ 2021-12-02 11:58:09) after ~0.03 minutes. 
+#&gt; ... flapper::lcp_graph_surface() call completed (@ 2021-12-02 14:43:53) after ~0.03 minutes. 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
-#&gt; flapper::lcp_from_point() called (@ 2021-12-02 11:58:09)... 
+#&gt; flapper::lcp_from_point() called (@ 2021-12-02 14:43:53)... 
 #&gt; ... Calling cppRouting::get_distance_matrix() to get least-cost distances... 
 #&gt; ... Making raster of least-cost distances from origin ... 
-#&gt; ... flapper::lcp_from_point() call completed (@ 2021-12-02 11:58:09) after ~0 minutes. 
+#&gt; ... flapper::lcp_from_point() call completed (@ 2021-12-02 14:43:53) after ~0 minutes. 
 #&gt; ... Implementing algorithm iteratively over time steps... 
 #&gt; ... ... Time = 1... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
@@ -2164,7 +2164,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 11:58:40) after ~0.58 minutes. </div><div class='input'><span class='co'># But the speed benefits in this case are minimal.</span>
+#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:44:23) after ~0.58 minutes. </div><div class='input'><span class='co'># But the speed benefits in this case are minimal.</span>
 <span class='co'># Algorithm duration during testing ~0.61 minutes.</span>
 
 <span class='co'>#### Example (8): Extend the movement model via variables in data</span>
@@ -2201,7 +2201,7 @@ At each subsequent time step, this process repeats, with n possible locations of
             mobility <span class='op'>=</span> <span class='fl'>250</span>,
             n <span class='op'>=</span> <span class='fl'>10L</span>,
             seed <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 11:58:40)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:44:23)... 
 #&gt; ... Setting up function... 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
 #&gt; ... Implementing algorithm iteratively over time steps... 
@@ -2258,7 +2258,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 11:58:41) after ~0.01 minutes. </div><div class='input'>
+#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:44:24) after ~0.01 minutes. </div><div class='input'>
 <span class='co'>#### Dealing with convergence failures.</span>
 <span class='co'># The algorithm can fail to converge. There are a variety of options</span>
 <span class='co'># ... that can be trialled to deal with this:</span>
@@ -2280,7 +2280,7 @@ At each subsequent time step, this process repeats, with n possible locations of
             seed <span class='op'>=</span> <span class='fl'>1</span>,
             update_history <span class='op'>=</span> <span class='va'>out_8</span><span class='op'>$</span><span class='va'>history</span>,
             update_history_from_time_step <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 11:58:41)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:44:24)... 
 #&gt; ... Setting up function... 
 #&gt; ... Using update_history... 
 #&gt; ... Determining the set of possible starting locations for update (t = 5)... 
@@ -2326,7 +2326,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 11:58:41) after ~0.01 minutes. </div><div class='input'>
+#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:44:24) after ~0.01 minutes. </div><div class='input'>
 <span class='co'>#### Example (10): Implement re-sampling via resample</span>
 <span class='co'># Here, for demonstration purposes, we implement the algorithm from</span>
 <span class='co'># ... scratch with the original movement model, this time re-sampling</span>
@@ -2343,7 +2343,7 @@ At each subsequent time step, this process repeats, with n possible locations of
              n <span class='op'>=</span> <span class='fl'>10L</span>,
              resample <span class='op'>=</span> <span class='fl'>10</span>,
              seed <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 11:58:41)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:44:24)... 
 #&gt; ... Setting up function... 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
 #&gt; ... Implementing algorithm iteratively over time steps... 
@@ -2401,7 +2401,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 11:58:42) after ~0.01 minutes. </div><div class='input'>
+#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:44:25) after ~0.01 minutes. </div><div class='input'>
 <span class='co'>#### Example (10): A simulation workflow</span>
 <span class='co'># This example provides a simulation workflow for comparing simulated and</span>
 <span class='co'># ... reconstructed paths. Specifically, we simulate movement in an area,</span>
@@ -2427,7 +2427,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 <span class='fu'>prettyGraphics</span><span class='fu'>::</span><span class='fu'><a href='https://edwardlavender.github.io/prettyGraphics/reference/pretty_map.html'>pretty_map</a></span><span class='op'>(</span><span class='va'>dat_gebco_planar</span>,
                            add_rasters <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>dat_gebco_planar</span><span class='op'>)</span>,
                            add_polys <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>dat_sea</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='img'><img src='pf-22.png' alt='' width='700' height='433' /></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='img'><img src='pf-22.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## (C) Simulate movement path</span>
 <span class='co'># Define movement parameters</span>
 <span class='va'>sim_steps</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/GammaDist.html'>rgamma</a></span><span class='op'>(</span><span class='fl'>1</span>, shape <span class='op'>=</span> <span class='fl'>15</span>, scale <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span>
@@ -2442,10 +2442,10 @@ At each subsequent time step, this process repeats, with n possible locations of
                         sim_step <span class='op'>=</span> <span class='va'>sim_steps</span>,
                         add_rasters <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>dat_gebco_planar</span><span class='op'>)</span>,
                         seed <span class='op'>=</span> <span class='va'>seed</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::sim_path_sa() called (@ 2021-12-02 11:58:42)... 
+</div><div class='output co'>#&gt; flapper::sim_path_sa() called (@ 2021-12-02 14:44:26)... 
 #&gt; ... Setting up simulation... 
 #&gt; ... Simulating movement path... 
-#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=======                                                               |  10%  |                                                                              |==============                                                        |  20%  |                                                                              |=====================                                                 |  30%  |                                                                              |============================                                          |  40%  |                                                                              |===================================                                   |  50%  |                                                                              |==========================================                            |  60%  |                                                                              |=================================================                     |  70%  |                                                                              |========================================================              |  80%  |                                                                              |===============================================================       |  90%  |                                                                              |======================================================================| 100%... Plotting simulated path... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='img'><img src='pf-24.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::sim_path_sa() call completed (@ 2021-12-02 11:58:43) after ~0 minutes. </div><div class='input'><span class='co'># Get resultant depth time series</span>
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=======                                                               |  10%  |                                                                              |==============                                                        |  20%  |                                                                              |=====================                                                 |  30%  |                                                                              |============================                                          |  40%  |                                                                              |===================================                                   |  50%  |                                                                              |==========================================                            |  60%  |                                                                              |=================================================                     |  70%  |                                                                              |========================================================              |  80%  |                                                                              |===============================================================       |  90%  |                                                                              |======================================================================| 100%... Plotting simulated path... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='img'><img src='pf-24.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::sim_path_sa() call completed (@ 2021-12-02 14:44:26) after ~0 minutes. </div><div class='input'><span class='co'># Get resultant depth time series</span>
 <span class='va'>path_sim</span> <span class='op'>&lt;-</span> <span class='va'>path_sim</span><span class='op'>$</span><span class='va'>xy_mat</span>
 <span class='va'>path_sim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>path_id <span class='op'>=</span> <span class='fl'>1</span>,
                        cell_id <span class='op'>=</span> <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/cellFrom.html'>cellFromXY</a></span><span class='op'>(</span><span class='va'>dat_gebco_planar</span>, <span class='va'>path_sim</span><span class='op'>)</span>,
@@ -2475,10 +2475,10 @@ At each subsequent time step, this process repeats, with n possible locations of
              bathy <span class='op'>=</span> <span class='va'>dat_gebco_planar</span>,
              calc_depth_error <span class='op'>=</span> <span class='va'>cde</span>,
              save_record_spatial <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 11:58:43)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:44:26)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Plotting movement time series (for each chunk)... </div><div class='img'><img src='pf-27.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Implementing algorithm over time steps... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 11:58:43) after ~0.01 minutes. </div><div class='input'>
+#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:44:27) after ~0.01 minutes. </div><div class='input'>
 <span class='co'>## Implement pf() on the results from dc()</span>
 <span class='co'># We will assume that the origin was known.</span>
 <span class='co'># ... We will mostly use the default options.</span>
@@ -2489,7 +2489,7 @@ At each subsequent time step, this process repeats, with n possible locations of
      calc_distance <span class='op'>=</span> <span class='st'>"euclid"</span>,
      mobility <span class='op'>=</span> <span class='fl'>200</span>,
      n <span class='op'>=</span> <span class='fl'>10L</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 11:58:43)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:44:27)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>acdc_simplify() implemented for type = 'dc'.</span></div><div class='output co'>#&gt; ... Determining the set of possible starting locations (t = 1)... 
 #&gt; ... Implementing algorithm iteratively over time steps... 
 #&gt; ... ... Time = 1... 
@@ -2521,7 +2521,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 10... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 11:58:44) after ~0.01 minutes. </div><div class='input'>
+#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:44:27) after ~0.01 minutes. </div><div class='input'>
 <span class='co'>## Visualise particle histories in relation to simulated paths</span>
 <span class='co'># Here, each plot shows the particles sampled at a particular time step</span>
 <span class='co'># ... The green area shows areas of the requisite depth at that time step and the</span>
@@ -2534,18 +2534,18 @@ At each subsequent time step, this process repeats, with n possible locations of
                 xlim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/range.html'>range</a></span><span class='op'>(</span><span class='va'>path_sim</span><span class='op'>$</span><span class='va'>cell_x</span><span class='op'>)</span>, ylim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/range.html'>range</a></span><span class='op'>(</span><span class='va'>path_sim</span><span class='op'>$</span><span class='va'>cell_y</span><span class='op'>)</span>,
                 crop_spatial <span class='op'>=</span> <span class='cn'>TRUE</span>,
                 prompt <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='input'><span class='fu'>graphics</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span><span class='va'>pp</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='input'><span class='fu'>graphics</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span><span class='va'>pp</span><span class='op'>)</span>
 </div><div class='img'><img src='pf-28.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## Assemble paths</span>
 <span class='va'>path_dcpf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='pf_simplify.html'>pf_simplify</a></span><span class='op'>(</span><span class='va'>history_dcpf</span>, bathy <span class='op'>=</span> <span class='va'>dat_gebco_planar</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 11:58:44)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:44:28)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 11:58:44) after ~0 minutes. </div><div class='input'>
+#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:44:28) after ~0 minutes. </div><div class='input'>
 <span class='co'>## Compare reconstructed versus observed depth time series</span>
 <span class='fu'><a href='pf_plot_1d.html'>pf_plot_1d</a></span><span class='op'>(</span><span class='va'>path_dcpf</span>, <span class='va'>depth_obs</span><span class='op'>)</span>
 </div><div class='img'><img src='pf-29.png' alt='' width='700' height='433' /></div><div class='input'>
@@ -2564,16 +2564,16 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; </span><span style='color: #949494;'># Groups:   path_id [100]</span><span>
 #&gt;    path_id timestep cell_id  cell_x  cell_y cell_z cell_pr  dist cell_x2 cell_y2
 #&gt;      </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span>       1        0  </span><span style='text-decoration: underline;'>635</span><span>947 </span><span style='text-decoration: underline;'>708</span><span>280.  6.25</span><span style='color: #949494;'>e</span><span>6   61.4   1      </span><span style='color: #BB0000;'>NA</span><span>       </span><span style='color: #BB0000;'>NA</span><span>  </span><span style='color: #BB0000;'>NA</span><span>   </span><span style='color: #949494;'> </span><span> 
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span>       1        1  </span><span style='text-decoration: underline;'>638</span><span>226 </span><span style='text-decoration: underline;'>708</span><span>180.  6.25</span><span style='color: #949494;'>e</span><span>6   64.4   0.977 125   </span><span style='text-decoration: underline;'>708</span><span>280.  6.25</span><span style='color: #949494;'>e</span><span>6
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span>       1        2  </span><span style='text-decoration: underline;'>641</span><span>266 </span><span style='text-decoration: underline;'>708</span><span>080.  6.25</span><span style='color: #949494;'>e</span><span>6   62.8   0.949 141.  </span><span style='text-decoration: underline;'>708</span><span>180.  6.25</span><span style='color: #949494;'>e</span><span>6
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span>       1        3  </span><span style='text-decoration: underline;'>646</span><span>591 </span><span style='text-decoration: underline;'>708</span><span>030.  6.25</span><span style='color: #949494;'>e</span><span>6   58.2   0.711 182.  </span><span style='text-decoration: underline;'>708</span><span>080.  6.25</span><span style='color: #949494;'>e</span><span>6
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span>       1        4  </span><span style='text-decoration: underline;'>651</span><span>917 </span><span style='text-decoration: underline;'>708</span><span>005.  6.25</span><span style='color: #949494;'>e</span><span>6   52.2   0.762 177.  </span><span style='text-decoration: underline;'>708</span><span>030.  6.25</span><span style='color: #949494;'>e</span><span>6
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span>       1        5  </span><span style='text-decoration: underline;'>653</span><span>439 </span><span style='text-decoration: underline;'>708</span><span>005.  6.25</span><span style='color: #949494;'>e</span><span>6   50.4   0.999  50   </span><span style='text-decoration: underline;'>708</span><span>005.  6.25</span><span style='color: #949494;'>e</span><span>6
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span>       1        6  </span><span style='text-decoration: underline;'>658</span><span>007 </span><span style='text-decoration: underline;'>708</span><span>055.  6.25</span><span style='color: #949494;'>e</span><span>6   46.7   0.890 158.  </span><span style='text-decoration: underline;'>708</span><span>005.  6.25</span><span style='color: #949494;'>e</span><span>6
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span>       1        7  </span><span style='text-decoration: underline;'>656</span><span>482 </span><span style='text-decoration: underline;'>707</span><span>980.  6.25</span><span style='color: #949494;'>e</span><span>6   46.5   0.996  90.1 </span><span style='text-decoration: underline;'>708</span><span>055.  6.25</span><span style='color: #949494;'>e</span><span>6
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span>       1        8  </span><span style='text-decoration: underline;'>653</span><span>436 </span><span style='text-decoration: underline;'>707</span><span>930.  6.25</span><span style='color: #949494;'>e</span><span>6   51.9   0.988 112.  </span><span style='text-decoration: underline;'>707</span><span>980.  6.25</span><span style='color: #949494;'>e</span><span>6
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span>       1        9  </span><span style='text-decoration: underline;'>652</span><span>670 </span><span style='text-decoration: underline;'>707</span><span>805.  6.25</span><span style='color: #949494;'>e</span><span>6   61.8   0.974 127.  </span><span style='text-decoration: underline;'>707</span><span>930.  6.25</span><span style='color: #949494;'>e</span><span>6
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span>       1        0  </span><span style='text-decoration: underline;'>635</span><span>947 </span><span style='text-decoration: underline;'>708</span><span>280.  6.25</span><span style='color: #949494;'>e</span><span>6   61.4   1       </span><span style='color: #BB0000;'>NA</span><span>      </span><span style='color: #BB0000;'>NA</span><span>  </span><span style='color: #BB0000;'>NA</span><span>   </span><span style='color: #949494;'> </span><span> 
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span>       1        1  </span><span style='text-decoration: underline;'>638</span><span>987 </span><span style='text-decoration: underline;'>708</span><span>180.  6.25</span><span style='color: #949494;'>e</span><span>6   63.2   0.949  141. </span><span style='text-decoration: underline;'>708</span><span>280.  6.25</span><span style='color: #949494;'>e</span><span>6
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span>       1        2  </span><span style='text-decoration: underline;'>642</span><span>788 </span><span style='text-decoration: underline;'>708</span><span>080.  6.25</span><span style='color: #949494;'>e</span><span>6   61.2   0.880  160. </span><span style='text-decoration: underline;'>708</span><span>180.  6.25</span><span style='color: #949494;'>e</span><span>6
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span>       1        3  </span><span style='text-decoration: underline;'>647</span><span>352 </span><span style='text-decoration: underline;'>708</span><span>030.  6.25</span><span style='color: #949494;'>e</span><span>6   57.4   0.890  158. </span><span style='text-decoration: underline;'>708</span><span>080.  6.25</span><span style='color: #949494;'>e</span><span>6
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span>       1        4  </span><span style='text-decoration: underline;'>650</span><span>399 </span><span style='text-decoration: underline;'>708</span><span>105.  6.25</span><span style='color: #949494;'>e</span><span>6   53.8   0.977  125  </span><span style='text-decoration: underline;'>708</span><span>030.  6.25</span><span style='color: #949494;'>e</span><span>6
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span>       1        5  </span><span style='text-decoration: underline;'>653</span><span>439 </span><span style='text-decoration: underline;'>708</span><span>005.  6.25</span><span style='color: #949494;'>e</span><span>6   50.4   0.949  141. </span><span style='text-decoration: underline;'>708</span><span>105.  6.25</span><span style='color: #949494;'>e</span><span>6
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span>       1        6  </span><span style='text-decoration: underline;'>654</span><span>965 </span><span style='text-decoration: underline;'>708</span><span>105.  6.25</span><span style='color: #949494;'>e</span><span>6   49.7   0.988  112. </span><span style='text-decoration: underline;'>708</span><span>005.  6.25</span><span style='color: #949494;'>e</span><span>6
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span>       1        7  </span><span style='text-decoration: underline;'>657</span><span>245 </span><span style='text-decoration: underline;'>708</span><span>030.  6.25</span><span style='color: #949494;'>e</span><span>6   46.8   0.991  106. </span><span style='text-decoration: underline;'>708</span><span>105.  6.25</span><span style='color: #949494;'>e</span><span>6
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span>       1        8  </span><span style='text-decoration: underline;'>654</span><span>197 </span><span style='text-decoration: underline;'>707</span><span>930.  6.25</span><span style='color: #949494;'>e</span><span>6   50.8   0.949  141. </span><span style='text-decoration: underline;'>708</span><span>030.  6.25</span><span style='color: #949494;'>e</span><span>6
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span>       1        9  </span><span style='text-decoration: underline;'>653</span><span>430 </span><span style='text-decoration: underline;'>707</span><span>780.  6.25</span><span style='color: #949494;'>e</span><span>6   62.3   0.917  152. </span><span style='text-decoration: underline;'>707</span><span>930.  6.25</span><span style='color: #949494;'>e</span><span>6
 #&gt; </span><span style='color: #949494;'># … with 1,090 more rows, and 1 more variable: dist_1 &lt;dbl&gt;</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/range.html'>range</a></span><span class='op'>(</span><span class='va'>path_dcpf</span><span class='op'>$</span><span class='va'>dist_1</span>, na.rm <span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1]   0 200</div><div class='input'>
 <span class='co'>## Visualise paths</span>
@@ -2601,7 +2601,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 <span class='va'>out_11</span> <span class='op'>&lt;-</span> <span class='fu'>pf</span><span class='op'>(</span>record <span class='op'>=</span> <span class='va'>record</span>,
              origin  <span class='op'>=</span> <span class='va'>xy</span>,
              write_history <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>file <span class='op'>=</span> <span class='va'>root</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 11:58:45)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:44:28)... 
 #&gt; ... Setting up function... 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
 #&gt; ... Implementing algorithm iteratively over time steps... 
@@ -2658,7 +2658,7 @@ At each subsequent time step, this process repeats, with n possible locations of
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 11:58:45) after ~0.01 minutes. </div><div class='input'><span class='co'># Read the record into R</span>
+#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:44:28) after ~0.01 minutes. </div><div class='input'><span class='co'># Read the record into R</span>
 <span class='va'>history_from_file</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='fu'><a href='pf_access_history_files.html'>pf_access_history_files</a></span><span class='op'>(</span><span class='va'>root</span><span class='op'>)</span>, <span class='va'>readRDS</span><span class='op'>)</span>
 <span class='co'># Show that the history recorded in 'out_11' is the same as that recorded by the saved files</span>
 <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>out_11</span><span class='op'>$</span><span class='va'>history</span><span class='op'>)</span>; <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>history_from_file</span><span class='op'>)</span>
@@ -2666,16 +2666,16 @@ At each subsequent time step, this process repeats, with n possible locations of
 </div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>out_11</span><span class='op'>$</span><span class='va'>history</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span>,
       <span class='va'>history_from_file</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    id_current pr_current timestep id_current pr_current timestep
-#&gt; 1       93016  0.7621859        1      93016  0.7621859        1
-#&gt; 2       68191  0.8903485        1      68191  0.8903485        1
-#&gt; 3       64990  0.5274673        1      64990  0.5274673        1
-#&gt; 4       81809  0.9995754        1      81809  0.9995754        1
-#&gt; 5       70584  0.9338431        1      70584  0.9338431        1
-#&gt; 6       64582  0.3003764        1      64582  0.3003764        1
-#&gt; 7       78983  0.9956703        1      78983  0.9956703        1
-#&gt; 8       84587  0.9961233        1      84587  0.9961233        1
-#&gt; 9       72974  0.8684713        1      72974  0.8684713        1
-#&gt; 10      68208  0.9087560        1      68208  0.9087560        1</div><div class='input'>
+#&gt; 1       80231  0.9241418        1      80231  0.9241418        1
+#&gt; 2       95802  0.5613876        1      95802  0.5613876        1
+#&gt; 3       76573  0.9338431        1      76573  0.9338431        1
+#&gt; 4       65784  0.5117442        1      65784  0.5117442        1
+#&gt; 5       76958  0.2820200        1      76958  0.2820200        1
+#&gt; 6       81407  0.9997572        1      81407  0.9997572        1
+#&gt; 7       79806  0.9998376        1      79806  0.9998376        1
+#&gt; 8       69422  0.8097959        1      69422  0.8097959        1
+#&gt; 9       87835  0.5653316        1      87835  0.5653316        1
+#&gt; 10      94623  0.3664419        1      94623  0.3664419        1</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

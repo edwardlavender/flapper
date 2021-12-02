@@ -175,11 +175,9 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>#### Define receiver locations as a SpatialPoints object with a UTM CRS</span>
-<span class='va'>proj_wgs84</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span><span class='st'>"+init=epsg:4326"</span><span class='op'>)</span>
-<span class='va'>proj_utm</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"+proj=utm +zone=29 +datum=WGS84"</span>,
-                          <span class='st'>"+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum WGS_1984 in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='input'><span class='va'>xy</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPoints</a></span><span class='op'>(</span><span class='va'>dat_moorings</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"receiver_long"</span>, <span class='st'>"receiver_lat"</span><span class='op'>)</span><span class='op'>]</span>,
+<span class='va'>proj_wgs84</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span>SRS_string <span class='op'>=</span> <span class='st'>"EPSG:4326"</span><span class='op'>)</span>
+<span class='va'>proj_utm</span>   <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span>SRS_string <span class='op'>=</span> <span class='st'>"EPSG:32629"</span><span class='op'>)</span>
+<span class='va'>xy</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPoints</a></span><span class='op'>(</span><span class='va'>dat_moorings</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"receiver_long"</span>, <span class='st'>"receiver_lat"</span><span class='op'>)</span><span class='op'>]</span>,
                         <span class='va'>proj_wgs84</span><span class='op'>)</span>
 <span class='va'>xy</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/spTransform.html'>spTransform</a></span><span class='op'>(</span><span class='va'>xy</span>, <span class='va'>proj_utm</span><span class='op'>)</span>
 
@@ -188,29 +186,29 @@
 </div><div class='img'><img src='get_detection_centroids-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; class       : SpatialPolygons 
 #&gt; features    : 1 
 #&gt; extent      : 699188.2, 710830.8, 6249818, 6269562  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs </div><div class='input'>
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </div><div class='input'>
 <span class='co'>#### Example (2): Account for barriers in the study area</span>
 <span class='fu'>get_detection_centroids</span><span class='op'>(</span><span class='va'>xy</span>, coastline <span class='op'>=</span> <span class='va'>dat_coast</span><span class='op'>)</span>
 </div><div class='img'><img src='get_detection_centroids-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; class       : SpatialPolygons 
 #&gt; features    : 1 
 #&gt; extent      : 699188.2, 710830.8, 6249818, 6269558  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs </div><div class='input'>
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </div><div class='input'>
 <span class='co'>#### Example (3): Adjust the detection range</span>
 <span class='fu'>get_detection_centroids</span><span class='op'>(</span><span class='va'>xy</span>, detection_range <span class='op'>=</span> <span class='fl'>400</span>, coastline <span class='op'>=</span> <span class='va'>dat_coast</span><span class='op'>)</span>
 </div><div class='img'><img src='get_detection_centroids-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; class       : SpatialPolygons 
 #&gt; features    : 1 
 #&gt; extent      : 699213.2, 710805.8, 6249843, 6269536  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs </div><div class='input'><span class='fu'>get_detection_centroids</span><span class='op'>(</span><span class='va'>xy</span>, detection_range <span class='op'>=</span> <span class='fl'>500</span>, coastline <span class='op'>=</span> <span class='va'>dat_coast</span><span class='op'>)</span>
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </div><div class='input'><span class='fu'>get_detection_centroids</span><span class='op'>(</span><span class='va'>xy</span>, detection_range <span class='op'>=</span> <span class='fl'>500</span>, coastline <span class='op'>=</span> <span class='va'>dat_coast</span><span class='op'>)</span>
 </div><div class='img'><img src='get_detection_centroids-4.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; class       : SpatialPolygons 
 #&gt; features    : 1 
 #&gt; extent      : 699113.2, 710905.8, 6249743, 6269629  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs </div><div class='input'>
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </div><div class='input'>
 <span class='co'>#### Example (4): Suppress the plot</span>
 <span class='fu'>get_detection_centroids</span><span class='op'>(</span><span class='va'>xy</span>, coastline <span class='op'>=</span> <span class='va'>dat_coast</span>, plot <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; class       : SpatialPolygons 
 #&gt; features    : 1 
 #&gt; extent      : 699188.2, 710830.8, 6249818, 6269558  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs </div><div class='input'>
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </div><div class='input'>
 <span class='co'>#### Example (5): Output characteristics are controlled via byid</span>
 <span class='co'># A SpatialPolygons object with one feature is the implicit output</span>
 <span class='va'>sp_1</span> <span class='op'>&lt;-</span> <span class='fu'>get_detection_centroids</span><span class='op'>(</span><span class='va'>xy</span>, coastline <span class='op'>=</span> <span class='va'>dat_coast</span>, byid <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
@@ -218,14 +216,14 @@
 </div><div class='output co'>#&gt; class       : SpatialPolygons 
 #&gt; features    : 1 
 #&gt; extent      : 699188.2, 710830.8, 6249818, 6269558  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs </div><div class='input'><span class='co'># A SpatialPolygons object with one feature for each element in xy</span>
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </div><div class='input'><span class='co'># A SpatialPolygons object with one feature for each element in xy</span>
 <span class='co'># ... can be returned via byid = TRUE</span>
 <span class='va'>sp_2</span> <span class='op'>&lt;-</span> <span class='fu'>get_detection_centroids</span><span class='op'>(</span><span class='va'>xy</span>, coastline <span class='op'>=</span> <span class='va'>dat_coast</span>, byid <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='img'><img src='get_detection_centroids-6.png' alt='' width='700' height='433' /></div><div class='input'><span class='va'>sp_2</span>
 </div><div class='output co'>#&gt; class       : SpatialPolygons 
 #&gt; features    : 40 
 #&gt; extent      : 699188.2, 710830.8, 6249818, 6269558  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs </div><div class='input'><span class='co'># The total area of the former will be smaller, since areas covered</span>
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </div><div class='input'><span class='co'># The total area of the former will be smaller, since areas covered</span>
 <span class='co'># ... by multiple receivers are merged</span>
 <span class='fu'>rgeos</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/rgeos/man/misc-gArea.html'>gArea</a></span><span class='op'>(</span><span class='va'>sp_1</span><span class='op'>)</span>; <span class='fu'>rgeos</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/rgeos/man/misc-gArea.html'>gArea</a></span><span class='op'>(</span><span class='va'>sp_2</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 16335577</div><div class='output co'>#&gt; [1] 21992939</div><div class='input'><span class='co'># But it can be more convenient to use the latter format in some cases</span>

@@ -180,12 +180,10 @@
     <pre class="examples"><div class='input'><span class='co'>#### Define data for acs_setup_centroids()</span>
 <span class='co'>## Define coordinates of receivers as SpatialPointsDataFrame with UTM CRS</span>
 <span class='co'># CRS of receiver locations as recorded in dat_moorings</span>
-<span class='va'>proj_wgs84</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span><span class='st'>"+init=epsg:4326"</span><span class='op'>)</span>
+<span class='va'>proj_wgs84</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span>SRS_string <span class='op'>=</span> <span class='st'>"EPSG:4326"</span><span class='op'>)</span>
 <span class='co'># CRS of receiver locations required</span>
-<span class='va'>proj_utm</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"+proj=utm +zone=29 +datum=WGS84"</span>,
-                          <span class='st'>"+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum WGS_1984 in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='input'><span class='co'># Define SpatialPoints object</span>
+<span class='va'>proj_utm</span>   <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span>SRS_string <span class='op'>=</span> <span class='st'>"EPSG:32629"</span><span class='op'>)</span>
+<span class='co'># Define SpatialPoints object</span>
 <span class='va'>xy_wgs84</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPoints</a></span><span class='op'>(</span><span class='va'>dat_moorings</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"receiver_long"</span>, <span class='st'>"receiver_lat"</span><span class='op'>)</span><span class='op'>]</span>, <span class='va'>proj_wgs84</span><span class='op'>)</span>
 <span class='va'>xy_utm</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/spTransform.html'>spTransform</a></span><span class='op'>(</span><span class='va'>xy_wgs84</span>, <span class='va'>proj_utm</span><span class='op'>)</span>
 <span class='co'># Link with receiver IDs to define a SpatialPointsDataFrame</span>
@@ -198,11 +196,11 @@
 <span class='va'>centroids</span> <span class='op'>&lt;-</span> <span class='fu'>acs_setup_centroids</span><span class='op'>(</span>xy <span class='op'>=</span> <span class='va'>xy_utm</span>,
                                  detection_range <span class='op'>=</span> <span class='fl'>500</span>
                                  <span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::acs_setup_detection_centroids() called (@ 2021-12-02 11:50:08)... 
+</div><div class='output co'>#&gt; flapper::acs_setup_detection_centroids() called (@ 2021-12-02 14:35:48)... 
 #&gt; ... Checking user inputs... 
 #&gt; ... Making centroids... 
 #&gt; ... Processing centroids... 
-#&gt; ... flapper::acs_setup_detection_centroids() call completed (@ 2021-12-02 11:50:08) after ~0 minutes. </div><div class='input'><span class='co'># A list of SpatialPolygonsDataFrames is returned</span>
+#&gt; ... flapper::acs_setup_detection_centroids() call completed (@ 2021-12-02 14:35:48) after ~0 minutes. </div><div class='input'><span class='co'># A list of SpatialPolygonsDataFrames is returned</span>
 <span class='co'># with elements from 1:max(xy_utm$receiver_id)</span>
 <span class='co'># NULL elements correspond to numbers in this sequence that do not refer to receivers</span>
 <span class='co'># Otherwise a SpatialPolygonsDataFrame is returned with all the centroids for that receiver</span>
@@ -217,7 +215,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 705972.2, 706972.2, 6253501, 6254501  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :           3, 706472.237977747, 6254001.47143853,        1 
@@ -226,7 +224,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 709257.8, 710257.8, 6267227, 6268227  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :           4, 709757.838706845, 6267726.89057173,        1 
@@ -241,7 +239,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 708276.6, 709276.6, 6268637, 6269637  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :           7, 708776.612630041, 6269137.04656454,        1 
@@ -253,7 +251,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 705539.9, 706539.9, 6253830, 6254830  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :           9, 706039.851551317, 6254329.75898771,        1 
@@ -265,7 +263,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 707042.3, 708042.3, 6267227, 6268227  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,   receiver_long,    receiver_lat, optional 
 #&gt; value       :          11, 707542.34971065, 6267727.0245263,        1 
@@ -274,7 +272,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 709576.1, 710576.1, 6266821, 6267821  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          12, 710076.090170494, 6267320.89031923,        1 
@@ -286,7 +284,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 703120.8, 704120.8, 6265789, 6266789  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          14, 703620.828045288, 6266289.28828596,        1 
@@ -304,7 +302,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 708105.6, 709105.6, 6261775, 6262775  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          18, 708605.560505287, 6262275.05546168,        1 
@@ -316,7 +314,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 702012.6, 703012.6, 6264400, 6265400  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          20, 702512.639477486, 6264900.03635278,        1 
@@ -325,7 +323,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 708244.2, 709244.2, 6252351, 6253351  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          21, 708744.224623811, 6252850.83006878,        1 
@@ -337,7 +335,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 702364.7, 703364.7, 6264861, 6265861  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          23, 702864.703528681, 6265360.98651514,        1 
@@ -346,7 +344,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 708644.6, 709644.6, 6261965, 6262965  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          24, 709144.620204365, 6262465.13201869,        1 
@@ -358,7 +356,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 708775.6, 709775.6, 6252617, 6253617  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          26, 709275.587533625, 6253116.72186051,        1 
@@ -367,7 +365,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 703910.1, 704910.1, 6249743, 6250743  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          27, 704410.062684187, 6250242.84019987,        1 
@@ -379,7 +377,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 699113.2, 700113.2, 6267058, 6268058  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          29, 699613.246077539, 6267558.48978002,        1 
@@ -388,7 +386,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 707295.1, 708295.1, 6252403, 6253403  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          30, 707795.055093706, 6252902.81442825,        1 
@@ -397,7 +395,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 709290.5, 710290.5, 6252776, 6253776  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          31, 709790.510737235, 6253275.94670318,        1 
@@ -409,7 +407,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 706823.1, 707823.1, 6252924, 6253924  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          33, 707323.074814243, 6253424.16474594,        1 
@@ -421,7 +419,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 708090.7, 709090.7, 6262787, 6263787  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          35, 708590.650204488, 6263287.07874507,        1 
@@ -430,7 +428,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 708931.1, 709931.1, 6254563, 6255563  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          36, 709431.056489983, 6255062.70399093,        1 
@@ -439,7 +437,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 706400.2, 707400.2, 6251298, 6252298  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          37, 706900.208559446, 6251798.00038536,        1 
@@ -448,7 +446,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 707271.9, 708271.9, 6261487, 6262487  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          38, 707771.919408766, 6261986.83813631,        1 
@@ -457,7 +455,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 704831, 705831, 6264713, 6265713  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          39, 705331.007064075, 6265212.51343058,        1 
@@ -466,7 +464,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 708918.4, 709918.4, 6267669, 6268669  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          40, 709418.368318636, 6268169.10033173,        1 
@@ -475,7 +473,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 703076, 704076, 6266036, 6267036  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          41, 703576.003622304, 6266536.09000155,        1 
@@ -487,7 +485,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 707489.4, 708489.4, 6252351, 6253351  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          43, 707989.389162253, 6252851.01070556,        1 
@@ -496,7 +494,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 709587.4, 710587.4, 6266178, 6267178  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          44, 710087.448896256, 6266678.41000209,        1 
@@ -505,7 +503,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 708634.5, 709634.5, 6253011, 6254011  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,    receiver_lat, optional 
 #&gt; value       :          45, 709134.451181599, 6253511.1606833,        1 
@@ -514,7 +512,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 702030.4, 703030.4, 6265101, 6266101  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          46, 702530.410574209, 6265601.37925326,        1 
@@ -523,7 +521,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 702512.8, 703512.8, 6265823, 6266823  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          47, 703012.757869926, 6266323.23956501,        1 
@@ -532,7 +530,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 706695.3, 707695.3, 6253239, 6254239  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          48, 707195.281171695, 6253739.36429899,        1 
@@ -541,7 +539,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 705852.3, 706852.3, 6253784, 6254784  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          49, 706352.314484401, 6254283.62589339,        1 
@@ -550,7 +548,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 707425.6, 708425.6, 6260558, 6261558  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          50, 707925.605617203, 6261057.79757075,        1 
@@ -559,7 +557,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 706707.4, 707707.4, 6260511, 6261511  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          51, 707207.430187169, 6261011.42556153,        1 
@@ -568,7 +566,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 702198.1, 703198.1, 6265474, 6266474  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          52, 702698.057272382, 6265973.99135867,        1 
@@ -577,7 +575,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 705558.6, 706558.6, 6254034, 6255034  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          53, 706058.562480969, 6254534.03230611,        1 
@@ -586,7 +584,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 701922.5, 702922.5, 6264753, 6265753  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          54, 702422.531139993, 6265252.59847609,        1 
@@ -595,7 +593,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 709905.8, 710905.8, 6252868, 6253868  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          55, 710405.757752217, 6253367.62261389,        1 
@@ -604,7 +602,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 709123.1, 710123.1, 6252797, 6253797  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          56, 709623.053614371, 6253296.88416775,        1 
@@ -613,7 +611,7 @@
 #&gt; class       : SpatialPolygonsDataFrame 
 #&gt; features    : 1 
 #&gt; extent      : 707967.6, 708967.6, 6252362, 6253362  (xmin, xmax, ymin, ymax)
-#&gt; crs         : +proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+#&gt; crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
 #&gt; variables   : 4
 #&gt; names       : receiver_id,    receiver_long,     receiver_lat, optional 
 #&gt; value       :          57, 708467.606224498, 6252861.98611045,        1 
@@ -623,24 +621,24 @@
                                   detection_range <span class='op'>=</span> <span class='fl'>500</span>,
                                   plot <span class='op'>=</span> <span class='cn'>TRUE</span>
                                   <span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::acs_setup_detection_centroids() called (@ 2021-12-02 11:50:08)... 
+</div><div class='output co'>#&gt; flapper::acs_setup_detection_centroids() called (@ 2021-12-02 14:35:48)... 
 #&gt; ... Checking user inputs... 
 #&gt; ... Plotting background map of area... </div><div class='img'><img src='acs_setup_centroids-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Making centroids... 
 #&gt; ... Plotting centroids on map... 
 #&gt; ... Processing centroids... 
-#&gt; ... flapper::acs_setup_detection_centroids() call completed (@ 2021-12-02 11:50:08) after ~0 minutes. </div><div class='input'>
+#&gt; ... flapper::acs_setup_detection_centroids() call completed (@ 2021-12-02 14:35:48) after ~0 minutes. </div><div class='input'>
 <span class='co'>#### Example (3): Remove areas of the centroids that overlap with coastline</span>
 <span class='va'>centroids</span> <span class='op'>&lt;-</span> <span class='fu'>acs_setup_centroids</span><span class='op'>(</span>xy <span class='op'>=</span> <span class='va'>xy_utm</span>,
                                   detection_range <span class='op'>=</span> <span class='fl'>500</span>,
                                   plot <span class='op'>=</span> <span class='cn'>TRUE</span>,
                                   coastline <span class='op'>=</span> <span class='va'>dat_coast</span>
                                   <span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::acs_setup_detection_centroids() called (@ 2021-12-02 11:50:08)... 
+</div><div class='output co'>#&gt; flapper::acs_setup_detection_centroids() called (@ 2021-12-02 14:35:48)... 
 #&gt; ... Checking user inputs... 
 #&gt; ... Plotting background map of area... </div><div class='img'><img src='acs_setup_centroids-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Making centroids... 
 #&gt; ... Plotting centroids on map... 
 #&gt; ... Processing centroids... 
-#&gt; ... flapper::acs_setup_detection_centroids() call completed (@ 2021-12-02 11:50:10) after ~0.03 minutes. </div><div class='input'>
+#&gt; ... flapper::acs_setup_detection_centroids() call completed (@ 2021-12-02 14:35:50) after ~0.03 minutes. </div><div class='input'>
 <span class='co'>#### Example (4): Remove areas of the centroids beyond a boundary</span>
 <span class='va'>xy_utm_coords</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/coordinates.html'>coordinates</a></span><span class='op'>(</span><span class='va'>xy_utm</span><span class='op'>)</span>
 <span class='va'>boundaries</span> <span class='op'>&lt;-</span> <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/extent.html'>extent</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>min</a></span><span class='op'>(</span><span class='va'>xy_utm_coords</span><span class='op'>[</span>, <span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span>,
@@ -654,12 +652,12 @@
                                   coastline <span class='op'>=</span> <span class='va'>dat_coast</span>,
                                   boundaries <span class='op'>=</span> <span class='va'>boundaries</span>
                                   <span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::acs_setup_detection_centroids() called (@ 2021-12-02 11:50:10)... 
+</div><div class='output co'>#&gt; flapper::acs_setup_detection_centroids() called (@ 2021-12-02 14:35:50)... 
 #&gt; ... Checking user inputs... 
 #&gt; ... Plotting background map of area... </div><div class='img'><img src='acs_setup_centroids-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Making centroids... 
 #&gt; ... Plotting centroids on map... 
 #&gt; ... Processing centroids... 
-#&gt; ... flapper::acs_setup_detection_centroids() call completed (@ 2021-12-02 11:50:11) after ~0.02 minutes. </div><div class='input'>
+#&gt; ... flapper::acs_setup_detection_centroids() call completed (@ 2021-12-02 14:35:51) after ~0.02 minutes. </div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

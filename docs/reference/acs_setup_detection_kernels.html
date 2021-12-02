@@ -220,11 +220,9 @@ For each unique array design (i.e. set of active receivers, given receiver deplo
 <span class='co'># Focus on a subset of receivers for example speed</span>
 <span class='va'>moorings</span> <span class='op'>&lt;-</span> <span class='va'>dat_moorings</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>, <span class='op'>]</span>
 <span class='co'># Define receiver locations as a SpatialPoints object with a UTM CRS</span>
-<span class='va'>proj_wgs84</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span><span class='st'>"+init=epsg:4326"</span><span class='op'>)</span>
-<span class='va'>proj_utm</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"+proj=utm +zone=29 +datum=WGS84"</span>,
-                          <span class='st'>"+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum WGS_1984 in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='input'><span class='va'>xy</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPoints</a></span><span class='op'>(</span><span class='va'>moorings</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"receiver_long"</span>, <span class='st'>"receiver_lat"</span><span class='op'>)</span><span class='op'>]</span>,
+<span class='va'>proj_wgs84</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span>SRS_string <span class='op'>=</span> <span class='st'>"EPSG:4326"</span><span class='op'>)</span>
+<span class='va'>proj_utm</span>   <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span>SRS_string <span class='op'>=</span> <span class='st'>"EPSG:32629"</span><span class='op'>)</span>
+<span class='va'>xy</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPoints</a></span><span class='op'>(</span><span class='va'>moorings</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"receiver_long"</span>, <span class='st'>"receiver_lat"</span><span class='op'>)</span><span class='op'>]</span>,
                         <span class='va'>proj_wgs84</span><span class='op'>)</span>
 <span class='va'>xy</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/spTransform.html'>spTransform</a></span><span class='op'>(</span><span class='va'>xy</span>, <span class='va'>proj_utm</span><span class='op'>)</span>
 <span class='co'># Link receiver IDs, locations and deployment dates to form a SpatialPointsDataFrame</span>
@@ -266,7 +264,7 @@ For each unique array design (i.e. set of active receivers, given receiver deplo
                                        overlaps <span class='op'>=</span> <span class='va'>overlaps</span>,
                                        calc_detection_pr <span class='op'>=</span> <span class='va'>calc_dpr</span>,
                                        map <span class='op'>=</span> <span class='va'>map_blank</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::acs_setup_detection_kernels() called (@ 2021-12-02 11:50:12)... 
+</div><div class='output co'>#&gt; flapper::acs_setup_detection_kernels() called (@ 2021-12-02 14:35:52)... 
 #&gt; ... Setting up function... 
 #&gt; ... Getting receiver-specific kernels (for detection)... 
 #&gt; 
@@ -324,7 +322,7 @@ For each unique array design (i.e. set of active receivers, given receiver deplo
 #&gt; ... ... ... ... Extract detection probability kernels for active receivers... 
 #&gt; ... ... ... ... Combining detection kernels to calculate the background detection probability surfaces (this is a slow step)... 
 #&gt; ... Process detection probability kernels ... 
-#&gt; ... flapper::acs_setup_detection_kernels() call completed (@ 2021-12-02 11:50:14) after ~0.03 minutes. </div><div class='input'>
+#&gt; ... flapper::acs_setup_detection_kernels() call completed (@ 2021-12-02 14:35:54) after ~0.03 minutes. </div><div class='input'>
 <span class='co'># Examine list elements</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>kernels</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;                               Length Class      Mode
@@ -409,7 +407,7 @@ For each unique array design (i.e. set of active receivers, given receiver deplo
                                         map <span class='op'>=</span> <span class='va'>map_blank</span>,
                                         coastline <span class='op'>=</span> <span class='va'>sea</span>,
                                         boundaries <span class='op'>=</span> <span class='fu'><a href='update_extent.html'>update_extent</a></span><span class='op'>(</span><span class='va'>map_blank</span>, <span class='op'>-</span><span class='fl'>1000</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::acs_setup_detection_kernels() called (@ 2021-12-02 11:50:16)... 
+</div><div class='output co'>#&gt; flapper::acs_setup_detection_kernels() called (@ 2021-12-02 14:35:56)... 
 #&gt; ... Setting up function... 
 #&gt; ... Getting receiver-specific kernels (for detection)... 
 #&gt; 
@@ -467,7 +465,7 @@ For each unique array design (i.e. set of active receivers, given receiver deplo
 #&gt; ... ... ... ... Extract detection probability kernels for active receivers... 
 #&gt; ... ... ... ... Combining detection kernels to calculate the background detection probability surfaces (this is a slow step)... 
 #&gt; ... Process detection probability kernels ... 
-#&gt; ... flapper::acs_setup_detection_kernels() call completed (@ 2021-12-02 11:50:18) after ~0.02 minutes. </div><div class='input'>
+#&gt; ... flapper::acs_setup_detection_kernels() call completed (@ 2021-12-02 14:35:58) after ~0.03 minutes. </div><div class='input'>
 <span class='co'># Examine example receiver-specific kernels</span>
 <span class='va'>pp</span> <span class='op'>&lt;-</span> <span class='fu'>graphics</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span>mfrow <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>kernels</span><span class='op'>$</span><span class='va'>receiver_specific_kernels</span><span class='op'>[[</span><span class='fl'>3</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>

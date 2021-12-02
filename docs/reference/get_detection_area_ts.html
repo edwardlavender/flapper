@@ -169,21 +169,19 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>#### Define SpatialPointsDataFrame with receiver locations and deployment dates</span>
-<span class='va'>proj_wgs84</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span><span class='st'>"+init=epsg:4326"</span><span class='op'>)</span>
-<span class='va'>proj_utm</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"+proj=utm +zone=29 +datum=WGS84"</span>,
-                          <span class='st'>"+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum WGS_1984 in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='input'><span class='va'>xy</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPoints</a></span><span class='op'>(</span><span class='va'>dat_moorings</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"receiver_long"</span>, <span class='st'>"receiver_lat"</span><span class='op'>)</span><span class='op'>]</span>,
+<span class='va'>proj_wgs84</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span>SRS_string <span class='op'>=</span> <span class='st'>"EPSG:4326"</span><span class='op'>)</span>
+<span class='va'>proj_utm</span>   <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span>SRS_string <span class='op'>=</span> <span class='st'>"EPSG:32629"</span><span class='op'>)</span>
+<span class='va'>xy</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPoints</a></span><span class='op'>(</span><span class='va'>dat_moorings</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"receiver_long"</span>, <span class='st'>"receiver_lat"</span><span class='op'>)</span><span class='op'>]</span>,
                         <span class='va'>proj_wgs84</span><span class='op'>)</span>
 <span class='va'>xy</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/spTransform.html'>spTransform</a></span><span class='op'>(</span><span class='va'>xy</span>, <span class='va'>proj_utm</span><span class='op'>)</span>
 <span class='va'>xy</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPointsDataFrame</a></span><span class='op'>(</span><span class='va'>xy</span>, data <span class='op'>=</span> <span class='va'>dat_moorings</span><span class='op'>)</span>
 
 <span class='co'>#### Example (1): Implement function with default arguments</span>
 <span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'>get_detection_area_ts</span><span class='op'>(</span><span class='va'>xy</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2021-12-02 11:53:01)... 
+</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2021-12-02 14:38:54)... 
 #&gt; ... Implementing function checks... 
 #&gt; ... Implementing algorithm... 
-#&gt; ... Visualising time series </div><div class='img'><img src='get_detection_area_ts-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::get_detection_area_ts() call completed (@ 2021-12-02 11:53:07) after ~0.1 minutes. </div><div class='input'>
+#&gt; ... Visualising time series </div><div class='img'><img src='get_detection_area_ts-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::get_detection_area_ts() call completed (@ 2021-12-02 14:39:00) after ~0.1 minutes. </div><div class='input'>
 <span class='co'>#### Example (2): Adjust detection range, include coastline and use parallel processing</span>
 <span class='co'># For areas with complex coastline, this will reduce the speed of the algorithm</span>
 <span class='co'># So we will also supply a cluster to improve the computation time.</span>
@@ -198,11 +196,11 @@
 
 <span class='co'>#### Example (3) Hide or customise the plot</span>
 <span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'>get_detection_area_ts</span><span class='op'>(</span><span class='va'>xy</span>, plot <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2021-12-02 11:53:07)... 
+</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2021-12-02 14:39:00)... 
 #&gt; ... Implementing function checks... 
 #&gt; ... Implementing algorithm... 
 #&gt; ... Visualising time series 
-#&gt; ... flapper::get_detection_area_ts() call completed (@ 2021-12-02 11:53:13) after ~0.1 minutes. </div><div class='input'><span class='va'>dat</span> <span class='op'>&lt;-</span>
+#&gt; ... flapper::get_detection_area_ts() call completed (@ 2021-12-02 14:39:06) after ~0.1 minutes. </div><div class='input'><span class='va'>dat</span> <span class='op'>&lt;-</span>
   <span class='fu'>get_detection_area_ts</span><span class='op'>(</span><span class='va'>xy</span>,
                         pretty_axis_args <span class='op'>=</span>
                           <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
@@ -212,10 +210,10 @@
                        xlab <span class='op'>=</span> <span class='st'>"Time (month-year)"</span>,
                        ylab <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/expression.html'>expression</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"Area ("</span>, <span class='va'>m</span><span class='op'>^</span><span class='fl'>2</span>, <span class='st'>")"</span><span class='op'>)</span><span class='op'>)</span>,
                        type <span class='op'>=</span> <span class='st'>"l"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2021-12-02 11:53:13)... 
+</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2021-12-02 14:39:06)... 
 #&gt; ... Implementing function checks... 
 #&gt; ... Implementing algorithm... 
-#&gt; ... Visualising time series </div><div class='output co'>#&gt; <span class='message'>Argument 'side' not supplied to pretty_axis_args (nor 'axis_ls'); defaulting to side = 1:2.</span></div><div class='img'><img src='get_detection_area_ts-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::get_detection_area_ts() call completed (@ 2021-12-02 11:53:19) after ~0.11 minutes. </div><div class='input'>
+#&gt; ... Visualising time series </div><div class='output co'>#&gt; <span class='message'>Argument 'side' not supplied to pretty_axis_args (nor 'axis_ls'); defaulting to side = 1:2.</span></div><div class='img'><img src='get_detection_area_ts-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::get_detection_area_ts() call completed (@ 2021-12-02 14:39:12) after ~0.1 minutes. </div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

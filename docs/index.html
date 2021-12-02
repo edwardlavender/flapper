@@ -75,9 +75,9 @@
 <div id="flapper" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#flapper" class="anchor"></a>flapper</h1></div>
-<p><strong><em>From passive acoustic telemetry to space use: an <code>R</code> package of algorithms for reconstructing movement paths and patterns of space use from acoustic and archival time series.</em></strong></p>
-<p><a href="https://www.repostatus.org/#wip"><img src="https://www.repostatus.org/badges/latest/wip.svg" alt="Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public."></a></p>
-<p><code>flapper</code> is an <code>R</code> package which provides tools for passive acoustic telemetry (PAT) data. The package has been particularly motivated by the collection of new acoustic and archival data from a Critically Endangered elasmobranch, the flapper skate (<em>Dipturus intermedius</em>), off the west coast of Scotland where a static PAT array has been established to examine the movements of individuals within a Marine Protected Area. <code>flapper</code> has been designed to complement existing packages for the analyses of these data (e.g. <a href="https://github.com/RossDwyer/VTrack">VTrack</a>, <a href="https://gitlab.oceantrack.org/GreatLakes/glatos">glatos</a> and <a href="https://github.com/aspillaga/fishtrack3d">fishtrack3d</a> and <a href="https://github.com/hugomflavio/actel">actel</a>), with a particular focus on the provision of tools that integrate PAT and archival data for improved inference of patterns of space use, including for pelagic and benthic/demersal species. To this end, <code>flapper</code> contains functions in the following themes:</p>
+<p><strong>From passive acoustic telemetry to space use: an <code>R</code> package of algorithms for reconstructing movement paths and patterns of space use from acoustic and archival time series. <a href="https://edwardlavender.github.io/flapper/" class="uri">https://edwardlavender.github.io/flapper/</a></strong></p>
+<p><a href="https://www.repostatus.org/#wip"><img src="https://www.repostatus.org/badges/latest/wip.svg" alt="Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public."></a> <a href="https://cran.r-project.org/package=flapper"><img src="http://www.r-pkg.org/badges/version/flapper" alt="CRAN_Status_Badge"></a></p>
+<p><a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> is an <code>R</code> package which provides tools for passive acoustic telemetry (PAT) data. The package has been particularly motivated by the collection of new acoustic and archival data from a Critically Endangered elasmobranch, the flapper skate (<em>Dipturus intermedius</em>), off the west coast of Scotland where a static PAT array has been established to examine the movements of individuals within a Marine Protected Area. <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> has been designed to complement existing packages for the analyses of these data (e.g. <a href="https://github.com/RossDwyer/VTrack">VTrack</a>, <a href="https://gitlab.oceantrack.org/GreatLakes/glatos">glatos</a> and <a href="https://github.com/aspillaga/fishtrack3d">fishtrack3d</a> and <a href="https://github.com/hugomflavio/actel">actel</a>), with a particular focus on the provision of tools that integrate PAT and archival data for improved inference of patterns of space use, including for pelagic and benthic/demersal species. To this end, <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> contains functions in the following themes:</p>
 <ul>
 <li>
 <strong>Data processing tools</strong>, including data assembly (e.g., range-testing datasets), the evaluation of false detections and quality checks;</li>
@@ -93,10 +93,11 @@
 <strong>Simulation tools</strong>, including tools for the simulation of passive acoustic telemetry arrays, movement paths, detections and the comparison of simulated and inferred patterns of space use under different conditions;</li>
 </ul>
 <p><img src="articles/readme_context.png"><em>flapper: An <code>R</code> package designed to facilitate the integration of acoustic and archival datasets to improve estimates of space use. Inserted sample depth and acoustic time series were collected as part of the Movement Ecology of Flapper Skate project by Marine Scotland Science and NatureScot. The insert of the flapper skate is also courtesy of this project. The bathymetry data are sourced from the Ireland, Northern Island and Scotland Hydrographic survey (Howe et al., 2015). Plots were produced using the <a href="https://github.com/edwardlavender/prettyGraphics">prettyGraphics</a> package.</em></p>
+<p><strong>For full package details, vignettes and illustrated examples, go to <a href="https://edwardlavender.github.io/flapper/" class="uri">https://edwardlavender.github.io/flapper/</a>.</strong></p>
 <div id="highlights" class="section level2">
 <h2 class="hasAnchor">
 <a href="#highlights" class="anchor"></a>Highlights</h2>
-<p>The main highlights of the package are the provision of routines for the rapid calculation of biologically meaningful distances in area with complex barriers to movement (e.g., coastline) alongside algorithms (most of which are exclusive to <code>flapper</code>) for inferring space use from discrete detections at receivers, especially:</p>
+<p>The main highlights of the package are the provision of routines for the rapid calculation of biologically meaningful distances in area with complex barriers to movement (e.g., coastline) alongside algorithms (most of which are exclusive to <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a>) for inferring space use from discrete detections at receivers, especially:</p>
 <ul>
 <li>
 <strong><code>lcp_*()</code>.</strong> These functions facilitate the calculation of shortest paths and their distances between and around points using efficient <code>C++</code> algorithms from the <a href="https://github.com/vlarmet/cppRouting">cppRouting</a> package. This makes it easy to use biologically meaningful distances (that account for the bathymetric surface over which a benthic animal must move, if applicable, and barriers to movement) in movement models.</li>
@@ -125,7 +126,7 @@
 <span id="cb1-4"><a href="#cb1-4"></a>devtools<span class="op">::</span><span class="kw">install_url</span>(                                    <span class="co"># suggested</span></span>
 <span id="cb1-5"><a href="#cb1-5"></a>  <span class="st">"https://gitlab.oceantrack.org/GreatLakes/glatos/repository/master/archive.zip"</span>,</span>
 <span id="cb1-6"><a href="#cb1-6"></a>   <span class="dt">build_opts =</span> <span class="kw">c</span>(<span class="st">"--no-resave-data"</span>, <span class="st">"--no-manual"</span>)) </span></code></pre></div>
-<p>To install these packages with their vignettes, add <code>dependencies = TRUE</code> and <code>build_vignettes = TRUE</code> as arguments to the code above (see <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">?devtools::install_github</a></code> or <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">?devtools::install_url</a></code> for further information). Then, you can install the development version of <code>flapper</code> from <a href="https://github.com/edwardlavender/flapper">GitHub</a> as shown below:</p>
+<p>To install these packages with their vignettes, add <code>dependencies = TRUE</code> and <code>build_vignettes = TRUE</code> as arguments to the code above (see <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">?devtools::install_github</a></code> or <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">?devtools::install_url</a></code> for further information). Then, you can install the development version of <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> from <a href="https://github.com/edwardlavender/flapper">GitHub</a> as shown below:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"edwardlavender/flapper"</span>, dependencies <span class="op">=</span> <span class="cn">TRUE</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>The <code>dependencies = TRUE</code> argument will also install any suggested packages, which are required by some functions/examples and to build vignettes (which will be added to the package in due course). To access the vignettes, use <code>vignette("flapper_intro", package = "flapper")</code> for a general introduction to the package. <em>Note that vignettes have not yet been added to the package.</em></p>
@@ -133,7 +134,7 @@
 <div id="example-datasets" class="section level2">
 <h2 class="hasAnchor">
 <a href="#example-datasets" class="anchor"></a>Example datasets</h2>
-<p>A key feature of the <code>flapper</code> package is that almost all functions are designed to be implemented using standard object types (e.g., dataframes and matrices) rather than package-specific object classes. For simplicity, <code>flapper</code> makes some assumptions about variable names that follow a consistent and logical structure (e.g., individual IDs are given as <code>individual_id</code> and receiver IDs are given as <code>receiver_id</code>) but, notwithstanding this framework, this structure means that the functions in the package are accessible and straightforward to use.</p>
+<p>A key feature of the <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> package is that almost all functions are designed to be implemented using standard object types (e.g., dataframes and matrices) rather than package-specific object classes. For simplicity, <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> makes some assumptions about variable names that follow a consistent and logical structure (e.g., individual IDs are given as <code>individual_id</code> and receiver IDs are given as <code>receiver_id</code>) but, notwithstanding this framework, this structure means that the functions in the package are accessible and straightforward to use.</p>
 <p>Functions are illustrated using simulated data and the following sample data collected from flapper skate off the west coast of Scotland:</p>
 <ul>
 <li>
@@ -312,11 +313,11 @@
 <div id="space-use-algorithms" class="section level2">
 <h2 class="hasAnchor">
 <a href="#space-use-algorithms" class="anchor"></a>Space use algorithms</h2>
-<p>The main thrust of <code>flapper</code> is the implementation of algorithms designed to infer space use from PAT data and their evaluation under different circumstances (e.g., array designs, movement models and detection models).</p>
+<p>The main thrust of <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> is the implementation of algorithms designed to infer space use from PAT data and their evaluation under different circumstances (e.g., array designs, movement models and detection models).</p>
 <div id="the-centres-of-activity-coa-algorithm" class="section level3">
 <h3 class="hasAnchor">
 <a href="#the-centres-of-activity-coa-algorithm" class="anchor"></a>The centres of activity (COA) algorithm</h3>
-<p>Centres of activity (COA) are one of the most widely used metrics for the reconstruction of patterns of space use from PAT data. Several methods have been developed to calculate COAs, but the mean-position algorithm is the commonest. To generate estimates of space use, COAs are usually taken as point estimates from which utilisation distributions (typically kernel utilisation distributions, KUDs) are estimated. <code>flapper</code> facilitates the implementation of this approach with the following functions:</p>
+<p>Centres of activity (COA) are one of the most widely used metrics for the reconstruction of patterns of space use from PAT data. Several methods have been developed to calculate COAs, but the mean-position algorithm is the commonest. To generate estimates of space use, COAs are usually taken as point estimates from which utilisation distributions (typically kernel utilisation distributions, KUDs) are estimated. <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> facilitates the implementation of this approach with the following functions:</p>
 <ul>
 <li>
 <code><a href="reference/coa_setup_delta_t.html">coa_setup_delta_t()</a></code> informs decisions as to an appropriate time interval over which to calculate COAs;</li>
@@ -330,8 +331,8 @@
 </div>
 <div id="the-flapper-family-of-algorithms" class="section level3">
 <h3 class="hasAnchor">
-<a href="#the-flapper-family-of-algorithms" class="anchor"></a>The <code>flapper</code> family of algorithms</h3>
-<p>Alongside the COA algorithm, this package introduces the <code>flapper</code> of algorithms for the inferring patterns of space use.</p>
+<a href="#the-flapper-family-of-algorithms" class="anchor"></a>The <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> family of algorithms</h3>
+<p>Alongside the COA algorithm, this package introduces the <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> of algorithms for the inferring patterns of space use.</p>
 <p><img src="articles/readme_flapper_family_implementation.png"><em>The `flapper’ family of algorithms. The acoustic-centroid depth-contour (ACDC) branch utilises acoustic and/or archival data to map the possible locations of an animal through time. The particle filtering (PF) branch refines these maps via the implementation of a particle simulation and filtering approach for the reconstruction of possible movement paths.</em></p>
 </div>
 <div id="acdc-branch-algorithms" class="section level3">
@@ -345,7 +346,7 @@
 <div id="the-acoustic-contour-ac-algorithms" class="section level4">
 <h4 class="hasAnchor">
 <a href="#the-acoustic-contour-ac-algorithms" class="anchor"></a>The acoustic-contour* (AC*) algorithm(s)</h4>
-<p>The <code>flapper</code> family-equivalent of the COA algorithm is the acoustic-contour (AC) algorithm. This approach represents the information from acoustic detections in the form of acoustic centroids, which contract and expand in line with the distribution of uncertainty in the individual’s location when it is detected and in the gaps between detections. The acoustic-centroid depth-contour (ACDC) algorithm combines the AC and DC algorithms, using PAT data to inform the area within which depth contours are most likely to be found. These algorithms are implemented with the <code>acdc*()</code> family of functions:</p>
+<p>The <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> family-equivalent of the COA algorithm is the acoustic-contour (AC) algorithm. This approach represents the information from acoustic detections in the form of acoustic centroids, which contract and expand in line with the distribution of uncertainty in the individual’s location when it is detected and in the gaps between detections. The acoustic-centroid depth-contour (ACDC) algorithm combines the AC and DC algorithms, using PAT data to inform the area within which depth contours are most likely to be found. These algorithms are implemented with the <code>acdc*()</code> family of functions:</p>
 <ul>
 <li>
 <code><a href="reference/acs_setup_mobility.html">acs_setup_mobility()</a></code> examines the assumption of a constant ‘mobility’ parameter;</li>
@@ -425,7 +426,7 @@
 <div id="simulation-tools" class="section level2">
 <h2 class="hasAnchor">
 <a href="#simulation-tools" class="anchor"></a>Simulation tools</h2>
-<p>Simulations are a valuable tool in ecology which can elucidate the relative performance of alternative methods for ecological inferences (e.g., the <code>COA</code> approach versus the <code>DC</code> approach for inferring patterns of space use) and the extent to which new data sources influence ecological inferences under different circumstances (e.g. the extent to which sparse or regular PAT detections improve estimates of space use). To this end, <code>flapper</code> provides joined-up routines for the evaluation of approaches for the estimation of patterns of space use under different conditions; namely:</p>
+<p>Simulations are a valuable tool in ecology which can elucidate the relative performance of alternative methods for ecological inferences (e.g., the <code>COA</code> approach versus the <code>DC</code> approach for inferring patterns of space use) and the extent to which new data sources influence ecological inferences under different circumstances (e.g. the extent to which sparse or regular PAT detections improve estimates of space use). To this end, <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> provides joined-up routines for the evaluation of approaches for the estimation of patterns of space use under different conditions; namely:</p>
 <ul>
 <li>
 <code><a href="reference/sim_array.html">sim_array()</a></code> simulates alternative array designs;<br>
@@ -460,6 +461,12 @@
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
 <p>Howe, J.A., Anderton, R., Arosio, R., Dove, D., Bradwell, T., Crump, P., Cooper, R., Cocuccio, A., 2014. The seabed geomorphology and geological structure of the Firth of Lorn, western Scotland, UK, as revealed by multibeam echo-sounder survey. Earth Environ. Sci. Trans. R. Soc. Edinburgh 105, 273–284. <a href="https://doi.org/10.1017/S1755691015000146" class="uri">https://doi.org/10.1017/S1755691015000146</a></p>
+</div>
+<div id="citation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#citation" class="anchor"></a>Citation</h2>
+<p>Lavender, E. et al. (in prep). A semi-stochastic modelling framework for passive acoustic telemetry.</p>
+<p>Lavender, E. (2021). flapper: Explore Animal Space Use Within Passive Acoustic Telemetry Arrays. R package version 0.0.9000. <a href="https://github.com/edwardlavender/flapper/" class="uri">https://github.com/edwardlavender/flapper/</a></p>
 </div>
 </div>
   </div>

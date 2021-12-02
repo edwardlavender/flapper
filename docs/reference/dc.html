@@ -217,10 +217,10 @@
 <span class='co'>#### Example (1): Implement algorithm with default options</span>
 <span class='co'>## Implement algorithm</span>
 <span class='va'>out_dc</span> <span class='op'>&lt;-</span> <span class='fu'>dc</span><span class='op'>(</span>archival <span class='op'>=</span> <span class='va'>depth</span>, bathy <span class='op'>=</span> <span class='va'>dat_gebco</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 11:50:56)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:39)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Plotting movement time series (for each chunk)... </div><div class='img'><img src='dc-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Implementing algorithm over time steps... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 11:50:57) after ~0.01 minutes. </div><div class='input'><span class='co'>## dc() returns a named list that is an 'acdc_archive' class object</span>
+#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:39) after ~0.01 minutes. </div><div class='input'><span class='co'>## dc() returns a named list that is an 'acdc_archive' class object</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>out_dc</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;             Length Class      Mode
 #&gt; archive      1     -none-     list
@@ -249,12 +249,12 @@
 <span class='co'># ... in each cell matches the archival data</span>
 <span class='fu'>prettyGraphics</span><span class='fu'>::</span><span class='fu'><a href='https://edwardlavender.github.io/prettyGraphics/reference/pretty_map.html'>pretty_map</a></span><span class='op'>(</span>add_rasters <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>dc_summary</span><span class='op'>$</span><span class='va'>map</span><span class='op'>)</span>,
                            add_polys <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>dat_coast</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='img'><img src='dc-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># Convert counts on map to percentages</span>
+</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='img'><img src='dc-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># Convert counts on map to percentages</span>
 <span class='fu'>prettyGraphics</span><span class='fu'>::</span><span class='fu'><a href='https://edwardlavender.github.io/prettyGraphics/reference/pretty_map.html'>pretty_map</a></span><span class='op'>(</span>add_rasters <span class='op'>=</span>
                              <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>dc_summary</span><span class='op'>$</span><span class='va'>map</span><span class='op'>/</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>depth</span><span class='op'>)</span> <span class='op'>*</span> <span class='fl'>100</span>,
                                   zlim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>,
                            add_polys <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>dat_coast</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'.</span></div><div class='img'><img src='dc-4.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># Check for occasions when the individual's depth was not consistent</span>
+</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='img'><img src='dc-4.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># Check for occasions when the individual's depth was not consistent</span>
 <span class='co'># ... with the depth data for the area and the depth error e.g., possibly</span>
 <span class='co'># ... due to movement beyond this area:</span>
 <span class='fu'><a href='https://rdrr.io/r/base/any.html'>any</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/do.call.html'>do.call</a></span><span class='op'>(</span><span class='va'>rbind</span>, <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>dc_summary</span><span class='op'>$</span><span class='va'>record</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>elm</span><span class='op'>)</span> <span class='va'>elm</span><span class='op'>$</span><span class='va'>dat</span><span class='op'>)</span><span class='op'>)</span><span class='op'>$</span><span class='va'>availability</span> <span class='op'>==</span> <span class='cn'>FALSE</span><span class='op'>)</span>
@@ -273,116 +273,17 @@
 <span class='va'>cde</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Vectorize.html'>Vectorize</a></span><span class='op'>(</span><span class='va'>cde</span><span class='op'>)</span>
 <span class='co'>## Implement algorithm with  depth-dependent error</span>
 <span class='va'>out_dc</span> <span class='op'>&lt;-</span> <span class='fu'>dc</span><span class='op'>(</span>archival <span class='op'>=</span> <span class='va'>depth</span>, bathy <span class='op'>=</span> <span class='va'>dat_gebco</span>, calc_depth_error <span class='op'>=</span> <span class='va'>cde</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 11:50:57)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:40)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' taken to depend on depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Plotting movement time series (for each chunk)... </div><div class='img'><img src='dc-5.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Implementing algorithm over time steps... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 11:50:58) after ~0.01 minutes. </div><div class='input'>
+#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:40) after ~0.01 minutes. </div><div class='input'>
 <span class='co'>#### Example (3): Write timestep-specific maps of allowed positions to file</span>
 <span class='va'>out_dc</span> <span class='op'>&lt;-</span> <span class='fu'>dc</span><span class='op'>(</span>archival <span class='op'>=</span> <span class='va'>depth</span>, bathy <span class='op'>=</span> <span class='va'>dat_gebco</span>,
              write_record_spatial_for_pf <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>filename <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 11:50:58)... 
-#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; <span class='message'>'/' added to the directory inputted to the argument 'write_record_spatial_for_pf$filename' ('/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpPN9Ii5').</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
-#&gt; ... Plotting movement time series (for each chunk)... </div><div class='output co'>#&gt; ... Implementing algorithm over time steps... </div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='img'><img src='dc-6.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::dc() call completed (@ 2021-12-02 11:51:00) after ~0.04 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:40)... 
+#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; <span class='message'>'/' added to the directory inputted to the argument 'write_record_spatial_for_pf$filename' ('/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum').</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
+#&gt; ... Plotting movement time series (for each chunk)... </div><div class='img'><img src='dc-6.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Implementing algorithm over time steps... 
+#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:43) after ~0.04 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;   [1] "1.png"                    "2.png"                   
 #&gt;   [3] "25"                       "28"                      
 #&gt;   [5] "35"                       "ACDC_algorithm_demo.html"
@@ -490,10 +391,11 @@
 #&gt; [209] "dot_acdc_log_1.txt"       "dot_acdc_log_2.txt"      
 #&gt; [211] "dot_acdc_log_3.txt"       "dot_acdc_log_4.txt"      
 #&gt; [213] "dot_acdc_log_5.txt"       "downlit"                 
-#&gt; [215] "filed3e82bdd5745.so"      "filed3e83a97df1e"        
-#&gt; [217] "filed3e8403e8f17"         "filed3e85649c4e5"        
-#&gt; [219] "filed3e86275b458"         "filed3e877b2c52d"        
-#&gt; [221] "images"                   "js"                      </div><div class='input'>
+#&gt; [215] "file13f6c19d43aa9"        "file13f6c1f494b16.so"    
+#&gt; [217] "file13f6c3784320a"        "file13f6c584d015a"       
+#&gt; [219] "file13f6c7f8e2861"        "file13f6ca6459dc"        
+#&gt; [221] "file13f6cfc5f1f9"         "images"                  
+#&gt; [223] "js"                      </div><div class='input'>
 <span class='co'>#### Example (4): Implement the algorithm in parallel</span>
 <span class='co'>## Trial different options for 'split' and compare speed</span>
 <span class='co'># Approach (1)</span>
@@ -512,10 +414,10 @@
              plot_ts <span class='op'>=</span> <span class='cn'>FALSE</span>,
              split <span class='op'>=</span> <span class='fl'>1</span>,
              cl <span class='op'>=</span> <span class='va'>cl</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 11:51:01)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:44)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Implementing algorithm over chunks... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 11:51:02) after ~0.01 minutes. </div><div class='input'><span class='va'>at2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span><span class='op'>(</span><span class='op'>)</span>
+#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:44) after ~0.01 minutes. </div><div class='input'><span class='va'>at2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='co'># Approach (2)</span>
 <span class='va'>bt1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='va'>cl</span> <span class='op'>&lt;-</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/makeCluster.html'>makeCluster</a></span><span class='op'>(</span><span class='fl'>2L</span><span class='op'>)</span>
@@ -532,24 +434,24 @@
              plot_ts <span class='op'>=</span> <span class='cn'>FALSE</span>,
              split <span class='op'>=</span> <span class='fl'>5</span>,
              cl <span class='op'>=</span> <span class='va'>cl</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 11:51:03)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:46)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Implementing algorithm over chunks... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 11:51:04) after ~0.01 minutes. </div><div class='input'><span class='va'>bt2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span><span class='op'>(</span><span class='op'>)</span>
+#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:46) after ~0.01 minutes. </div><div class='input'><span class='va'>bt2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='co'># Compare timings</span>
 <span class='fu'><a href='https://rdrr.io/r/base/difftime.html'>difftime</a></span><span class='op'>(</span><span class='va'>at2</span>, <span class='va'>at1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Time difference of 1.815125 secs</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/difftime.html'>difftime</a></span><span class='op'>(</span><span class='va'>bt2</span>, <span class='va'>bt1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Time difference of 1.797281 secs</div><div class='input'>
+</div><div class='output co'>#&gt; Time difference of 1.816631 secs</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/difftime.html'>difftime</a></span><span class='op'>(</span><span class='va'>bt2</span>, <span class='va'>bt1</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Time difference of 1.793341 secs</div><div class='input'>
 <span class='co'>#### Example (5): Write messages to file via con</span>
 <span class='va'>out_dc</span> <span class='op'>&lt;-</span> <span class='fu'>dc</span><span class='op'>(</span>archival <span class='op'>=</span> <span class='va'>depth</span>, bathy <span class='op'>=</span> <span class='va'>dat_gebco</span>,
              con <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"/dc_log.txt"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpPN9Ii5/dc_log.txt does not exist: attempting to write file in specified directory...</span></div><div class='output co'>#&gt; <span class='message'>... Blank file successfully written to file.</span></div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"/dc_log.txt"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "flapper::dc() called (@ 2021-12-02 11:51:04)... "                              
+</div><div class='output co'>#&gt; <span class='message'>/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/dc_log.txt does not exist: attempting to write file in specified directory...</span></div><div class='output co'>#&gt; <span class='message'>... Blank file successfully written to file.</span></div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"/dc_log.txt"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "flapper::dc() called (@ 2021-12-02 14:36:46)... "                              
 #&gt; [2] "... Setting up function... "                                                   
 #&gt; [3] "... Implementing calc_depth_error()... "                                       
 #&gt; [4] "... Plotting movement time series (for each chunk)... "                        
 #&gt; [5] "... Implementing algorithm over time steps... "                                
-#&gt; [6] "... flapper::dc() call completed (@ 2021-12-02 11:51:05) after ~0.01 minutes. "</div><div class='input'>
+#&gt; [6] "... flapper::dc() call completed (@ 2021-12-02 14:36:47) after ~0.01 minutes. "</div><div class='input'>
 <span class='co'>#### Example (6) Compare an automated vs. manual implementation of DC</span>
 
 <span class='co'>## (A) Compare step-wise results for randomly select time steps</span>
@@ -557,10 +459,10 @@
 <span class='va'>out_dc</span> <span class='op'>&lt;-</span> <span class='fu'>dc</span><span class='op'>(</span>archival <span class='op'>=</span> <span class='va'>depth</span>,
              bathy <span class='op'>=</span> <span class='va'>dat_gebco</span>,
              save_record_spatial <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 11:51:05)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:47)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Plotting movement time series (for each chunk)... </div><div class='output co'>#&gt; ... Implementing algorithm over time steps... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 11:51:05) after ~0.01 minutes. </div><div class='input'><span class='co'># Compare results for randomly selected time steps to manual implementation</span>
+#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:48) after ~0.01 minutes. </div><div class='input'><span class='co'># Compare results for randomly selected time steps to manual implementation</span>
 <span class='co'># ... with the same simple calc_depth_error model</span>
 <span class='va'>pp</span> <span class='op'>&lt;-</span> <span class='fu'>graphics</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span>mfrow <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 <span class='kw'>for</span><span class='op'>(</span><span class='va'>i</span> <span class='kw'>in</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/ncell.html'>nrow</a></span><span class='op'>(</span><span class='va'>depth</span><span class='op'>)</span>, <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
@@ -577,10 +479,10 @@
              bathy <span class='op'>=</span> <span class='va'>dat_gebco</span>,
              save_record_spatial <span class='op'>=</span> <span class='cn'>NULL</span>,
              split <span class='op'>=</span> <span class='fl'>10L</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 11:51:06)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:48)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Plotting movement time series (for each chunk)... </div><div class='img'><img src='dc-8.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Implementing algorithm over chunks... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 11:51:07) after ~0.01 minutes. </div><div class='input'><span class='co'># Get overall map via acdc_simplify()</span>
+#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:49) after ~0.01 minutes. </div><div class='input'><span class='co'># Get overall map via acdc_simplify()</span>
 <span class='va'>map_1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='acdc_simplify.html'>acdc_simplify</a></span><span class='op'>(</span><span class='va'>out_dc</span>, type <span class='op'>=</span> <span class='st'>"dc"</span>, mask <span class='op'>=</span> <span class='va'>dat_gebco</span><span class='op'>)</span><span class='op'>$</span><span class='va'>map</span>
 </div><div class='output co'>#&gt; <span class='message'>acdc_simplify() implemented for type = 'dc'.</span></div><div class='input'><span class='co'># Get overall map via a simple custom approach</span>
 <span class='va'>map_2</span> <span class='op'>&lt;-</span> <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/setValues.html'>setValues</a></span><span class='op'>(</span><span class='va'>dat_gebco</span>, <span class='fl'>0</span><span class='op'>)</span>

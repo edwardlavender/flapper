@@ -180,11 +180,9 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>#### Define receiver locations as a SpatialPoints object with a UTM CRS</span>
-<span class='va'>proj_wgs84</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span><span class='st'>"+init=epsg:4326"</span><span class='op'>)</span>
-<span class='va'>proj_utm</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"+proj=utm +zone=29 +datum=WGS84"</span>,
-                          <span class='st'>"+units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum WGS_1984 in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='input'><span class='va'>xy</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPoints</a></span><span class='op'>(</span><span class='va'>dat_moorings</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"receiver_long"</span>, <span class='st'>"receiver_lat"</span><span class='op'>)</span><span class='op'>]</span>,
+<span class='va'>proj_wgs84</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span>SRS_string <span class='op'>=</span> <span class='st'>"EPSG:4326"</span><span class='op'>)</span>
+<span class='va'>proj_utm</span>   <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span>SRS_string <span class='op'>=</span> <span class='st'>"EPSG:32629"</span><span class='op'>)</span>
+<span class='va'>xy</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPoints</a></span><span class='op'>(</span><span class='va'>dat_moorings</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"receiver_long"</span>, <span class='st'>"receiver_lat"</span><span class='op'>)</span><span class='op'>]</span>,
                         <span class='va'>proj_wgs84</span><span class='op'>)</span>
 <span class='va'>xy</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/spTransform.html'>spTransform</a></span><span class='op'>(</span><span class='va'>xy</span>, <span class='va'>proj_utm</span><span class='op'>)</span>
 
@@ -195,7 +193,7 @@
                                 coastline <span class='op'>=</span> <span class='va'>dat_coast</span>,
                                 envir <span class='op'>=</span> <span class='va'>dat_gebco</span>
                                 <span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::get_detection_centroids_envir() called (@ 2021-12-02 11:53:23)... 
+</div><div class='output co'>#&gt; flapper::get_detection_centroids_envir() called (@ 2021-12-02 14:39:16)... 
 #&gt; ... Implementing function checks... 
 #&gt; ... Defining detection centroid(s)... 
 #&gt; ... Extracting environmental conditions from detection area(s)... </div><div class='input'><span class='co'># The function returns a list of dataframes, one for each receiver</span>
@@ -341,131 +339,131 @@
                                 envir <span class='op'>=</span> <span class='va'>dat_gebco</span>,
                                 sample_size <span class='op'>=</span> <span class='fl'>2</span>
                                 <span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::get_detection_centroids_envir() called (@ 2021-12-02 11:53:25)... 
+</div><div class='output co'>#&gt; flapper::get_detection_centroids_envir() called (@ 2021-12-02 14:39:18)... 
 #&gt; ... Implementing function checks... 
 #&gt; ... Defining detection centroid(s)... 
 #&gt; ... Extracting environmental conditions from detection area(s)... </div><div class='input'><span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>depths_by_centroid</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; List of 40
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3078 3078
-#&gt;   ..$ envir: num [1:2] 107 107
+#&gt;   ..$ cell : num [1:2] 3077 3077
+#&gt;   ..$ envir: num [1:2] 99.3 99.3
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 870 869
-#&gt;   ..$ envir: num [1:2] 167 175
+#&gt;   ..$ cell : num [1:2] 871 871
+#&gt;   ..$ envir: num [1:2] 152 152
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 644 643
-#&gt;   ..$ envir: num [1:2] 138.1 72.1
+#&gt;   ..$ cell : num [1:2] 644 644
+#&gt;   ..$ envir: num [1:2] 138 138
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3000 3002
-#&gt;   ..$ envir: num [1:2] NA 29.8
+#&gt;   ..$ cell : num [1:2] 3001 3000
+#&gt;   ..$ envir: num [1:2] 25.4 NA
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 863 860
-#&gt;   ..$ envir: num [1:2] 180 145
+#&gt;   ..$ cell : num [1:2] 862 862
+#&gt;   ..$ envir: num [1:2] 166 166
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 946 946
-#&gt;   ..$ envir: num [1:2] 135 135
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1142 1068
-#&gt;   ..$ envir: num [1:2] 101.9 48.4
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1754 1753
-#&gt;   ..$ envir: num [1:2] 46.9 55
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1285 1285
-#&gt;   ..$ envir: num [1:2] 14.5 14.5
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3234 3308
-#&gt;   ..$ envir: num [1:2] 85.5 48.5
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1214 1214
-#&gt;   ..$ envir: num [1:2] 28.8 28.8
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1682 1682
-#&gt;   ..$ envir: num [1:2] 25.6 25.6
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3162 3235
-#&gt;   ..$ envir: num [1:2] 71.9 61.3
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3660 3588
-#&gt;   ..$ envir: num [1:2] 106 113
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 831 905
-#&gt;   ..$ envir: num [1:2] 118.1 84.4
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3231 3232
-#&gt;   ..$ envir: num [1:2] 107 116
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3238 3165
-#&gt;   ..$ envir: num [1:2] 35 32.8
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3154 3154
-#&gt;   ..$ envir: num [1:2] 112 112
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1531 1606
-#&gt;   ..$ envir: num [1:2] 43.8 36.1
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 2940 2868
-#&gt;   ..$ envir: num [1:2] 130 120
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3450 3450
-#&gt;   ..$ envir: num [1:2] 93.9 93.9
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1750 1751
-#&gt;   ..$ envir: num [1:2] 61.5 57.8
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1224 1222
-#&gt;   ..$ envir: num [1:2] 133 131
-#&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 794 794
-#&gt;   ..$ envir: num [1:2] 179 179
+#&gt;   ..$ cell : num [1:2] 946 871
+#&gt;   ..$ envir: num [1:2] 135 152
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
 #&gt;   ..$ cell : num [1:2] 1069 1068
 #&gt;   ..$ envir: num [1:2] 25.2 48.4
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3231 3232
-#&gt;   ..$ envir: num [1:2] 107 116
+#&gt;   ..$ cell : num [1:2] 1755 1754
+#&gt;   ..$ envir: num [1:2] 32.2 46.9
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1093 1020
-#&gt;   ..$ envir: num [1:2] 75.9 83.2
+#&gt;   ..$ cell : num [1:2] 1285 1287
+#&gt;   ..$ envir: num [1:2] 14.5 22.9
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3163 3088
-#&gt;   ..$ envir: num [1:2] 47.5 114.8
+#&gt;   ..$ cell : num [1:2] 3235 3235
+#&gt;   ..$ envir: num [1:2] 61.3 61.3
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1213 1138
-#&gt;   ..$ envir: num [1:2] 28.5 21.6
+#&gt;   ..$ cell : num [1:2] 1287 1214
+#&gt;   ..$ envir: num [1:2] 22.9 28.8
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1066 1065
-#&gt;   ..$ envir: num [1:2] 71.6 57.5
+#&gt;   ..$ cell : num [1:2] 1683 1755
+#&gt;   ..$ envir: num [1:2] 32.5 32.2
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3079 3081
-#&gt;   ..$ envir: num [1:2] 102 142
+#&gt;   ..$ cell : num [1:2] 3237 3161
+#&gt;   ..$ envir: num [1:2] 42.8 104
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3002 3002
-#&gt;   ..$ envir: num [1:2] 29.8 29.8
+#&gt;   ..$ cell : num [1:2] 3661 3661
+#&gt;   ..$ envir: num [1:2] 108 108
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1973 1898
-#&gt;   ..$ envir: num [1:2] 55.8 60
+#&gt;   ..$ cell : num [1:2] 831 905
+#&gt;   ..$ envir: num [1:2] 118.1 84.4
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1970 1969
-#&gt;   ..$ envir: num [1:2] 33.8 34.5
+#&gt;   ..$ cell : num [1:2] 3231 3231
+#&gt;   ..$ envir: num [1:2] 107 107
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1138 1140
-#&gt;   ..$ envir: num [1:2] 21.6 47.2
+#&gt;   ..$ cell : num [1:2] 3238 3165
+#&gt;   ..$ envir: num [1:2] 35 32.8
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 3155 3154
+#&gt;   ..$ envir: num [1:2] 94 112
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 1532 1604
+#&gt;   ..$ envir: num [1:2] 28.6 55.3
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 2941 2867
+#&gt;   ..$ envir: num [1:2] 127 123
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 3375 3449
+#&gt;   ..$ envir: num [1:2] 75.3 92.5
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 1824 1824
+#&gt;   ..$ envir: num [1:2] 64.9 64.9
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 1222 1297
+#&gt;   ..$ envir: num [1:2] 131 102
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 796 795
+#&gt;   ..$ envir: num [1:2] 161 174
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 994 1067
+#&gt;   ..$ envir: num [1:2] NA 53.5
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 3305 3230
+#&gt;   ..$ envir: num [1:2] 89.3 79
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 1093 1019
+#&gt;   ..$ envir: num [1:2] 75.9 126.8
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 3161 3087
+#&gt;   ..$ envir: num [1:2] 104 142
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 1213 1211
+#&gt;   ..$ envir: num [1:2] 28.5 20.4
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 1067 1065
+#&gt;   ..$ envir: num [1:2] 53.5 57.5
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 3079 3080
+#&gt;   ..$ envir: num [1:2] 102 137
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 3003 3002
+#&gt;   ..$ envir: num [1:2] 58 29.8
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 1973 1974
+#&gt;   ..$ envir: num [1:2] 55.8 44.7
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 1895 1971
+#&gt;   ..$ envir: num [1:2] 31.9 36.1
+#&gt;  $ :'data.frame':	2 obs. of  2 variables:
+#&gt;   ..$ cell : num [1:2] 1140 1138
+#&gt;   ..$ envir: num [1:2] 47.2 21.6
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
 #&gt;   ..$ cell : num [1:2] 3001 2927
 #&gt;   ..$ envir: num [1:2] 25.4 NA
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 1286 1213
-#&gt;   ..$ envir: num [1:2] 22 28.5
+#&gt;   ..$ cell : num [1:2] 1285 1286
+#&gt;   ..$ envir: num [1:2] 14.5 22
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3165 3168
-#&gt;   ..$ envir: num [1:2] 32.8 29.4
+#&gt;   ..$ cell : num [1:2] 3165 3167
+#&gt;   ..$ envir: num [1:2] 32.8 58.5
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3237 3238
-#&gt;   ..$ envir: num [1:2] 42.8 35
+#&gt;   ..$ cell : num [1:2] 3237 3163
+#&gt;   ..$ envir: num [1:2] 42.8 47.5
 #&gt;  $ :'data.frame':	2 obs. of  2 variables:
-#&gt;   ..$ cell : num [1:2] 3232 3233
-#&gt;   ..$ envir: num [1:2] 116 105</div><div class='input'>
+#&gt;   ..$ cell : num [1:2] 3307 3307
+#&gt;   ..$ envir: num [1:2] 54.9 54.9</div><div class='input'>
 <span class='co'>#### Example (3) Extract a random sample of values with weighted probabilities</span>
 <span class='co'># Define detection probability function based only on distance</span>
 <span class='va'>calc_detection_pr</span> <span class='op'>&lt;-</span>
@@ -486,7 +484,7 @@
                                 sample_size <span class='op'>=</span> <span class='fl'>2</span>,
                                 sample_probs <span class='op'>=</span> <span class='va'>calc_detection_pr</span>
                                 <span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::get_detection_centroids_envir() called (@ 2021-12-02 11:53:27)... 
+</div><div class='output co'>#&gt; flapper::get_detection_centroids_envir() called (@ 2021-12-02 14:39:20)... 
 #&gt; ... Implementing function checks... 
 #&gt; ... Defining detection centroid(s)... 
 #&gt; ... Extracting environmental conditions from detection area(s)... </div><div class='input'><span class='co'># Each element of the outputted list includes the 'cell' and 'envir' column</span>
@@ -496,20 +494,20 @@
 <span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>depths_by_centroid</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; List of 40
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3004 3004
-#&gt;   ..$ envir: num [1:2] 69.9 69.9
-#&gt;   ..$ dist : num [1:2] 320 320
-#&gt;   ..$ prob : num [1:2] 0.333 0.333
+#&gt;   ..$ cell : num [1:2] 3003 3078
+#&gt;   ..$ envir: num [1:2] 58 107
+#&gt;   ..$ dist : num [1:2] 63.6 260.8
+#&gt;   ..$ prob : num [1:2] 0.866 0.473
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 871 871
-#&gt;   ..$ envir: num [1:2] 152 152
-#&gt;   ..$ dist : num [1:2] 255 255
-#&gt;   ..$ prob : num [1:2] 0.488 0.488
+#&gt;   ..$ cell : num [1:2] 870 870
+#&gt;   ..$ envir: num [1:2] 167 167
+#&gt;   ..$ dist : num [1:2] 4.13 4.13
+#&gt;   ..$ prob : num [1:2] 0.921 0.921
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 644 645
-#&gt;   ..$ envir: num [1:2] 138 141
-#&gt;   ..$ dist : num [1:2] 54.8 209.5
-#&gt;   ..$ prob : num [1:2] 0.876 0.6
+#&gt;   ..$ cell : num [1:2] 645 645
+#&gt;   ..$ envir: num [1:2] 141 141
+#&gt;   ..$ dist : num [1:2] 209 209
+#&gt;   ..$ prob : num [1:2] 0.6 0.6
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 3001 3002
 #&gt;   ..$ envir: num [1:2] 25.4 29.8
@@ -521,180 +519,180 @@
 #&gt;   ..$ dist : num [1:2] 99.8 157.3
 #&gt;   ..$ prob : num [1:2] 0.818 0.716
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 945 945
-#&gt;   ..$ envir: num [1:2] 162 162
-#&gt;   ..$ dist : num [1:2] 87.7 87.7
-#&gt;   ..$ prob : num [1:2] 0.835 0.835
+#&gt;   ..$ cell : num [1:2] 944 944
+#&gt;   ..$ envir: num [1:2] 176 176
+#&gt;   ..$ dist : num [1:2] 326 326
+#&gt;   ..$ prob : num [1:2] 0.318 0.318
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1067 1069
-#&gt;   ..$ envir: num [1:2] 53.5 25.2
-#&gt;   ..$ dist : num [1:2] 294 228
-#&gt;   ..$ prob : num [1:2] 0.393 0.554
+#&gt;   ..$ cell : num [1:2] 1069 1068
+#&gt;   ..$ envir: num [1:2] 25.2 48.4
+#&gt;   ..$ dist : num [1:2] 228 56
+#&gt;   ..$ prob : num [1:2] 0.554 0.874
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1753 1753
-#&gt;   ..$ envir: num [1:2] 55 55
-#&gt;   ..$ dist : num [1:2] 173 173
-#&gt;   ..$ prob : num [1:2] 0.684 0.684
+#&gt;   ..$ cell : num [1:2] 1755 1755
+#&gt;   ..$ envir: num [1:2] 32.2 32.2
+#&gt;   ..$ dist : num [1:2] 338 338
+#&gt;   ..$ prob : num [1:2] 0.293 0.293
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1285 1360
-#&gt;   ..$ envir: num [1:2] 14.5 19.3
-#&gt;   ..$ dist : num [1:2] 215 420
-#&gt;   ..$ prob : num [1:2] 0.587 0.154
+#&gt;   ..$ cell : num [1:2] 1285 1285
+#&gt;   ..$ envir: num [1:2] 14.5 14.5
+#&gt;   ..$ dist : num [1:2] 215 215
+#&gt;   ..$ prob : num [1:2] 0.587 0.587
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3235 3234
-#&gt;   ..$ envir: num [1:2] 61.3 85.5
-#&gt;   ..$ dist : num [1:2] 247 58.9
-#&gt;   ..$ prob : num [1:2] 0.508 0.871
+#&gt;   ..$ cell : num [1:2] 3234 3233
+#&gt;   ..$ envir: num [1:2] 85.5 104.9
+#&gt;   ..$ dist : num [1:2] 58.9 45.5
+#&gt;   ..$ prob : num [1:2] 0.871 0.885
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1287 1212
-#&gt;   ..$ envir: num [1:2] 22.9 28
-#&gt;   ..$ dist : num [1:2] 307 195
-#&gt;   ..$ prob : num [1:2] 0.36 0.634
+#&gt;   ..$ cell : num [1:2] 1212 1212
+#&gt;   ..$ envir: num [1:2] 28 28
+#&gt;   ..$ dist : num [1:2] 195 195
+#&gt;   ..$ prob : num [1:2] 0.634 0.634
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1681 1682
-#&gt;   ..$ envir: num [1:2] 47.6 25.6
-#&gt;   ..$ dist : num [1:2] 230 192
-#&gt;   ..$ prob : num [1:2] 0.55 0.642
+#&gt;   ..$ cell : num [1:2] 1683 1682
+#&gt;   ..$ envir: num [1:2] 32.5 25.6
+#&gt;   ..$ dist : num [1:2] 391 192
+#&gt;   ..$ prob : num [1:2] 0.197 0.642
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3163 3236
-#&gt;   ..$ envir: num [1:2] 47.5 47.9
-#&gt;   ..$ dist : num [1:2] 144 212
-#&gt;   ..$ prob : num [1:2] 0.742 0.594
+#&gt;   ..$ cell : num [1:2] 3236 3236
+#&gt;   ..$ envir: num [1:2] 47.9 47.9
+#&gt;   ..$ dist : num [1:2] 212 212
+#&gt;   ..$ prob : num [1:2] 0.594 0.594
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 3661 3662
 #&gt;   ..$ envir: num [1:2] 108 115
 #&gt;   ..$ dist : num [1:2] 125 235
 #&gt;   ..$ prob : num [1:2] 0.778 0.538
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 830 905
-#&gt;   ..$ envir: num [1:2] 117.1 84.4
-#&gt;   ..$ dist : num [1:2] 215 321
-#&gt;   ..$ prob : num [1:2] 0.587 0.329
-#&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3231 3231
-#&gt;   ..$ envir: num [1:2] 107 107
-#&gt;   ..$ dist : num [1:2] 65.2 65.2
-#&gt;   ..$ prob : num [1:2] 0.864 0.864
-#&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3163 3163
-#&gt;   ..$ envir: num [1:2] 47.5 47.5
-#&gt;   ..$ dist : num [1:2] 144 144
-#&gt;   ..$ prob : num [1:2] 0.742 0.742
-#&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3154 3155
-#&gt;   ..$ envir: num [1:2] 112 94
-#&gt;   ..$ dist : num [1:2] 148 131
-#&gt;   ..$ prob : num [1:2] 0.736 0.767
-#&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1531 1605
-#&gt;   ..$ envir: num [1:2] 43.8 47.2
-#&gt;   ..$ dist : num [1:2] 295 228
-#&gt;   ..$ prob : num [1:2] 0.39 0.555
-#&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 2867 2866
-#&gt;   ..$ envir: num [1:2] 123 135
-#&gt;   ..$ dist : num [1:2] 173 248
-#&gt;   ..$ prob : num [1:2] 0.683 0.506
-#&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3449 3374
-#&gt;   ..$ envir: num [1:2] 92.5 72.1
-#&gt;   ..$ dist : num [1:2] 281 293
-#&gt;   ..$ prob : num [1:2] 0.423 0.394
-#&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1751 1750
-#&gt;   ..$ envir: num [1:2] 57.8 61.5
-#&gt;   ..$ dist : num [1:2] 258 194
-#&gt;   ..$ prob : num [1:2] 0.479 0.635
-#&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1297 1296
-#&gt;   ..$ envir: num [1:2] 102 105
-#&gt;   ..$ dist : num [1:2] 273 335
-#&gt;   ..$ prob : num [1:2] 0.443 0.3
-#&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 794 794
-#&gt;   ..$ envir: num [1:2] 179 179
-#&gt;   ..$ dist : num [1:2] 178 178
-#&gt;   ..$ prob : num [1:2] 0.674 0.674
-#&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 994 1067
-#&gt;   ..$ envir: num [1:2] NA 53.5
-#&gt;   ..$ dist : num [1:2] 262 294
-#&gt;   ..$ prob : num [1:2] 0.471 0.393
+#&gt;   ..$ cell : num [1:2] 831 830
+#&gt;   ..$ envir: num [1:2] 118 117
+#&gt;   ..$ dist : num [1:2] 204 215
+#&gt;   ..$ prob : num [1:2] 0.614 0.587
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 3231 3230
 #&gt;   ..$ envir: num [1:2] 107 79
 #&gt;   ..$ dist : num [1:2] 65.2 95.5
 #&gt;   ..$ prob : num [1:2] 0.864 0.824
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1020 1093
-#&gt;   ..$ envir: num [1:2] 83.2 75.9
-#&gt;   ..$ dist : num [1:2] 218 352
-#&gt;   ..$ prob : num [1:2] 0.58 0.265
+#&gt;   ..$ cell : num [1:2] 3165 3238
+#&gt;   ..$ envir: num [1:2] 32.8 35
+#&gt;   ..$ dist : num [1:2] 241 370
+#&gt;   ..$ prob : num [1:2] 0.522 0.231
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3162 3088
-#&gt;   ..$ envir: num [1:2] 71.9 114.8
-#&gt;   ..$ dist : num [1:2] 177 340
-#&gt;   ..$ prob : num [1:2] 0.675 0.29
+#&gt;   ..$ cell : num [1:2] 3154 3155
+#&gt;   ..$ envir: num [1:2] 112 94
+#&gt;   ..$ dist : num [1:2] 148 131
+#&gt;   ..$ prob : num [1:2] 0.736 0.767
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1213 1213
-#&gt;   ..$ envir: num [1:2] 28.5 28.5
-#&gt;   ..$ dist : num [1:2] 67.5 67.5
-#&gt;   ..$ prob : num [1:2] 0.861 0.861
+#&gt;   ..$ cell : num [1:2] 1531 1532
+#&gt;   ..$ envir: num [1:2] 43.8 28.6
+#&gt;   ..$ dist : num [1:2] 295 302
+#&gt;   ..$ prob : num [1:2] 0.39 0.372
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1065 1066
-#&gt;   ..$ envir: num [1:2] 57.5 71.6
-#&gt;   ..$ dist : num [1:2] 196.4 61.9
-#&gt;   ..$ prob : num [1:2] 0.631 0.868
+#&gt;   ..$ cell : num [1:2] 2866 2866
+#&gt;   ..$ envir: num [1:2] 135 135
+#&gt;   ..$ dist : num [1:2] 248 248
+#&gt;   ..$ prob : num [1:2] 0.506 0.506
+#&gt;  $ :'data.frame':	2 obs. of  4 variables:
+#&gt;   ..$ cell : num [1:2] 3449 3376
+#&gt;   ..$ envir: num [1:2] 92.5 90.4
+#&gt;   ..$ dist : num [1:2] 281 339
+#&gt;   ..$ prob : num [1:2] 0.423 0.291
+#&gt;  $ :'data.frame':	2 obs. of  4 variables:
+#&gt;   ..$ cell : num [1:2] 1824 1750
+#&gt;   ..$ envir: num [1:2] 64.9 61.5
+#&gt;   ..$ dist : num [1:2] 292 194
+#&gt;   ..$ prob : num [1:2] 0.398 0.635
+#&gt;  $ :'data.frame':	2 obs. of  4 variables:
+#&gt;   ..$ cell : num [1:2] 1296 1223
+#&gt;   ..$ envir: num [1:2] 105 132
+#&gt;   ..$ dist : num [1:2] 335 204
+#&gt;   ..$ prob : num [1:2] 0.3 0.614
+#&gt;  $ :'data.frame':	2 obs. of  4 variables:
+#&gt;   ..$ cell : num [1:2] 794 795
+#&gt;   ..$ envir: num [1:2] 179 174
+#&gt;   ..$ dist : num [1:2] 177.6 82.1
+#&gt;   ..$ prob : num [1:2] 0.674 0.843
+#&gt;  $ :'data.frame':	2 obs. of  4 variables:
+#&gt;   ..$ cell : num [1:2] 1068 1068
+#&gt;   ..$ envir: num [1:2] 48.4 48.4
+#&gt;   ..$ dist : num [1:2] 56 56
+#&gt;   ..$ prob : num [1:2] 0.874 0.874
+#&gt;  $ :'data.frame':	2 obs. of  4 variables:
+#&gt;   ..$ cell : num [1:2] 3230 3231
+#&gt;   ..$ envir: num [1:2] 79 107
+#&gt;   ..$ dist : num [1:2] 95.5 65.2
+#&gt;   ..$ prob : num [1:2] 0.824 0.864
+#&gt;  $ :'data.frame':	2 obs. of  4 variables:
+#&gt;   ..$ cell : num [1:2] 1093 1019
+#&gt;   ..$ envir: num [1:2] 75.9 126.8
+#&gt;   ..$ dist : num [1:2] 352 141
+#&gt;   ..$ prob : num [1:2] 0.265 0.749
+#&gt;  $ :'data.frame':	2 obs. of  4 variables:
+#&gt;   ..$ cell : num [1:2] 3163 3163
+#&gt;   ..$ envir: num [1:2] 47.5 47.5
+#&gt;   ..$ dist : num [1:2] 144 144
+#&gt;   ..$ prob : num [1:2] 0.742 0.742
+#&gt;  $ :'data.frame':	2 obs. of  4 variables:
+#&gt;   ..$ cell : num [1:2] 1137 1213
+#&gt;   ..$ envir: num [1:2] 22.2 28.5
+#&gt;   ..$ dist : num [1:2] 353.2 67.5
+#&gt;   ..$ prob : num [1:2] 0.263 0.861
+#&gt;  $ :'data.frame':	2 obs. of  4 variables:
+#&gt;   ..$ cell : num [1:2] 1067 1066
+#&gt;   ..$ envir: num [1:2] 53.5 71.6
+#&gt;   ..$ dist : num [1:2] 293.7 61.9
+#&gt;   ..$ prob : num [1:2] 0.393 0.868
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 3154 3154
 #&gt;   ..$ envir: num [1:2] 112 112
 #&gt;   ..$ dist : num [1:2] 148 148
 #&gt;   ..$ prob : num [1:2] 0.736 0.736
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3003 3004
-#&gt;   ..$ envir: num [1:2] 58 69.9
-#&gt;   ..$ dist : num [1:2] 63.6 319.6
-#&gt;   ..$ prob : num [1:2] 0.866 0.333
+#&gt;   ..$ cell : num [1:2] 3002 3002
+#&gt;   ..$ envir: num [1:2] 29.8 29.8
+#&gt;   ..$ dist : num [1:2] 122 122
+#&gt;   ..$ prob : num [1:2] 0.782 0.782
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1974 1898
-#&gt;   ..$ envir: num [1:2] 44.7 60
-#&gt;   ..$ dist : num [1:2] 401 291
-#&gt;   ..$ prob : num [1:2] 0.18 0.399
+#&gt;   ..$ cell : num [1:2] 1899 1898
+#&gt;   ..$ envir: num [1:2] 80.7 60
+#&gt;   ..$ dist : num [1:2] 186 291
+#&gt;   ..$ prob : num [1:2] 0.654 0.399
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1896 1897
-#&gt;   ..$ envir: num [1:2] 32.5 38.5
-#&gt;   ..$ dist : num [1:2] 231 329
-#&gt;   ..$ prob : num [1:2] 0.547 0.312
+#&gt;   ..$ cell : num [1:2] 1970 1897
+#&gt;   ..$ envir: num [1:2] 33.8 38.5
+#&gt;   ..$ dist : num [1:2] 234 329
+#&gt;   ..$ prob : num [1:2] 0.54 0.312
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1137 1065
-#&gt;   ..$ envir: num [1:2] 22.2 57.5
-#&gt;   ..$ dist : num [1:2] 353 196
-#&gt;   ..$ prob : num [1:2] 0.263 0.631
+#&gt;   ..$ cell : num [1:2] 1065 1065
+#&gt;   ..$ envir: num [1:2] 57.5 57.5
+#&gt;   ..$ dist : num [1:2] 196 196
+#&gt;   ..$ prob : num [1:2] 0.631 0.631
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 2929 2927
-#&gt;   ..$ envir: num [1:2] 31.2 NA
-#&gt;   ..$ dist : num [1:2] 421 275
-#&gt;   ..$ prob : num [1:2] 0.153 0.437
+#&gt;   ..$ cell : num [1:2] 3002 2928
+#&gt;   ..$ envir: num [1:2] 29.8 14
+#&gt;   ..$ dist : num [1:2] 122 246
+#&gt;   ..$ prob : num [1:2] 0.782 0.51
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1286 1285
-#&gt;   ..$ envir: num [1:2] 22 14.5
-#&gt;   ..$ dist : num [1:2] 65.3 214.8
-#&gt;   ..$ prob : num [1:2] 0.864 0.587
+#&gt;   ..$ cell : num [1:2] 1213 1213
+#&gt;   ..$ envir: num [1:2] 28.5 28.5
+#&gt;   ..$ dist : num [1:2] 67.5 67.5
+#&gt;   ..$ prob : num [1:2] 0.861 0.861
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3165 3167
-#&gt;   ..$ envir: num [1:2] 32.8 58.5
-#&gt;   ..$ dist : num [1:2] 241 121
-#&gt;   ..$ prob : num [1:2] 0.522 0.784
+#&gt;   ..$ cell : num [1:2] 3167 3165
+#&gt;   ..$ envir: num [1:2] 58.5 32.8
+#&gt;   ..$ dist : num [1:2] 121 241
+#&gt;   ..$ prob : num [1:2] 0.784 0.522
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 3163 3165
 #&gt;   ..$ envir: num [1:2] 47.5 32.8
 #&gt;   ..$ dist : num [1:2] 144 241
 #&gt;   ..$ prob : num [1:2] 0.742 0.522
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3232 3233
-#&gt;   ..$ envir: num [1:2] 116 105
-#&gt;   ..$ dist : num [1:2] 231.2 45.5
-#&gt;   ..$ prob : num [1:2] 0.547 0.885</div><div class='input'>
+#&gt;   ..$ cell : num [1:2] 3232 3234
+#&gt;   ..$ envir: num [1:2] 116.5 85.5
+#&gt;   ..$ dist : num [1:2] 231.2 58.9
+#&gt;   ..$ prob : num [1:2] 0.547 0.871</div><div class='input'>
 <span class='co'>#### Example (4) Sampling without replacement via sample_replace = FALSE</span>
 <span class='va'>depths_by_centroid</span> <span class='op'>&lt;-</span>
   <span class='fu'>get_detection_centroids_envir</span><span class='op'>(</span>xy <span class='op'>=</span> <span class='va'>xy</span>,
@@ -705,211 +703,211 @@
                                 sample_probs <span class='op'>=</span> <span class='va'>calc_detection_pr</span>,
                                 sample_replace <span class='op'>=</span> <span class='cn'>FALSE</span>
                                 <span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::get_detection_centroids_envir() called (@ 2021-12-02 11:53:30)... 
+</div><div class='output co'>#&gt; flapper::get_detection_centroids_envir() called (@ 2021-12-02 14:39:23)... 
 #&gt; ... Implementing function checks... 
 #&gt; ... Defining detection centroid(s)... 
 #&gt; ... Extracting environmental conditions from detection area(s)... </div><div class='input'><span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>depths_by_centroid</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; List of 40
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3078 3077
-#&gt;   ..$ envir: num [1:2] 107.1 99.3
-#&gt;   ..$ dist : num [1:2] 261 178
-#&gt;   ..$ prob : num [1:2] 0.473 0.673
+#&gt;   ..$ cell : num [1:2] 3003 3077
+#&gt;   ..$ envir: num [1:2] 58 99.3
+#&gt;   ..$ dist : num [1:2] 63.6 177.7
+#&gt;   ..$ prob : num [1:2] 0.866 0.673
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 870 871
 #&gt;   ..$ envir: num [1:2] 167 152
 #&gt;   ..$ dist : num [1:2] 4.13 254.84
 #&gt;   ..$ prob : num [1:2] 0.921 0.488
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 645 644
-#&gt;   ..$ envir: num [1:2] 141 138
-#&gt;   ..$ dist : num [1:2] 209.5 54.8
-#&gt;   ..$ prob : num [1:2] 0.6 0.876
+#&gt;   ..$ cell : num [1:2] 644 643
+#&gt;   ..$ envir: num [1:2] 138.1 72.1
+#&gt;   ..$ dist : num [1:2] 54.8 307
+#&gt;   ..$ prob : num [1:2] 0.876 0.361
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 3003 3002
 #&gt;   ..$ envir: num [1:2] 58 29.8
 #&gt;   ..$ dist : num [1:2] 63.6 122.4
 #&gt;   ..$ prob : num [1:2] 0.866 0.782
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 860 862
-#&gt;   ..$ envir: num [1:2] 145 166
-#&gt;   ..$ dist : num [1:2] 357 157
-#&gt;   ..$ prob : num [1:2] 0.256 0.716
+#&gt;   ..$ cell : num [1:2] 862 863
+#&gt;   ..$ envir: num [1:2] 166 180
+#&gt;   ..$ dist : num [1:2] 157 414
+#&gt;   ..$ prob : num [1:2] 0.716 0.162
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 946 871
-#&gt;   ..$ envir: num [1:2] 135 152
-#&gt;   ..$ dist : num [1:2] 203 255
-#&gt;   ..$ prob : num [1:2] 0.616 0.488
+#&gt;   ..$ cell : num [1:2] 945 946
+#&gt;   ..$ envir: num [1:2] 162 135
+#&gt;   ..$ dist : num [1:2] 87.7 202.8
+#&gt;   ..$ prob : num [1:2] 0.835 0.616
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1069 1067
-#&gt;   ..$ envir: num [1:2] 25.2 53.5
-#&gt;   ..$ dist : num [1:2] 228 294
-#&gt;   ..$ prob : num [1:2] 0.554 0.393
+#&gt;   ..$ cell : num [1:2] 1068 1067
+#&gt;   ..$ envir: num [1:2] 48.4 53.5
+#&gt;   ..$ dist : num [1:2] 56 294
+#&gt;   ..$ prob : num [1:2] 0.874 0.393
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1755 1752
-#&gt;   ..$ envir: num [1:2] 32.2 56.3
-#&gt;   ..$ dist : num [1:2] 338 406
-#&gt;   ..$ prob : num [1:2] 0.293 0.173
+#&gt;   ..$ cell : num [1:2] 1752 1755
+#&gt;   ..$ envir: num [1:2] 56.3 32.2
+#&gt;   ..$ dist : num [1:2] 406 338
+#&gt;   ..$ prob : num [1:2] 0.173 0.293
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1287 1286
-#&gt;   ..$ envir: num [1:2] 22.9 22
-#&gt;   ..$ dist : num [1:2] 307.4 65.3
-#&gt;   ..$ prob : num [1:2] 0.36 0.864
+#&gt;   ..$ cell : num [1:2] 1286 1285
+#&gt;   ..$ envir: num [1:2] 22 14.5
+#&gt;   ..$ dist : num [1:2] 65.3 214.8
+#&gt;   ..$ prob : num [1:2] 0.864 0.587
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3233 3234
-#&gt;   ..$ envir: num [1:2] 104.9 85.5
-#&gt;   ..$ dist : num [1:2] 45.5 58.9
-#&gt;   ..$ prob : num [1:2] 0.885 0.871
+#&gt;   ..$ cell : num [1:2] 3234 3233
+#&gt;   ..$ envir: num [1:2] 85.5 104.9
+#&gt;   ..$ dist : num [1:2] 58.9 45.5
+#&gt;   ..$ prob : num [1:2] 0.871 0.885
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1214 1213
-#&gt;   ..$ envir: num [1:2] 28.8 28.5
-#&gt;   ..$ dist : num [1:2] 214.3 67.5
-#&gt;   ..$ prob : num [1:2] 0.588 0.861
+#&gt;   ..$ cell : num [1:2] 1212 1287
+#&gt;   ..$ envir: num [1:2] 28 22.9
+#&gt;   ..$ dist : num [1:2] 195 307
+#&gt;   ..$ prob : num [1:2] 0.634 0.36
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 1681 1682
 #&gt;   ..$ envir: num [1:2] 47.6 25.6
 #&gt;   ..$ dist : num [1:2] 230 192
 #&gt;   ..$ prob : num [1:2] 0.55 0.642
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3163 3162
-#&gt;   ..$ envir: num [1:2] 47.5 71.9
-#&gt;   ..$ dist : num [1:2] 144 177
-#&gt;   ..$ prob : num [1:2] 0.742 0.675
+#&gt;   ..$ cell : num [1:2] 3236 3162
+#&gt;   ..$ envir: num [1:2] 47.9 71.9
+#&gt;   ..$ dist : num [1:2] 212 177
+#&gt;   ..$ prob : num [1:2] 0.594 0.675
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 3661 3587
 #&gt;   ..$ envir: num [1:2] 108 107
 #&gt;   ..$ dist : num [1:2] 125 353
 #&gt;   ..$ prob : num [1:2] 0.778 0.262
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 904 830
-#&gt;   ..$ envir: num [1:2] 76.1 117.1
-#&gt;   ..$ dist : num [1:2] 328 215
-#&gt;   ..$ prob : num [1:2] 0.314 0.587
+#&gt;   ..$ cell : num [1:2] 831 905
+#&gt;   ..$ envir: num [1:2] 118.1 84.4
+#&gt;   ..$ dist : num [1:2] 204 321
+#&gt;   ..$ prob : num [1:2] 0.614 0.329
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3232 3231
-#&gt;   ..$ envir: num [1:2] 116 107
-#&gt;   ..$ dist : num [1:2] 231.2 65.2
-#&gt;   ..$ prob : num [1:2] 0.547 0.864
+#&gt;   ..$ cell : num [1:2] 3230 3231
+#&gt;   ..$ envir: num [1:2] 79 107
+#&gt;   ..$ dist : num [1:2] 95.5 65.2
+#&gt;   ..$ prob : num [1:2] 0.824 0.864
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3164 3165
-#&gt;   ..$ envir: num [1:2] 40.4 32.8
-#&gt;   ..$ dist : num [1:2] 101 241
-#&gt;   ..$ prob : num [1:2] 0.817 0.522
+#&gt;   ..$ cell : num [1:2] 3163 3164
+#&gt;   ..$ envir: num [1:2] 47.5 40.4
+#&gt;   ..$ dist : num [1:2] 144 101
+#&gt;   ..$ prob : num [1:2] 0.742 0.817
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3154 3155
-#&gt;   ..$ envir: num [1:2] 112 94
-#&gt;   ..$ dist : num [1:2] 148 131
-#&gt;   ..$ prob : num [1:2] 0.736 0.767
+#&gt;   ..$ cell : num [1:2] 3154 3156
+#&gt;   ..$ envir: num [1:2] 112.5 84.7
+#&gt;   ..$ dist : num [1:2] 148 380
+#&gt;   ..$ prob : num [1:2] 0.736 0.214
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1606 1605
-#&gt;   ..$ envir: num [1:2] 36.1 47.2
-#&gt;   ..$ dist : num [1:2] 237 228
-#&gt;   ..$ prob : num [1:2] 0.532 0.555
+#&gt;   ..$ cell : num [1:2] 1604 1606
+#&gt;   ..$ envir: num [1:2] 55.3 36.1
+#&gt;   ..$ dist : num [1:2] 424 237
+#&gt;   ..$ prob : num [1:2] 0.15 0.532
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 2867 2941
-#&gt;   ..$ envir: num [1:2] 123 127
-#&gt;   ..$ dist : num [1:2] 173 311
-#&gt;   ..$ prob : num [1:2] 0.683 0.353
+#&gt;   ..$ cell : num [1:2] 2866 2940
+#&gt;   ..$ envir: num [1:2] 135 130
+#&gt;   ..$ dist : num [1:2] 248 358
+#&gt;   ..$ prob : num [1:2] 0.506 0.254
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3374 3448
-#&gt;   ..$ envir: num [1:2] 72.1 89.9
-#&gt;   ..$ dist : num [1:2] 293 361
-#&gt;   ..$ prob : num [1:2] 0.394 0.248
+#&gt;   ..$ cell : num [1:2] 3375 3376
+#&gt;   ..$ envir: num [1:2] 75.3 90.4
+#&gt;   ..$ dist : num [1:2] 186 339
+#&gt;   ..$ prob : num [1:2] 0.656 0.291
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 1824 1750
 #&gt;   ..$ envir: num [1:2] 64.9 61.5
 #&gt;   ..$ dist : num [1:2] 292 194
 #&gt;   ..$ prob : num [1:2] 0.398 0.635
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1297 1222
-#&gt;   ..$ envir: num [1:2] 102 131
-#&gt;   ..$ dist : num [1:2] 273 281
-#&gt;   ..$ prob : num [1:2] 0.443 0.423
+#&gt;   ..$ cell : num [1:2] 1223 1222
+#&gt;   ..$ envir: num [1:2] 132 131
+#&gt;   ..$ dist : num [1:2] 204 281
+#&gt;   ..$ prob : num [1:2] 0.614 0.423
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 794 795
 #&gt;   ..$ envir: num [1:2] 179 174
 #&gt;   ..$ dist : num [1:2] 177.6 82.1
 #&gt;   ..$ prob : num [1:2] 0.674 0.843
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1067 1068
-#&gt;   ..$ envir: num [1:2] 53.5 48.4
-#&gt;   ..$ dist : num [1:2] 294 56
-#&gt;   ..$ prob : num [1:2] 0.393 0.874
+#&gt;   ..$ cell : num [1:2] 1067 994
+#&gt;   ..$ envir: num [1:2] 53.5 NA
+#&gt;   ..$ dist : num [1:2] 294 262
+#&gt;   ..$ prob : num [1:2] 0.393 0.471
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3231 3305
-#&gt;   ..$ envir: num [1:2] 107.1 89.3
-#&gt;   ..$ dist : num [1:2] 65.2 407.9
-#&gt;   ..$ prob : num [1:2] 0.864 0.171
+#&gt;   ..$ cell : num [1:2] 3230 3231
+#&gt;   ..$ envir: num [1:2] 79 107
+#&gt;   ..$ dist : num [1:2] 95.5 65.2
+#&gt;   ..$ prob : num [1:2] 0.824 0.864
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1018 1093
-#&gt;   ..$ envir: num [1:2] 159 75.9
-#&gt;   ..$ dist : num [1:2] 352 352
-#&gt;   ..$ prob : num [1:2] 0.264 0.265
+#&gt;   ..$ cell : num [1:2] 1020 1019
+#&gt;   ..$ envir: num [1:2] 83.2 126.8
+#&gt;   ..$ dist : num [1:2] 218 141
+#&gt;   ..$ prob : num [1:2] 0.58 0.749
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3163 3161
-#&gt;   ..$ envir: num [1:2] 47.5 104
-#&gt;   ..$ dist : num [1:2] 144 206
-#&gt;   ..$ prob : num [1:2] 0.742 0.609
+#&gt;   ..$ cell : num [1:2] 3161 3088
+#&gt;   ..$ envir: num [1:2] 104 115
+#&gt;   ..$ dist : num [1:2] 206 340
+#&gt;   ..$ prob : num [1:2] 0.609 0.29
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1138 1213
-#&gt;   ..$ envir: num [1:2] 21.6 28.5
-#&gt;   ..$ dist : num [1:2] 172.3 67.5
-#&gt;   ..$ prob : num [1:2] 0.685 0.861
+#&gt;   ..$ cell : num [1:2] 1139 1211
+#&gt;   ..$ envir: num [1:2] 22 20.4
+#&gt;   ..$ dist : num [1:2] 157 197
+#&gt;   ..$ prob : num [1:2] 0.717 0.63
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1066 1067
-#&gt;   ..$ envir: num [1:2] 71.6 53.5
-#&gt;   ..$ dist : num [1:2] 61.9 293.7
-#&gt;   ..$ prob : num [1:2] 0.868 0.393
+#&gt;   ..$ cell : num [1:2] 1067 1066
+#&gt;   ..$ envir: num [1:2] 53.5 71.6
+#&gt;   ..$ dist : num [1:2] 293.7 61.9
+#&gt;   ..$ prob : num [1:2] 0.393 0.868
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3080 3154
-#&gt;   ..$ envir: num [1:2] 137 112
-#&gt;   ..$ dist : num [1:2] 94.5 147.6
-#&gt;   ..$ prob : num [1:2] 0.826 0.736
+#&gt;   ..$ cell : num [1:2] 3080 3079
+#&gt;   ..$ envir: num [1:2] 137 102
+#&gt;   ..$ dist : num [1:2] 94.5 282.7
+#&gt;   ..$ prob : num [1:2] 0.826 0.419
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3004 3003
-#&gt;   ..$ envir: num [1:2] 69.9 58
-#&gt;   ..$ dist : num [1:2] 319.6 63.6
-#&gt;   ..$ prob : num [1:2] 0.333 0.866
+#&gt;   ..$ cell : num [1:2] 3003 3004
+#&gt;   ..$ envir: num [1:2] 58 69.9
+#&gt;   ..$ dist : num [1:2] 63.6 319.6
+#&gt;   ..$ prob : num [1:2] 0.866 0.333
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1899 1972
-#&gt;   ..$ envir: num [1:2] 80.7 45.3
-#&gt;   ..$ dist : num [1:2] 186 359
-#&gt;   ..$ prob : num [1:2] 0.654 0.251
+#&gt;   ..$ cell : num [1:2] 1898 1973
+#&gt;   ..$ envir: num [1:2] 60 55.8
+#&gt;   ..$ dist : num [1:2] 291 281
+#&gt;   ..$ prob : num [1:2] 0.399 0.423
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1897 1896
-#&gt;   ..$ envir: num [1:2] 38.5 32.5
-#&gt;   ..$ dist : num [1:2] 329 231
-#&gt;   ..$ prob : num [1:2] 0.312 0.547
+#&gt;   ..$ cell : num [1:2] 1897 1970
+#&gt;   ..$ envir: num [1:2] 38.5 33.8
+#&gt;   ..$ dist : num [1:2] 329 234
+#&gt;   ..$ prob : num [1:2] 0.312 0.54
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1139 1065
-#&gt;   ..$ envir: num [1:2] 22 57.5
-#&gt;   ..$ dist : num [1:2] 157 196
-#&gt;   ..$ prob : num [1:2] 0.717 0.631
+#&gt;   ..$ cell : num [1:2] 1064 1139
+#&gt;   ..$ envir: num [1:2] 32.7 22
+#&gt;   ..$ dist : num [1:2] 386 157
+#&gt;   ..$ prob : num [1:2] 0.204 0.717
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3001 3002
-#&gt;   ..$ envir: num [1:2] 25.4 29.8
-#&gt;   ..$ dist : num [1:2] 143 122
-#&gt;   ..$ prob : num [1:2] 0.744 0.782
+#&gt;   ..$ cell : num [1:2] 2927 2928
+#&gt;   ..$ envir: num [1:2] NA 14
+#&gt;   ..$ dist : num [1:2] 275 246
+#&gt;   ..$ prob : num [1:2] 0.437 0.51
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1286 1212
-#&gt;   ..$ envir: num [1:2] 22 28
-#&gt;   ..$ dist : num [1:2] 65.3 195.2
-#&gt;   ..$ prob : num [1:2] 0.864 0.634
+#&gt;   ..$ cell : num [1:2] 1212 1286
+#&gt;   ..$ envir: num [1:2] 28 22
+#&gt;   ..$ dist : num [1:2] 195.2 65.3
+#&gt;   ..$ prob : num [1:2] 0.634 0.864
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3166 3165
-#&gt;   ..$ envir: num [1:2] 47.7 32.8
-#&gt;   ..$ dist : num [1:2] 136 241
-#&gt;   ..$ prob : num [1:2] 0.757 0.522
+#&gt;   ..$ cell : num [1:2] 3167 3165
+#&gt;   ..$ envir: num [1:2] 58.5 32.8
+#&gt;   ..$ dist : num [1:2] 121 241
+#&gt;   ..$ prob : num [1:2] 0.784 0.522
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3237 3164
-#&gt;   ..$ envir: num [1:2] 42.8 40.4
-#&gt;   ..$ dist : num [1:2] 306 101
-#&gt;   ..$ prob : num [1:2] 0.364 0.817
+#&gt;   ..$ cell : num [1:2] 3163 3162
+#&gt;   ..$ envir: num [1:2] 47.5 71.9
+#&gt;   ..$ dist : num [1:2] 144 177
+#&gt;   ..$ prob : num [1:2] 0.742 0.675
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3233 3232
-#&gt;   ..$ envir: num [1:2] 105 116
-#&gt;   ..$ dist : num [1:2] 45.5 231.2
-#&gt;   ..$ prob : num [1:2] 0.885 0.547</div><div class='input'>
+#&gt;   ..$ cell : num [1:2] 3307 3233
+#&gt;   ..$ envir: num [1:2] 54.9 104.9
+#&gt;   ..$ dist : num [1:2] 417.6 45.5
+#&gt;   ..$ prob : num [1:2] 0.158 0.885</div><div class='input'>
 <span class='co'>#### Example (5) Parallelise the algorithm via cl and varlist arguments</span>
 <span class='va'>depths_by_centroid</span> <span class='op'>&lt;-</span>
   <span class='fu'>get_detection_centroids_envir</span><span class='op'>(</span>xy <span class='op'>=</span> <span class='va'>xy</span>,
@@ -922,211 +920,211 @@
                                 cl <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/makeCluster.html'>makeCluster</a></span><span class='op'>(</span><span class='fl'>2L</span><span class='op'>)</span>,
                                 varlist <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"dat_gebco"</span>,<span class='st'>"calc_detection_pr"</span><span class='op'>)</span>
                                 <span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::get_detection_centroids_envir() called (@ 2021-12-02 11:53:32)... 
+</div><div class='output co'>#&gt; flapper::get_detection_centroids_envir() called (@ 2021-12-02 14:39:25)... 
 #&gt; ... Implementing function checks... 
 #&gt; ... Defining detection centroid(s)... 
 #&gt; ... Extracting environmental conditions from detection area(s)... </div><div class='output co'>#&gt; <span class='error'>Error in get(name, envir = envir): object 'calc_detection_pr' not found</span></div><div class='input'><span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>depths_by_centroid</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; List of 40
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3078 3077
-#&gt;   ..$ envir: num [1:2] 107.1 99.3
-#&gt;   ..$ dist : num [1:2] 261 178
-#&gt;   ..$ prob : num [1:2] 0.473 0.673
+#&gt;   ..$ cell : num [1:2] 3003 3077
+#&gt;   ..$ envir: num [1:2] 58 99.3
+#&gt;   ..$ dist : num [1:2] 63.6 177.7
+#&gt;   ..$ prob : num [1:2] 0.866 0.673
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 870 871
 #&gt;   ..$ envir: num [1:2] 167 152
 #&gt;   ..$ dist : num [1:2] 4.13 254.84
 #&gt;   ..$ prob : num [1:2] 0.921 0.488
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 645 644
-#&gt;   ..$ envir: num [1:2] 141 138
-#&gt;   ..$ dist : num [1:2] 209.5 54.8
-#&gt;   ..$ prob : num [1:2] 0.6 0.876
+#&gt;   ..$ cell : num [1:2] 644 643
+#&gt;   ..$ envir: num [1:2] 138.1 72.1
+#&gt;   ..$ dist : num [1:2] 54.8 307
+#&gt;   ..$ prob : num [1:2] 0.876 0.361
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 3003 3002
 #&gt;   ..$ envir: num [1:2] 58 29.8
 #&gt;   ..$ dist : num [1:2] 63.6 122.4
 #&gt;   ..$ prob : num [1:2] 0.866 0.782
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 860 862
-#&gt;   ..$ envir: num [1:2] 145 166
-#&gt;   ..$ dist : num [1:2] 357 157
-#&gt;   ..$ prob : num [1:2] 0.256 0.716
+#&gt;   ..$ cell : num [1:2] 862 863
+#&gt;   ..$ envir: num [1:2] 166 180
+#&gt;   ..$ dist : num [1:2] 157 414
+#&gt;   ..$ prob : num [1:2] 0.716 0.162
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 946 871
-#&gt;   ..$ envir: num [1:2] 135 152
-#&gt;   ..$ dist : num [1:2] 203 255
-#&gt;   ..$ prob : num [1:2] 0.616 0.488
+#&gt;   ..$ cell : num [1:2] 945 946
+#&gt;   ..$ envir: num [1:2] 162 135
+#&gt;   ..$ dist : num [1:2] 87.7 202.8
+#&gt;   ..$ prob : num [1:2] 0.835 0.616
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1069 1067
-#&gt;   ..$ envir: num [1:2] 25.2 53.5
-#&gt;   ..$ dist : num [1:2] 228 294
-#&gt;   ..$ prob : num [1:2] 0.554 0.393
+#&gt;   ..$ cell : num [1:2] 1068 1067
+#&gt;   ..$ envir: num [1:2] 48.4 53.5
+#&gt;   ..$ dist : num [1:2] 56 294
+#&gt;   ..$ prob : num [1:2] 0.874 0.393
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1755 1752
-#&gt;   ..$ envir: num [1:2] 32.2 56.3
-#&gt;   ..$ dist : num [1:2] 338 406
-#&gt;   ..$ prob : num [1:2] 0.293 0.173
+#&gt;   ..$ cell : num [1:2] 1752 1755
+#&gt;   ..$ envir: num [1:2] 56.3 32.2
+#&gt;   ..$ dist : num [1:2] 406 338
+#&gt;   ..$ prob : num [1:2] 0.173 0.293
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1287 1286
-#&gt;   ..$ envir: num [1:2] 22.9 22
-#&gt;   ..$ dist : num [1:2] 307.4 65.3
-#&gt;   ..$ prob : num [1:2] 0.36 0.864
+#&gt;   ..$ cell : num [1:2] 1286 1285
+#&gt;   ..$ envir: num [1:2] 22 14.5
+#&gt;   ..$ dist : num [1:2] 65.3 214.8
+#&gt;   ..$ prob : num [1:2] 0.864 0.587
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3233 3234
-#&gt;   ..$ envir: num [1:2] 104.9 85.5
-#&gt;   ..$ dist : num [1:2] 45.5 58.9
-#&gt;   ..$ prob : num [1:2] 0.885 0.871
+#&gt;   ..$ cell : num [1:2] 3234 3233
+#&gt;   ..$ envir: num [1:2] 85.5 104.9
+#&gt;   ..$ dist : num [1:2] 58.9 45.5
+#&gt;   ..$ prob : num [1:2] 0.871 0.885
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1214 1213
-#&gt;   ..$ envir: num [1:2] 28.8 28.5
-#&gt;   ..$ dist : num [1:2] 214.3 67.5
-#&gt;   ..$ prob : num [1:2] 0.588 0.861
+#&gt;   ..$ cell : num [1:2] 1212 1287
+#&gt;   ..$ envir: num [1:2] 28 22.9
+#&gt;   ..$ dist : num [1:2] 195 307
+#&gt;   ..$ prob : num [1:2] 0.634 0.36
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 1681 1682
 #&gt;   ..$ envir: num [1:2] 47.6 25.6
 #&gt;   ..$ dist : num [1:2] 230 192
 #&gt;   ..$ prob : num [1:2] 0.55 0.642
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3163 3162
-#&gt;   ..$ envir: num [1:2] 47.5 71.9
-#&gt;   ..$ dist : num [1:2] 144 177
-#&gt;   ..$ prob : num [1:2] 0.742 0.675
+#&gt;   ..$ cell : num [1:2] 3236 3162
+#&gt;   ..$ envir: num [1:2] 47.9 71.9
+#&gt;   ..$ dist : num [1:2] 212 177
+#&gt;   ..$ prob : num [1:2] 0.594 0.675
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 3661 3587
 #&gt;   ..$ envir: num [1:2] 108 107
 #&gt;   ..$ dist : num [1:2] 125 353
 #&gt;   ..$ prob : num [1:2] 0.778 0.262
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 904 830
-#&gt;   ..$ envir: num [1:2] 76.1 117.1
-#&gt;   ..$ dist : num [1:2] 328 215
-#&gt;   ..$ prob : num [1:2] 0.314 0.587
+#&gt;   ..$ cell : num [1:2] 831 905
+#&gt;   ..$ envir: num [1:2] 118.1 84.4
+#&gt;   ..$ dist : num [1:2] 204 321
+#&gt;   ..$ prob : num [1:2] 0.614 0.329
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3232 3231
-#&gt;   ..$ envir: num [1:2] 116 107
-#&gt;   ..$ dist : num [1:2] 231.2 65.2
-#&gt;   ..$ prob : num [1:2] 0.547 0.864
+#&gt;   ..$ cell : num [1:2] 3230 3231
+#&gt;   ..$ envir: num [1:2] 79 107
+#&gt;   ..$ dist : num [1:2] 95.5 65.2
+#&gt;   ..$ prob : num [1:2] 0.824 0.864
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3164 3165
-#&gt;   ..$ envir: num [1:2] 40.4 32.8
-#&gt;   ..$ dist : num [1:2] 101 241
-#&gt;   ..$ prob : num [1:2] 0.817 0.522
+#&gt;   ..$ cell : num [1:2] 3163 3164
+#&gt;   ..$ envir: num [1:2] 47.5 40.4
+#&gt;   ..$ dist : num [1:2] 144 101
+#&gt;   ..$ prob : num [1:2] 0.742 0.817
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3154 3155
-#&gt;   ..$ envir: num [1:2] 112 94
-#&gt;   ..$ dist : num [1:2] 148 131
-#&gt;   ..$ prob : num [1:2] 0.736 0.767
+#&gt;   ..$ cell : num [1:2] 3154 3156
+#&gt;   ..$ envir: num [1:2] 112.5 84.7
+#&gt;   ..$ dist : num [1:2] 148 380
+#&gt;   ..$ prob : num [1:2] 0.736 0.214
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1606 1605
-#&gt;   ..$ envir: num [1:2] 36.1 47.2
-#&gt;   ..$ dist : num [1:2] 237 228
-#&gt;   ..$ prob : num [1:2] 0.532 0.555
+#&gt;   ..$ cell : num [1:2] 1604 1606
+#&gt;   ..$ envir: num [1:2] 55.3 36.1
+#&gt;   ..$ dist : num [1:2] 424 237
+#&gt;   ..$ prob : num [1:2] 0.15 0.532
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 2867 2941
-#&gt;   ..$ envir: num [1:2] 123 127
-#&gt;   ..$ dist : num [1:2] 173 311
-#&gt;   ..$ prob : num [1:2] 0.683 0.353
+#&gt;   ..$ cell : num [1:2] 2866 2940
+#&gt;   ..$ envir: num [1:2] 135 130
+#&gt;   ..$ dist : num [1:2] 248 358
+#&gt;   ..$ prob : num [1:2] 0.506 0.254
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3374 3448
-#&gt;   ..$ envir: num [1:2] 72.1 89.9
-#&gt;   ..$ dist : num [1:2] 293 361
-#&gt;   ..$ prob : num [1:2] 0.394 0.248
+#&gt;   ..$ cell : num [1:2] 3375 3376
+#&gt;   ..$ envir: num [1:2] 75.3 90.4
+#&gt;   ..$ dist : num [1:2] 186 339
+#&gt;   ..$ prob : num [1:2] 0.656 0.291
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 1824 1750
 #&gt;   ..$ envir: num [1:2] 64.9 61.5
 #&gt;   ..$ dist : num [1:2] 292 194
 #&gt;   ..$ prob : num [1:2] 0.398 0.635
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1297 1222
-#&gt;   ..$ envir: num [1:2] 102 131
-#&gt;   ..$ dist : num [1:2] 273 281
-#&gt;   ..$ prob : num [1:2] 0.443 0.423
+#&gt;   ..$ cell : num [1:2] 1223 1222
+#&gt;   ..$ envir: num [1:2] 132 131
+#&gt;   ..$ dist : num [1:2] 204 281
+#&gt;   ..$ prob : num [1:2] 0.614 0.423
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
 #&gt;   ..$ cell : num [1:2] 794 795
 #&gt;   ..$ envir: num [1:2] 179 174
 #&gt;   ..$ dist : num [1:2] 177.6 82.1
 #&gt;   ..$ prob : num [1:2] 0.674 0.843
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1067 1068
-#&gt;   ..$ envir: num [1:2] 53.5 48.4
-#&gt;   ..$ dist : num [1:2] 294 56
-#&gt;   ..$ prob : num [1:2] 0.393 0.874
+#&gt;   ..$ cell : num [1:2] 1067 994
+#&gt;   ..$ envir: num [1:2] 53.5 NA
+#&gt;   ..$ dist : num [1:2] 294 262
+#&gt;   ..$ prob : num [1:2] 0.393 0.471
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3231 3305
-#&gt;   ..$ envir: num [1:2] 107.1 89.3
-#&gt;   ..$ dist : num [1:2] 65.2 407.9
-#&gt;   ..$ prob : num [1:2] 0.864 0.171
+#&gt;   ..$ cell : num [1:2] 3230 3231
+#&gt;   ..$ envir: num [1:2] 79 107
+#&gt;   ..$ dist : num [1:2] 95.5 65.2
+#&gt;   ..$ prob : num [1:2] 0.824 0.864
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1018 1093
-#&gt;   ..$ envir: num [1:2] 159 75.9
-#&gt;   ..$ dist : num [1:2] 352 352
-#&gt;   ..$ prob : num [1:2] 0.264 0.265
+#&gt;   ..$ cell : num [1:2] 1020 1019
+#&gt;   ..$ envir: num [1:2] 83.2 126.8
+#&gt;   ..$ dist : num [1:2] 218 141
+#&gt;   ..$ prob : num [1:2] 0.58 0.749
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3163 3161
-#&gt;   ..$ envir: num [1:2] 47.5 104
-#&gt;   ..$ dist : num [1:2] 144 206
-#&gt;   ..$ prob : num [1:2] 0.742 0.609
+#&gt;   ..$ cell : num [1:2] 3161 3088
+#&gt;   ..$ envir: num [1:2] 104 115
+#&gt;   ..$ dist : num [1:2] 206 340
+#&gt;   ..$ prob : num [1:2] 0.609 0.29
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1138 1213
-#&gt;   ..$ envir: num [1:2] 21.6 28.5
-#&gt;   ..$ dist : num [1:2] 172.3 67.5
-#&gt;   ..$ prob : num [1:2] 0.685 0.861
+#&gt;   ..$ cell : num [1:2] 1139 1211
+#&gt;   ..$ envir: num [1:2] 22 20.4
+#&gt;   ..$ dist : num [1:2] 157 197
+#&gt;   ..$ prob : num [1:2] 0.717 0.63
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1066 1067
-#&gt;   ..$ envir: num [1:2] 71.6 53.5
-#&gt;   ..$ dist : num [1:2] 61.9 293.7
-#&gt;   ..$ prob : num [1:2] 0.868 0.393
+#&gt;   ..$ cell : num [1:2] 1067 1066
+#&gt;   ..$ envir: num [1:2] 53.5 71.6
+#&gt;   ..$ dist : num [1:2] 293.7 61.9
+#&gt;   ..$ prob : num [1:2] 0.393 0.868
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3080 3154
-#&gt;   ..$ envir: num [1:2] 137 112
-#&gt;   ..$ dist : num [1:2] 94.5 147.6
-#&gt;   ..$ prob : num [1:2] 0.826 0.736
+#&gt;   ..$ cell : num [1:2] 3080 3079
+#&gt;   ..$ envir: num [1:2] 137 102
+#&gt;   ..$ dist : num [1:2] 94.5 282.7
+#&gt;   ..$ prob : num [1:2] 0.826 0.419
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3004 3003
-#&gt;   ..$ envir: num [1:2] 69.9 58
-#&gt;   ..$ dist : num [1:2] 319.6 63.6
-#&gt;   ..$ prob : num [1:2] 0.333 0.866
+#&gt;   ..$ cell : num [1:2] 3003 3004
+#&gt;   ..$ envir: num [1:2] 58 69.9
+#&gt;   ..$ dist : num [1:2] 63.6 319.6
+#&gt;   ..$ prob : num [1:2] 0.866 0.333
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1899 1972
-#&gt;   ..$ envir: num [1:2] 80.7 45.3
-#&gt;   ..$ dist : num [1:2] 186 359
-#&gt;   ..$ prob : num [1:2] 0.654 0.251
+#&gt;   ..$ cell : num [1:2] 1898 1973
+#&gt;   ..$ envir: num [1:2] 60 55.8
+#&gt;   ..$ dist : num [1:2] 291 281
+#&gt;   ..$ prob : num [1:2] 0.399 0.423
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1897 1896
-#&gt;   ..$ envir: num [1:2] 38.5 32.5
-#&gt;   ..$ dist : num [1:2] 329 231
-#&gt;   ..$ prob : num [1:2] 0.312 0.547
+#&gt;   ..$ cell : num [1:2] 1897 1970
+#&gt;   ..$ envir: num [1:2] 38.5 33.8
+#&gt;   ..$ dist : num [1:2] 329 234
+#&gt;   ..$ prob : num [1:2] 0.312 0.54
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1139 1065
-#&gt;   ..$ envir: num [1:2] 22 57.5
-#&gt;   ..$ dist : num [1:2] 157 196
-#&gt;   ..$ prob : num [1:2] 0.717 0.631
+#&gt;   ..$ cell : num [1:2] 1064 1139
+#&gt;   ..$ envir: num [1:2] 32.7 22
+#&gt;   ..$ dist : num [1:2] 386 157
+#&gt;   ..$ prob : num [1:2] 0.204 0.717
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3001 3002
-#&gt;   ..$ envir: num [1:2] 25.4 29.8
-#&gt;   ..$ dist : num [1:2] 143 122
-#&gt;   ..$ prob : num [1:2] 0.744 0.782
+#&gt;   ..$ cell : num [1:2] 2927 2928
+#&gt;   ..$ envir: num [1:2] NA 14
+#&gt;   ..$ dist : num [1:2] 275 246
+#&gt;   ..$ prob : num [1:2] 0.437 0.51
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 1286 1212
-#&gt;   ..$ envir: num [1:2] 22 28
-#&gt;   ..$ dist : num [1:2] 65.3 195.2
-#&gt;   ..$ prob : num [1:2] 0.864 0.634
+#&gt;   ..$ cell : num [1:2] 1212 1286
+#&gt;   ..$ envir: num [1:2] 28 22
+#&gt;   ..$ dist : num [1:2] 195.2 65.3
+#&gt;   ..$ prob : num [1:2] 0.634 0.864
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3166 3165
-#&gt;   ..$ envir: num [1:2] 47.7 32.8
-#&gt;   ..$ dist : num [1:2] 136 241
-#&gt;   ..$ prob : num [1:2] 0.757 0.522
+#&gt;   ..$ cell : num [1:2] 3167 3165
+#&gt;   ..$ envir: num [1:2] 58.5 32.8
+#&gt;   ..$ dist : num [1:2] 121 241
+#&gt;   ..$ prob : num [1:2] 0.784 0.522
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3237 3164
-#&gt;   ..$ envir: num [1:2] 42.8 40.4
-#&gt;   ..$ dist : num [1:2] 306 101
-#&gt;   ..$ prob : num [1:2] 0.364 0.817
+#&gt;   ..$ cell : num [1:2] 3163 3162
+#&gt;   ..$ envir: num [1:2] 47.5 71.9
+#&gt;   ..$ dist : num [1:2] 144 177
+#&gt;   ..$ prob : num [1:2] 0.742 0.675
 #&gt;  $ :'data.frame':	2 obs. of  4 variables:
-#&gt;   ..$ cell : num [1:2] 3233 3232
-#&gt;   ..$ envir: num [1:2] 105 116
-#&gt;   ..$ dist : num [1:2] 45.5 231.2
-#&gt;   ..$ prob : num [1:2] 0.885 0.547</div><div class='input'>
+#&gt;   ..$ cell : num [1:2] 3307 3233
+#&gt;   ..$ envir: num [1:2] 54.9 104.9
+#&gt;   ..$ dist : num [1:2] 417.6 45.5
+#&gt;   ..$ prob : num [1:2] 0.158 0.885</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -172,33 +172,11 @@
              detection_centroids <span class='op'>=</span> <span class='va'>dat_centroids</span>,
              mobility <span class='op'>=</span> <span class='fl'>250</span>,
              write_record_spatial_for_pf <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>filename <span class='op'>=</span> <span class='va'>root</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>flapper::ac() called (@ 2021-12-02 11:59:48)...</span></div><div class='output co'>#&gt; flapper::.acs_pl() called (@ 2021-12-02 11:59:48)... 
-#&gt; ... Checking user inputs... 
-#&gt; ... ... acoustics$timestamp rounded to the nearest 120 second(s). </div><div class='output co'>#&gt; <span class='message'>acoustics$timestamp rounded to the nearest 120 second(s).</span></div><div class='output co'>#&gt; ... Processing movement time series... 
-#&gt; ... Plotting movement time series (for each chunk)... </div><div class='output co'>#&gt; ... Calling .acs() to implement ACDC algorithm on one chunk... 
-#&gt; flapper::.acs() called (@ 2021-12-02 11:59:48)... 
-#&gt;   |                                                                              |                                                                      |   0%... Initiating algorithm: moving over acoustic and internal ('archival') time steps... 
-#&gt; ... On acoustic time step ('timestep_detection') 1. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. </div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt;   |                                                                              |==================                                                    |  25%... On acoustic time step ('timestep_detection') 2. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. </div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt;   |                                                                              |===================================                                   |  50%... On acoustic time step ('timestep_detection') 3. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. </div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt;   |                                                                              |====================================================                  |  75%... On acoustic time step ('timestep_detection') 4. 
-#&gt; ... ... On internal time step ('timestep_archival') 1. </div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; ... ... On internal time step ('timestep_archival') 2. 
-#&gt; ... ... ... Acoustic centroid is expanding... </div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt;   |                                                                              |======================================================================| 100%
-#&gt; ... Movement over acoustic and internal ('archival') time steps has been completed. 
-#&gt; ... flapper::.acs() call completed (@ 2021-12-02 11:59:48) after ~0 minutes. 
-#&gt; ... flapper::.acs_pl() call completed (@ 2021-12-02 11:59:48) after ~0 minutes. </div><div class='output co'>#&gt; <span class='message'>flapper::ac() finished (@ 2021-12-02 11:59:48)...</span></div><div class='img'><img src='pf_setup_record-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># List the files for pf()</span>
+</div><div class='output co'>#&gt; <span class='message'>flapper::ac() called (@ 2021-12-02 14:45:23)...</span></div><div class='output co'>#&gt; flapper::.acs_pl() called (@ 2021-12-02 14:45:23)... 
+#&gt; ... Checking user inputs... </div><div class='output co'>#&gt; <span class='warning'>Warning: Nothing to summarize if you provide a single RasterLayer; see cellStats</span></div><div class='output co'>#&gt; <span class='error'>Error in if (any(bathy == 0)[1]) warning("'bathy' contains zero values.",     immediate. = TRUE, call. = TRUE): argument is not interpretable as logical</span></div><div class='input'><span class='co'># List the files for pf()</span>
 <span class='va'>files</span> <span class='op'>&lt;-</span> <span class='fu'>pf_setup_record</span><span class='op'>(</span><span class='va'>root</span>, type <span class='op'>=</span> <span class='st'>"acs"</span>, pattern <span class='op'>=</span> <span class='st'>"*.grd"</span><span class='op'>)</span>
-<span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>files</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpPN9Ii5/ac//chu_1_acc_1_arc_1.grd"
-#&gt; [2] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpPN9Ii5/ac//chu_1_acc_2_arc_1.grd"
-#&gt; [3] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpPN9Ii5/ac//chu_1_acc_3_arc_1.grd"
-#&gt; [4] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpPN9Ii5/ac//chu_1_acc_4_arc_1.grd"
-#&gt; [5] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpPN9Ii5/ac//chu_1_acc_4_arc_2.grd"</div><div class='input'><span class='co'># Implement pf() using files (not shown).</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: File naming structure is unrecognised.</span></div><div class='output co'>#&gt; <span class='error'>Error in pf_setup_record(root, type = "acs", pattern = "*.grd"): File naming structure is unrecognised.</span></div><div class='input'><span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>files</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in utils::head(files): object 'files' not found</span></div><div class='input'><span class='co'># Implement pf() using files (not shown).</span>
 
 <span class='co'>#### Example (2): Example with the DC algorithm</span>
 <span class='co'># Define a directory in which to save files</span>
@@ -209,21 +187,17 @@
 <span class='va'>out_dc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='dc.html'>dc</a></span><span class='op'>(</span>archival <span class='op'>=</span> <span class='va'>depth</span>,
              bathy <span class='op'>=</span> <span class='va'>dat_gebco</span>,
              write_record_spatial_for_pf <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>filename <span class='op'>=</span> <span class='va'>root</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 11:59:48)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:45:23)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
-#&gt; ... Plotting movement time series (for each chunk)... </div><div class='output co'>#&gt; ... Implementing algorithm over time steps... </div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum Unknown based on WGS84 ellipsoid in CRS definition,</span>
-#&gt; <span class='warning'> but +towgs84= values preserved</span></div><div class='img'><img src='pf_setup_record-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::dc() call completed (@ 2021-12-02 11:59:48) after ~0 minutes. </div><div class='input'><span class='co'># List the files for pf()</span>
+#&gt; ... Plotting movement time series (for each chunk)... </div><div class='img'><img src='pf_setup_record-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Implementing algorithm over time steps... 
+#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:45:23) after ~0 minutes. </div><div class='input'><span class='co'># List the files for pf()</span>
 <span class='va'>files</span> <span class='op'>&lt;-</span> <span class='fu'>pf_setup_record</span><span class='op'>(</span><span class='va'>root</span>, type <span class='op'>=</span> <span class='st'>"dc"</span>, pattern <span class='op'>=</span> <span class='st'>"*.grd"</span><span class='op'>)</span>
 <span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>files</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpPN9Ii5/dc//arc_1.grd"
-#&gt; [2] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpPN9Ii5/dc//arc_2.grd"
-#&gt; [3] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpPN9Ii5/dc//arc_3.grd"
-#&gt; [4] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpPN9Ii5/dc//arc_4.grd"
-#&gt; [5] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpPN9Ii5/dc//arc_5.grd"</div><div class='input'><span class='co'># Implement pf() using files (not shown).</span>
+</div><div class='output co'>#&gt; [1] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/dc//arc_1.grd"
+#&gt; [2] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/dc//arc_2.grd"
+#&gt; [3] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/dc//arc_3.grd"
+#&gt; [4] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/dc//arc_4.grd"
+#&gt; [5] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/dc//arc_5.grd"</div><div class='input'><span class='co'># Implement pf() using files (not shown).</span>
 
 </div></pre>
   </div>

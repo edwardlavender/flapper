@@ -224,12 +224,12 @@
   <span class='va'>int_1</span> <span class='op'>&lt;-</span> <span class='fu'>segments_cross_barrier</span><span class='op'>(</span><span class='va'>start</span>, <span class='va'>end</span>, barrier <span class='op'>=</span> <span class='va'>barrier</span><span class='op'>)</span>
   <span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.726   0.001   0.728 </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span>
+#&gt;   0.704   0.001   0.706 </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span>
   <span class='va'>int_2</span> <span class='op'>&lt;-</span> <span class='fu'>segments_cross_barrier</span><span class='op'>(</span><span class='va'>start</span>, <span class='va'>end</span>, barrier <span class='op'>=</span> <span class='va'>barrier</span>,
                                   distance <span class='op'>=</span> <span class='va'>dat_dist</span>, mobility <span class='op'>=</span> <span class='fl'>500</span><span class='op'>)</span>
   <span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.155   0.001   0.158 </div><div class='input'>
+#&gt;   0.140   0.000   0.141 </div><div class='input'>
 <span class='co'>## The two approaches return identical solutions:</span>
 <span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span><span class='op'>(</span><span class='va'>int_1</span>, <span class='va'>int_2</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
