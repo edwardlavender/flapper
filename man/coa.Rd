@@ -8,6 +8,7 @@ coa(
   mat,
   xy,
   cl = NULL,
+  varlist = NULL,
   na_omit = TRUE,
   as_POSIXct = as.POSIXct,
   output = "matrix"
@@ -18,7 +19,7 @@ coa(
 
 \item{xy}{A matrix that defines receiver locations (x, y). This should contain one row for each receiver (column) in \code{mat} (in the same order as in \code{mat}) and two columns for the coordinates. Planar coordinates (i.e., in Universal Transverse Mercator projection) are required for the averaging process.}
 
-\item{cl}{A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the connection to the cluster is closed within the function.}
+\item{cl, varlist}{(optional) Parallelisation options. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.}
 
 \item{na_omit, as_POSIXct}{Processing options. \code{na_omit} is a logical variable that defines whether or not to omit NAs (i.e., rows in \code{mat} for which no detections were made and thus for which COAs cannot be calculated) from returned coordinates. If \code{output = "data.frame"} (see below), \code{as_POSIXct} is a function to convert time stamps, taken from the row names of \code{mat}, to a POSIXct vector. \code{as_POSIXct = NULL} suppresses this conversion.}
 
@@ -80,10 +81,10 @@ utils::str(coa_dat)
 
 #### Example (3): Implement the algorithm on a cluster
 # This will only be faster for very large detection time series.
-\dontrun{
-coa_mat <- coa(mat = detection_matrix_by_id[[1]],
-               xy = xy,
-               cl = parallel::makeCluster(2L))
+if(flapper_run_parallel){
+  coa_mat <- coa(mat = detection_matrix_by_id[[1]],
+                 xy = xy,
+                 cl = parallel::makeCluster(2L))
 }
 
 }

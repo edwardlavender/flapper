@@ -8,7 +8,7 @@
 #' @param plot A logical input that defines whether or not to plot the rasters. If \code{plot = TRUE}, the function produces a plot for each time unit.
 #' @param before_plot,after_plot (optional) Stand-alone functions that are executed before and after the plot for each time unit is created, respectively. For example, it may be useful to plot the coast in an area before each raster is plotted, or add custom axes after each plot has been produced.
 #' @param fix_zlim,one_page,... (optional) Plot customisation options. \code{fix_zlim} is a logical input that defines whether or not to fix z axis limits across all plots (to facilitate comparisons), or a vector of two numbers that define a custom range for the z axis which is fixed across all plots. \code{fix_zlim = FALSE} produces plots in which the z axis is allowed to vary flexibly between time units. \code{one_page} is a logical input that defines whether or not to produce all plots on one page; this is only implemented if there are fewer than 25 time units, beyond which there are typically to many plots to fit on one page. Additional plot customisation arguments can be passed to \code{\link[fields]{image.plot}} via \code{...}.
-#' @param cl A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the slower steps of the algorithm are implemented in parallel. The connection to the cluster is closed within the function.
+#' @param cl,varlist (optional) Parallelisation options. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.
 #' @param verbose A logical input that defines whether or not to relay messages to the console to monitor function progress.
 #'
 #' @return The function returns a named list of rasters, one for each time unit, in which the value of each cell is the number of times that that cell was represented by the corresponding depth bin in the depth time series.
@@ -103,7 +103,7 @@ dcq <- function(archival_ls,
                bathy,
                bin = 10, transform = NULL,
                plot = TRUE, before_plot = NULL, after_plot = NULL, fix_zlim = FALSE, one_page = FALSE,
-               cl = NULL,
+               cl = NULL, varlist = NULL,
                verbose = TRUE,...){
 
   #### Checks
@@ -160,7 +160,10 @@ dcq <- function(archival_ls,
   cat_to_console("... Step 3: Translating counts of observations within depth bins into maps...")
   area_use <- bathy
   area_use <- raster::setValues(area_use, 0)
-  area_use_ls <- pbapply::pblapply(use_freq_by_time_unit, cl = cl, function(use_freq){
+  area_use_ls <- cl_lapply(use_freq_by_time_unit,
+                           cl = cl,
+                           varlist = varlist,
+                           fun = function(use_freq){
     # use_freq <- use_freq_by_time_unit[[1]]
     # Determine the cell IDs of cells which lie within the lower and upper values
     # ... of each depth bin:
@@ -180,7 +183,6 @@ dcq <- function(archival_ls,
                area_use = area_use)
     return(ls)
   })
-  if(!is.null(cl)) parallel::stopCluster(cl = cl)
 
   #### Visualise map of depth/space use for each time unit
   if(plot){

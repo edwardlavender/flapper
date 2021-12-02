@@ -115,7 +115,7 @@ acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"),
 #' @param xlim,ylim,fix_zlim,pretty_axis_args Axis control arguments. \code{xlim} and \code{ylim} control the axis limits, following the rules of the \code{lim} argument in \code{\link[prettyGraphics]{pretty_axis}}. \code{fix_zlim} is a logical input that defines whether or not to fix z axis limits across all plots (to facilitate comparisons), or a vector of two numbers that define a custom range for the z axis which is fixed across all plots. \code{fix_zlim = FALSE} produces plots in which the z axis is allowed to vary flexibly between time units. Other axis options supported by \code{\link[prettyGraphics]{pretty_axis}} are implemented by passing a named list of arguments to this function via \code{pretty_axis_args}.
 #' @param par_param (optional) A named list of arguments, passed to \code{\link[graphics]{par}}, to control the plotting window. This is executed before plotting is initiated and therefore affects all plots.
 #' @param png_param (optional) A named list of arguments, passed to \code{\link[grDevices]{png}}, to save plots to file. If supplied, the plot for each time step is saved separately. The `filename' argument should be the directory in which plots are saved. Plots are then saved as "1.png", "2.png" and so on.
-#' @param cl A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the function loops over specified time steps in parallel to make plots. This is only implemented if plots are saved to file (i.e., \code{png_param} is supplied). If supplied, the connection to the cluster is closed within the function.
+#' @param cl,varlist (optional) Parallelisation options. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}. If supplied, the function loops over specified time steps in parallel to make plots. This is only implemented if plots are saved to file (i.e., \code{png_param} is supplied).
 #' @param verbose A logical variable that defines whether or not relay messages to the console to monitor function progress.
 #' @param check A logical variable that defines whether or not to check user inputs to the function before its initiation.
 #' @param ... Additional arguments, passed to \code{\link[raster]{plot}}, to customise the blank background plot onto which spatial layers are added, such as \code{xlab}, \code{ylab} and \code{main}.
@@ -231,7 +231,7 @@ acdc_plot_record <- function(record,
                                                      control_sci_notation = list(magnitude = 16L, digits = 0)),
                              par_param = list(),
                              png_param = list(),
-                             cl = NULL,
+                             cl = NULL, varlist = NULL,
                              verbose = TRUE,
                              check = TRUE,...){
 
@@ -369,7 +369,7 @@ acdc_plot_record <- function(record,
 
   #### Loop over every detection
   cat_to_console("... Making plots for each time step ...")
-  pbapply::pblapply(1:length(acdc_plot), cl = cl, function(i){
+  cl_lapply(1:length(acdc_plot), cl = cl, varlist = varlist, fun = function(i){
 
     #### Set up image to save
     if(save_png){
@@ -434,7 +434,6 @@ acdc_plot_record <- function(record,
     #### Save fig
     if(save_png) grDevices::dev.off()
   })
-  if(!is.null(cl)) parallel::stopCluster(cl)
 
   return(invisible())
 

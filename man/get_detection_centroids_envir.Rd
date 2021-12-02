@@ -30,9 +30,7 @@ get_detection_centroids_envir(
 
 \item{sample_probs}{(optional) If \code{sample_size} is specified, \code{sample_probs} is a function that calculates the detection probability given the distance (m) between a cell and a receiver.}
 
-\item{cl}{A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is closed within the function.}
-
-\item{varlist}{A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.}
+\item{cl, varlist}{(optional) Parallelisation options. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.}
 
 \item{verbose}{A logical variable that defines whether or not relay messages to the console to monitor function progress.}
 }
@@ -122,7 +120,6 @@ depths_by_centroid <-
 utils::str(depths_by_centroid)
 
 #### Example (5) Parallelise the algorithm via cl and varlist arguments
-\dontrun{
 depths_by_centroid <-
   get_detection_centroids_envir(xy = xy,
                                 detection_range = 425,
@@ -135,7 +132,6 @@ depths_by_centroid <-
                                 varlist = c("dat_gebco","calc_detection_pr")
                                 )
 utils::str(depths_by_centroid)
-}
 
 }
 \author{

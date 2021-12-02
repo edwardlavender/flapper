@@ -38,7 +38,7 @@ lcp_comp(
 
 \item{...}{Additional arguments passed to \code{\link[cppRouting]{get_distance_pair}} for shortest-distance calculations (\code{algorithm}, \code{constant} and/or \code{allcores}).}
 
-\item{cl, varlist}{Parallelisation options for distance-based location sampling (i.e., if \code{distance != NULL}). \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}}. \code{varlist} is a character vector of object names to export (see \code{\link[parallel]{clusterExport}}). Exported objects must be located in the global environment.}
+\item{cl, varlist}{(optional) Parallelisation options for distance-based location sampling (i.e., if \code{distance != NULL}). \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.}
 
 \item{verbose}{A logical input that defines whether or not to print messages to the console to monitor function progress.}
 }

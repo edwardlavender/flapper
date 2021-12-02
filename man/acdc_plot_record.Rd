@@ -23,6 +23,7 @@ acdc_plot_record(
   par_param = list(),
   png_param = list(),
   cl = NULL,
+  varlist = NULL,
   verbose = TRUE,
   check = TRUE,
   ...
@@ -53,7 +54,7 @@ acdc_plot_record(
 
 \item{png_param}{(optional) A named list of arguments, passed to \code{\link[grDevices]{png}}, to save plots to file. If supplied, the plot for each time step is saved separately. The `filename' argument should be the directory in which plots are saved. Plots are then saved as "1.png", "2.png" and so on.}
 
-\item{cl}{A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the function loops over specified time steps in parallel to make plots. This is only implemented if plots are saved to file (i.e., \code{png_param} is supplied). If supplied, the connection to the cluster is closed within the function.}
+\item{cl, varlist}{(optional) Parallelisation options. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}. If supplied, the function loops over specified time steps in parallel to make plots. This is only implemented if plots are saved to file (i.e., \code{png_param} is supplied).}
 
 \item{verbose}{A logical variable that defines whether or not relay messages to the console to monitor function progress.}
 

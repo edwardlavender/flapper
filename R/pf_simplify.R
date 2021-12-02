@@ -18,7 +18,7 @@
 #' @param calc_distance_algorithm,calc_distance_constant Additional shortest-distance calculation options (see \code{\link[cppRouting]{get_distance_pair}}). \code{calc_distance_algorithm} is a character that defines the algorithm: \code{"Dijkstra"}, \code{"bi"}, \code{"A*"} or \code{"NBA"} are supported. \code{calc_distance_constant} is the numeric constant required to maintain the heuristic function admissible in the A* and NBA algorithms. For shortest distances (based on costs derived via \code{\link[flapper]{lcp_costs}}), the default (\code{calc_distance_constant = 1}) is appropriate.
 #' @param mobility,mobility_from_origin (optional) The mobility parameters (see \code{\link[flapper]{pf}}). If unsupplied, these can be extracted from \code{archive}, if available. However, even if \code{\link[flapper]{pf}} was implemented without these options, it is beneficial to specify mobility limits here (especially if \code{calc_distance = "lcp"}) because they restrict the number of calculations that are required (for example, for shortest distances, at each time step, distances are only calculated for the subset of particle connections below \code{mobility_from_origin} or \code{mobility} in distance).
 #' @param write_history A named list of arguments, passed to \code{\link[base]{saveRDS}}, to write `intermediate' files. The `file' argument should be the directory in which to write files. This argument is currently only implemented for \code{\link[flapper]{pf_archive-class}} objects derived with \code{calc_distance = TRUE} and \code{calc_distance_euclid_fast = TRUE} via \code{\link[flapper]{pf}} for which connected cell pairs need to be derived (i.e., not following a previous implementation of \code{\link[flapper]{pf_simplify}}). If supplied, two directories are created in `file' (1/ and 2/), in which dataframes of the pairwise distances between connected cells and the subset of those  that formed continuous paths from the start to the end of the time series are written, respectively. Files are named by time steps as `pf_1', `pf_2' and so on. Files for each time step are written and re-read from this directory during particle processing. This helps to minimise vector memory requirements because the information for all time steps does not have to be retained in memory at once.
-#' @param cl,varlist,use_all_cores Parallelisation options for the first stage of the algorithm, which identifies connected cell pairs, associated distances and movement probabilities. The first parallelisation option is to parallelise the algorithm over time steps via \code{cl}. This is a cluster object created by \code{\link[parallel]{makeCluster}} or an integer defining the number of child processes (ignored on Windows) (see \code{\link[pbapply]{pblapply}}). If \code{cl} is supplied, \code{varlist} may be required. This is a character vector of object names to export (see \code{\link[parallel]{clusterExport}}). Exported objects must be located in the global environment. The second parallelisation option is to parallelise shortest-distance calculations within time steps via a logical input (\code{TRUE}) to \code{use_all_cores} that is passed to \code{\link[cppRouting]{get_distance_matrix}}. This option is only implemented for \code{calc_distance = "lcp"}.
+#' @param cl,varlist,use_all_cores (optional) Parallelisation options for the first stage of the algorithm, which identifies connected cell pairs, associated distances and movement probabilities. The first parallelisation option is to parallelise the algorithm over time steps via \code{cl}. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. If \code{cl} is supplied, \code{varlist} may be required. This is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.The second parallelisation option is to parallelise shortest-distance calculations within time steps via a logical input (\code{TRUE}) to \code{use_all_cores} that is passed to \code{\link[cppRouting]{get_distance_matrix}}. This option is only implemented for \code{calc_distance = "lcp"}.
 #' @param return A character (\code{return = "path"} or \code{return = "archive"}) that defines the type of object that is returned (see Details).
 #' @param summarise_pr (optional) For \code{return = "archive"}, \code{summarise_pf} is a function or a logical input that defines whether or not (and how) to summarise the probabilities of duplicate cell records for each time step. If a function is supplied, only one record of each sampled cell is returned per time step, with the associated probability calculated from the probabilities of each sample of that cell using the supplied function. For example, \code{summarise_pr = max} returns the most probable sample. Alternatively, if a logical input (\code{summarise_pr = TRUE}) is supplied, only one record of each sampled cell is returned per time step, with the associated probability calculated as the sum of the normalised probabilities of all samples for that cell, rescaled so that the maximum probability takes a score of one. Specifying \code{summarise_pr} is useful for deriving maps of the `probability of use' across an area based on particle histories because it ensures that `probability of use' scores depend on the number of time steps during which an individual could have occupied a location, rather than the total number of samples of that location (see \code{\link[flapper]{pf_plot_map}}). Both \code{summarise_pr = NULL} and \code{summarise_pr = FALSE} suppress this argument.
 #' @param max_n_copies (optional) For \code{return = "path"}, \code{max_n_copies} is an integer that specifies the maximum number of copies of a sampled cell that are retained at each time stamp. Each copy represents a different route to that cell. By default, all copies (i.e. routes to that cell are retained) via \code{max_n_copies = NULL}. However, in cases where there are a large number of paths through a landscape, the function can run into vector memory limitations during path assembly, so \code{max_n_copies} may need to be set. In this case, at each time step, if there are more than \code{max_n_copies} paths to a given cell, then a subset of these (\code{max_n_copies}) are sampled, according to the \code{max_n_copies_sampler} argument.
@@ -417,23 +417,14 @@ pf_simplify <- function(archive,
   max_n_particles_sampler <- match.arg(max_n_particles_sampler)
   max_n_copies_sampler    <- match.arg(max_n_copies_sampler)
   # Check cluster
-  if(is.null(cl)){
-    if(!is.null(varlist)){
-      warning("'cl' is NULL: input to 'varlist' ignored.", immediate. = TRUE, call. = FALSE)
-      varlist <- NULL
-    }
-  } else {
-    if(!inherits(cl, "cluster") && !is.null(varlist)){
-      warning("'cl' is an integer: input to 'varlist' ignored.", immediate. = TRUE, call. = FALSE)
-      varlist <- NULL
-    }
-    if(use_all_cores) {
-      warning("Both 'cl' and 'use_all_cores' supplied: 'use_all_cores' ignored.", immediate. = TRUE, call. = FALSE)
-      use_all_cores <- FALSE
-    }
+  if(!is.null(cl) && use_all_cores){
+    warning("Both 'cl' and 'use_all_cores' supplied: 'use_all_cores' ignored.",
+            immediate. = TRUE, call. = FALSE)
+    use_all_cores <- FALSE
   }
   if(use_all_cores && calc_distance != "lcp") {
-    warning("'use_all_cores' ignored: calc_distance != 'lcp'.", immediate. = TRUE, call. = FALSE)
+    warning("'use_all_cores' ignored: calc_distance != 'lcp'.",
+            immediate. = TRUE, call. = FALSE)
     use_all_cores <- FALSE
   }
   # Match return
@@ -507,7 +498,7 @@ pf_simplify <- function(archive,
         if(inherits(cl, "cluster")) chunks <- length(cl) else chunks <- cl
       t_vec <- 2:length(history)
       t_ind_by_chunk <- parallel::splitIndices(length(t_vec), chunks)
-      if(!is.null(cl) && !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
+      cl_export(cl, varlist)
       history_by_chunk <- pbapply::pblapply(t_ind_by_chunk, cl = cl, function(t_ind_for_chunk){
         ## Define time step indices for chunk
         t_vec_for_chunk <- t_vec[t_ind_for_chunk]
@@ -706,7 +697,7 @@ pf_simplify <- function(archive,
         })
         return(history_for_chunk)
       })
-      if(return == "path" && !is.null(cl) && inherits(cl, "cluster")) parallel::stopCluster(cl = cl)
+      if(return == "path") cl_stop(cl)
       history <- purrr::flatten(history_by_chunk)
 
       # ... (2) Method for pf outputs not derived via calc_distance_euclid_fast
@@ -726,7 +717,7 @@ pf_simplify <- function(archive,
       }
 
       #### Update history with distances and probabilities of movement between connected cells
-      if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
+      cl_export(cl, varlist)
       history <- pbapply::pblapply(1:length(history), cl = cl, function(t){
 
         #### Get full suite of allowed cells from current time step
@@ -782,7 +773,7 @@ pf_simplify <- function(archive,
         d <- d %>% dplyr::filter(.data$pr_current > 0)
         return(d)
       })
-      if(return == "path" && !is.null(cl) && inherits(cl, "cluster")) parallel::stopCluster(cl = cl)
+      if(return == "path") cl_stop(cl)
     }
 
 
@@ -887,7 +878,7 @@ pf_simplify <- function(archive,
         })
       return(history_for_chunk)
     })
-    if(!is.null(cl) && inherits(cl, "cluster")) parallel::stopCluster(cl = cl)
+    cl_stop(cl)
     history <- purrr::flatten(history_by_chunk)
     archive_for_connected_cells <- list(history = history,
                                         method = "pf_simplify",

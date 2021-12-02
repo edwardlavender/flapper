@@ -23,9 +23,7 @@ get_detection_area_ts(
 
 \item{verbose}{A logical input that defines whether or not to print messages to the console to relay function progress.}
 
-\item{cl}{(optional) A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. The connection to the cluster is closed within the function.}
-
-\item{varlist}{(optional) A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.}
+\item{cl, varlist}{(optional) Parallelisation options. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.}
 
 \item{...}{Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}}, to customise the plot produced.}
 }
@@ -51,13 +49,13 @@ dat <- get_detection_area_ts(xy)
 #### Example (2): Adjust detection range, include coastline and use parallel processing
 # For areas with complex coastline, this will reduce the speed of the algorithm
 # So we will also supply a cluster to improve the computation time.
-\dontrun{
-dat <- get_detection_area_ts(xy,
-                             detection_range = 500,
-                             coastline = dat_coast,
-                             cl = parallel::makeCluster(2L),
-                             varlist = "dat_coast"
-                             )
+if(flapper_run_parallel){
+  dat <- get_detection_area_ts(xy,
+                               detection_range = 500,
+                               coastline = dat_coast,
+                               cl = parallel::makeCluster(2L),
+                               varlist = "dat_coast"
+                               )
 }
 
 #### Example (3) Hide or customise the plot

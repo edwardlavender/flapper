@@ -233,6 +233,12 @@ dat_acdc <- acdc(acoustics = acc,
 saveRDS(dat_acdc, paste0(tempdir(), "/dat_acdc.rds"))
 file.size(paste0(tempdir(), "/dat_acdc.rds"))/1e6
 
+#####################################
+#####################################
+#### Global flapper options
+
+flapper_run_parallel <- FALSE # TRUE
+flapper_run_slow     <- FALSE # TRUE
 
 #####################################
 #####################################
@@ -254,7 +260,9 @@ usethis::use_data(dat_dc, overwrite = TRUE)
 usethis::use_data(dat_acdc, overwrite = TRUE)
 usethis::use_data(dat_dcpf_histories, overwrite = TRUE)
 usethis::use_data(dat_dcpf_paths, overwrite = TRUE)
-
+# global options
+usethis::use_data(flapper_run_parallel, overwrite = TRUE)
+usethis::use_data(flapper_run_slow, overwrite = TRUE)
 
 #### End of code.
 #####################################

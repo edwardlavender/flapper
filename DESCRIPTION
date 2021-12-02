@@ -18,6 +18,7 @@ Suggests:
     plotly, animation, scales, viridis,
     circular, 
     httr, jsonlite,
+    rbenchmark,
     rmarkdown, knitr
 Remotes: 
     github::edwardlavender/prettyGraphics, 

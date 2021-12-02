@@ -549,7 +549,6 @@ acs_setup_detection_kernels <-
     # (used to up-weight areas around a receiver with a detection)
     cat_to_console("... Getting receiver-specific kernels (for detection)...")
     xy_ls <- lapply(1:length(xy), function(i) xy[i, ])
-    # if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
     detection_kernels_by_xy <-
       pbapply::pblapply(xy_ls, cl = NULL, function(xyi){
         ## Focus on area within centroid, for speed
@@ -590,7 +589,6 @@ acs_setup_detection_kernels <-
                     det_pr_around_xyi_positive = det_pr_around_xyi_positive)
         return(out)
       })
-    # if(!is.null(cl)) parallel::stopCluster(cl = cl)
     names(detection_kernels_by_xy)   <- as.character(xy$receiver_id)
     receiver_specific_kernels        <- lapply(detection_kernels_by_xy, function(elm) elm$det_pr_around_xyi)
     names(receiver_specific_kernels) <- names(detection_kernels_by_xy)

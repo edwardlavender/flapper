@@ -170,7 +170,7 @@ pf_plot_map <- function(xpf,
 #' @param grid,... Arguments passed to \code{estimate_ud} (and ultimately \code{\link[adehabitatHR]{kernelUD}}, where they are defined) to estimate the kernel utilisation distribution. If \code{\link[flapper]{kud_around_coastline}} or \code{\link[flapper]{kud_around_coastline_fast}} is supplied to \code{estimate_ud}, then \code{grid} must be a \code{\link[sp]{SpatialPixelsDataFrame}}. However, note that in all cases, KUD(s) are resampled onto \code{bathy}.
 #' @param scale For \code{\link[flapper]{pf_kud_1}}, \code{scale} is a logical input that defines whether or not to scale the KUD for each time step such that the most probable locations are assigned a score of one.
 #' @param plot_by_time,prompt For \code{\link[flapper]{pf_kud_1}}, \code{plot_by_time} is a logical variable that defines whether or not to plot the cumulative (un-normalised) KUD for each time step. If supplied, \code{prompt} is a logical variable that defines whether or not to pause function execution between sequential plots. These arguments are not implemented in parallel (see \code{cl}, below).
-#' @param chunks,cl,varlist For \code{\link[flapper]{pf_kud_1}}, \code{chunks}, \code{cl} and \code{varlist} are chunk-wise implementation controls. \code{chunks} is an integer that defines the number of chunks into which to split particle/path time series. To minimise memory requirements, within each chunk, a blank map is sequentially updated with the KUD for each time step; the cumulative KUD for each chunk is then summed across chunks to create a single KUD. This approach minimises memory use while facilitating improvements in computation time through the parallel processing of each chunk via \code{cl} and \code{varlist}. \code{cl} is cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If \code{cl} is supplied, \code{varlist} may also be required. This is a character vector of objects to export. \code{varlist} is passed to the \code{varlist} of \code{\link[parallel]{clusterExport}}. Exported objects must be located in the global environment.
+#' @param chunks,cl,varlist For \code{\link[flapper]{pf_kud_1}}, \code{chunks}, \code{cl} and \code{varlist} are chunk-wise implementation controls. \code{chunks} is an integer that defines the number of chunks into which to split particle/path time series. To minimise memory requirements, within each chunk, a blank map is sequentially updated with the KUD for each time step; the cumulative KUD for each chunk is then summed across chunks to create a single KUD. This approach minimises memory use while facilitating improvements in computation time through the parallel processing of each chunk via \code{cl} and \code{varlist}. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.
 #' @param mask (optional) A spatial mask (see \code{\link[raster]{mask}}).
 #' @param plot A logical input that defines whether or not to plot the KUD.
 #' @param verbose A logical input that defines whether or not to print messages to the console to monitor function progress.
@@ -230,13 +230,14 @@ pf_plot_map <- function(xpf,
 #'          sample_size = 500,
 #'          estimate_ud = kud_around_coastline_fast, grid = grid)
 #' ## Implementation based on paths
-#' \dontrun{
-#' pf_kud_1(out_dcpf_paths,
-#'          bathy = bathy,
-#'          sample_size = 500,
-#'          estimate_ud = kud_around_coastline_fast, grid = grid)
-#' prettyGraphics::add_sp_path(x = out_dcpf_paths$cell_x, y = out_dcpf_paths$cell_y,
-#'                             length = 0.01)
+#' if(flapper_run_parallel){
+#'   pf_kud_1(out_dcpf_paths,
+#'            bathy = bathy,
+#'            sample_size = 500,
+#'            estimate_ud = kud_around_coastline_fast, grid = grid)
+#'   prettyGraphics::add_sp_path(x = out_dcpf_paths$cell_x,
+#'                               y = out_dcpf_paths$cell_y,
+#'                               length = 0.01)
 #' }
 #' par(pp)
 #'
@@ -264,15 +265,15 @@ pf_plot_map <- function(xpf,
 #'          chunks = 2L,
 #'          cl = parallel::makeCluster(2L))
 #' ## Implementation based on paths
-#' \dontrun{
-#' cl <- parallel::makeCluster(2L)
-#' parallel::clusterEvalQ(cl = cl, library(raster))
-#' pf_kud_1(out_dcpf_paths,
-#'          bathy = bathy,
-#'          sample_size = 500,
-#'          estimate_ud = flapper::kud_around_coastline_fast, grid = grid,
-#'          chunks = 2L,
-#'          cl = cl)
+#' if(flapper_run_parallel){
+#'   cl <- parallel::makeCluster(2L)
+#'   parallel::clusterEvalQ(cl = cl, library(raster))
+#'   pf_kud_1(out_dcpf_paths,
+#'            bathy = bathy,
+#'            sample_size = 500,
+#'            estimate_ud = flapper::kud_around_coastline_fast, grid = grid,
+#'            chunks = 2L,
+#'            cl = cl)
 #' }
 #' par(pp)
 #'
@@ -370,7 +371,7 @@ pf_kud_1 <- function(xpf,
   }
   if(chunks <= 1L & !is.null(cl)){
     warning("'cl' supplied but 'chunks <= 1L': ignoring 'cl'.", immediate. = TRUE, call. = FALSE)
-    if(inherits(cl, "cluster")) parallel::stopCluster(cl)
+    cl_stop(cl)
     cl <- NULL
   }
 
@@ -407,8 +408,7 @@ pf_kud_1 <- function(xpf,
   # Define blank raster that provides the foundation for KUDs
   blank <- raster::setValues(bathy, 0)
   # Loop over each 'chunk' and calculate cumulative KUD for that chunk
-  if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
-  kud_by_chunk <- pbapply::pblapply(particles_by_chunk, cl = cl, function(particles_for_chunk){
+  kud_by_chunk <- cl_lapply(particles_by_chunk, cl = cl, varlist = varlist, fun = function(particles_for_chunk){
     # Isolate particles for that chunk
     particles_by_t <- split(particles_for_chunk, particles_for_chunk$timestep)
     # Define blank UD
@@ -466,7 +466,6 @@ pf_kud_1 <- function(xpf,
     }
     return(ud)
   })
-  if(!is.null(cl)) parallel::stopCluster(cl = cl)
 
   #### Process KUDs
   cat_to_console("... Processing KUD(s)...")

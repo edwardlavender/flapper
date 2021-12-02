@@ -15,6 +15,7 @@ dcq(
   fix_zlim = FALSE,
   one_page = FALSE,
   cl = NULL,
+  varlist = NULL,
   verbose = TRUE,
   ...
 )
@@ -34,7 +35,7 @@ dcq(
 
 \item{fix_zlim, one_page, ...}{(optional) Plot customisation options. \code{fix_zlim} is a logical input that defines whether or not to fix z axis limits across all plots (to facilitate comparisons), or a vector of two numbers that define a custom range for the z axis which is fixed across all plots. \code{fix_zlim = FALSE} produces plots in which the z axis is allowed to vary flexibly between time units. \code{one_page} is a logical input that defines whether or not to produce all plots on one page; this is only implemented if there are fewer than 25 time units, beyond which there are typically to many plots to fit on one page. Additional plot customisation arguments can be passed to \code{\link[fields]{image.plot}} via \code{...}.}
 
-\item{cl}{A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the slower steps of the algorithm are implemented in parallel. The connection to the cluster is closed within the function.}
+\item{cl, varlist}{(optional) Parallelisation options. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.}
 
 \item{verbose}{A logical input that defines whether or not to relay messages to the console to monitor function progress.}
 }

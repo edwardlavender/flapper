@@ -107,7 +107,7 @@ pf_access_history <- function(archive,
 #'
 #' @param history A \code{\link[flapper]{pf_archive-class}} class object from \code{\link[flapper]{pf}}, the list of particle histories (the `history' element of a \code{\link[flapper]{pf_archive-class}} object) from \code{\link[flapper]{pf}} or a list of file paths to particle histories.
 #' @param use_memory_safe If \code{history} is a record of file paths, \code{use_memory_safe} is a logical variable that defines whether or not to use the `memory-safe(r)' method to access unique cell samples. If specified, the function sequentially loads each file and re-defines the vector of unique particles at each time step as the unique combination of previous (unique) samples and the samples from the current time step. This may be slow. Alternatively, under the default \code{use_memory_safe = FALSE} option, the function loads each file (in parallel if specified), retaining all sampled particles, before selecting the unique particles (once) at the end of this process. This option should be faster.
-#' @param cl,varlist Parallelisation options implemented if (a) particle histories are contained in memory or (b) particle histories are supplied as a list of file paths with \code{use_memory_safe = FALSE}. \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is closed within the function. \code{varlist} is a character vector of names of objects to export that is passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. Exported objects must be located in the global environment.
+#' @param cl,varlist (optional) Parallelisation options implemented if (a) particle histories are contained in memory or (b) particle histories are supplied as a list of file paths with \code{use_memory_safe = FALSE}. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.
 #'
 #' @return The function returns a vector of the unique particles sampled by the PF algorithm.
 #'
@@ -162,11 +162,6 @@ pf_access_particles_unique <- function(history,
     if(!file.exists(history_1)) stop(paste0("history[[1]] ('", history_1, "') does not exist."))
     history_1 <- readRDS(history_1)
   }
-  if(is.null(cl) & !is.null(varlist)) {
-    warning("'cl' is NULL but 'varlist' is not: 'varlist' ignored.",
-            immediate. = TRUE, call. = FALSE)
-    varlist <- FALSE
-  }
 
   #### Access unique cells (from file)
   if(read_history){
@@ -185,12 +180,9 @@ pf_access_particles_unique <- function(history,
 
       ## Faster option: load all cells for each time step, selecting unique cells at the end
     } else {
-      if(!is.null(cl) & is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
-      cells_by_time <-
-        pbapply::pblapply(history,
-                          cl = cl,
-                          function(f) readRDS(f)$id_current)
-      if(!is.null(cl)) parallel::stopCluster(cl = cl)
+      cells_by_time <- cl_lapply(history,
+                                 cl = cl, varlist = varlist,
+                                 function(f) readRDS(f)$id_current)
       cells <- unlist(cells_by_time)
       cells <- unique(cells)
 
@@ -199,9 +191,9 @@ pf_access_particles_unique <- function(history,
     #### Access unique cells (in memory)
   } else {
 
-    if(!is.null(cl) & is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
-    cells <- pbapply::pblapply(history, cl = cl, function(d) d$id_current)
-    if(!is.null(cl)) parallel::stopCluster(cl = cl)
+    cells <- cl_lapply(history,
+                       cl = cl, varlist = varlist,
+                       fun = function(d) d$id_current)
     cells <- unlist(cells)
     cells <- unique(cells)
 

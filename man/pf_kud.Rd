@@ -51,7 +51,7 @@ pf_kud_2(
 
 \item{plot_by_time, prompt}{For \code{\link[flapper]{pf_kud_1}}, \code{plot_by_time} is a logical variable that defines whether or not to plot the cumulative (un-normalised) KUD for each time step. If supplied, \code{prompt} is a logical variable that defines whether or not to pause function execution between sequential plots. These arguments are not implemented in parallel (see \code{cl}, below).}
 
-\item{chunks, cl, varlist}{For \code{\link[flapper]{pf_kud_1}}, \code{chunks}, \code{cl} and \code{varlist} are chunk-wise implementation controls. \code{chunks} is an integer that defines the number of chunks into which to split particle/path time series. To minimise memory requirements, within each chunk, a blank map is sequentially updated with the KUD for each time step; the cumulative KUD for each chunk is then summed across chunks to create a single KUD. This approach minimises memory use while facilitating improvements in computation time through the parallel processing of each chunk via \code{cl} and \code{varlist}. \code{cl} is cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If \code{cl} is supplied, \code{varlist} may also be required. This is a character vector of objects to export. \code{varlist} is passed to the \code{varlist} of \code{\link[parallel]{clusterExport}}. Exported objects must be located in the global environment.}
+\item{chunks, cl, varlist}{For \code{\link[flapper]{pf_kud_1}}, \code{chunks}, \code{cl} and \code{varlist} are chunk-wise implementation controls. \code{chunks} is an integer that defines the number of chunks into which to split particle/path time series. To minimise memory requirements, within each chunk, a blank map is sequentially updated with the KUD for each time step; the cumulative KUD for each chunk is then summed across chunks to create a single KUD. This approach minimises memory use while facilitating improvements in computation time through the parallel processing of each chunk via \code{cl} and \code{varlist}. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.}
 
 \item{mask}{(optional) A spatial mask (see \code{\link[raster]{mask}}).}
 
@@ -117,13 +117,14 @@ pf_kud_1(out_dcpf_particles_1,
          sample_size = 500,
          estimate_ud = kud_around_coastline_fast, grid = grid)
 ## Implementation based on paths
-\dontrun{
-pf_kud_1(out_dcpf_paths,
-         bathy = bathy,
-         sample_size = 500,
-         estimate_ud = kud_around_coastline_fast, grid = grid)
-prettyGraphics::add_sp_path(x = out_dcpf_paths$cell_x, y = out_dcpf_paths$cell_y,
-                            length = 0.01)
+if(flapper_run_parallel){
+  pf_kud_1(out_dcpf_paths,
+           bathy = bathy,
+           sample_size = 500,
+           estimate_ud = kud_around_coastline_fast, grid = grid)
+  prettyGraphics::add_sp_path(x = out_dcpf_paths$cell_x,
+                              y = out_dcpf_paths$cell_y,
+                              length = 0.01)
 }
 par(pp)
 
@@ -151,15 +152,15 @@ pf_kud_1(out_dcpf_particles_1,
          chunks = 2L,
          cl = parallel::makeCluster(2L))
 ## Implementation based on paths
-\dontrun{
-cl <- parallel::makeCluster(2L)
-parallel::clusterEvalQ(cl = cl, library(raster))
-pf_kud_1(out_dcpf_paths,
-         bathy = bathy,
-         sample_size = 500,
-         estimate_ud = flapper::kud_around_coastline_fast, grid = grid,
-         chunks = 2L,
-         cl = cl)
+if(flapper_run_parallel){
+  cl <- parallel::makeCluster(2L)
+  parallel::clusterEvalQ(cl = cl, library(raster))
+  pf_kud_1(out_dcpf_paths,
+           bathy = bathy,
+           sample_size = 500,
+           estimate_ud = flapper::kud_around_coastline_fast, grid = grid,
+           chunks = 2L,
+           cl = cl)
 }
 par(pp)
 

@@ -26,9 +26,7 @@ process_surface(
 
 \item{plot}{A logical input that defines whether or not to plot a summary of the differences between the original \code{\link[raster]{raster}} (\code{x}) and the aggregated \code{\link[raster]{raster}}(s). If specified, the minimum, median and maximum difference are shown for each statistic (\code{stat}).}
 
-\item{cl}{(optional) A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is stopped within the function.}
-
-\item{varlist}{(optional) A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.}
+\item{cl, varlist}{(optional) Parallelisation options. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.}
 
 \item{verbose}{A logical input that defines whether or not to print messages to the console to relay function progress.}
 }

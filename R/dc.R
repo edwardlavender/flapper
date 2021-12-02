@@ -12,7 +12,7 @@
 #' @param save_args A logical input that defines whether or not to save the list of function inputs in the returned object.
 #' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console; otherwise, they are written to file (see below).
 #' @param con If \code{verbose = TRUE}, \code{con} is character string that defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}). Otherwise, \code{con} defines the full pathway to a .txt file (which can be created on-the-fly) into which messages are written to relay function progress.
-#' @param split,cl,varlist (optional) Parallelisation arguments. \code{split} is an integer which, if supplied, splits the \code{archival} dataframe every \code{n}th row into chunks†. The algorithm is applied sequentially within each chunk (if applicable) and chunk-wise maps can be summed afterwards to create a single map of space use. The advantage of this approach is that chunks can be analysed in parallel, via \code{cl} and \code{varlist}, while memory use is minimised. \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. \code{varlist} is a character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.
+#' @param split,cl,varlist (optional) Parallelisation options. \code{split} is an integer which, if supplied, splits the \code{archival} dataframe every \code{n}th row into chunks†. The algorithm is applied sequentially within each chunk (if applicable) and chunk-wise maps can be summed afterwards to create a single map of space use. The advantage of this approach is that chunks can be analysed in parallel, via \code{cl} and \code{varlist}, while memory use is minimised. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.
 #'
 #' @details
 #'
@@ -238,11 +238,6 @@ dc <- function(archival,
     cl <- NULL
     varlist <- NULL
   }
-  if(is.null(cl) & !is.null(varlist)) {
-    warning("'varlist' is supplied but 'cl' is NULL.",
-            immediate. = TRUE, call. = TRUE)
-    varlist <- NULL
-  }
   ## Check write_record_spatial_for_pf inputs
   if(!is.null(write_record_spatial_for_pf)){
     check_named_list(input = write_record_spatial_for_pf)
@@ -298,9 +293,8 @@ dc <- function(archival,
   } else {
     cat_to_cf("... Implementing algorithm over chunks...")
   }
-  if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
   ## Implement .dc() algorithm over chunks
-  .out_by_chunk <- pbapply::pblapply(archival_ls, cl = cl, function(d){
+  .out_by_chunk <- cl_lapply(archival_ls, cl = cl, varlist = varlist, fun = function(d){
     # Define storage container for chunk-specific outputs
     .out <- list(map = NULL,
                  record = list(),
@@ -332,7 +326,6 @@ dc <- function(archival,
     class(.out) <- c(class(.out), "acdc_archive")
     return(.out)
   })
-  if(!is.null(cl)) parallel::stopCluster(cl)
 
   #### Finalise algorithm
   out$archive <- .out_by_chunk

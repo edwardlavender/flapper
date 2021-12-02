@@ -564,8 +564,7 @@ process_quality_check <-
 #' @param stat A named list of functions used to aggregate \code{x} (see the \code{fun} argument of \code{\link[raster]{aggregate}}).
 #' @param ... Additional arguments passed to \code{\link[raster]{aggregate}} to control aggregation.
 #' @param plot A logical input that defines whether or not to plot a summary of the differences between the original \code{\link[raster]{raster}} (\code{x}) and the aggregated \code{\link[raster]{raster}}(s). If specified, the minimum, median and maximum difference are shown for each statistic (\code{stat}).
-#' @param cl (optional) A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is stopped within the function.
-#' @param varlist (optional) A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.
+#' @param cl,varlist (optional) Parallelisation options. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.
 #' @param verbose A logical input that defines whether or not to print messages to the console to relay function progress.
 #'
 #' @details This function was motivated by the particle filtering algorithms in \code{\link[flapper]{flapper}} (e.g., \code{\link[flapper]{pf}}). For these algorithms, it is computationally beneficial to reduce \code{\link[raster]{raster}} resolution, where possible, by aggregation. To facilitate this process, this function quantifies the relative error induced by different aggregation functions. If appropriate, the particle filtering algorithm(s) can then be implemented using the aggregated \code{\link[raster]{raster}} that minimises the error, with the magnitude of that error propagated via the \code{depth_error} parameter.
@@ -603,7 +602,8 @@ process_surface <- function(x,
 
   # Aggregate raster by each statistic
   cat_to_console("... Aggregating raster...")
-  if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
+  cl_check(cl, varlist)
+  cl_export(cl, varlist)
   x_agg_by_stat <- pbapply::pblapply(stat, cl = cl, function(foo){
     x_agg <- raster::aggregate(x, fact = fact, fun = foo,...)
     return(x_agg)
@@ -615,7 +615,7 @@ process_surface <- function(x,
     x_agg_rs <- raster::resample(x_agg, x_blank, method = "ngb")
     return(x_agg_rs)
   })
-  if(!is.null(cl)) parallel::stopCluster(cl)
+  cl_stop(cl)
 
   # Get differences between original raster and aggregated (resampled) rasters for each statistic
   cat_to_console("... Computing differences between the original and aggregated raster(s)...")

@@ -325,7 +325,7 @@ coa_setup_delta_t <- function(acoustics,
 #'
 #' @param mat A detection matrix, with one row for each time step and one column for each receiver, in which each cell defines the number of detections at each time step/receiver (for a particular individual) (see \code{\link[flapper]{make_matrix_detections}}). It is advisable that the rows and columns of this matrix are labelled by time stamp and receiver respectively, especially if there are any rows without detections (see \code{output} below).
 #' @param xy A matrix that defines receiver locations (x, y). This should contain one row for each receiver (column) in \code{mat} (in the same order as in \code{mat}) and two columns for the coordinates. Planar coordinates (i.e., in Universal Transverse Mercator projection) are required for the averaging process.
-#' @param cl A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. If supplied, the connection to the cluster is closed within the function.
+#' @param cl,varlist (optional) Parallelisation options. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.
 #' @param na_omit,as_POSIXct Processing options. \code{na_omit} is a logical variable that defines whether or not to omit NAs (i.e., rows in \code{mat} for which no detections were made and thus for which COAs cannot be calculated) from returned coordinates. If \code{output = "data.frame"} (see below), \code{as_POSIXct} is a function to convert time stamps, taken from the row names of \code{mat}, to a POSIXct vector. \code{as_POSIXct = NULL} suppresses this conversion.
 #' @param output A character that defines the output format. Currently supported options are: \code{"matrix"}, which returns a matrix of the coordinates of COAs; and \code{"data.frame"}, which returns a dataframe with timestamps (taken from the row names of \code{mat}) and COA coordinates.
 #'
@@ -380,10 +380,10 @@ coa_setup_delta_t <- function(acoustics,
 #'
 #' #### Example (3): Implement the algorithm on a cluster
 #' # This will only be faster for very large detection time series.
-#' \dontrun{
-#' coa_mat <- coa(mat = detection_matrix_by_id[[1]],
-#'                xy = xy,
-#'                cl = parallel::makeCluster(2L))
+#' if(flapper_run_parallel){
+#'   coa_mat <- coa(mat = detection_matrix_by_id[[1]],
+#'                  xy = xy,
+#'                  cl = parallel::makeCluster(2L))
 #' }
 #'
 #' @seealso \code{\link[flapper]{coa_setup_delta_t}} suggests suitable time intervals over which to calculate COAs. \code{\link[flapper]{make_matrix_detections}} makes the detection matrices from detection time series data required by this function. For data in the VEMCO Vue export format, the `COA' function in the VTrack package (https://github.com/RossDwyer/VTrack) can also be used to calculate centres of activity.
@@ -394,7 +394,11 @@ coa_setup_delta_t <- function(acoustics,
 #' @export
 #'
 
-coa <- function(mat, xy, cl = NULL, na_omit = TRUE, as_POSIXct = as.POSIXct, output = "matrix"){
+coa <- function(mat, xy,
+                cl = NULL, varlist = NULL,
+                na_omit = TRUE,
+                as_POSIXct = as.POSIXct,
+                output = "matrix"){
 
   #### Define objects
   if(all(mat == 0)) stop("No detection(s) identified in mat: unable to calculate COA(s).", call. = FALSE)
@@ -414,7 +418,7 @@ coa <- function(mat, xy, cl = NULL, na_omit = TRUE, as_POSIXct = as.POSIXct, out
   ry <- xy[, 2]
 
   #### Calculate COAs
-  coa_ls <- pbapply::pblapply(1:nrow(det_mat), cl = cl, function(i){
+  coa_ls <- cl_lapply(1:nrow(det_mat), cl = cl, varlist = varlist, fun = function(i){
     # Extract parameters for speed
     det_mat_i     <- det_mat[i, ]
     det_mat_i_sum <- sum(det_mat_i)
@@ -430,7 +434,6 @@ coa <- function(mat, xy, cl = NULL, na_omit = TRUE, as_POSIXct = as.POSIXct, out
     }
     return(tmp)
   })
-  if(!is.null(cl)) parallel::stopCluster(cl = cl)
   coa_mat <- do.call(rbind, coa_ls)
   rownames(coa_mat) <- rownames(det_mat)
   colnames(coa_mat) <- c("x", "y")

@@ -70,7 +70,7 @@ raster::plot(raster::distanceFromPoints(r, origin))
 raster::plot(lcp_dist)
 par(pp)
 
-\dontrun{
+if(flapper_run_slow){
 
 #### Example (2): Implement function across specific destinations
 ## Supply destination cell coordinates/IDs directly

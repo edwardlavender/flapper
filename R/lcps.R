@@ -206,7 +206,7 @@ lcp_graph_surface <- function(surface, cost, verbose = TRUE){
 #' raster::plot(lcp_dist)
 #' par(pp)
 #'
-#' \dontrun{
+#' if(flapper_run_slow){
 #'
 #' #### Example (2): Implement function across specific destinations
 #' ## Supply destination cell coordinates/IDs directly
@@ -350,7 +350,7 @@ lcp_from_point <- function(origin,
 #' @param combination A character string (\code{"pair"} or \code{"matrix"}) that defines whether or not to compute shortest distances/paths for (a) each sequential \code{origin} and \code{destination} pair of coordinates (\code{combination = "pair"}) or (b) all combinations of \code{origin} and \code{destination} coordinates (\code{combination = "matrix"}). This argument is only applicable if there is more than one \code{origin} and \code{destination}. For \code{combination = "pair"}, the number of \code{origin} and \code{destination} coordinates needs to be the same, since each \code{origin} is matched with each \code{destination}.
 #' @param method A character string (\code{"cppRouting"} or \code{"gdistance"}) that defines the method used to compute the shortest distances between the \code{origin} and the \code{destination}. \code{"cppRouting"} is the default \code{method}. Under this option, functions in the \code{\link[cppRouting]{cppRouting}} package are used to compute the shortest paths (\code{\link[cppRouting]{get_path_pair}} or \code{\link[cppRouting]{get_multi_paths}} for each pair of coordinates or for all combinations of coordinates, respectively) and/or distances (\code{\link[cppRouting]{get_distance_pair}} or \code{\link[cppRouting]{get_distance_matrix}}). This package implements functions written in C++ and massively outperforms the other \code{method = "gdistance"} for large problems. Otherwise, if \code{method = "gdistance"}, functions in the \code{\link[gdistance]{gdistance}} are called iteratively to compute shortest paths (via \code{\link[gdistance]{shortestPath}}) or distances (via \code{\link[gdistance]{costDistance}}).
 #' @param cppRouting_algorithm A character string that defines the algorithm used to compute shortest paths or distances. This is only applicable if \code{method = "cppRouting"}: \code{method = "gdistance"} implements Dijkstra's algorithm only. For shortest paths or their distances between pairs of coordinates, the options are \code{"Dijkstra"}, \code{"bi"}, \code{"A*"} or \code{"NBA"} for the uni-directional Dijkstra, bi-directional Dijkstra, A star unidirectional search or new bi-directional A star algorithms respectively (see \code{\link[cppRouting]{get_path_pair}} or \code{\link[cppRouting]{get_distance_pair}}). For shortest paths between all combinations of coordinates, \code{cppRouting_algorithm} is ignored and the Dijkstra algorithm is implemented recursively. For shortest distances between all combinations of coordinates, the options are \code{"phast"} or \code{"mch"} (see \code{\link[cppRouting]{get_distance_matrix}}).
-#' @param use_all_cores,cl,varlist Parallelisation arguments for \code{method = "cppRouting"} (\code{use_all_cores}) or \code{method = "gdistance"} (\code{cl} and \code{varlist}) respectively. If \code{method = "cppRouting"}, parallelisation is implemented via \code{use_all_cores} for computing shortest distances only (not computing shortest paths). \code{use_all_cores} is a logical input that defines whether or not to use all cores for computing shortest distance(s). If \code{method = "gdistance"}, parallelisation is implemented via \code{cl} and \code{varlist} for both shortest paths and distances function calls. \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is stopped within the function. \code{varlist} is a character vector of containing the names of exported objects. This may be required if \code{cl} is supplied. This is passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. Exported objects must be located in the global environment.
+#' @param use_all_cores,cl,varlist Parallelisation options for \code{method = "cppRouting"} (\code{use_all_cores}) or \code{method = "gdistance"} (\code{cl} and \code{varlist}) respectively. If \code{method = "cppRouting"}, parallelisation is implemented via \code{use_all_cores} for computing shortest distances only (not computing shortest paths). \code{use_all_cores} is a logical input that defines whether or not to use all cores for computing shortest distance(s). If \code{method = "gdistance"}, parallelisation is implemented via \code{cl} and \code{varlist} for both shortest paths and distances function calls. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.
 #' @param check A logical input that defines whether or not to check function inputs. If \code{TRUE}, internal checks are implemented to check user-inputs and whether or not inputted coordinates are in appropriate places on the processed \code{surface} (for instance, to ensure inputted coordinates do not lie over masked areas). This helps to prevent intractable error messages. If \code{FALSE}, these checks are not implemented, so function progress may be faster initially (especially for large \code{origin}/\code{destination} coordinate matrices).
 #' @param verbose A logical input that defines whether or not to print messages to the console to monitor function progress. This is especially useful with a large \code{surface} since the algorithms are computationally intensive.
 #'
@@ -1114,18 +1114,15 @@ lcp_over_surface <-
         ## Least cost distances between pairs
         if(combination == "pair"){
 
-          # Set up cluster to loop over each pair of coordinates
-          if(!is.null(cl) & !is.null(varlist)) {
-            parallel::clusterExport(cl = cl, varlist = varlist)
-          }
           # Loop over each pair of coordinates and compute least-cost distances
+          cl_export(cl, varlist)
           dist_lcp_by_pair <- pbapply::pblapply(coords_by_pair, cl = cl, FUN = function(xy){
             costDistance_param <- list(x = tr, fromCoords = xy[, 1:2, drop = FALSE], toCoords = xy[, 3:4, drop = FALSE])
             dist_lcp <- do.call(gdistance::costDistance, costDistance_param)
             return(dist_lcp)
           })
-          if(all(goal %in% 1)) if(!is.null(cl)) parallel::stopCluster(cl = cl)
-          # Process least-cost distances and close cluster
+          if(all(goal %in% 1)) cl_stop(cl)
+          # Process least-cost distances
           dist_lcp <- as.numeric(unlist(dist_lcp_by_pair))
 
 
@@ -1167,18 +1164,14 @@ lcp_over_surface <-
           coords_by_pair <- lapply(seq_len(nrow(coords)), function(i) coords[i,, drop = FALSE])
         }
 
-        ## Set up cluster to loop over each pair of coordinates
-        if(!is.null(cl) & !is.null(varlist)) {
-          parallel::clusterExport(cl = cl, varlist = varlist)
-        }
-
         ## Loop over each pair of coordinates and compute least-cost paths
+        if(all(goal %in% 2)) cl_export(cl, varlist)
         path_lcp_SpatialLines <- pbapply::pblapply(coords_by_pair, cl = cl, FUN = function(xy){
           param <- list(x = tr, origin = xy[, 1:2, drop = FALSE], goal = xy[, 3:4, drop = FALSE], output = "SpatialLines")
           path_lcp <- do.call(gdistance::shortestPath, param)
           return(path_lcp)
         })
-        if(!is.null(cl)) parallel::stopCluster(cl = cl)
+        cl_stop(cl)
 
         ## Process least-cost paths
         # Define dataframe with paths and cells
@@ -1624,7 +1617,7 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
 #' @param n_max If \code{mobility} is supplied, \code{n_max} is an integer that defines the maximum number of location pairs for which shortest distances are calculated.
 #' @param graph (optional) A graph object that defines cell nodes and edge costs for connected cells within the surface (see \code{\link[flapper]{lcp_graph_surface}}). This is used for shortest-distance calculations.
 #' @param ... Additional arguments passed to \code{\link[cppRouting]{get_distance_pair}} for shortest-distance calculations (\code{algorithm}, \code{constant} and/or \code{allcores}).
-#' @param cl,varlist Parallelisation options for distance-based location sampling (i.e., if \code{distance != NULL}). \code{cl} is a cluster object created by \code{\link[parallel]{makeCluster}}. \code{varlist} is a character vector of object names to export (see \code{\link[parallel]{clusterExport}}). Exported objects must be located in the global environment.
+#' @param cl,varlist (optional) Parallelisation options for distance-based location sampling (i.e., if \code{distance != NULL}). \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.
 #' @param verbose A logical input that defines whether or not to print messages to the console to monitor function progress.
 #'
 #' @details This function was motivated by the need to determine the extent to which Euclidean distances are a suitable approximation of shortest distances in movement models for benthic animals.
@@ -1818,11 +1811,6 @@ lcp_comp <- function(surface,
             immediate. = TRUE, call. = FALSE)
     cl <- varlist <- NULL
   }
-  if(is.null(cl) & !is.null(varlist)){
-    warning("'cl' is NULL but 'varlist' is not: 'varlist' ignored.",
-            immediate. = TRUE, call. = FALSE)
-    varlist <- NULL
-  }
   ## Check dots
   dots <- list(...)
   if(length(dots) > 0L) {
@@ -1840,9 +1828,8 @@ lcp_comp <- function(surface,
   if(!is.null(distance)){
 
     cat_to_console("... Sampling n location pairs for each distance value...")
-    if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
     points_by_dist <-
-      pbapply::pblapply(distance, cl = cl, function(step){
+      cl_lapply(distance, cl = cl, varlist = varlist, fun = function(step){
 
         #### Sample n random locations within area
         cat_to_console(paste0("... ... Sampling for distance = ", step, "..."))
@@ -1883,7 +1870,6 @@ lcp_comp <- function(surface,
         rownames(points_for_dist) <- NULL
         return(points_for_dist)
       })
-    if(!is.null(cl)) parallel::stopCluster(cl = cl)
 
     #### Join dataframes
     point_samples <- dplyr::bind_rows(points_by_dist)

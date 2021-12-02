@@ -489,8 +489,7 @@ get_detection_area_sum <- function(xy,
 #' @param xy,detection_range,coastline,scale Arguments required to calculate the total area surveyed by receivers (at each time point) via \code{\link[flapper]{get_detection_area_sum}}. For this function, \code{xy} should be a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that includes both receiver locations and corresponding deployment times (in columns named `receiver_start_date' and `receiver_end_date' respectively).
 #' @param plot A logical input that defines whether or not to plot a time series of the total area sampled by receivers.
 #' @param verbose A logical input that defines whether or not to print messages to the console to relay function progress.
-#' @param cl (optional) A cluster object created by \code{\link[parallel]{makeCluster}} to implement the algorithm in parallel. The connection to the cluster is closed within the function.
-#' @param varlist (optional) A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.
+#' @param cl,varlist (optional) Parallelisation options. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.
 #' @param ... Additional arguments, passed to \code{\link[prettyGraphics]{pretty_plot}}, to customise the plot produced.
 #'
 #' @return The function returns a dataframe with, for each date (`date') from the time of the first receiver's deployment to the time of the last receiver's retrieval, the number of receivers operational on that date (`n') and the total area sampled (`receiver_area'). If \code{plot = TRUE}, the function also returns a plot of the area sampled by receivers through time.
@@ -511,13 +510,13 @@ get_detection_area_sum <- function(xy,
 #' #### Example (2): Adjust detection range, include coastline and use parallel processing
 #' # For areas with complex coastline, this will reduce the speed of the algorithm
 #' # So we will also supply a cluster to improve the computation time.
-#' \dontrun{
-#' dat <- get_detection_area_ts(xy,
-#'                              detection_range = 500,
-#'                              coastline = dat_coast,
-#'                              cl = parallel::makeCluster(2L),
-#'                              varlist = "dat_coast"
-#'                              )
+#' if(flapper_run_parallel){
+#'   dat <- get_detection_area_ts(xy,
+#'                                detection_range = 500,
+#'                                coastline = dat_coast,
+#'                                cl = parallel::makeCluster(2L),
+#'                                varlist = "dat_coast"
+#'                                )
 #' }
 #'
 #' #### Example (3) Hide or customise the plot
@@ -553,23 +552,20 @@ get_detection_area_ts <- function(xy,
   cat_to_console("... Implementing function checks...")
   check_class(input = xy, to_class = "SpatialPointsDataFrame", type = "stop")
   check_names(input = xy, req = c("receiver_start_date", "receiver_end_date"))
-  if(is.null(cl) & !is.null(varlist)) message("cl = NULL: input to 'varlist' ignored.")
 
   #### Implement algorithm
   cat_to_console("... Implementing algorithm...")
   rdate_seq <- seq.Date(min(xy$receiver_start_date), max(xy$receiver_end_date), 1)
-  if(!is.null(cl) & !is.null(varlist)) parallel::clusterExport(cl = cl, varlist = varlist)
-  rcov <- pbapply::pblapply(rdate_seq, cl = cl, function(rdate){
+  rcov <- cl_lapply(rdate_seq, cl = cl, varlist = varlist, fun = function(rdate){
     pos <- which(xy$receiver_start_date <= rdate & xy$receiver_end_date >= rdate)
     receiver_area <- get_detection_area_sum(xy = xy[pos, ],
-                                        detection_range = detection_range,
-                                        coastline = coastline,
-                                        scale = scale,
-                                        plot = FALSE)
+                                            detection_range = detection_range,
+                                            coastline = coastline,
+                                            scale = scale,
+                                            plot = FALSE)
     d <- data.frame(date = rdate, n = length(pos), receiver_area = receiver_area)
     return(d)
   })
-  if(!is.null(cl)) parallel::stopCluster(cl)
   rcov <- dplyr::bind_rows(rcov)
 
   #### Visualise time series
@@ -824,8 +820,7 @@ get_id_rec_overlap <- function(ids,
 #' @param sample_size (optional) An integer that defines the number of samples of the environmental variable to draw from the area around each receiver (see the `size' argument of \code{\link[base]{sample}}). If this is provided, \code{sample_size} samples are taken from this area; otherwise, all values are extracted.
 #' @param sample_replace (optional) If \code{sample_size} is specified, \code{sample_replace} is a logical input that defines whether to implement sampling with (\code{sample_replace = TRUE}, the default) or without (\code{sample_replace = FALSE}) replacement (see the `replace' argument of \code{\link[base]{sample}}).
 #' @param sample_probs (optional) If \code{sample_size} is specified, \code{sample_probs} is a function that calculates the detection probability given the distance (m) between a cell and a receiver.
-#' @param cl A cluster object created by \code{\link[parallel]{makeCluster}}. If supplied, the connection to the cluster is closed within the function.
-#' @param varlist A character vector of names of objects to export, to be passed to the \code{varlist} argument of \code{\link[parallel]{clusterExport}}. This may be required if \code{cl} is supplied. Exported objects must be located in the global environment.
+#' @param cl,varlist (optional) Parallelisation options. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes. \code{varlist} is a character vector of variables for export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.
 #' @param verbose A logical variable that defines whether or not relay messages to the console to monitor function progress.
 #'
 #' @return The function returns a list of dataframes (one for each element in \code{xy}; i.e., each receiver), each of which includes the cell IDs of \code{envir} from which values were extracted (`cell'), the value of the environmental variable in that cell (`envir') and, if applicable, the distance between that cell and the receiver (`dist', m) and the detection probability in that cell (`prob').
@@ -910,7 +905,6 @@ get_id_rec_overlap <- function(ids,
 #' utils::str(depths_by_centroid)
 #'
 #' #### Example (5) Parallelise the algorithm via cl and varlist arguments
-#' \dontrun{
 #' depths_by_centroid <-
 #'   get_detection_centroids_envir(xy = xy,
 #'                                 detection_range = 425,
@@ -923,23 +917,22 @@ get_id_rec_overlap <- function(ids,
 #'                                 varlist = c("dat_gebco","calc_detection_pr")
 #'                                 )
 #' utils::str(depths_by_centroid)
-#' }
 #'
 #' @author Edward Lavender
 #' @export
 #'
 
 get_detection_centroids_envir <- function(xy,
-                                      detection_range,
-                                      coastline,
-                                      plot = FALSE,
-                                      envir,
-                                      sample_size = NULL,
-                                      sample_replace = TRUE,
-                                      sample_probs = NULL,
-                                      cl = NULL,
-                                      varlist = NULL,
-                                      verbose = TRUE,...){
+                                          detection_range,
+                                          coastline,
+                                          plot = FALSE,
+                                          envir,
+                                          sample_size = NULL,
+                                          sample_replace = TRUE,
+                                          sample_probs = NULL,
+                                          cl = NULL,
+                                          varlist = NULL,
+                                          verbose = TRUE,...){
 
   #### Checks
   t_onset <- Sys.time()
@@ -950,25 +943,21 @@ get_detection_centroids_envir <- function(xy,
     if(!is.null(sample_probs)) message("sample_size = NULL: input to 'sample_probs' ignored.")
     sample_probs <- NULL
   }
-  if(is.null(cl) & !is.null(varlist)) message("cl = NULL: input to 'varlist' ignored.")
   check...("byid",...)
 
   #### Define detection centroids
   cat_to_console("... Defining detection centroid(s)...")
   xy_buf <- get_detection_centroids(xy = xy,
-                                detection_range = detection_range,
-                                coastline = coastline,
-                                plot = plot,
-                                byid = TRUE,...)
+                                    detection_range = detection_range,
+                                    coastline = coastline,
+                                    plot = plot,
+                                    byid = TRUE,...)
   xy_buf_ls <- lapply(1:length(xy_buf), function(i) xy_buf[i])
 
   #### Extract conditions
   cat_to_console("... Extracting environmental conditions from detection area(s)...")
-  if(!is.null(cl) & !is.null(varlist)) {
-    parallel::clusterExport(cl = cl, varlist = varlist)
-  }
   ls_envir <-
-    pbapply::pblapply(xy_buf_ls, cl = cl, FUN = function(centroid){
+    cl_lapply(xy_buf_ls, cl = cl, varlist = varlist, fun = function(centroid){
 
       ## Extract conditions
       # Create list of conditions sampled by each receiver
@@ -991,7 +980,6 @@ get_detection_centroids_envir <- function(xy,
       return(dat)
 
     })
-  if(!is.null(cl)) parallel::stopCluster(cl)
 
   #### Sample values according to their probability
   if(!is.null(sample_size)) {
