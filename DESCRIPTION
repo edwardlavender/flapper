@@ -27,7 +27,7 @@ Remotes:
     url::https://gitlab.oceantrack.org/GreatLakes/glatos/-/archive/master/glatos-master.zip/
 Depends: R (>= 4.0)
 License: GPL-3
-URL: https://github.com/edwardlavender/flapper/
+URL: https://github.com/edwardlavender/flapper/, https://edwardlavender.github.io/flapper/
 BugReports: https://github.com/edwardlavender/flapper/issues/
 Encoding: UTF-8
 LazyData: true
