@@ -49,6 +49,8 @@ This function simulates detections at passive acoustic telemetry receivers under
 }
 \details{
 The function assumes that the individual transmits an acoustic signal which has the capacity to be detected at each time step. In reality, acoustic transmitters are often programmed with a randomly varying delay, but this is not currently implemented. The function also assumes that all receivers that are supplied are able to make detections. If the receivers at which an individual could be detected change over time, it may be necessary to apply the function iteratively or post-process the outcomes to ensure that individuals are not detected at inactive receivers.
+
+For coupled simulation--analysis workflows (such as \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_sa}} and \code{\link[flapper]{sim_detections}} plus \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}},  \code{\link[flapper]{acdc}} and \code{\link[flapper]{pf}}), it is important that receiver locations (from \code{\link[flapper]{sim_array}}) and individual locations (from \code{\link[flapper]{sim_path_sa}}) are represented on the \code{\link[raster]{raster}} grid used to reconstruct simulated movements before simulating detections. Receiver locations and movement distances must remain admissible according to the movement model when translated on the grid. Grid resolution should be sufficiently high to represent effectively simulated movement probabilities and detection probabilities.
 }
 \examples{
 #### Step (1) Simulate an array in an area

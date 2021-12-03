@@ -67,10 +67,6 @@
 
   #### Check parallelisation options
   if(is.null(cl)) n_cores <- 1 else n_cores <- length(cl)
-  # if(n_cores == 1 & !is.null(split)) {
-  #  message("Input to 'split' is ignored since cl = NULL.")
-  #  split <- NULL
-  # }
   if(inherits(acoustics, "list") & !is.null(split)) message("Input to 'split' ignored since inherits(acoustics, 'list') == TRUE.")
 
   #### Define function for printing messages to file or console
@@ -170,6 +166,10 @@
   }
 
   #### Study site rasters
+  ## Check for zeros
+  if(is.null(calc_depth_error) && length(raster::Which(bathy == 0, cells = TRUE)) > 0L)
+    warning("'bathy' contains zero values.",
+            immediate. = TRUE, call. = TRUE)
   ## Blank map for space use over the study area
   map <- raster::setValues(bathy, 0)
   map <- raster::mask(map, bathy)

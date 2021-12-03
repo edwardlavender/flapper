@@ -162,8 +162,7 @@ kernels <- acs_setup_detection_kernels(xy = xy,
                                        centroids = dat_centroids,
                                        overlaps = overlaps,
                                        calc_detection_pr = calc_dpr,
-                                       map = gebco,
-                                       coastline = invert_poly(dat_coast))
+                                       bathy = gebco)
 ## (D) Implement algorithm
 out_acdc_3 <- flapper:::.acs(acoustics = acc,
                              archival = arc,

@@ -123,6 +123,8 @@ acs_setup_mobility <- function(depth,
 #'
 #' @details Given a detection at a particular receiver at a particular time, the detection centroid defines the boundaries of the area around a receiver within which the individual must have been located (from the perspective of that receiver).
 #'
+#' For the AC* algorithms, note that in some coastal settings the representation of detection centroids as \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects may cause a mismatch with detection kernels and the bathymetry \code{\link[raster]{raster}} in terms of what is defined as water versus land. At the time of writing, in the AC* algorithms the detection kernels/bathymetry data take precedence, with any grid cells that have a value of \code{NA} masked, even if within `detection centroids'. In the future, these disparities should be resolved by redefining detection centroids on the bathymetry grid too.
+#'
 #' @return The function returns a list of \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects, with one element for all numbers from 1 to the maximum receiver number (\code{xy$receiver_id}). Any list elements that do not correspond to receivers contain a \code{NULL} element. List elements that correspond to receivers contain a \code{\link[sp]{SpatialPolygonsDataFrame-class}} object containing the detection centroid for that receiver.
 #'
 #' @examples
@@ -279,18 +281,16 @@ acs_setup_centroids <- function(xy,
 #' @title Setup detection probability kernels for the AC* algorithm(s)
 #' @description This function produces detection probability kernels for incorporation into the acoustic-contour* (AC*) algorithms. Within acoustic centroids, the incorporation of detection probability kernels reduces uncertainty and increases precision in simulated patterns of space use by up-weighting areas nearer to receivers when an individual is detected and down-weighing areas nearer to receivers when an individual is not detected (see Details).
 #'
-#' To implement the function, a \code{\link[sp]{SpatialPointsDataFrame}} that defines receiver IDs, locations and deployment dates must be supplied (via \code{xy}). A record of servicing events for receivers can also be supplied (via \code{services}). Detection probability kernels are calculated around each receiver, using a user-defined function based on Euclidean distances (\code{calc_detection_pr}) across a \code{\link[raster]{raster}} (\code{map}). Kernels can be restricted by the \code{coastline} and \code{boundaries} of an area if applicable. These kernels are used to weight possible locations around a receiver when an individual is detected.
+#' To implement the function, a \code{\link[sp]{SpatialPointsDataFrame}} that defines receiver IDs, locations and deployment dates must be supplied (via \code{xy}). A record of servicing events for receivers can also be supplied (via \code{services}). Detection probability kernels are calculated around each receiver, using a user-defined function based on Euclidean distances (\code{calc_detection_pr}) across a \code{\link[raster]{raster}} (\code{bathy}). Kernels can be restricted by barriers to movement as defined by \code{NAs} in \code{bathy} and the boundaries of the area. These kernels are used to weight possible locations around a receiver when an individual is detected.
 #'
 #' For each unique array design (i.e. set of active receivers, given receiver deployment dates and servicing events, if applicable), a detection probability surface across the whole area is also created, which is used to weight possible locations of the individual in the time steps between detections (up-weighting locations away from receivers). By default, these calculations account for any areas of overlap in the detection probability kernels of multiple receivers. This step is computationally demanding, but it can be suppressed or sped-up via the \code{overlaps} argument. Outputs are returned in a named list that is designed to be incorporated into the AC* algorithm(s).
 #'
-#' @param xy A \code{\link[sp]{SpatialPointsDataFrame}} that defines receiver IDs, locations and deployment dates. The \code{data} slot must include a dataframe with the following columns: an unique, integer identifier for each receiver (`receiver_id') and receiver deployment \code{\link[base]{Dates}} (`receiver_start_date' and `receiver_end_date'). For receiver locations, the coordinate reference system should be the Universal Transverse Mercator system with distances in metres (as for \code{map}, below).
+#' @param xy A \code{\link[sp]{SpatialPointsDataFrame}} that defines receiver IDs, locations and deployment dates. The \code{data} slot must include a dataframe with the following columns: an unique, integer identifier for each receiver (`receiver_id') and receiver deployment \code{\link[base]{Dates}} (`receiver_start_date' and `receiver_end_date'). For receiver locations, the coordinate reference system should be the Universal Transverse Mercator system with distances in metres (as for \code{bathy}, below).
 #' @param services (optional) A dataframe that defines receiver IDs and servicing \code{\link[base]{Dates}} (times during the deployment period of a receiver when it was not active due to servicing). If provided, this must contain the following columns: an integer identifier for serviced receivers (named ‘receiver_id’) and two columns that define the time of the service(s) (‘service_start_date’ and ‘service_end_date’) (see \code{\link[flapper]{make_matrix_receivers}}).
 #' @param centroids The list of detection centroids, with one element for each number from \code{1:max(xy$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.
 #' @param overlaps (optional) A named list, from \code{\link[flapper]{get_detection_centroids_overlap}}, that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers. If provided, this speeds up detection probability calculations in overlapping regions by focusing on only the subset of receivers with overlapping detection probability kernels. If there are no overlapping receivers, \code{FALSE} can be supplied instead to suppress these calculations.
 #' @param calc_detection_pr A function that takes in a vector of distances and returns a vector of detection probabilities (around a receiver). Detection probability should decline to 0 after the \code{detection_range} distance from a receiver (see \code{\link[flapper]{acs_setup_centroids}}).
-#' @param map A (blank) \code{\link[raster]{raster}} on which receiver locations and detection probability kernels are represented. As for \code{xy}, the coordinate reference system should be the Universal Transverse Mercator system with distances in metres. Resolution needs to be sufficiently high such that detection probability can be represented effectively, given \code{calc_detection_pr}, but sufficiently low for convenient run times. For the \code{\link[flapper]{acdc}} algorithm, this should have the same properties as \code{bathy}.
-#' @param coastline (optional) A \code{\link[sp]{SpatialPolygonsDataFrame-class}} mask applied to detection probability kernels (e.g. on land, as in  \code{\link[flapper]{acs_setup_centroids}}). Algorithm speed declines with the complexity of \code{coastline}.
-#' @param boundaries An \code{\link[raster]{extent}} object that defines the boundaries of an area within which individuals are assumed to have remained (as in \code{\link[flapper]{acs_setup_centroids}}), if these are different from the extent of \code{map}. If provided, detection probability kernels are processed to remain within this area.
+#' @param bathy A \code{\link[raster]{raster}} of the bathymetry across an area (see \code{\link[flapper]{ac}}). Receiver locations and detection probability kernels are represented across this \code{\link[raster]{raster}}. As for \code{xy}, the coordinate reference system should be the Universal Transverse Mercator system with distances in metres. Resolution needs to be sufficiently high such that detection probability can be represented effectively, given \code{calc_detection_pr}, but sufficiently low for convenient run times. If \code{bathy} contains NAs, it is also taken as a mask that is applied to detection probability kernels to remove `impossible` areas (e.g., on land).
 #' @param verbose A logical input that defines whether or not to print messages to the console to relay function progress.
 #'
 #' @details A detection probability kernel is a bivariate probability density function that describes detection probability around a receiver. Typically, this takes the shape of a dome whereby detection probability declines uniformly around a receiver with increasing distance. Accordingly, this function assumes that detection probability kernels only depend on distance (via \code{calc_detection_pr}) and are constant in space and time. Spatially variable detection probability kernels can be incorporated just as easily into the AC* algorithm(s) but need to be created manually. For example, in areas of complex coastline, narrow peninsulas that punctuate detection centroids may effectively block transmissions from the outer regions of detection centroids from being detected at receivers, in which case a model that incorporates the `line of sight' between receivers and the surrounding regions may be appropriate. However, temporally variable detection probability kernels are not currently supported by the AC* algorithm(s).
@@ -344,13 +344,13 @@ acs_setup_centroids <- function(xy,
 #'                                                   "receiver_start_date",
 #'                                                   "receiver_end_date")])
 #'
-#' ## Define blank map of area for which AC* algorithm(s) will be implemented
+#' ## Define bathymetric map of area for which AC* algorithm(s) will be implemented
 #' # ... The resolution must be sufficiently high
 #' # ... such that there are areas with non zero detection probability.
 #' # ... However, function speed will fall with large, high resolution rasters.
 #' # ... Here, we set a low resolution for example speed.
-#' map_blank <- raster::raster(raster::extent(dat_gebco), res = c(50, 50))
-#' map_blank <- raster::setValues(map_blank, 0)
+#' surface <- raster::raster(raster::extent(dat_gebco), res = c(50, 50))
+#' surface <- raster::resample(dat_gebco, surface)
 #'
 #' ## Define detection probability function
 #' # This should depend on distance alone
@@ -376,7 +376,7 @@ acs_setup_centroids <- function(xy,
 #'                                        centroids = dat_centroids,
 #'                                        overlaps = overlaps,
 #'                                        calc_detection_pr = calc_dpr,
-#'                                        map = map_blank)
+#'                                        bathy = surface)
 #'
 #' # Examine list elements
 #' summary(kernels)
@@ -414,55 +414,6 @@ acs_setup_centroids <- function(xy,
 #' })
 #' graphics::par(pp)
 #'
-#' #### Example (2): Incorporate spatial information (coastline, area boundaries)
-#'
-#' # Define spatial mask for the land and check this via a plot
-#' sea <- invert_poly(dat_coast)
-#' area <- raster::setValues(map_blank, 1)
-#' raster::plot(raster::mask(area, sea))
-#'
-#' # Implement algorithm
-#' kernels <- acs_setup_detection_kernels(xy = xy,
-#'                                         centroids = dat_centroids,
-#'                                         overlaps = overlaps,
-#'                                         calc_detection_pr = calc_dpr,
-#'                                         map = map_blank,
-#'                                         coastline = sea,
-#'                                         boundaries = update_extent(map_blank, -1000))
-#'
-#' # Examine example receiver-specific kernels
-#' pp <- graphics::par(mfrow = c(1, 2))
-#' raster::plot(kernels$receiver_specific_kernels[[3]])
-#' points(xy[xy$receiver_id == 3, ], cex = 2)
-#' raster::plot(kernels$receiver_specific_kernels[[4]])
-#' points(xy[xy$receiver_id == 4, ], cex = 2)
-#' graphics::par(pp)
-#'
-#' # Examine example receiver-specific inverse kernels
-#' pp <- graphics::par(mfrow = c(1, 2))
-#' raster::plot(kernels$receiver_specific_inv_kernels[[3]])
-#' points(xy[xy$receiver_id == 3, ], cex = 2)
-#' raster::plot(kernels$receiver_specific_inv_kernels[[4]])
-#' points(xy[xy$receiver_id == 4, ], cex = 2)
-#' graphics::par(pp)
-#'
-#' # Examine background detection Pr surfaces
-#' # ... (for each unique combination of receivers that were deployed)
-#' pp <- graphics::par(mfrow = c(2, 3), mar = c(0, 0, 0, 0))
-#' lapply(kernels$bkg_surface_by_design, function(bkg) {
-#'   raster::plot(bkg, axes = FALSE)
-#'   graphics::box()
-#' })
-#' graphics::par(pp)
-#'
-#' # Examine background inverse detection Pr surfaces
-#' pp <- graphics::par(mfrow = c(2, 3), mar = c(0, 0, 0, 0))
-#' lapply(kernels$bkg_inv_surface_by_design, function(bkg) {
-#'   raster::plot(bkg, axes = FALSE)
-#'   graphics::box()
-#' })
-#' graphics::par(pp)
-#'
 #' @seealso This is one of a number of functions used to set up the AC and ACDC algorithms implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}: \code{\link[flapper]{acs_setup_mobility}}, \code{\link[flapper]{acs_setup_centroids}} and \code{\link[flapper]{acs_setup_detection_kernels}}. This function is supported by \code{\link[flapper]{make_matrix_receivers}}, which defines receiver activity statuses; \code{\link[flapper]{acs_setup_centroids}}, which defines acoustic centroids; and \code{\link[flapper]{get_detection_centroids_overlap}}, which defines detection centroid overlaps
 #' @author Edward Lavender
 #' @export
@@ -473,8 +424,7 @@ acs_setup_detection_kernels <-
            centroids,
            overlaps = NULL,
            calc_detection_pr,
-           map,
-           coastline = NULL, boundaries = NULL,
+           bathy,
            verbose = TRUE
   ){
 
@@ -502,7 +452,7 @@ acs_setup_detection_kernels <-
       stop(paste("Argument 'xy$receiver_id' must be of class 'integer', not class(es):"), class(moorings$receiver_id))
     if(any(moorings$receiver_id <= 0))
       stop("Argument 'xy$receiver_id' cannot contain receiver IDs <= 0.")
-    if(any(duplicated(moorings$receiver_id )))
+    if(any(duplicated(moorings$receiver_id)))
       stop("Argument 'xy$receiver_id' contains duplicate elements.")
     ## services
     if(!is.null(services)){
@@ -523,21 +473,11 @@ acs_setup_detection_kernels <-
       check_names(input = overlaps, req = "list_by_receiver", type = all)
     }
     ## spatial data
-    # check spatial data
-    if(!is.null(coastline) & !is.null(boundaries)) {
-      coastline <- raster::crop(coastline, boundaries)
-      if(is.null(coastline)) message("No coastline within defined boundaries. \n")
-    }
-    # process map/area
-    map <- raster::setValues(map, 0)
-    if(!is.null(boundaries)) map <- raster::crop(map, boundaries)
-    if(!is.null(coastline)) map <- raster::mask(map, coastline)
-    # cluster: not currently implemented due to issues with raster temporary files
-    # if(is.null(cl) & !is.null(varlist)) {
-    #   warning("cl = NULL but varlist is not NULL: varlist ignored.",
-    #           immediate. = TRUE, call. = TRUE)
-    #   varlist <- NULL
-    # }
+    map           <- raster::setValues(bathy, 0)
+    if(length(raster::Which(is.na(bathy), cells = TRUE)) > 0L)
+      mask_layer <- TRUE
+    else
+      mask_layer <- FALSE
 
 
     ######################################
@@ -565,14 +505,12 @@ acs_setup_detection_kernels <-
         # raster::plot(det_pr_around_xyi)
         ## Process kernels
         cat_to_console("... ... ... Processing kernel ...")
-        if(!is.null(boundaries)) raster::crop(det_pr_around_xyi, boundaries)
         det_pr_around_xyi <- raster::extend(det_pr_around_xyi, raster::extent(map), value = 0)
-        if(!is.null(coastline))  det_pr_around_xyi <- raster::mask(det_pr_around_xyi, coastline)
+        if(mask_layer) det_pr_around_xyi <- raster::mask(det_pr_around_xyi, bathy)
         dpr_at_xyi <- raster::extract(det_pr_around_xyi, xyi)
         if(is.na(dpr_at_xyi)) {
           warning("Detection probability is NA at receiver ", xyi$receiver_id, ".",
                   immediate. = TRUE, call. = FALSE)
-          if(!is.null(coastline)) message("... Is the 'coastline' mask the right way around (masking the land and not the sea)?")
         } else if(dpr_at_xyi == 0) warning("Detection probability = NA at receiver ", xyi$receiver_id,
                                            immediate. = TRUE, call. = FALSE)
         ## Create modified kernels

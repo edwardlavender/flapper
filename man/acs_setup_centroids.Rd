@@ -37,6 +37,8 @@ This function produces the detection centroids required by the acoustic-centroid
 }
 \details{
 Given a detection at a particular receiver at a particular time, the detection centroid defines the boundaries of the area around a receiver within which the individual must have been located (from the perspective of that receiver).
+
+For the AC* algorithms, note that in some coastal settings the representation of detection centroids as \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects may cause a mismatch with detection kernels and the bathymetry \code{\link[raster]{raster}} in terms of what is defined as water versus land. At the time of writing, in the AC* algorithms the detection kernels/bathymetry data take precedence, with any grid cells that have a value of \code{NA} masked, even if within `detection centroids'. In the future, these disparities should be resolved by redefining detection centroids on the bathymetry grid too.
 }
 \examples{
 #### Define data for acs_setup_centroids()
