@@ -333,6 +333,12 @@ Building on the analysis of detection time series, some functions
         from archival time series;
   - `get_mvt_resting()` identifies ‘resting’ behaviour from archival
     time series;
+  - `get_hr_*()` functions get animal ‘home ranges’:
+      - `get_hr_prop()` gets a custom range from a utilisation
+        distribution (UD);
+      - `get_hr_core()` gets the ‘core range’ from a UD;
+      - `get_hr_home()` gets the ‘home range’ from a UD;
+      - `get_hr_full()` gets the ‘full range’ from a UD;
 
 ## Space use algorithms
 

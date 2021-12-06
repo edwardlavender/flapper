@@ -103,6 +103,15 @@ Building on the analysis of detection time series, some functions provide moveme
     \item \link{get_mvt_mobility_from_archival} estimates swimming speeds from archival time series;
   }
   \item \link{get_mvt_resting} identifies `resting' behaviour from archival time series;
+  \itemize{
+    \item \link{get_hr} functions get animal `home ranges':
+    \itemize{
+      \item \link{get_hr_prop} gets a custom range from a utilisation distribution (UD);
+      \item \link{get_hr_core} gets the `core range' from a UD;
+      \item \link{get_hr_home} gets the `home range' from a UD;
+      \item \link{get_hr_full} gets the `full range' from a UD;
+    }
+  }
 }
 }
 
@@ -115,7 +124,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
     \item \link{coa_setup_delta_t} informs decisions as to an appropriate time interval over which to calculate COAs;
     \item \link{make_matrix_detections} summarises matrices over time intervals (see above);
     \item \link{coa} implements the arithmetic version of the mean-position algorithm to calculate COAs;
-    \item \link{kud_habitat}, \link{kud_around_coastline} and \code{kud_around_coastline_fast} facilitate the estimation of home ranges (e.g., from estimated COAs) in areas of complex coastline;
+    \item \link{kud_habitat}, \link{kud_around_coastline} and \link{kud_around_coastline_fast} facilitate the estimation of home ranges (e.g., from estimated COAs) in areas of complex coastline;
   }
   \item The `flapper` family of algorithms
   \itemize{

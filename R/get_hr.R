@@ -1,0 +1,104 @@
+#' @title Get animal `home ranges'
+#' @description These functions extract `home range' estimates from \code{\link[raster]{raster}} objects that describe the intensity of movements within an area (from example from \code{\link[flapper]{pf_kud}}).
+#'
+#' @param x A \code{\link[raster]{raster}} of the utilisation distribution (UD).
+#' @param prop For \code{\link[flapper]{get_hr_prop}}, \code{prop} is a number that defines the home range proportion.
+#' @param rm_zero A logical variable that defines whether or not to ignore cells in \code{x} with a value of zero.
+#' @param plot A logical variable that defines whether or not to plot the home range.
+#' @param add_raster,... Plot customisation options. \code{add_raster} is a named list of arguments to customise the home range surface and \code{...} are additional arguments passed to \code{\link[prettyGraphics]{pretty_map}}.
+#'
+#' @details Animal home ranges are widely quantified as `the smallest subregion that accounts for a specified proportion, \emph{p}, of [the animal's] total distribution' (Jennrich and Turner 1969, page 232). In line with this approach, \code{\link[flapper]{get_hr_prop}} extracts the region within a frequency distribution of space use (i.e., UD) that is enclosed by a specified proportion (\code{prop}) contour. Following the most widely used adopted conventions, three additional wrapper functions facilitate the extraction of core, home and full ranges:
+#' \itemize{
+#'   \item \code{\link[flapper]{get_hr_core}} extracts the `core range' as the region enclosed by the 50 percent contour of the UD (\code{prop = 0.50});
+#'   \item \code{\link[flapper]{get_hr_home}} extracts the `home range' as the 95 percent contour of the UD (\code{prop = 0.95});
+#'   \item \code{\link[flapper]{get_hr_full}} extracts the `full' range as the boundaries of the UD (\code{prop = 1.00});
+#' }
+#'
+#' These functions differ from functions in the \code{adehabitatHR} package (namely \code{\link[adehabitatHR]{getverticeshr}}) in that they are designed to input and output \code{\link[raster]{raster}} objects.
+#'
+#' @return The functions return a \code{\link[raster]{raster}}. Cells with a value of one are inside the specified range boundaries; cells with a value of zero are beyond range boundaries.
+#'
+#' @examples
+#' #### Define an example UD
+#' # We will use particles sampled by a particle filtering algorithm
+#' # ... to create a UD:
+#' particles <- pf_simplify(dat_dcpf_histories,
+#'                          summarise_pr = max,
+#'                          return = "archive")
+#' # Define grids for UD estimation
+#' map       <- dat_dcpf_histories$args$bathy
+#' habitat   <- kud_habitat(map, plot = FALSE)
+#' # Define UD as a raster
+#' ud        <- pf_kud_2(particles,
+#'                       bathy = map, grid = habitat,
+#'                       estimate_ud = kud_around_coastline,
+#'                       plot = FALSE)
+#'
+#' #### Plot UD and home range estimators
+#' pp <- par(mfrow = c(2, 2))
+#' prettyGraphics::pretty_map(add_rasters = list(x = ud), main = "UD")
+#' get_hr_full(ud, main = "Full range")
+#' get_hr_home(ud, main = "Home range")
+#' get_hr_core(ud, main = "Core range")
+#' par(pp)
+#'
+#' #### Extract custom ranges with get_hr_prop()
+#' get_hr_prop(ud, prop = 0.25)
+#' get_hr_prop(ud, prop = 0.10)
+#' get_hr_prop(ud, prop = 0.05)
+#'
+#' @references Jennrich, R. I. and Turner, F. B. (1969). Measurement of non-circular home range. Journal of Theoretical Biology, 22, 227--237.
+#'
+#' @author Edward Lavender
+#' @name get_hr
+NULL
+
+
+#### get_hr_prop()
+#' @name get_hr
+#' @export
+
+get_hr_prop <- function(x, prop = 0.5, rm_zero = TRUE, plot = TRUE, add_raster = list(),...){
+  check_class(input = x, to_class = "RasterLayer", type = "stop")
+  if(length(prop) != 1L)
+    stop("'prop' should be a single number (proportion).", call. = FALSE)
+  if(rm_zero) {
+    x0 <- x == 0
+    x[x0] <- NA
+  }
+  threshold <- raster::quantile(x, probs = 1 - prop, na.rm = TRUE)
+  x[x < threshold]  <- 0
+  x[x >= threshold] <- 1
+  if(rm_zero) x[x0] <- 0
+  if(plot) {
+    add_raster$x <- x
+    prettyGraphics::pretty_map(add_rasters = add_raster,...)
+  }
+  return(invisible(x))
+}
+
+#### get_hr_core()
+#' @name get_hr
+#' @export
+
+get_hr_core <- function(x, rm_zero = TRUE, plot = TRUE, add_raster = list(),...){
+  get_hr_prop(x = x, prop = 0.5, plot = plot, add_raster = add_raster,...)
+}
+
+#### get_hr_home()
+#' @name get_hr
+#' @export
+
+get_hr_home <- function(x, rm_zero = TRUE, plot = TRUE, add_raster = list(),...){
+  get_hr_prop(x = x, prop = 0.95, plot = plot, add_raster = add_raster,...)
+}
+
+#### get_hr_full()
+#' @name get_hr
+#' @export
+
+get_hr_full <- function(x, rm_zero = TRUE, plot = TRUE, add_raster = list(),...){
+  get_hr_prop(x = x, prop = 1, plot = plot, add_raster = add_raster,...)
+}
+
+
