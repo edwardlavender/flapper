@@ -101,6 +101,9 @@ pf_setup_record <- function(root, type = c("acs", "dc"), use_absolute_paths = FA
       stop(msg_unrecognised)
     }
   }
+  if(length(unique(tools::file_ext(files))) != 1L)
+    warning("Multiple file types (extensions) identified in 'root'. Did you forget to pass 'pattern' to list.files()?",
+            immediate. = TRUE, call. = FALSE)
   files <- data.frame(index = 1:length(files), name = files)
   if(type == "acs"){
     files[, c("chu_id", "acc_id", "arc_id")] <- stringr::str_split_fixed(files$name, "_", 6)[, c(2, 4, 6)]
