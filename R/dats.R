@@ -56,9 +56,10 @@
 #'
 #' @format A dataframe with 59,420 observations and 8 variables:
 #' \describe{
-#'   \item{timestamp}{A POSIXct object which defines the time of each observation.}
 #'   \item{individual_id}{A unique identifier of the individual that was detected (see \code{\link{dat_ids}}).}
 #'   \item{transmitter_id}{The acoustic transmitter that was detected (see \code{\link{dat_ids}}).}
+#'   \item{index}{An integer individual-specific cumulative detection index.}
+#'   \item{timestamp}{A POSIXct object which defines the time of each observation.}
 #'   \item{receiver_id}{A unique identifier of the receiver at which the individual was detected (see \code{\link{dat_moorings}}).}
 #'   \item{receiver}{The receiver at which the individual was detected (see \code{\link{dat_moorings}}).}
 #'   \item{receiver_long}{The longitude of the receiver at which the individual was detected (see \code{\link{dat_moorings}}).}

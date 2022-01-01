@@ -235,6 +235,7 @@ ecological investigations and space use algorithms:
   - `buffer_and_crop()` buffers a spatial object (e.g., receiver
     locations) and uses this buffered object to crop another (e.g., the
     local bathymetry);
+  - `get_intersection()` intersects spatial geometries;
   - `xy_from_click()` gets location coordinates from mouse clicks;
   - `crop_from_click()` crops a raster to an area defined by mouse
     clicks;

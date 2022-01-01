@@ -4,7 +4,7 @@
 
 #' @title Back-end implementation of the AC and ACDC algorithms
 #' @description This function is the back-end of the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms.
-#' @param acoustics A dataframe that contains passive acoustic telemetry detection time series for a specific individual (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named `receiver_id' (that must match that inputted to \code{\link[flapper]{acs_setup_centroids}}); a POSIXct vector of time stamps when detections were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'.
+#' @param acoustics A dataframe that contains passive acoustic telemetry detection time series for a specific individual (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named `receiver_id' (that must match that inputted to \code{\link[flapper]{acs_setup_centroids}}); an integer vector of detection indices, named `index'; a POSIXct vector of time stamps when detections were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'.
 #' @param archival For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series for the same individual (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; a POSIXct vector of time stamps when observations were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals.
 #' @param step A number that defines the time step length (s) between consecutive detections. If \code{archival} is supplied, this is the resolution of the archival data (e.g., 120 s).
 #' @param round_ts A logical input that defines whether or not to round the \code{acoustics} and/or \code{archival} time series to the nearest \code{step/60} minutes. This step is necessary to ensure appropriate alignment between the two time series given the assumption of a constant \code{mobility} parameter (see below). For implementations via \code{\link[flapper]{.acs_pl}}, this step is implemented in \code{\link[flapper]{.acs_pl}}.
@@ -293,7 +293,7 @@
       cat_to_cf("... Checking user inputs...")
       # Check acoustics contains required column names and correct variable types
       check_names(input = acoustics,
-                  req = c("timestamp", "timestamp_num", "receiver_id"),
+                  req = c("index", "timestamp", "timestamp_num", "receiver_id"),
                   extract_names = colnames,
                   type = all)
       check_class(input = acoustics$timestamp, to_class = "POSIXct", type = "stop")
@@ -452,7 +452,7 @@
 
     # For each acoustic time step
     # ... (except the last one - because we can't calculate where the individual
-    # ... is next if we're on the last acoustics df
+    # ... is next if we're on the last acoustics df)
     # ... we'll implement the algorithm
     out$time <- rbind(out$time, data.frame(event = "algorithm_initiation", time = Sys.time()))
     cat_to_cf("... Initiating algorithm: moving over acoustic and internal ('archival') time steps...")
@@ -462,9 +462,28 @@
       ######################################
       #### Define the details of the current and next acoustic detection
 
-      #### Print the acoustic time step
+      #### Get the time steps
       # timestep_detection <- 1
       cat_to_cf(paste0("... On acoustic time step ('timestep_detection') ", timestep_detection, "."))
+
+      #### Obtain the details of the previous acoustic detection (if applicable)
+      # This is only applicable if index > 1.
+      # If we are on the first detection time stamp (for a given chunk),
+      # ... then we know that the previous receiver is the same as the current receiver
+      # ... because this is enforced during chunk definition
+      # ... (i.e., the acoustics dataframe has been split to ensure
+      # ... that the previous receiver at which the  individual was detected
+      # ... is ALWAYS the same as the current receiver).
+      # If we are on a later detection time stamp, then we can define the previous receiver
+      # ... from the objects created at the previous time step.
+      index <- acoustics$index[timestep_detection]
+      if(index > 1L) {
+        if(timestep_detection == 1L){
+          receiver_0_id <- acoustics$receiver_id[timestep_detection]
+        } else {
+          receiver_0_id <- receiver_1_id
+        }
+      }
 
       #### Obtain details of current acoustic detection
       # Define the time of the current acoustic detection
@@ -556,13 +575,31 @@
 
         #### At the moment of detection, get the detection centroids
         if(timestep_archival == 1){
-          # Get the detection centroid around the current receiver
-          centroid <- detection_centroids[[receiver_1_id]]
-          # If the individual was next detected at a different receiver, we also need the (expanded) centroid around that receiver
-          if(receiver_1_id != receiver_2_id){
-            centroid_2 <- detection_centroids[[receiver_2_id]]
-            centroid_2 <- rgeos::gBuffer(centroid_2, width = mobility * (lpos - 1))
+
+          ## Previous centroid (perspective Ap)
+          # If the current detection is at a new receiver (compared to the previous time step),
+          # ... get the (expanded) detection centroid from the previous time step
+          centroid_ap <- NULL
+          if(index > 1){
+            if(receiver_0_id != receiver_1_id)
+              centroid_ap <- rgeos::gBuffer(centroid_c, width = mobility, quadsegs = 1000)
           }
+
+          ## Detection centroid (perspective A or An)
+          # Get the detection centroid around the current receiver
+          centroid_an <- detection_centroids[[receiver_1_id]]
+
+          ## Next centroid (perspective B)
+          # If the individual was next detected at a different receiver,
+          # ... we also need the (expanded) centroid around that receiver
+          if(receiver_1_id != receiver_2_id){
+            centroid_b <- detection_centroids[[receiver_2_id]]
+            centroid_b <- rgeos::gBuffer(centroid_b, width = mobility * (lpos - 1), quadsegs = 1000)
+          } else centroid_b <- NULL
+
+          ## Individual's centroid (perspective C)
+          # (i.e., the boundaries of the individuals location, given perspectives A, Ap and B)
+          centroid_c <- get_intersection(list(centroid_an, centroid_ap, centroid_b))
 
           #### For subsequent time steps in-between detections
         } else {
@@ -571,13 +608,16 @@
           # .... we simply expand/contract the centroid around this receiver
           if(receiver_1_id == receiver_2_id){
 
+            ## Define blank centroids
+            centroid_an <- centroid_ap <- centroid_b <- NULL
+
             ## Option 1: as the time step increases until halfway through acoustic detections:
             # ... increase the size of the centroid by the value of mobility (m) at each time step
             # Note the use of ceiling: if lpos is odd, then this takes us to the middle timestep_archival;
             # ... if lpos is even, then there are two middle timestep_archivals, and this takes us to the first one.
             if(timestep_archival <= ceiling(lpos/2)){
               cat_to_cf(paste0("... ... ... Acoustic centroid is expanding..."))
-              centroid <- rgeos::gBuffer(centroid, width = mobility)
+              centroid_c <- rgeos::gBuffer(centroid_c, width = mobility, quadsegs = 1000)
 
               ## Option 2: as the time step increases, from beyond halfway through acoustic detections,
               # ... to time of the next acoustic detection, we decrease the centroid size
@@ -602,7 +642,7 @@
                 cat_to_cf(paste0("... ... ... Acoustic centroid is constant ..."))
               } else {
                 cat_to_cf(paste0("... ... ... Acoustic centroid is shrinking ..."))
-                centroid <- rgeos::gBuffer(centroid, width = -mobility)
+                centroid_c <- rgeos::gBuffer(centroid_c, width = -mobility, quadsegs = 1000)
               }
             }
 
@@ -611,15 +651,16 @@
             # ... and contract the centroid of the other receiver
             # ... note that a high 'quadsegs' here is required to ensure correct calculations.
           } else {
+            # Blank centroid_an
+            centroid_an <- NULL
             # Expand existing centroid
-            centroid <- rgeos::gBuffer(centroid, width = mobility, quadsegs = 1000)
+            centroid_ap <- rgeos::gBuffer(centroid_c, width = mobility, quadsegs = 1000)
             # Contract centroid around receiver_id_2
-            centroid_2 <- rgeos::gBuffer(centroid_2, width = -mobility, quadsegs = 1000)
+            centroid_b <- rgeos::gBuffer(centroid_b, width = -mobility, quadsegs = 1000)
             # Get the intersection between the expanding centroid for receiver_1_id and the contracting centroid for receiver_2_id
-            centroid <- rgeos::gIntersection(centroid, centroid_2)
+            centroid_c <- rgeos::gIntersection(centroid_ap, centroid_b)
           }
         }
-
 
 
         ######################################
@@ -718,7 +759,7 @@
 
         #### AC algorithm implementation only depends on detection probability kernels
         if(is.null(archival)){
-          map_timestep <- raster::mask(kernel, centroid)
+          map_timestep <- raster::mask(kernel, centroid_c)
           if(is.null(detection_kernels)) map_timestep <- raster::mask(map_timestep, bathy)
 
           #### ACDC algorithm implementation also incorporates depth
@@ -726,7 +767,7 @@
 
           # Identify the area of the bathymetry raster which is contained within the
           # ... allowed polygon. This step can be slow.
-          bathy_sbt <- raster::mask(bathy, centroid)
+          bathy_sbt <- raster::mask(bathy, centroid_c)
           if(is.null(detection_kernels)) bathy_sbt <- raster::mask(bathy_sbt, bathy)
 
           # Identify possible position of individual at this time step based on depth ± depth_error m:
@@ -748,11 +789,13 @@
         # ... (e.g. for illustrative plots and/or error checking):
         if(is.null(save_record_spatial) | timestep_cumulative %in% save_record_spatial){
           # Create a list, plot options (po), which contains relevant spatial information:
-          po <- list(centroid = centroid,
-                     map_timestep = map_timestep,
+          po <- list(centroid_ap    = centroid_ap,
+                     centroid_an     = centroid_an,
+                     centroid_b     = centroid_b,
+                     centroid_c     = centroid_c,
+                     kernel         = kernel,
+                     map_timestep   = map_timestep,
                      map_cumulative = map_cumulative)
-          # Add other spatial information that may have been created along the way:
-          if(receiver_1_id != receiver_2_id) po <- append(po, list(centroid_2 = centroid_2))
 
           # If the user hasn't selected to save the spatial record, simply define po = NULL,
           # ... so we can proceed to add plot options to the list() below without errors:

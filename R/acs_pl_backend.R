@@ -5,7 +5,7 @@
 #' @title Intermediate wrapper for \code{\link[flapper]{.acs}} that supports parallelisation
 #' @description This function implements the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms. This is called via a front-end function (i.e. \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}). It checks and processes inputs and implements the selected algorithm via calls to \code{\link[flapper]{.acs}}. Outputs are returned in a named list.
 #'
-#' @param acoustics A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. Each dataframe should contain the following columns: an integer vector of receiver IDs, named `receiver_id'; and a POSIXct vector of time stamps when detections were made, named `timestamp'. If a list of dataframes is supplied, dataframes must be refer to the detections of a single individual and be ordered by time (e.g., in hourly chunks). The algorithm will be implemented on each dataframe, termed `chunk', either in sequence or parallel. Any empty or \code{NULL} elements will be removed automatically.
+#' @param acoustics A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. Each dataframe should contain the following columns: an integer vector of receiver IDs, named `receiver_id'; an integer vector of detection indices, named `index'; and a POSIXct vector of time stamps when detections were made, named `timestamp'. If a list of dataframes is supplied, dataframes must be refer to the detections of a single individual and be ordered by time (e.g., in hourly chunks). In addition, sequential list elements must be linked by identical receiver pairs (i.e., the final receiver at which the individual was detected for any given chunk must be the same as the receiver at which the individual was next detected at the start of the next chunk) because it is only in this specific scenario that information does not need to be shared across time steps (see \code{split}). The algorithm will be implemented on each dataframe, termed `chunk', either in sequence or parallel. Any empty or \code{NULL} elements will be removed automatically.
 #' @param archival For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series (see \code{\link[flapper]{.acs}}).
 #' @param step A number that defines the time step length (s) between consecutive detections (see \code{\link[flapper]{.acs}}).
 #' @param plot_ts A logical input that defines whether or not to plot movement time series (see \code{\link[flapper]{.acs}}).
@@ -22,7 +22,7 @@
 #' @param verbose A logical variable that defines whether or not to print messages to the console or to file to relay function progress. If \code{con = ""}, messages are printed to the console (which is only supported if the algorithm is not implemented in parallel: see below); otherwise, they are written to file (see below).
 #' @param con If \code{verbose = TRUE}, \code{con} is character string defines how messages relaying function progress are returned. If \code{con = ""}, messages are printed to the console (unless redirected by \code{\link[base]{sink}}), an approach that is only implemented if the function is not implemented in parallel. Otherwise, \code{con} defines the directory into which to write .txt files, into which messages are written to relay function progress. This approach, rather than printing to the console, is recommended for clarity, speed and debugging. If the algorithm is implemented step-wise, then a single file is written to the specified directory named acdc_log.txt. If the algorithm is implemented chunk-wise, then an additional file is written for each chunk (named dot_acdc_log_1.txt, dot_acdc_log_2.txt and so on), with the details for each chunk.
 #' @param progress (optional) If the algorithm is implemented step-wise, \code{progress} is an integer (\code{1}, \code{2} or \code{3}) that defines whether or not to display a progress bar in the console as the algorithm moves over acoustic time steps (\code{1}), the `archival' time steps between each pair of acoustic detections (\code{2}) or both acoustic and archival time steps (\code{3}), in which case the overall acoustic progress bar is punctuated by an archival progress bar for each pair of acoustic detections. This option is useful if there is a large number of archival observations between acoustic detections. Any other input will suppress the progress bar. If the algorithm is implemented for chunks, inputs to \code{progress} are ignored and a single progress bar is shown of the progress across acoustic chunks.
-#' @param split A character string that defines the time unit used to split acoustic time series into chunks (e.g., \code{"12 hours"}). If provided, this must be supported by \code{\link[lubridate]{floor_date}} (otherwise, a pre-defined list of acoustic time series can be passed to \code{acoustics}, e.g., specifying seasonal chunks). If \code{split = NULL} and a cluster has been specified (see \code{cl}) (and \code{acoustics} is a dataframe), then the acoustic time series is automatically split into chunks and the algorithm implemented for each chunk in parallel.
+#' @param split A character string that defines the (approximate) time unit used to split acoustic time series into chunks (e.g., \code{"12 hours"}). If provided, this must be supported by \code{\link[base]{cut.POSIXt}} (otherwise, a pre-defined list of acoustic time series can be passed to \code{acoustics}, e.g., specifying seasonal chunks). If \code{split = NULL} and a cluster has been specified (see \code{cl}) (and \code{acoustics} is a dataframe), then the acoustic time series is automatically split into chunks and the algorithm implemented for each chunk in parallel. In all cases, splitting is subject to the constraint that  chunks must join at identical receiver pairs (i.e., the last receiver at which the individual was detected on one chunk must match the first receiver at which the individual was next detected at the start of the next chunk): in these specific scenarios, information does not need to transfer from one time step to the next.
 #' @param cl,varlist (optional) Parallelisation options. \code{cl} is (a) a cluster object from \code{\link[parallel]{makeCluster}} or (b) an integer that defines the number of child processes to implement the algorithm in parallel. If supplied, the algorithm is implemented for each chunk in a list of acoustic time series, either (a) as supplied by the user (if \code{acoustics} is a list), (b) as defined by the input to \code{split}, or (c) as defined automatically from the number of nodes in the cluster if \code{split = NULL}. If \code{cl} is supplied, \code{varlist} may also be required. This is a character vector of objects to export (see \code{\link[flapper]{cl_export}}). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see \code{\link[flapper]{cl_stop}}). For further information, see \code{\link[flapper]{cl_lapply}} and \code{\link[flapper]{flapper-tips-parallel}}.
 #'
 #' @return The function returns an \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
@@ -66,8 +66,9 @@
   out <- list(archive = NULL, ts_by_chunk = NULL, time = NULL, args = NULL)
 
   #### Check parallelisation options
-  if(is.null(cl)) n_cores <- 1 else n_cores <- length(cl)
-  if(inherits(acoustics, "list") & !is.null(split)) message("Input to 'split' ignored since inherits(acoustics, 'list') == TRUE.")
+  n_cores <- cl_cores(cl)
+  if(inherits(acoustics, "list") & !is.null(split))
+    message("Input to 'split' ignored since inherits(acoustics, 'list') == TRUE.")
 
   #### Define function for printing messages to file or console
   ## Check the connection for writing files, if applicable
@@ -103,15 +104,33 @@
   # Check acoustics contains required column names and correct variable types
   if(!inherits(acoustics, "list")) acoustics_tmp <- list(acoustics) else acoustics_tmp <- acoustics
   length_acoustics_tmp <- length(acoustics_tmp)
-  lapply(acoustics_tmp, function(acc) {
-    check_names(arg = "acoustics",
-                input = acc,
-                req = c("timestamp", "receiver_id"),
-                extract_names = colnames,
-                type = all)
-    check_class(input = acc$timestamp, to_class = "POSIXct", type = "stop")
-    check_class(input = acc$receiver_id, to_class = "integer", type = "stop")
-  })
+  n_obs_by_chunk <-
+    lapply(acoustics_tmp, function(acc) {
+      check_names(arg = "acoustics",
+                  input = acc,
+                  req = c("timestamp", "receiver_id", "index"),
+                  extract_names = colnames,
+                  type = all)
+      check_class(input = acc$timestamp, to_class = "POSIXct", type = "stop")
+      check_class(input = acc$receiver_id, to_class = "integer", type = "stop")
+      return(nrow(acc))
+    })
+  if(min(acoustics_tmp[[1]]$index) != 1L)
+    stop("The first 'index' value in 'acoustics' should be 1L.", call. = FALSE)
+  # Check the number of observations
+  n_obs <- sum(unlist(n_obs_by_chunk))
+  if(n_obs <= 1L) stop("At least two observations are required to implement an AC* algorithm.", call. = FALSE)
+  # Check the ratio of the number of observations to the number of cores
+  # ... The number of cores should not exceed the maximum number of chunks.
+  # ... Since a minimum of two observations per chunk is required,
+  # ... the number of cores should be less than half of the number of observations.
+  # ... If not, we will reset n_cores to a more appropriate value.
+  # ... This helps to guide splitting (if necessary), but ultimately the function is still implemented
+  # ... using the user-defined cluster or number of child processes.
+  if(n_obs/n_cores < 2L) {
+    warning("The number of specified cores exceeds the maximum number of chunks.", immediate. = TRUE, call. = FALSE)
+    n_cores <- floor(n_obs/n_cores)
+  }
   # Check archival contains required column names and correct variable types
   if(!is.null(archival)){
     check_names(input = archival,
@@ -216,25 +235,72 @@
 
     #### Implement splitting
     if(length_acoustics_tmp == 1){
+      cat_to_cf("... Splitting 'acoustics' into chunks...")
 
-      ## Define split if not provided
-      # If the split hasn't been specified, then the user doesn't care
+      ## Define 'permitted' splitting positions
+      # ... Splitting is only permitted at positions
+      # ... when the 'previous' receiver == the 'current' receiver
+      # ... because at these time steps information does not need
+      # ... to pass from the previous chunk to the next chunk).
+      # ... Splitting is also subject to the constraint that each chunk should comprise
+      # ... at least three observations. Currently, this constraint is not enforced here,
+      # ... but issues are captured below.
+      acoustics$split_permit <- dplyr::lag(acoustics$receiver_id) == acoustics$receiver_id
+      acoustics$split_permit[1] <- FALSE
+      if(!any(acoustics$split_permit))
+        stop("The algorithm cannot be implemented chunkwise for this dataset.", call. = FALSE)
+
+      ## Define (approximate) splitting time interval ('split') if unspecified
+      # If 'split' hasn't been specified, then the user doesn't care
       # ... about splitting the outputs into biologically interpretable time intervals
-      # ... However, we"ll still define a split factor, to be based on computational perspectives
-      if(is.null(split)) {
-        cat_to_cf("... Splitting 'acoustics' into chunks...")
-        chunks <- seq(min(acoustics$timestamp), max(acoustics$timestamp), length.out = n_cores+1)
-        dft <- difftime(chunks[2], chunks[1])
-        dft_num <- as.numeric(dft)
-        dft_num <- floor(dft_num)
+      # ... so we will simply select an interval based on the desired number of chunks
+      if(is.null(split)){
+        dft       <- ceiling((max(acoustics$timestamp) - min(acoustics$timestamp))/n_cores)
+        dft_num   <- as.numeric(dft)
         dft_units <- attr(dft, "units")
-        message(paste("'acoustics' dataframe split into chunks of ~", dft_num, dft_units, "across", n_cores, "core(s)."))
-        split <- paste(dft_num, dft_units)
+        split     <- paste(dft_num, dft_units)
       }
 
       ## Split dataframe
-      acoustics$split <- lubridate::floor_date(acoustics$timestamp, unit = split)
-      acoustics_ls <- split(acoustics, f = acoustics$split)
+      # Define suitable splitting positions
+      acoustics$bin <- cut(acoustics$timestamp, split)
+      acc_by_bin    <- split(acoustics, acoustics$bin)
+      split_ind <- lapply(2:length(acc_by_bin), function(i){
+        acc_for_bin <- acc_by_bin[[i]]
+        pos <- which(acc_for_bin$split_permit)
+        if(length(pos) >= 1L){
+          return(acc_for_bin$index[min(pos)])
+        } else {
+          return(NULL)
+        }
+      })
+      split_ind <- unlist(compact(split_ind))
+      # Split acoustics at specified positions
+      acoustics_ls <- split(acoustics, findInterval(seq_len(nrow(acoustics)), split_ind))
+      if(nrow(acoustics_ls[[length(acoustics_ls)]]) < 2L){
+        ind <- length(acoustics_ls)
+        acoustics_ls[[ind-1]] <- rbind(acoustics_ls[[ind-1]], acoustics_ls[[ind]])
+        acoustics_ls[[ind]]   <- NULL
+      }
+
+      ## Report the number and duration of chunks
+      if(length(acoustics_ls) > 1L){
+        dft <- difftime(max(acoustics_ls[[1]]$timestamp), min(acoustics_ls[[1]]$timestamp))
+        dft_units <- attr(dft, "units")
+        dft_by_chunk <-
+          sapply(acoustics_ls,
+                 function(elm)
+                   as.numeric(difftime(max(elm$timestamp),
+                                       min(elm$timestamp),
+                                       units = dft_units)))
+        dft_med <- round(stats::median(dft_by_chunk))
+        dft_min <- round(min(dft_by_chunk))
+        dft_max <- round(max(dft_by_chunk))
+        message(paste0("'acoustics' dataframe split into ", length(acoustics_ls), " chunks of ~",
+                       dft_med, " (", dft_min, "--", dft_max, ") ", dft_units,
+                       " across ", n_cores, " core(s)."))
+      }
+
     } else{
       acoustics_ls <- acoustics
     }
@@ -250,6 +316,19 @@
       message(msg)
       cat_to_cf(paste("... ... ...", msg))
       acoustics_ls <- acoustics_ls[which(!empty_elms)]
+    }
+
+    ## Check splitting with respect to receiver IDs
+    # Splitting is only supported between identical receiver pairs
+    # ... because it is only for these pairs at which information from the previous time step
+    # ... is not required for the next time step (and information can't be shared across chunks).
+    for(i in 2:length(acoustics_ls)){
+      acc_1 <- acoustics_ls[[i - 1]]
+      acc_2 <- acoustics_ls[[i]]
+      acc_1_r <- acc_1[nrow(acc_1), "receiver_id"]
+      acc_2_r <- acc_2[1, "receiver_id"]
+      if(acc_1_r != acc_2_r)
+        stop("'acoustics' must be split at identical receiver pairs.", call. = FALSE)
     }
 
     ## Force overlapping time series

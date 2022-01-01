@@ -15,7 +15,8 @@
 #'
 #' \itemize{
 #'   \item \code{\link[flapper]{cl_check}} checks \code{cl} and \code{varlist} arguments, as inputted to a parent function. For example, if \code{cl = NULL}, \code{varlist} should also be \code{NULL}.
-#'   \item  \code{\link[flapper]{cl_chunks}} defines a list, with one element for core specified, that contains an integer vector of the positions of an object over which to iterate serially in each chunk.
+#'   \item \code{\link[flapper]{cl_cores}} identifies the number of cores specified.
+#'   \item \code{\link[flapper]{cl_chunks}} defines a list, with one element for core specified, that contains an integer vector of the positions of an object over which to iterate serially in each chunk.
 #'   \item \code{\link[flapper]{cl_export}} implements \code{\link[parallel]{clusterExport}} if both \code{cl} and \code{varlist} are specified.
 #'   \item \code{\link[flapper]{cl_stop}} implements \code{\link[parallel]{stopCluster}} if \code{cl} is a cluster object from \code{\link[parallel]{makeCluster}}.
 #' }
@@ -86,6 +87,7 @@
 #' @return
 #' \itemize{
 #'   \item \code{\link[flapper]{cl_lapply}} returns a list.
+#'   \item \code{\link[flapper]{cl_cores}} returns an integer.
 #'   \item \code{\link[flapper]{cl_chunks}} returns a list of integers.
 #'   \item \code{\link[flapper]{cl_check}}, \code{\link[flapper]{cl_export}} and \code{\link[flapper]{cl_stop}} return \code{invisible()}.
 #' }
@@ -153,16 +155,26 @@ cl_check <- function(cl = NULL, varlist = NULL){
 }
 
 
+#### cl_cores()
+#' @rdname cl
+#' @export
+
+cl_cores <- function(cl = NULL){
+  if(is.null(cl)){
+    n <- 1L
+  } else {
+    if(inherits(cl, "cluster")) n <- length(cl) else n <- cl
+  }
+  return(n)
+}
+
+
 #### cl_chunks()
 #' @rdname cl
 #' @export
 
 cl_chunks <- function(cl = NULL, length){
-  if(is.null(cl)){
-    chunks <- 1L
-  } else {
-    if(inherits(cl, "cluster")) chunks <- length(cl) else chunks <- cl
-  }
+  chunks <- cl_cores(cl)
   index <- parallel::splitIndices(length, chunks)
   return(invisible(index))
 }

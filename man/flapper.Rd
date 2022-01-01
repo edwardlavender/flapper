@@ -38,6 +38,7 @@ Some functions facilitate the acquisition, assembly, processing and checking of 
 Some functions facilitate spatial operations that support ecological investigations and space use algorithms:
 \itemize{
   \item \link{buffer_and_crop} buffers a spatial object (e.g., receiver locations) and uses this buffered object to crop another (e.g., the local bathymetry);
+  \item \link{get_intersection} intersects spatial geometries;
   \item \link{xy_from_click} gets location coordinates from mouse clicks;
   \item \link{crop_from_click} crops a \code{\link[raster]{raster}} to an area defined by mouse clicks;
   \item \link{cells_from_val} returns the cells (or a \code{\link[raster]{raster}} of the cells) of a \code{\link[raster]{raster}} that are equal to a specified value or lie within a specified range of values;

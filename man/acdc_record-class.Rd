@@ -41,13 +41,13 @@ For the DC algorithm, \code{record$dat} contains the \code{archival} data for th
   \item `map_timestep' is a RasterLayer of all the positions that the individual could have occupied at that time step, given the algorithm;
   \item `map_cumulative' is a RasterLayer of the cumulative of the number of times when the movement data were compatible with the individual being in that cell, under the specified algorithm, from all previous time steps up to the current time step (i.e., the sum of `map_timestep' across all time steps from the first time step to the current time step) (unless \code{normalise = TRUE} in which case the interpretation differs);
 }
-For the AC* algorithms, this list also includes information on the acoustic centroids:
+For the AC* algorithms, this list also includes information on the acoustic centroids and location probability:
 \itemize{
-  \item `centroid' is a \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the acoustic centroid at that time step, which depends on the time since the previous detection, the time until the next detection, the spatial arrangement of receivers, the mobility parameter and any spatial masks (i.e., the coastline and specified boundaries);
-}
-If the receiver at which the individual was detected at the current and next time step differs, the `spatial' list also contains the following elements:
-\itemize{
-  \item `centroid_2' is a \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location from the perspective of the receiver at which the individual was next detected;
+  \item `centroid_ap` is \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location from the perspective of its previous location;
+  \item `centroid_an' is a \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location from the perspective of the receiver that records a detection at the moment of detection (i.e., the detection centroid);
+  \item `centroid_b` is \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location from (A) the perspective of
+  \item `centroid_c` is a \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location at a given time step, accounting for the information provided by previous, current and future locations;
+  \item `kernel` is a \code{\link[raster]{raster}} that defines location probability across the grid, accounting for the receiver(s) at which an individual was detected and the receiver(s) at which an individual was not detected and receiver arrangement;
 }
 
 For \code{save_record_spatial = 0L} or elements outside of the specified input to \code{save_record_spatial}, `spatial' is simply an empty list.

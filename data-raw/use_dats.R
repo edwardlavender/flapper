@@ -6,6 +6,8 @@
 # 1) Adds example datasets (dats) to flapper R package.
 # setwd(paste0(getwd(), "/data-raw/"))
 
+#### Essential packages
+library(dplyr)
 
 #####################################
 #####################################
@@ -19,6 +21,21 @@ dat_sentinel  <- readRDS("dat_sentinel.rds")
 dat_archival  <- readRDS("dat_archival.rds")
 
 #### Processing
+## dat_acoustics
+# Add individual-specific detection index to dat_acoustics
+dat_acoustics <-
+  dat_acoustics %>%
+  dplyr::group_by(.data$individual_id) %>%
+  dplyr::mutate(index = dplyr::row_number()) %>%
+  dplyr::select(individual_id, transmitter_id,
+                index, timestamp,
+                receiver_id, receiver,
+                receiver_long, receiver_lat, receiver_depth) %>%
+  data.frame()
+# Visualise detection indices
+lapply(split(dat_acoustics, dat_acoustics$individual_id),
+       function(d) plot(d$index, type = "l"))
+## moorings
 rownames(dat_moorings) <- dat_moorings$receiver_id
 
 
@@ -185,7 +202,7 @@ dat_centroids <- acs_setup_centroids(xy = xy_utm,
                                      coastline = dat_coast,
                                      boundaries = raster::extent(dat_gebco),
                                      plot = TRUE,
-                                     quadsegs = 5,
+                                     resolution = 5,
                                      verbose = TRUE)
 # Check size (Mb) of file prior to inclusion in package
 saveRDS(dat_centroids, paste0(tempdir(), "/dat_centroids.rds"))

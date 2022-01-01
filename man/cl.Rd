@@ -4,6 +4,7 @@
 \alias{cl}
 \alias{cl_lapply}
 \alias{cl_check}
+\alias{cl_cores}
 \alias{cl_chunks}
 \alias{cl_export}
 \alias{cl_stop}
@@ -12,6 +13,8 @@
 cl_lapply(x, fun, ..., cl = NULL, varlist = NULL, use_chunks = FALSE)
 
 cl_check(cl = NULL, varlist = NULL)
+
+cl_cores(cl = NULL)
 
 cl_chunks(cl = NULL, length)
 
@@ -35,6 +38,7 @@ cl_stop(cl = NULL)
 \value{
 \itemize{
   \item \code{\link[flapper]{cl_lapply}} returns a list.
+  \item \code{\link[flapper]{cl_cores}} returns an integer.
   \item \code{\link[flapper]{cl_chunks}} returns a list of integers.
   \item \code{\link[flapper]{cl_check}}, \code{\link[flapper]{cl_export}} and \code{\link[flapper]{cl_stop}} return \code{invisible()}.
 }
@@ -47,7 +51,8 @@ A set of wrappers for \code{\link[parallel]{parallel}} functions that facilitate
 
 \itemize{
   \item \code{\link[flapper]{cl_check}} checks \code{cl} and \code{varlist} arguments, as inputted to a parent function. For example, if \code{cl = NULL}, \code{varlist} should also be \code{NULL}.
-  \item  \code{\link[flapper]{cl_chunks}} defines a list, with one element for core specified, that contains an integer vector of the positions of an object over which to iterate serially in each chunk.
+  \item \code{\link[flapper]{cl_cores}} identifies the number of cores specified.
+  \item \code{\link[flapper]{cl_chunks}} defines a list, with one element for core specified, that contains an integer vector of the positions of an object over which to iterate serially in each chunk.
   \item \code{\link[flapper]{cl_export}} implements \code{\link[parallel]{clusterExport}} if both \code{cl} and \code{varlist} are specified.
   \item \code{\link[flapper]{cl_stop}} implements \code{\link[parallel]{stopCluster}} if \code{cl} is a cluster object from \code{\link[parallel]{makeCluster}}.
 }
