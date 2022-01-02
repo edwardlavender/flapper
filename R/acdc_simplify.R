@@ -11,7 +11,7 @@
 #' @param keep_chunks A logical variable that defines whether or not to retain all chunk-specific information.
 #' @return The function returns an object of class \code{\link[flapper]{acdc_record-class}}.
 #' @details If the \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an \code{\link[flapper]{acdc_record-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps) and (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series (for AC* algorithm(s)) to return an \code{\link[flapper]{acdc_record-class}} object.
-#' @seealso The AC, DC and ACDC algorithms are implemented by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}. After simplification, \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} can be implemented to visualise time-specific results.
+#' @seealso The AC, DC and ACDC algorithms are implemented by \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}. After simplification, \code{\link[flapper]{acdc_plot_trace}}, \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} can be implemented to visualise time-specific results.
 #' @author Edward Lavender
 #' @export
 #'

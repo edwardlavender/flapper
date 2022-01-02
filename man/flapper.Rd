@@ -150,6 +150,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
         \item \link{acdc_access_dat} accesses stored dataframes in an \link{acdc_record-class} object object;
         \item \link{acdc_access_timesteps} accesses the total number of time steps in an \link{acdc_record-class} object;
         \item \link{acdc_access_maps} accesses stored maps in an \link{acdc_record-class} object;
+        \item \link{acdc_plot_trace} plots acoustic centroid dynamics;
         \item \link{acdc_plot_record} plots the results of the algorithm(s);
         \item \link{acdc_animate_record} creates html animations of the algorithm(s);
         }

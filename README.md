@@ -434,6 +434,7 @@ using several key functions:
       - `acdc_access_timesteps()` accesses the total number of time
         steps;
       - `acdc_access_maps()` accesses stored maps;
+  - `acdc_plot_trace()` plots acoustic centroid dynamics;
   - `acdc_plot_record()` plots the results of the algorithm(s);
   - `acdc_animate_record()` creates html animations of algorithm(s);
 
