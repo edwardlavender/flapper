@@ -5,7 +5,7 @@
 \alias{dat_acoustics}
 \title{Example passive acoustic telemetry detections dataset}
 \format{
-A dataframe with 59,420 observations and 8 variables:
+A dataframe with 39,242 observations and 9 variables:
 \describe{
   \item{individual_id}{A unique identifier of the individual that was detected (see \code{\link{dat_ids}}).}
   \item{transmitter_id}{The acoustic transmitter that was detected (see \code{\link{dat_ids}}).}
@@ -26,6 +26,9 @@ dat_acoustics
 }
 \description{
 A dataset containing a sample of processed flapper skate (\emph{Dipturus intermedius}) detection time series. Data are arranged by \code{individual_id}, \code{timestamp} and then \code{receiver_id} (see below).
+}
+\details{
+Time stamps are expressed to the nearest two minutes. `Duplicate' detections (of the same individual at the same receiver in the same time step) are excluded. This supports the implementation of the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms (see \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}).
 }
 \references{
 Data collection and processing is described in Lavender (in prep). Fine-scale habitat use of the Critically Endangered flapper skate (\emph{Dipturus intermedius}). [Doctoral dissertation, University of St Andrews].

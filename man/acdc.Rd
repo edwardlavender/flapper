@@ -30,7 +30,7 @@ acdc(
 \arguments{
 \item{acoustics}{A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{ac}}).}
 
-\item{archival}{A dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; and a POSIXct vector of time stamps when observations were made, named `timestamp'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Both acoustic and archival time series are rounded to the resolution of \code{archival} observations to ensure alignment (see Details).}
+\item{archival}{A dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; and a POSIXct vector of time stamps when observations were made, named `timestamp'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Both acoustic and archival time series are rounded to the resolution of \code{archival} observations to ensure alignment (see Details). `Duplicate' observations (of the same individual at the same receiver, if applicable, in the same time step) are dropped.}
 
 \item{plot_ts}{A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.}
 
@@ -97,6 +97,9 @@ acc <- acc[acc$timestamp <= end, ]
 arc <- arc[arc$timestamp <= end, ]
 arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
              arc$timestamp <= max(acc$timestamp) + 2*60, ]
+# Process time series (if necessary)
+# ... Observations should be processed to the nearest time step
+# ... Duplicate detections should be dropped
 
 #### Example (1) Implement ACDC algorithm with default arguments
 # This implements the algorithm on a single core, printing messages

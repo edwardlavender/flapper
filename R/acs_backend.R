@@ -61,6 +61,12 @@
 #' arc <- arc[arc$timestamp <= end, ]
 #' arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
 #'              arc$timestamp <= max(acc$timestamp) + 2*60, ]
+#' # Process time series
+#' # ... Detections should be rounded to the nearest step
+#' # ... Duplicate detections
+#' # ... ... (of the same individual at the same receiver in the same step)
+#' # ... ... should be dropped
+#' # ... This step has already been implemented for dat_acoustics.
 #'
 #' #### Example (1) Implement AC algorithm with default arguments
 #' out_acdc_1 <- flapper:::.acs(acoustics = acc,

@@ -35,6 +35,15 @@ dat_acoustics <-
 # Visualise detection indices
 lapply(split(dat_acoustics, dat_acoustics$individual_id),
        function(d) plot(d$index, type = "l"))
+# Round detection time series to the nearest two minutes and drop duplicate observations
+# ... This is beneficial in the AC* algorithms.
+dat_acoustics <-
+  dat_acoustics %>%
+  dplyr::group_by(.data$individual_id, .data$receiver_id) %>%
+  dplyr::mutate(timestamp = lubridate::round_date(.data$timestamp, unit = "2 mins")) %>%
+  dplyr::filter(!duplicated(.data$timestamp)) %>%
+  data.frame()
+nrow(dat_acoustics)
 ## moorings
 rownames(dat_moorings) <- dat_moorings$receiver_id
 

@@ -29,7 +29,7 @@ ac(
 \arguments{
 \item{acoustics}{A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. Each dataframe should contain the following columns: an integer vector of receiver IDs, named `receiver_id'; an integer vector of detection indices, named `index'; and a POSIXct vector of time stamps when detections were made, named `timestamp'. If a list of dataframes is supplied, dataframes must be refer to the detections of a single individual and be ordered by time (e.g., in hourly chunks). In addition, sequential list elements must be linked by identical receiver pairs (i.e., the final receiver at which the individual was detected for any given chunk must be the same as the receiver at which the individual was next detected at the start of the next chunk) because it is only in this specific scenario that information does not need to be shared across time steps (see \code{split}). The algorithm will be implemented on each dataframe, termed `chunk', either in sequence or parallel. Any empty or \code{NULL} elements will be removed automatically.}
 
-\item{step}{A number that defines the time step length (s) between consecutive detections. The series are rounded to the nearest \code{step} to ensure alignment (see Details).}
+\item{step}{A number that defines the time step length (s) between consecutive detections. The series are rounded to the nearest \code{step} to ensure alignment (see Details). `Duplicate' detections (of the same individual at the same receiver in the same step) are dropped.}
 
 \item{bathy}{A \code{\link[raster]{raster}} that defines a grid across the area within which the individual could have moved. The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acs_setup_centroids}}).}
 
@@ -90,6 +90,9 @@ The end result is a map that shows where the individual could have spent more or
 # Focus on an example individual for speed
 id <- 25
 acc <- dat_acoustics[dat_acoustics$individual_id == id, ][1:25, ]
+# Process time series (if necessary)
+# ... Observations should be processed to the nearest time step
+# ... Duplicate detections should be dropped
 
 #### Example (1) Implement AC algorithm with default arguments
 # This implements the algorithm on a single core, printing messages

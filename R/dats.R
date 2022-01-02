@@ -54,7 +54,7 @@
 #' @title Example passive acoustic telemetry detections dataset
 #' @description A dataset containing a sample of processed flapper skate (\emph{Dipturus intermedius}) detection time series. Data are arranged by \code{individual_id}, \code{timestamp} and then \code{receiver_id} (see below).
 #'
-#' @format A dataframe with 59,420 observations and 8 variables:
+#' @format A dataframe with 39,242 observations and 9 variables:
 #' \describe{
 #'   \item{individual_id}{A unique identifier of the individual that was detected (see \code{\link{dat_ids}}).}
 #'   \item{transmitter_id}{The acoustic transmitter that was detected (see \code{\link{dat_ids}}).}
@@ -66,6 +66,8 @@
 #'   \item{receiver_lat}{The latitude of the receiver at which the individual was detected (see \code{\link{dat_moorings}}).}
 #'   \item{receiver_depth}{The depth of the receiver at which the individual was detected (see \code{\link{dat_moorings}}).}
 #' }
+#'
+#' @details Time stamps are expressed to the nearest two minutes. `Duplicate' detections (of the same individual at the same receiver in the same time step) are excluded. This supports the implementation of the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms (see \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}).
 #'
 #' @source Data were collected by, and belong to, Marine Scotland Science and NatureScot. Data were processed by Edward Lavender. If you wish to use these data, please contact Marine Scotland Science and NatureScot for further information.
 #'

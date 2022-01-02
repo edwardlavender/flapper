@@ -208,6 +208,12 @@
         message(paste0("acoustics[[", i, "]]$timestamp rounded to the nearest ", step, " second(s)."))
         acc$timestamp <- lubridate::round_date(acc$timestamp, round_to)
       }
+      acc$dup       <- duplicated(paste0(acc$receiver_id, "-", acc$timestamp))
+      if(any(acc$dup)) {
+        cat_to_cf(paste0("... ... Duplicate observations in acoustics[[", i, "]] identified and dropped."))
+        message(paste0("Duplicate observations in acoustics[[", i, "]] identified and dropped."))
+        acc <- acc[!acc$dup, ]
+      }
       return(acc)
     })
   } else {
@@ -217,6 +223,12 @@
       message(paste("acoustics$timestamp rounded to the nearest", step, "second(s)."))
       acoustics$timestamp <- lubridate::round_date(acoustics$timestamp, round_to)
     }
+    acoustics$dup <- duplicated(paste0(acoustics$receiver_id, "-", acoustics$timestamp))
+    if(any(acoustics$dup)) {
+      cat_to_cf("... ... Duplicate observations in 'acoustics' identified and dropped.")
+      message("Duplicate observations in 'acoustics' identified and dropped.")
+      acoustics <- acoustics[!acoustics$dup, ]
+    }
   }
   if(!is.null(archival)) {
     arc_timestamp_round <- lubridate::round_date(archival$timestamp, round_to)
@@ -224,6 +236,12 @@
       cat_to_cf(paste("... ... archival$timestamp rounded to the nearest", step, "second(s)."))
       message(paste("archival$timestamp rounded to the nearest", step, "second(s)."))
       archival$timestamp <- lubridate::round_date(archival$timestamp, round_to)
+    }
+    archival$dup <- duplicated(archival$timestamp)
+    if(any(archival$dup)) {
+      cat_to_cf("... ... Duplicate observations in 'archival' identified and dropped.")
+      message(paste0("Duplicate observations in 'archival' identified and dropped."))
+      archival <- archival[!archival$dup, ]
     }
   }
   # Re-define acoustics_tmp
