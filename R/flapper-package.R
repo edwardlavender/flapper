@@ -179,6 +179,19 @@
 #'   \item \link{eval_by_kud} compares patterns of space use inferred from simulated and estimated movement paths using kernel utilisation distributions;
 #' }
 #'
+#' @section Parallelisation:
+#' Parallelisation is facilitated by the \code{cl_*()} function family:
+#' \itemize{
+#'   \item \link{cl_lapply} is a wrapper for \code{\link[pbapply]{pblapply}} that handles cluster checking set up and closure (see \link{flapper-tips-parallel}) using the following functions:
+#'   \itemize{
+#'     \item \link{cl_check} checks a cluster;
+#'     \item \link{cl_cores} identifies the number of cores;
+#'     \item \link{cl_chunks} defines chunks for parallelisation;
+#'     \item \link{cl_export} exports objects required by a cluster;
+#'     \item \link{cl_stop} closes a cluster;
+#'   }
+#' }
+#'
 #' @seealso https://github.com/edwardlavender/flapper
 #'
 #' @docType package

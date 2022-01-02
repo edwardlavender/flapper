@@ -500,6 +500,20 @@ detections models, `eval_by_kud()` compares patterns of space use
 inferred from simulated and estimated movement paths using kernel
 utilisation distributions.
 
+## Parallelisation routines
+
+Parallelisation in
+[`flapper`](https://edwardlavender.github.io/flapper/) is facilitated by
+the `cl_*()` function family:
+
+  - `cl_lapply()` is a wrapper for `pbapply::pblapply()` that handles
+    cluster checking set up and closure, using the following functions:
+      - `cl_check()` checks a cluster;
+      - `cl_cores()` identifies the number of cores;
+      - `cl_chunks()` defines chunks for parallelisation;
+      - `cl_export()` exports objects required by a cluster;
+      - `cl_stop()` closes a cluster;
+
 ## Associated packages
 
   - **[prettyGraphics](https://github.com/edwardlavender/prettyGraphics)**
