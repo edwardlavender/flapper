@@ -17,7 +17,7 @@
 #' @param detection_centroids A list of detection centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.
 #' @param mobility A number that defines the distance (m) that an individual could move in the time steps between acoustic detections (see also \code{\link[flapper]{acs_setup_centroids}}).
 #' @param calc_depth_error In the ACDC algorithm, \code{calc_depth_error} is function that returns the depth errors around a vector of depths. The function should accept vector of depths (from \code{archival$depth}) and return a matrix, with one row for each (lower and upper) error and one one column for each depth (if the error varies with depth). For each depth, the two numbers are added to the observed depth to define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been shallower that observed) and the second positive (i.e., the individual could have been deeper than observed). The appropriate form for \code{calc_depth_error} depends on the species (pelagic versus demersal/benthic species), the measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations). For example, for a pelagic species, the constant function \code{calc_depth_error = function(...) matrix(c(-2.5, Inf)} implies that the individual could have occupied bathymetric cells that are deeper than the observed depth + (-2.5) m and shallower than Inf m (i.e. the individual could have been in any location in which the depth was deeper than the shallow depth limit for the individual). In contrast, for a benthic species, the constant function \code{calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m.
-#' @param normalise A logical variable that defines whether or not to normalise the map of possible locations at each time step. In both cases, at each time step the possible locations of the individual are scaled so that the most probable locations have a score of 1 and other scores vary between 0--1. If \code{normalise = FALSE}, these scores are simply summed at each time step, in which case scores on the final map can be interpreted as the number of time steps when the individual could have been in any given location. In contrast, if \code{normalise = TRUE}, at each time step scores are normalised so that they sum to one; the consequence is that time steps with detections, when uncertainty in the individual's location concentrates in the detection centroid around a receiver, are weighted more strongly than time steps between detections, when the uncertainty in the individual's location is spread across a larger area. The final surface can be normalised within \code{\link[flapper]{acdc_simplify}}, with in each cell (0--1) providing a measure of the relative potential use of each location.
+#' @param normalise A logical variable that defines whether or not to normalise the map of possible locations at each time step so that they sum to one.
 #' @param chunk An integer that defines the chunk ID (from \code{\link[flapper]{.acs_pl}}).
 #' @param save_record_spatial An integer vector that defines the time steps for which to save a record of the spatial information from each time step. \code{save_record_spatial = 0} suppresses the return of this information and \code{save_record_spatial = NULL} returns this information for all time steps.
 #' @param write_record_spatial_for_pf (optional) A named list, passed to \code{\link[raster]{writeRaster}}, to save a subset of the spatial record (specifically the \code{\link[raster]{raster}} of the individual's possible positions at each time step) to file. This forms the basis for extending maps of space use via particle filtering (see \code{\link[flapper]{pf}}.) The `filename' argument should be the directory in which to save files. Files are named by chunk ID, acoustic and internal (archival) time steps. For example, the file for the first chunk, the first acoustic time step and the first archival time step is named `chu_1_acc_1_arc_1'.
@@ -432,6 +432,7 @@
     if(is.null(detection_kernels)){
       kernel <- raster::setValues(bathy, 1)
       kernel <- raster::mask(kernel, bathy)
+      if(normalise) kernel <- kernel/raster::cellStats(kernel, "sum")
     }
 
     #### Define depth errors (if applicable)
@@ -739,8 +740,6 @@
                 }
               }
             }
-            # Re-scale kernels so that the most probable areas have a score of one
-            kernel <- kernel/raster::cellStats(kernel, "max")
 
             #### At other time steps (timestep_archival != 1 ) (in between detections),
             # ... we simply upweight areas away from receivers relative to those within detection centroids
@@ -753,6 +752,8 @@
             kernel <- detection_kernels$bkg_inv_surface_by_design[[kernel_index]]
 
           }
+          #### Normalise detection kernel
+          if(normalise) kernel <- kernel/raster::cellStats(kernel, "sum")
         }
 
         #### Define uniform probabilities across study site, if detection kernels unsupplied
@@ -767,6 +768,7 @@
         if(is.null(archival)){
           map_timestep <- raster::mask(kernel, centroid_c)
           if(is.null(detection_kernels)) map_timestep <- raster::mask(map_timestep, bathy)
+          if(normalise) map_timestep <- map_timestep/raster::cellStats(map_timestep, "sum")
 
           #### ACDC algorithm implementation also incorporates depth
         } else {
@@ -779,13 +781,13 @@
           # Identify possible position of individual at this time step based on depth ± depth_error m:
           # this returns a raster with cells of value 0 (not depth constraint) or 1 (meets depth constraint)
           map_timestep <- bathy_sbt >= depth_lwr & bathy_sbt <= depth_upr
+          if(normalise) map_timestep <- map_timestep/raster::cellStats(map_timestep, "sum")
 
           # Weight by detection probability, if necessary
+          # Note that if map_timestep and kernel have been normalised
+          # ... map_timestep remains normalised after this calculation
           if(!is.null(detection_kernels)) map_timestep <- map_timestep * kernel
         }
-
-        # Normalise probabilities within centroid, if specified
-        if(normalise) map_timestep <- map_timestep/raster::cellStats(map_timestep, stat = "sum")
 
         # Add these positions to the map raster
         map_cumulative <- sum(map_cumulative,  map_timestep, na.rm = TRUE)
