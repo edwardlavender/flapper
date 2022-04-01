@@ -1641,14 +1641,17 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
 #' }
 #'
 #' @examples
+#' #### Load packages
+#' require(prettyGraphics)
+#'
 #' #### Define surface for examples
 #' # We will focus on a relatively small area for speed
 #' # The raster resolution should be equal in x and y directions
-#' bathy      <- dat_gebco
+#' bathy      <- flapper::dat_gebco
 #' boundaries <- raster::extent(700652.2, 708401.2, 6262905, 6270179)
 #' blank      <- raster::raster(boundaries, res = c(5, 5))
 #' bathy      <- raster::resample(bathy, blank)
-#' bathy      <- mask_io(bathy, dat_coast, mask_inside = TRUE)
+#' bathy      <- mask_io(bathy, flapper::dat_coast, mask_inside = TRUE)
 #' # raster::plot(bathy)
 #' # raster::lines(dat_coast)
 #'
@@ -1682,13 +1685,13 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
 #'
 #' ## Compare simulated, Euclidean and shortest distances
 #' pp <- graphics::par(mfrow = c(1, 2))
-#' prettyGraphics::pretty_plot(out_1$dist_sim, out_1$dist_euclid,
-#'                             xlab = "Distance (simulated) [m]",
-#'                             ylab = "Distance (Euclidean)[m]")
+#' pretty_plot(out_1$dist_sim, out_1$dist_euclid,
+#'             xlab = "Distance (simulated) [m]",
+#'             ylab = "Distance (Euclidean)[m]")
 #' graphics::abline(0, 1)
-#' prettyGraphics::pretty_plot(out_1$dist_euclid, out_1$dist_lcp,
-#'                             xlab = "Distance (Euclidean) [m]",
-#'                             ylab = "Distance (shortest) [m]")
+#' pretty_plot(out_1$dist_euclid, out_1$dist_lcp,
+#'             xlab = "Distance (Euclidean) [m]",
+#'             ylab = "Distance (shortest) [m]")
 #' graphics::abline(0, 1)
 #' graphics::par(pp)
 #'
@@ -1727,10 +1730,10 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
 #' pp <- graphics::par(mfrow = c(1, 2), oma = c(3, 3, 3, 3), mar = c(4, 4, 4, 4))
 #' # Results for paths that do not cross a barrier
 #' # ... Visualisation
-#' prettyGraphics::pretty_plot(out_3_barrier0$dist_euclid, out_3_barrier0$dist_lcp,
-#'                             xlab = "Distance (Euclidean) [m]",
-#'                             ylab = "Distance (shortest) [m]",
-#'                             pch = ".")
+#' pretty_plot(out_3_barrier0$dist_euclid, out_3_barrier0$dist_lcp,
+#'             xlab = "Distance (Euclidean) [m]",
+#'             ylab = "Distance (shortest) [m]",
+#'             pch = ".")
 #' graphics::abline(0, 1, col = "red")
 #' graphics::abline(h = mob, col = "royalblue", lty = 3)
 #' # ... Euclidean distance parameter at which mobility is exceeded
@@ -1738,30 +1741,55 @@ lcp_interp <- function(paths, surface, ..., keep_cols = FALSE, calc_distance = T
 #' graphics::abline(v = limit0, col = "royalblue", lty = 3)
 #' # Results for paths that cross a barrier
 #' # ... Visualisation
-#' prettyGraphics::pretty_plot(out_3_barrier1$dist_euclid, out_3_barrier1$dist_lcp,
-#'                             xlab = "Distance (Euclidean) [m]",
-#'                             ylab = "Distance (shortest) [m]",
-#'                             pch = ".")
+#' pretty_plot(out_3_barrier1$dist_euclid, out_3_barrier1$dist_lcp,
+#'            xlab = "Distance (Euclidean) [m]",
+#'            ylab = "Distance (shortest) [m]",
+#'            pch = ".")
 #' graphics::abline(0, 1, col = "red")
 #' graphics::abline(h = mob, col = "royalblue", lty = 3)
 #' # ... Euclidean distance parameter at which mobility is exceeded
-#' limit1 <- min(out_3_barrier1$dist_euclid[out_3_barrier1$dist_lcp > mob]); limit1
+#' limit1 <-
+#'   min(out_3_barrier1$dist_euclid[out_3_barrier1$dist_lcp > mob]); limit1
 #' graphics::abline(v = limit1, col = "royalblue", lty = 3)
 #' graphics::par(pp)
 #'
 #' ## Plot the difference between Euclidean and shortest distances with distance
 #' pp <- graphics::par(mfrow = c(1, 2), oma = c(3, 3, 3, 3), mar = c(4, 4, 4, 4))
-#' prettyGraphics::pretty_plot(out_3_barrier0$dist_euclid,
-#'                             out_3_barrier0$dist_lcp - out_3_barrier0$dist_euclid,
-#'                             xlab = "Distance (Euclidean) [m]",
-#'                             ylab = "Distance (shortest - Euclidean) [m]",
-#'                             pch = ".")
-#' prettyGraphics::pretty_plot(out_3_barrier1$dist_euclid,
-#'                             out_3_barrier1$dist_lcp - out_3_barrier1$dist_euclid,
-#'                             xlab = "Distance (Euclidean) [m]",
-#'                             ylab = "Distance (shortest - Euclidean) [m]",
-#'                             pch = ".")
+#' pretty_plot(out_3_barrier0$dist_euclid,
+#'             out_3_barrier0$dist_lcp - out_3_barrier0$dist_euclid,
+#'             xlab = "Distance (Euclidean) [m]",
+#'             ylab = "Distance (shortest - Euclidean) [m]",
+#'             pch = ".")
+#' pretty_plot(out_3_barrier1$dist_euclid,
+#'             out_3_barrier1$dist_lcp - out_3_barrier1$dist_euclid,
+#'             xlab = "Distance (Euclidean) [m]",
+#'             ylab = "Distance (shortest - Euclidean) [m]",
+#'             pch = ".")
 #' graphics::par(pp)
+#'
+#' ## Approximate shortest distances using a model based on Euclidean distances
+#' # Fit model
+#' mod <- lm(dist_lcp ~ 0 + dist_euclid:barrier, data = out_3)
+#' # Examine model predictions
+#' x <- seq(0, 500)
+#' nd <- data.frame(barrier = factor(0, levels = c(0, 1)), dist_euclid = x)
+#' ci <- list_CIs(predict(mod, nd, se.fit = TRUE))
+#' pretty_plot(out_3$dist_euclid, out_3$dist_lcp,
+#'                             col = c("grey", "darkred")[out_3$barrier],
+#'                             cex = c(0.1, 1.5)[out_3$barrier])
+#' add_error_envelope(x, ci)
+#' nd$barrier <- factor(1, levels = c(0, 1))
+#' ci <- list_CIs(predict(mod, nd, se.fit = TRUE))
+#' add_error_envelope(x, ci,
+#'                    add_fit = list(col = "red"),
+#'                    add_ci = list(col = scales::alpha("red", 0.5),
+#'                                  border = FALSE))
+#' # Define predictive model based on this analysis
+#' lcp_predict <- function(x, m, barrier){
+#'   stopifnot(length(m) == 2L)
+#'   stopifnot(all(barrier %in% c(0, 1)))
+#'   return(m[1] * x * (barrier == 0) + m[2] * x * (barrier == 1))
+#'   }
 #'
 #' @author Edward Lavender
 #' @export
