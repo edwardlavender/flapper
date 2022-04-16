@@ -859,7 +859,6 @@ pf_simplify <- function(archive,
                   dplyr::mutate(pr_current = .data$pr_current/denom) %>%
                   dplyr::mutate(pr_current = sum(.data$pr_current)) %>%
                   dplyr::ungroup() %>%
-                  dplyr::mutate(pr_current = .data$pr_current/max(.data$pr_current)) %>%
                   dplyr::group_by(.data$id_current) %>%
                   dplyr::slice(1L)
               }
