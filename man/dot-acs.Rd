@@ -18,7 +18,7 @@
   detection_time_window = 5,
   mobility,
   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-  normalise = FALSE,
+  normalise = TRUE,
   chunk = 1L,
   save_record_spatial = 1L,
   write_record_spatial_for_pf = NULL,

@@ -220,7 +220,7 @@
     detection_kernels = NULL, detection_kernels_overlap = NULL, detection_time_window = 5,
     mobility,
     calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-    normalise = FALSE,
+    normalise = TRUE,
     chunk = 1L,
     save_record_spatial = 1L,
     write_record_spatial_for_pf = NULL,
@@ -768,7 +768,6 @@
         if(is.null(archival)){
           map_timestep <- raster::mask(kernel, centroid_c)
           if(is.null(detection_kernels)) map_timestep <- raster::mask(map_timestep, bathy)
-          if(normalise) map_timestep <- map_timestep/raster::cellStats(map_timestep, "sum")
 
           #### ACDC algorithm implementation also incorporates depth
         } else {
@@ -781,15 +780,13 @@
           # Identify possible position of individual at this time step based on depth ± depth_error m:
           # this returns a raster with cells of value 0 (not depth constraint) or 1 (meets depth constraint)
           map_timestep <- bathy_sbt >= depth_lwr & bathy_sbt <= depth_upr
-          if(normalise) map_timestep <- map_timestep/raster::cellStats(map_timestep, "sum")
 
           # Weight by detection probability, if necessary
-          # Note that if map_timestep and kernel have been normalised
-          # ... map_timestep remains normalised after this calculation
           if(!is.null(detection_kernels)) map_timestep <- map_timestep * kernel
         }
 
         # Add these positions to the map raster
+        if(normalise) map_timestep <- map_timestep/raster::cellStats(map_timestep, "sum")
         map_cumulative <- sum(map_cumulative,  map_timestep, na.rm = TRUE)
         # map_cumulative <- raster::mask(map_cumulative, bathy)
 
