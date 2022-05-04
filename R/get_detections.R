@@ -148,7 +148,7 @@ get_detection_centroids <- function(xy,
   #### Checks
   # Check xy is a SpatialPoints object or similar
   check_class(input = xy, to_class = c("SpatialPoints", "SpatialPointsDataFrame"), type = "stop")
-  check...("spgeom", "width", "quadsegs",...)
+  check...(c("spgeom", "width", "quadsegs"),...)
   #### Define buffers around receivers equal to detection radius
   xy_buf <- rgeos::gBuffer(xy, width = detection_range, quadsegs = resolution,...)
 
