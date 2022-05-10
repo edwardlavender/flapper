@@ -319,14 +319,14 @@ pf_plot_map <- function(xpf,
 #'
 #' @seealso \code{\link[flapper]{pf}}, \code{\link[flapper]{pf_simplify}}, \code{\link[flapper]{pf_plot_map}}, \code{\link[adehabitatHR]{kernelUD}}, \code{\link[flapper]{kud_around_coastline}}, \code{\link[flapper]{kud_around_coastline_fast}}, \code{\link[flapper]{eval_by_kud}}
 #' @author Edward Lavender
-#' @name pf_kud
+#' @name pf_kud_
 NULL
 
 
 ######################################
 #### pf_kud_1()
 
-#' @rdname pf_kud
+#' @rdname pf_kud_
 #' @export
 
 pf_kud_1 <- function(xpf,
@@ -498,7 +498,7 @@ pf_kud_1 <- function(xpf,
 ######################################
 #### pf_kud_2()
 
-#' @rdname pf_kud
+#' @rdname pf_kud_
 #' @export
 
 pf_kud_2 <- function(xpf,
