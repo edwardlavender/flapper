@@ -14,7 +14,7 @@ Imports:
 Suggests:
     plyr, tidyr, stringr, 
     fasterRaster, sf, sfheaders,
-    glatos,
+    glatos, spatialEco,
     plotly, animation, scales, viridis,
     circular, 
     httr, jsonlite,

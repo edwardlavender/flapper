@@ -11,28 +11,26 @@
 get_hr_prop(
   x,
   prop = 0.5,
-  rm_zero = TRUE,
   plot = TRUE,
   add_raster = list(),
+  add_contour = list(),
   ...
 )
 
-get_hr_core(x, rm_zero = TRUE, plot = TRUE, add_raster = list(), ...)
+get_hr_core(x, plot = TRUE, add_raster = list(), add_contour = list(), ...)
 
-get_hr_home(x, rm_zero = TRUE, plot = TRUE, add_raster = list(), ...)
+get_hr_home(x, plot = TRUE, add_raster = list(), add_contour = list(), ...)
 
-get_hr_full(x, rm_zero = TRUE, plot = TRUE, add_raster = list(), ...)
+get_hr_full(x, plot = TRUE, add_raster = list(), add_contour = list(), ...)
 }
 \arguments{
 \item{x}{A \code{\link[raster]{raster}} of the utilisation distribution (UD).}
 
 \item{prop}{For \code{\link[flapper]{get_hr_prop}}, \code{prop} is a number that defines the home range proportion.}
 
-\item{rm_zero}{A logical variable that defines whether or not to ignore cells in \code{x} with a value of zero.}
-
 \item{plot}{A logical variable that defines whether or not to plot the home range.}
 
-\item{add_raster, ...}{Plot customisation options. \code{add_raster} is a named list of arguments to customise the home range surface and \code{...} are additional arguments passed to \code{\link[prettyGraphics]{pretty_map}}.}
+\item{add_raster, add_contour, ...}{Plot customisation options. \code{add_raster} is a named list of arguments to customise the home range surface that is passed to \code{\link[prettyGraphics]{pretty_map}}. \code{...} are additional arguments passed to \code{\link[prettyGraphics]{pretty_map}}. \code{add_contour} is a named list of arguments passed to \code{\link[raster]{contour}} that is called afterwards.}
 }
 \value{
 The functions return a \code{\link[raster]{raster}}. Cells with a value of one are inside the specified range boundaries; cells with a value of zero are beyond range boundaries.
@@ -48,7 +46,7 @@ Animal home ranges are widely quantified as `the smallest subregion that account
   \item \code{\link[flapper]{get_hr_full}} extracts the `full' range as the boundaries of the UD (\code{prop = 1.00});
 }
 
-These functions differ from functions in the \code{adehabitatHR} package (namely \code{\link[adehabitatHR]{getverticeshr}}) in that they are designed to input and output \code{\link[raster]{raster}} objects.
+These functions are simple wrappers for \code{\link[spatialEco]{raster.vol}}. They differ from functions in the \code{adehabitatHR} package (namely \code{\link[adehabitatHR]{getverticeshr}}) in that they are designed to input and output \code{\link[raster]{raster}} objects.
 }
 \examples{
 #### Define an example UD
