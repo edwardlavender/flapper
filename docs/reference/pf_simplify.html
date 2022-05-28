@@ -129,6 +129,7 @@
   max_n_particles_sampler <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"random"</span>, <span class='st'>"weighted"</span>, <span class='st'>"max"</span><span class='op'>)</span>,
   bathy <span class='op'>=</span> <span class='cn'>NULL</span>,
   calc_distance <span class='op'>=</span> <span class='cn'>NULL</span>,
+  calc_distance_lcp_fast <span class='op'>=</span> <span class='cn'>NULL</span>,
   calc_distance_graph <span class='op'>=</span> <span class='cn'>NULL</span>,
   calc_distance_limit <span class='op'>=</span> <span class='cn'>NULL</span>,
   calc_distance_barrier <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -176,12 +177,16 @@
       <td><p>A character that defines the method used to calculate distances between sequential combinations of particles (see <code><a href='pf.html'>pf</a></code>). Currently supported options are Euclidean distances (<code>"euclid"</code>) or shortest (least-cost) distances ("lcp"). In practice, Euclidean distances are calculated and then, for the subset of connections that meet specified criteria (see <code>calc_distance_limit</code>, <code>calc_distance_barrier</code>, <code>mobility_from_origin</code> and <code>mobility</code>), Euclidean distances are updated to shortest distances, if specified. Note that <code>calc_distance</code> does not need to be the same method as used for <code><a href='pf.html'>pf</a></code>: it is often computationally beneficial to implement <code><a href='pf.html'>pf</a></code> using Euclidean distances and then, for the subset of sampled particles, implement <code>pf_simplify</code> with <code>calc_distance = "lcp"</code> to re-compute distances using the shortest-distances algorithm, along with the adjusted probabilities. However, for large paths, the quickest option is to implement both functions using <code>calc_distance = "euclid"</code> and then interpolate shortest paths only for the set of returned paths (see <code><a href='lcp_interp.html'>lcp_interp</a></code>). If <code>calc_distance = NULL</code>, the method saved in <code>archive</code> is used.</p></td>
     </tr>
     <tr>
+      <th>calc_distance_lcp_fast</th>
+      <td><p>(optional) If <code>calc_distance = "lcp"</code>, <code>calc_distance_lcp_fast</code> is a function that predicts the shortest distance. This function must accept two arguments (even if they are ignored): (a) a numeric vector of Euclidean distances and (b) an integer vector of barrier overlaps that defines whether (1) or not (1) each transect crosses a barrier (see <code><a href='lcp_comp.html'>lcp_comp</a></code>). This option avoids the need to implement shortest-distance algorithms.</p></td>
+    </tr>
+    <tr>
       <th>calc_distance_graph</th>
-      <td><p>(optional) If <code>calc_distance = "lcp"</code>, <code>calc_distance_graph</code> is a graph object that defines the distances between connected cells in <code>bathy</code>. If unsupplied, this is taken from <code>archive$args$calc_distance_graph</code>, if available, or computed via <code><a href='lcp_graph_surface.html'>lcp_graph_surface</a></code>.</p></td>
+      <td><p>(optional) If <code>calc_distance = "lcp"</code> and <code>calc_distance_lcp_fast = NULL</code>, <code>calc_distance_graph</code> is a graph object that defines the distances between connected cells in <code>bathy</code>. If unsupplied, this is taken from <code>archive$args$calc_distance_graph</code>, if available, or computed via <code><a href='lcp_graph_surface.html'>lcp_graph_surface</a></code>.</p></td>
     </tr>
     <tr>
       <th>calc_distance_limit</th>
-      <td><p>(optional) If <code>calc_distance = "lcp"</code>, <code>calc_distance_limit</code> is a number that defines the lower Euclidean distance limit for shortest-distances calculations. If supplied, shortest distances are only calculated for cell connections that are more than a Euclidean distance of <code>calc_distance_limit</code> apart. In other words, if supplied, it is assumed that there exists a valid shortest path (shorter than the maximum distance imposed by the animal's mobility constraints) if the Euclidean distance between two points is less than <code>calc_distance_limit</code> (unless that segment crosses a barrier: see <code>calc_distance_barrier</code>). This option can improve the speed of distance calculations. However, if supplied, note that Euclidean and shortest distances (and resultant probabilities) may be mixed in function outputs. This argument is currently only implemented for <code><a href='pf_archive-class.html'>pf_archive-class</a></code> objects derived with <code>calc_distance = TRUE</code> and <code>calc_distance_euclid_fast = TRUE</code> via <code><a href='pf.html'>pf</a></code> for which connected cell pairs need to be derived (i.e., not following a previous implementation of <code>pf_simplify</code>).</p></td>
+      <td><p>(optional) If <code>calc_distance = "lcp"</code> and <code>calc_distance_lcp_fast = NULL</code>, <code>calc_distance_limit</code> is a number that defines the lower Euclidean distance limit for shortest-distances calculations. If supplied, shortest distances are only calculated for cell connections that are more than a Euclidean distance of <code>calc_distance_limit</code> apart. In other words, if supplied, it is assumed that there exists a valid shortest path (shorter than the maximum distance imposed by the animal's mobility constraints) if the Euclidean distance between two points is less than <code>calc_distance_limit</code> (unless that segment crosses a barrier: see <code>calc_distance_barrier</code>). This option can improve the speed of distance calculations. However, if supplied, note that Euclidean and shortest distances (and resultant probabilities) may be mixed in function outputs. This argument is currently only implemented for <code><a href='pf_archive-class.html'>pf_archive-class</a></code> objects derived with <code>calc_distance = TRUE</code> and <code>calc_distance_euclid_fast = TRUE</code> via <code><a href='pf.html'>pf</a></code> for which connected cell pairs need to be derived (i.e., not following a previous implementation of <code>pf_simplify</code>).</p></td>
     </tr>
     <tr>
       <th>calc_distance_barrier</th>
@@ -197,11 +202,11 @@
     </tr>
     <tr>
       <th>calc_distance_restrict</th>
-      <td><p>(optional) If <code>calc_distance_limit</code> and/or <code>calc_distance_barrier</code> are supplied, <code>calc_distance_restrict</code> is a logical variable that defines whether (<code>TRUE</code>) or not (<code>FALSE</code>) to restrict further the particle pairs for which shortest distances are calculated. If <code>TRUE</code>, the subset of particles flagged by <code>calc_distance_limit</code> and <code>calc_distance_barrier</code> for shortest-distance calculations is further restricted to consider only those pairs of particles for which there is not a valid connection to or from those particles under the Euclidean distance metric. Either way, there is no reduction in the set of particles, only in the number of connections evaluated between those particles. This can improve the speed of distance calculations.</p></td>
+      <td><p>(optional) If and <code>calc_distance_lcp_fast = NULL</code> and <code>calc_distance_limit</code> and/or <code>calc_distance_barrier</code> are supplied, <code>calc_distance_restrict</code> is a logical variable that defines whether (<code>TRUE</code>) or not (<code>FALSE</code>) to restrict further the particle pairs for which shortest distances are calculated. If <code>TRUE</code>, the subset of particles flagged by <code>calc_distance_limit</code> and <code>calc_distance_barrier</code> for shortest-distance calculations is further restricted to consider only those pairs of particles for which there is not a valid connection to or from those particles under the Euclidean distance metric. Either way, there is no reduction in the set of particles, only in the number of connections evaluated between those particles. This can improve the speed of distance calculations.</p></td>
     </tr>
     <tr>
       <th>calc_distance_algorithm, calc_distance_constant</th>
-      <td><p>Additional shortest-distance calculation options (see <code><a href='https://rdrr.io/pkg/cppRouting/man/get_distance_pair.html'>get_distance_pair</a></code>). <code>calc_distance_algorithm</code> is a character that defines the algorithm: <code>"Dijkstra"</code>, <code>"bi"</code>, <code>"A*"</code> or <code>"NBA"</code> are supported. <code>calc_distance_constant</code> is the numeric constant required to maintain the heuristic function admissible in the A* and NBA algorithms. For shortest distances (based on costs derived via <code><a href='lcp_costs.html'>lcp_costs</a></code>), the default (<code>calc_distance_constant = 1</code>) is appropriate.</p></td>
+      <td><p>Additional shortest-distance calculation options if <code>calc_distance_lcp_fast = NULL</code> (see <code><a href='https://rdrr.io/pkg/cppRouting/man/get_distance_pair.html'>get_distance_pair</a></code>). <code>calc_distance_algorithm</code> is a character that defines the algorithm: <code>"Dijkstra"</code>, <code>"bi"</code>, <code>"A*"</code> or <code>"NBA"</code> are supported. <code>calc_distance_constant</code> is the numeric constant required to maintain the heuristic function admissible in the A* and NBA algorithms. For shortest distances (based on costs derived via <code><a href='lcp_costs.html'>lcp_costs</a></code>), the default (<code>calc_distance_constant = 1</code>) is appropriate.</p></td>
     </tr>
     <tr>
       <th>mobility, mobility_from_origin</th>
@@ -266,14 +271,14 @@
 #&gt; args    21     -none- list     </div><div class='input'>
 <span class='co'>#### Example (1): The default implementation</span>
 <span class='va'>paths_1</span>   <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:24)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:14)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:24) after ~0 minutes. </div><div class='input'>
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:14) after ~0 minutes. </div><div class='input'>
 <span class='co'>## Demonstration that the distance and probabilities calculations are correct</span>
 <span class='co'># The simple method below works if three conditions are met:</span>
 <span class='co'># ... The 'intrinsic' probability associated with each cell is the same (as for DC algorithm);</span>
@@ -296,20 +301,20 @@
                 pr_equal <span class='op'>=</span> <span class='va'>.data</span><span class='op'>$</span><span class='va'>cell_pr</span> <span class='op'>==</span> <span class='va'>.data</span><span class='op'>$</span><span class='va'>cell_pr_chk</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>paths_1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   path_id timestep cell_id   cell_x  cell_y   cell_z    cell_pr      dist
-#&gt; 1       1        0    3241 708897.1 6254392 135.0958 1.00000000        NA
-#&gt; 2       1        1    3722 708922.1 6254242 134.0199 0.06891651 152.06906
-#&gt; 3       1        2    3243 708947.1 6254392 133.6996 0.06891651 152.06906
-#&gt; 4       1        3    3166 709022.1 6254416 133.6938 0.74022781  79.05694
-#&gt; 5       1        4    3006 709022.1 6254466 134.0630 0.92414182  50.00000
-#&gt; 6       1        5    3009 709097.1 6254466 134.9762 0.77729986  75.00000
+</div><div class='output co'>#&gt;   path_id timestep cell_id   cell_x  cell_y   cell_z      cell_pr      dist
+#&gt; 1       1        0    3241 708897.1 6254392 135.0958 1.000000e+00        NA
+#&gt; 2       1        1    3722 708922.1 6254242 134.0199 1.808832e-05 152.06906
+#&gt; 3       1        2    3243 708947.1 6254392 133.6996 1.663445e-05 152.06906
+#&gt; 4       1        3    3166 709022.1 6254416 133.6938 1.569277e-04  79.05694
+#&gt; 5       1        4    3006 709022.1 6254466 134.0630 1.826367e-04  50.00000
+#&gt; 6       1        5    3009 709097.1 6254466 134.9762 1.547789e-04  75.00000
 #&gt;    cell_xp cell_yp cell_dist_chk cell_pr_chk dist_equal pr_equal
 #&gt; 1       NA      NA            NA          NA         NA       NA
-#&gt; 2 708897.1 6254392     152.06906  0.06891651       TRUE     TRUE
-#&gt; 3 708922.1 6254242     152.06906  0.06891651       TRUE     TRUE
-#&gt; 4 708947.1 6254392      79.05694  0.74022781       TRUE     TRUE
-#&gt; 5 709022.1 6254416      50.00000  0.92414182       TRUE     TRUE
-#&gt; 6 709022.1 6254466      75.00000  0.77729986       TRUE     TRUE</div><div class='input'>
+#&gt; 2 708897.1 6254392     152.06906  0.06891651       TRUE    FALSE
+#&gt; 3 708922.1 6254242     152.06906  0.06891651       TRUE    FALSE
+#&gt; 4 708947.1 6254392      79.05694  0.74022781       TRUE    FALSE
+#&gt; 5 709022.1 6254416      50.00000  0.92414182       TRUE    FALSE
+#&gt; 6 709022.1 6254466      75.00000  0.77729986       TRUE    FALSE</div><div class='input'>
 <span class='co'>## Demonstration that the depths of sampled cells are correct</span>
 <span class='va'>paths_1</span><span class='op'>$</span><span class='va'>cell_z_chk</span> <span class='op'>&lt;-</span> <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/extract.html'>extract</a></span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>,
                                       <span class='va'>paths_1</span><span class='op'>$</span><span class='va'>cell_id</span><span class='op'>)</span>
@@ -324,31 +329,31 @@
 <span class='co'># Log likelihood</span>
 <span class='fu'><a href='pf_loglik.html'>pf_loglik</a></span><span class='op'>(</span><span class='va'>paths_1</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    path_id    loglik      delta
-#&gt; 1        4 -22.65582 0.00000000
-#&gt; 2        5 -22.69600 0.04017947
-#&gt; 3        3 -22.72799 0.07217439
-#&gt; 4        2 -22.81958 0.16376265
-#&gt; 5        1 -23.77829 1.12246741
-#&gt; 6       19 -24.54311 1.88729381
-#&gt; 7       24 -24.54930 1.89348096
-#&gt; 8       18 -24.55858 1.90275861
-#&gt; 9       23 -24.56477 1.90894575
-#&gt; 10       9 -24.56695 1.91112531
-#&gt; 11      14 -24.57313 1.91731246
-#&gt; 12       8 -24.58241 1.92659011
-#&gt; 13      13 -24.58860 1.93277725
-#&gt; 14      16 -24.62446 1.96864247
-#&gt; 15      17 -24.62446 1.96864247
-#&gt; 16      21 -24.63065 1.97482962
-#&gt; 17      22 -24.63065 1.97482962
-#&gt; 18       6 -24.64829 1.99247397
-#&gt; 19       7 -24.64829 1.99247397
-#&gt; 20      11 -24.65448 1.99866112
-#&gt; 21      12 -24.65448 1.99866112
-#&gt; 22      20 -28.86000 6.20417920
-#&gt; 23      25 -28.86619 6.21036635
-#&gt; 24      10 -28.88383 6.22801070
-#&gt; 25      15 -28.89002 6.23419785</div><div class='input'><span class='co'># 2-d visualisation</span>
+#&gt; 1        4 -145.7709 0.00000000
+#&gt; 2        5 -145.8111 0.04017947
+#&gt; 3        3 -145.8431 0.07217439
+#&gt; 4        2 -145.9346 0.16376265
+#&gt; 5        1 -146.8934 1.12246741
+#&gt; 6       19 -147.6582 1.88729381
+#&gt; 7       24 -147.6644 1.89348096
+#&gt; 8       18 -147.6736 1.90275861
+#&gt; 9       23 -147.6798 1.90894575
+#&gt; 10       9 -147.6820 1.91112531
+#&gt; 11      14 -147.6882 1.91731246
+#&gt; 12       8 -147.6975 1.92659011
+#&gt; 13      13 -147.7037 1.93277725
+#&gt; 14      16 -147.7395 1.96864247
+#&gt; 15      17 -147.7395 1.96864247
+#&gt; 16      21 -147.7457 1.97482962
+#&gt; 17      22 -147.7457 1.97482962
+#&gt; 18       6 -147.7634 1.99247397
+#&gt; 19       7 -147.7634 1.99247397
+#&gt; 20      11 -147.7695 1.99866112
+#&gt; 21      12 -147.7695 1.99866112
+#&gt; 22      20 -151.9751 6.20417920
+#&gt; 23      25 -151.9813 6.21036635
+#&gt; 24      10 -151.9989 6.22801070
+#&gt; 25      15 -152.0051 6.23419785</div><div class='input'><span class='co'># 2-d visualisation</span>
 <span class='fu'><a href='pf_plot_2d.html'>pf_plot_2d</a></span><span class='op'>(</span><span class='va'>paths_1</span>, <span class='va'>dat_dcpf_histories</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>,
            add_paths <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>length <span class='op'>=</span> <span class='fl'>0.05</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='img'><img src='pf_simplify-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># 3-d visualisation</span>
@@ -366,7 +371,7 @@
 <span class='va'>dcpf_args</span><span class='op'>$</span><span class='va'>calc_distance_euclid_fast</span> <span class='op'>&lt;-</span> <span class='cn'>TRUE</span>
 <span class='va'>dcpf_args</span><span class='op'>$</span><span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>50</span>
 <span class='va'>out_dcpf_2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/do.call.html'>do.call</a></span><span class='op'>(</span><span class='va'>pf</span>, <span class='va'>dcpf_args</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:45:24)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2022-05-28 18:15:15)... 
 #&gt; ... Setting up function... 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
 #&gt; ... Implementing algorithm iteratively over time steps... 
@@ -423,55 +428,55 @@
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:45:25) after ~0.02 minutes. </div><div class='input'>
+#&gt; ... flapper::pf() call completed (@ 2022-05-28 18:15:16) after ~0.02 minutes. </div><div class='input'>
 <span class='co'>## Implement pf_simplify() using shortest distances</span>
 <span class='va'>paths_2</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>out_dcpf_2</span>, calc_distance <span class='op'>=</span> <span class='st'>"lcp"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:25)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:16)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'lcp'... 
 #&gt; ... Setting up LCP calculations... 
 #&gt; ... ... Setting up cost-surface for calc_distance = 'lcp'... 
-#&gt; flapper::lcp_costs() called (@ 2021-12-02 14:45:25)... 
+#&gt; flapper::lcp_costs() called (@ 2022-05-28 18:15:16)... 
 #&gt; ... Defining transition matrices... </div><div class='output co'>#&gt; <span class='warning'>Warning: transition function gives negative values</span></div><div class='output co'>#&gt; ... Calculating distance matrices... 
 #&gt; ... Assembling LCP costs... 
-#&gt; ... flapper::lcp_costs() call completed (@ 2021-12-02 14:45:25) after ~0 minutes. 
-#&gt; flapper::lcp_graph_surface() called (@ 2021-12-02 14:45:25)... 
+#&gt; ... flapper::lcp_costs() call completed (@ 2022-05-28 18:15:16) after ~0 minutes. 
+#&gt; flapper::lcp_graph_surface() called (@ 2022-05-28 18:15:16)... 
 #&gt; ... Defining nodes, edges and costs to make graph... 
 #&gt; ... Constructing graph object... 
-#&gt; ... flapper::lcp_graph_surface() call completed (@ 2021-12-02 14:45:25) after ~0 minutes. 
+#&gt; ... flapper::lcp_graph_surface() call completed (@ 2022-05-28 18:15:16) after ~0 minutes. 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... </div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; ... ... Identifying connected cells... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:26) after ~0.01 minutes. </div><div class='input'><span class='co'># ... Duration: ~ 0.655 s</span>
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:17) after ~0.01 minutes. </div><div class='input'><span class='co'># ... Duration: ~ 0.655 s</span>
 <span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span>
   <span class='fu'><a href='https://rdrr.io/r/base/invisible.html'>invisible</a></span><span class='op'>(</span><span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/capture.output.html'>capture.output</a></span><span class='op'>(</span>
     <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>out_dcpf_2</span>, calc_distance <span class='op'>=</span> <span class='st'>"lcp"</span><span class='op'>)</span>
     <span class='op'>)</span><span class='op'>)</span>
   <span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='warning'>Warning: transition function gives negative values</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.621   0.001   0.623 </div><div class='input'>
+#&gt;   0.645   0.002   0.647 </div><div class='input'>
 <span class='co'>## Demonstrate the LCP calculations are correct</span>
 <span class='va'>paths_2_lcps</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lcp_interp.html'>lcp_interp</a></span><span class='op'>(</span><span class='va'>paths_2</span>,
                             <span class='va'>out_dcpf_2</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>,
                             calc_distance <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::lcp_interp() called (@ 2021-12-02 14:45:27)... 
+</div><div class='output co'>#&gt; flapper::lcp_interp() called (@ 2022-05-28 18:15:18)... 
 #&gt; ... Setting up function... 
 #&gt; ... Processing paths... 
 #&gt; ... Calculating least-cost paths via flapper::lcp_over_surface()... 
-#&gt; flapper::lcp_over_surface() called (@ 2021-12-02 14:45:27)... 
+#&gt; flapper::lcp_over_surface() called (@ 2022-05-28 18:15:18)... 
 #&gt; ... Checking user inputs... </div><div class='output co'>#&gt; ... Defining cost matrix... </div><div class='output co'>#&gt; <span class='warning'>Warning: transition function gives negative values</span></div><div class='output co'>#&gt; ... Using method = 'cppRouting'... 
 #&gt; ... ... Defining nodes, edges and costs to make graph... 
 #&gt; ... ... Constructing graph object... 
-#&gt; ... ... Implementing bi algorithm to compute least-cost paths(s)... </div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='img'><img src='pf_simplify-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::lcp_over_surface() call completed (@ 2021-12-02 14:45:27) after ~0.01 minutes. 
+#&gt; ... ... Implementing bi algorithm to compute least-cost paths(s)... </div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='img'><img src='pf_simplify-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::lcp_over_surface() call completed (@ 2022-05-28 18:15:18) after ~0.01 minutes. 
 #&gt; ... Summarising distances for each least-cost path... 
-#&gt; ... flapper::lcp_interp() call completed (@ 2021-12-02 14:45:28) after ~0.02 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>paths_2</span><span class='op'>$</span><span class='va'>dist</span>, <span class='va'>paths_2_lcps</span><span class='op'>$</span><span class='va'>dist_lcp</span><span class='op'>$</span><span class='va'>dist</span><span class='op'>)</span><span class='op'>)</span>
+#&gt; ... flapper::lcp_interp() call completed (@ 2022-05-28 18:15:19) after ~0.02 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>paths_2</span><span class='op'>$</span><span class='va'>dist</span>, <span class='va'>paths_2_lcps</span><span class='op'>$</span><span class='va'>dist_lcp</span><span class='op'>$</span><span class='va'>dist</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;           [,1]      [,2]
 #&gt; [1,]        NA        NA
-#&gt; [2,]  25.00974  25.00974
-#&gt; [3,] 120.76289 120.76289
-#&gt; [4,] 185.41948 185.41948
-#&gt; [5,] 195.73773 195.73773
-#&gt; [6,]  85.38879  85.38879</div><div class='input'>
+#&gt; [2,] 100.03898 100.03898
+#&gt; [3,]  60.36391  60.36391
+#&gt; [4,] 135.40893 135.40893
+#&gt; [5,] 145.74588 145.74588
+#&gt; [6,]  35.36868  35.36868</div><div class='input'>
 <span class='co'>## Trial options for increasing speed of shortest-distance calculations</span>
 <span class='co'># Speed up shortest-distance calculations via (a) the graph:</span>
 <span class='co'># ... Duration: ~0.495 s</span>
@@ -480,14 +485,14 @@
 <span class='co'># ... ... see cppRouting::cpp_simplify()</span>
 <span class='co'># ... ... see cppRouting::cpp_contract()</span>
 <span class='va'>costs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lcp_costs.html'>lcp_costs</a></span><span class='op'>(</span><span class='va'>out_dcpf_2</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::lcp_costs() called (@ 2021-12-02 14:45:28)... 
+</div><div class='output co'>#&gt; flapper::lcp_costs() called (@ 2022-05-28 18:15:19)... 
 #&gt; ... Defining transition matrices... </div><div class='output co'>#&gt; <span class='warning'>Warning: transition function gives negative values</span></div><div class='output co'>#&gt; ... Calculating distance matrices... 
 #&gt; ... Assembling LCP costs... 
-#&gt; ... flapper::lcp_costs() call completed (@ 2021-12-02 14:45:28) after ~0 minutes. </div><div class='input'><span class='va'>graph</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lcp_graph_surface.html'>lcp_graph_surface</a></span><span class='op'>(</span><span class='va'>out_dcpf_2</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>, <span class='va'>costs</span><span class='op'>$</span><span class='va'>dist_total</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::lcp_graph_surface() called (@ 2021-12-02 14:45:28)... 
+#&gt; ... flapper::lcp_costs() call completed (@ 2022-05-28 18:15:19) after ~0 minutes. </div><div class='input'><span class='va'>graph</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lcp_graph_surface.html'>lcp_graph_surface</a></span><span class='op'>(</span><span class='va'>out_dcpf_2</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>, <span class='va'>costs</span><span class='op'>$</span><span class='va'>dist_total</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; flapper::lcp_graph_surface() called (@ 2022-05-28 18:15:19)... 
 #&gt; ... Defining nodes, edges and costs to make graph... 
 #&gt; ... Constructing graph object... 
-#&gt; ... flapper::lcp_graph_surface() call completed (@ 2021-12-02 14:45:28) after ~0 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span>
+#&gt; ... flapper::lcp_graph_surface() call completed (@ 2022-05-28 18:15:19) after ~0 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span>
   <span class='fu'><a href='https://rdrr.io/r/base/invisible.html'>invisible</a></span><span class='op'>(</span><span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/capture.output.html'>capture.output</a></span><span class='op'>(</span>
     <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>out_dcpf_2</span>,
                 calc_distance <span class='op'>=</span> <span class='st'>"lcp"</span>,
@@ -495,17 +500,17 @@
   <span class='op'>)</span><span class='op'>)</span>
 <span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.498   0.001   0.499 </div><div class='input'><span class='co'># Speed up shortest-distance calculations via (b) the lower Euclid dist limit</span>
+#&gt;   0.509   0.001   0.510 </div><div class='input'><span class='co'># Speed up shortest-distance calculations via (b) the lower Euclid dist limit</span>
 <span class='co'># ... Duration: ~0.493 s</span>
 <span class='va'>costs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lcp_costs.html'>lcp_costs</a></span><span class='op'>(</span><span class='va'>out_dcpf_2</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::lcp_costs() called (@ 2021-12-02 14:45:29)... 
+</div><div class='output co'>#&gt; flapper::lcp_costs() called (@ 2022-05-28 18:15:20)... 
 #&gt; ... Defining transition matrices... </div><div class='output co'>#&gt; <span class='warning'>Warning: transition function gives negative values</span></div><div class='output co'>#&gt; ... Calculating distance matrices... 
 #&gt; ... Assembling LCP costs... 
-#&gt; ... flapper::lcp_costs() call completed (@ 2021-12-02 14:45:29) after ~0 minutes. </div><div class='input'><span class='va'>graph</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lcp_graph_surface.html'>lcp_graph_surface</a></span><span class='op'>(</span><span class='va'>out_dcpf_2</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>, <span class='va'>costs</span><span class='op'>$</span><span class='va'>dist_total</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::lcp_graph_surface() called (@ 2021-12-02 14:45:29)... 
+#&gt; ... flapper::lcp_costs() call completed (@ 2022-05-28 18:15:20) after ~0 minutes. </div><div class='input'><span class='va'>graph</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lcp_graph_surface.html'>lcp_graph_surface</a></span><span class='op'>(</span><span class='va'>out_dcpf_2</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>, <span class='va'>costs</span><span class='op'>$</span><span class='va'>dist_total</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; flapper::lcp_graph_surface() called (@ 2022-05-28 18:15:20)... 
 #&gt; ... Defining nodes, edges and costs to make graph... 
 #&gt; ... Constructing graph object... 
-#&gt; ... flapper::lcp_graph_surface() call completed (@ 2021-12-02 14:45:29) after ~0 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span>
+#&gt; ... flapper::lcp_graph_surface() call completed (@ 2022-05-28 18:15:20) after ~0 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span>
   <span class='fu'><a href='https://rdrr.io/r/base/invisible.html'>invisible</a></span><span class='op'>(</span><span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/capture.output.html'>capture.output</a></span><span class='op'>(</span>
     <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>out_dcpf_2</span>,
                 calc_distance <span class='op'>=</span> <span class='st'>"lcp"</span>,
@@ -514,7 +519,7 @@
   <span class='op'>)</span><span class='op'>)</span>
 <span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.478   0.001   0.479 </div><div class='input'><span class='co'># Speed up shortest-distance calculations via (c) the barrier</span>
+#&gt;   0.507   0.001   0.509 </div><div class='input'><span class='co'># Speed up shortest-distance calculations via (c) the barrier</span>
 <span class='co'># ... Duration: ~1.411 s (much slower in this example)</span>
 <span class='va'>coastline</span> <span class='op'>&lt;-</span> <span class='fu'>sf</span><span class='fu'>::</span><span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_as_sf.html'>st_as_sf</a></span><span class='op'>(</span><span class='va'>dat_coast</span><span class='op'>)</span>
 <span class='fu'>sf</span><span class='fu'>::</span><span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_crs.html'>st_crs</a></span><span class='op'>(</span><span class='va'>coastline</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='cn'>NA</span>
@@ -528,7 +533,7 @@
   <span class='op'>)</span><span class='op'>)</span>
 <span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   1.381   0.002   1.383 </div><div class='input'><span class='co'># Speed up calculations via (d) mobility limits</span>
+#&gt;   1.404   0.002   1.407 </div><div class='input'><span class='co'># Speed up calculations via (d) mobility limits</span>
 <span class='co'># ... (In the examples above, the mobility parameters</span>
 <span class='co'># ... can be extracted from out_dcpf_2,</span>
 <span class='co'># ... so specifying them directly here in this example makes</span>
@@ -545,7 +550,7 @@
   <span class='op'>)</span><span class='op'>)</span>
 <span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt; <span class='message'>Running bidirectional Dijkstra...</span></div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.477   0.001   0.479 </div><div class='input'><span class='co'># Speed up calculations via (e) parallelisation</span>
+#&gt;   0.498   0.001   0.499 </div><div class='input'><span class='co'># Speed up calculations via (e) parallelisation</span>
 <span class='co'># ... see the details in the documentation.</span>
 
 <span class='co'>#### Example (3): Restrict the number of routes to each cell at each time step</span>
@@ -554,30 +559,30 @@
 <span class='co'># ... this does not make any difference here, but it can dramatically reduce</span>
 <span class='co'># ... the time taken to assemble paths and prevent vector memory issues.</span>
 <span class='va'>paths_3a</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>, max_n_copies <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:32)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:24)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:33) after ~0 minutes. </div><div class='input'><span class='va'>paths_3b</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>, max_n_copies <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:33)... 
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:24) after ~0 minutes. </div><div class='input'><span class='va'>paths_3b</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>, max_n_copies <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:24)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:33) after ~0 minutes. </div><div class='input'><span class='va'>paths_3c</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>, max_n_copies <span class='op'>=</span> <span class='fl'>7</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:33)... 
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:24) after ~0.01 minutes. </div><div class='input'><span class='va'>paths_3c</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>, max_n_copies <span class='op'>=</span> <span class='fl'>7</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:24)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:33) after ~0 minutes. </div><div class='input'><span class='co'># Compare the number of paths retained</span>
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:25) after ~0 minutes. </div><div class='input'><span class='co'># Compare the number of paths retained</span>
 <span class='fu'><a href='https://rdrr.io/pkg/raster/man/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>paths_3a</span><span class='op'>$</span><span class='va'>path_id</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10</div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>paths_3b</span><span class='op'>$</span><span class='va'>path_id</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25</div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>paths_3c</span><span class='op'>$</span><span class='va'>path_id</span><span class='op'>)</span>
@@ -588,120 +593,120 @@
 <span class='va'>paths_4a</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>,
                           max_n_copies <span class='op'>=</span> <span class='fl'>5</span>,
                           max_n_copies_sampler <span class='op'>=</span> <span class='st'>"random"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:33)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:25)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:33) after ~0 minutes. </div><div class='input'><span class='va'>paths_4b</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>,
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:25) after ~0.01 minutes. </div><div class='input'><span class='va'>paths_4b</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>,
                           max_n_copies <span class='op'>=</span> <span class='fl'>5</span>,
                           max_n_copies_sampler <span class='op'>=</span> <span class='st'>"weighted"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:33)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:25)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:34) after ~0 minutes. </div><div class='input'><span class='va'>paths_4c</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>,
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:25) after ~0 minutes. </div><div class='input'><span class='va'>paths_4c</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>,
                           max_n_copies <span class='op'>=</span> <span class='fl'>5</span>,
                           max_n_copies_sampler <span class='op'>=</span> <span class='st'>"max"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:34)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:25)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:34) after ~0 minutes. </div><div class='input'><span class='co'># Compare retained paths</span>
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:26) after ~0 minutes. </div><div class='input'><span class='co'># Compare retained paths</span>
 <span class='fu'><a href='pf_loglik.html'>pf_loglik</a></span><span class='op'>(</span><span class='va'>paths_3a</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    path_id    loglik      delta
-#&gt; 1        1 -22.65582 0.00000000
-#&gt; 2        3 -22.69600 0.04017947
-#&gt; 3        4 -22.72799 0.07217439
-#&gt; 4        5 -22.81958 0.16376265
-#&gt; 5        2 -23.77829 1.12246741
-#&gt; 6        7 -24.57313 1.91731246
-#&gt; 7        8 -24.58860 1.93277725
-#&gt; 8        6 -24.65448 1.99866112
-#&gt; 9        9 -24.65448 1.99866112
-#&gt; 10      10 -28.89002 6.23419785</div><div class='input'><span class='fu'><a href='pf_loglik.html'>pf_loglik</a></span><span class='op'>(</span><span class='va'>paths_3b</span><span class='op'>)</span>
+#&gt; 1        1 -145.7709 0.00000000
+#&gt; 2        3 -145.8111 0.04017947
+#&gt; 3        4 -145.8431 0.07217439
+#&gt; 4        5 -145.9346 0.16376265
+#&gt; 5        2 -146.8934 1.12246741
+#&gt; 6        7 -147.6582 1.88729381
+#&gt; 7        8 -147.6736 1.90275861
+#&gt; 8        6 -147.7395 1.96864247
+#&gt; 9        9 -147.7395 1.96864247
+#&gt; 10      10 -151.9751 6.20417920</div><div class='input'><span class='fu'><a href='pf_loglik.html'>pf_loglik</a></span><span class='op'>(</span><span class='va'>paths_3b</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    path_id    loglik      delta
-#&gt; 1        1 -22.65582 0.00000000
-#&gt; 2        3 -22.69600 0.04017947
-#&gt; 3        4 -22.72799 0.07217439
-#&gt; 4        5 -22.81958 0.16376265
-#&gt; 5        2 -23.77829 1.12246741
-#&gt; 6       13 -24.54311 1.88729381
-#&gt; 7       11 -24.54930 1.89348096
-#&gt; 8       17 -24.55858 1.90275861
-#&gt; 9       15 -24.56477 1.90894575
-#&gt; 10      12 -24.56695 1.91112531
-#&gt; 11      10 -24.57313 1.91731246
-#&gt; 12      14 -24.58241 1.92659011
-#&gt; 13      16 -24.58860 1.93277725
-#&gt; 14       8 -24.62446 1.96864247
-#&gt; 15      21 -24.62446 1.96864247
-#&gt; 16       7 -24.63065 1.97482962
-#&gt; 17      18 -24.63065 1.97482962
-#&gt; 18       6 -24.64829 1.99247397
-#&gt; 19      20 -24.64829 1.99247397
-#&gt; 20       9 -24.65448 1.99866112
-#&gt; 21      19 -24.65448 1.99866112
-#&gt; 22      22 -28.86000 6.20417920
-#&gt; 23      23 -28.86619 6.21036635
-#&gt; 24      25 -28.88383 6.22801070
-#&gt; 25      24 -28.89002 6.23419785</div><div class='input'><span class='fu'><a href='pf_loglik.html'>pf_loglik</a></span><span class='op'>(</span><span class='va'>paths_3c</span><span class='op'>)</span>
+#&gt; 1        1 -145.7709 0.00000000
+#&gt; 2        3 -145.8111 0.04017947
+#&gt; 3        4 -145.8431 0.07217439
+#&gt; 4        5 -145.9346 0.16376265
+#&gt; 5        2 -146.8934 1.12246741
+#&gt; 6       13 -147.6582 1.88729381
+#&gt; 7       10 -147.6644 1.89348096
+#&gt; 8       16 -147.6736 1.90275861
+#&gt; 9       17 -147.6798 1.90894575
+#&gt; 10      12 -147.6820 1.91112531
+#&gt; 11      11 -147.6882 1.91731246
+#&gt; 12      14 -147.6975 1.92659011
+#&gt; 13      15 -147.7037 1.93277725
+#&gt; 14       8 -147.7395 1.96864247
+#&gt; 15      18 -147.7395 1.96864247
+#&gt; 16       6 -147.7457 1.97482962
+#&gt; 17      19 -147.7457 1.97482962
+#&gt; 18       9 -147.7634 1.99247397
+#&gt; 19      20 -147.7634 1.99247397
+#&gt; 20       7 -147.7695 1.99866112
+#&gt; 21      21 -147.7695 1.99866112
+#&gt; 22      23 -151.9751 6.20417920
+#&gt; 23      24 -151.9813 6.21036635
+#&gt; 24      22 -151.9989 6.22801070
+#&gt; 25      25 -152.0051 6.23419785</div><div class='input'><span class='fu'><a href='pf_loglik.html'>pf_loglik</a></span><span class='op'>(</span><span class='va'>paths_3c</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    path_id    loglik      delta
-#&gt; 1        1 -22.65582 0.00000000
-#&gt; 2        3 -22.69600 0.04017947
-#&gt; 3        4 -22.72799 0.07217439
-#&gt; 4        5 -22.81958 0.16376265
-#&gt; 5        2 -23.77829 1.12246741
-#&gt; 6       12 -24.54311 1.88729381
-#&gt; 7       11 -24.54930 1.89348096
-#&gt; 8       14 -24.55858 1.90275861
-#&gt; 9       15 -24.56477 1.90894575
-#&gt; 10      10 -24.56695 1.91112531
-#&gt; 11      13 -24.57313 1.91731246
-#&gt; 12      17 -24.58241 1.92659011
-#&gt; 13      16 -24.58860 1.93277725
-#&gt; 14       9 -24.62446 1.96864247
-#&gt; 15      21 -24.62446 1.96864247
-#&gt; 16       8 -24.63065 1.97482962
-#&gt; 17      20 -24.63065 1.97482962
-#&gt; 18       6 -24.64829 1.99247397
-#&gt; 19      18 -24.64829 1.99247397
-#&gt; 20       7 -24.65448 1.99866112
-#&gt; 21      19 -24.65448 1.99866112
-#&gt; 22      22 -28.86000 6.20417920
-#&gt; 23      25 -28.86619 6.21036635
-#&gt; 24      23 -28.88383 6.22801070
-#&gt; 25      24 -28.89002 6.23419785</div><div class='input'>
+#&gt; 1        1 -145.7709 0.00000000
+#&gt; 2        3 -145.8111 0.04017947
+#&gt; 3        4 -145.8431 0.07217439
+#&gt; 4        5 -145.9346 0.16376265
+#&gt; 5        2 -146.8934 1.12246741
+#&gt; 6       13 -147.6582 1.88729381
+#&gt; 7       10 -147.6644 1.89348096
+#&gt; 8       17 -147.6736 1.90275861
+#&gt; 9       16 -147.6798 1.90894575
+#&gt; 10      12 -147.6820 1.91112531
+#&gt; 11      11 -147.6882 1.91731246
+#&gt; 12      14 -147.6975 1.92659011
+#&gt; 13      15 -147.7037 1.93277725
+#&gt; 14       6 -147.7395 1.96864247
+#&gt; 15      21 -147.7395 1.96864247
+#&gt; 16       8 -147.7457 1.97482962
+#&gt; 17      19 -147.7457 1.97482962
+#&gt; 18       7 -147.7634 1.99247397
+#&gt; 19      18 -147.7634 1.99247397
+#&gt; 20       9 -147.7695 1.99866112
+#&gt; 21      20 -147.7695 1.99866112
+#&gt; 22      25 -151.9751 6.20417920
+#&gt; 23      24 -151.9813 6.21036635
+#&gt; 24      23 -151.9989 6.22801070
+#&gt; 25      22 -152.0051 6.23419785</div><div class='input'>
 <span class='co'>#### Example (5): Set the maximum number of paths for reconstruction (for speed)</span>
 <span class='co'># Reconstruct all paths (note you may experience vector memory limitations)</span>
 <span class='co'># unique(pf_simplify(dat_dcpf_histories, max_n_paths = NULL)$path_id)</span>
 <span class='co'># Reconstruct one path</span>
 <span class='fu'><a href='https://rdrr.io/pkg/raster/man/unique.html'>unique</a></span><span class='op'>(</span><span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>, max_n_paths <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>$</span><span class='va'>path_id</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:34)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:26)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:34) after ~0 minutes. </div><div class='output co'>#&gt; [1] 1</div><div class='input'><span class='co'># Reconstruct (at most) five paths</span>
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:26) after ~0 minutes. </div><div class='output co'>#&gt; [1] 1</div><div class='input'><span class='co'># Reconstruct (at most) five paths</span>
 <span class='fu'><a href='https://rdrr.io/pkg/raster/man/unique.html'>unique</a></span><span class='op'>(</span><span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>, max_n_paths <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span><span class='op'>$</span><span class='va'>path_id</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:34)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:26)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:34) after ~0 minutes. </div><div class='output co'>#&gt; [1] 1 2 3 4 5</div><div class='input'>
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:26) after ~0 minutes. </div><div class='output co'>#&gt; [1] 1 2 3 4 5</div><div class='input'>
 <span class='co'>#### Example (6): Retain/drop the origin, if specified</span>
 <span class='co'># For the example particle histories, an origin was specified</span>
 <span class='va'>dat_dcpf_histories</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>origin</span>
@@ -709,43 +714,43 @@
 #&gt; [1,] 708886.3 6254404</div><div class='input'><span class='co'># This is included as 'timestep = 0' in the returned dataframe</span>
 <span class='co'># ... with the coordinates re-defined on bathy:</span>
 <span class='va'>paths_5a</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:34)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:26)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:34) after ~0 minutes. </div><div class='input'><span class='va'>paths_5a</span><span class='op'>[</span><span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"cell_x"</span>, <span class='st'>"cell_y"</span><span class='op'>)</span><span class='op'>]</span>
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:26) after ~0 minutes. </div><div class='input'><span class='va'>paths_5a</span><span class='op'>[</span><span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"cell_x"</span>, <span class='st'>"cell_y"</span><span class='op'>)</span><span class='op'>]</span>
 </div><div class='output co'>#&gt;     cell_x  cell_y
 #&gt; 1 708897.1 6254392</div><div class='input'><span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/xyFromCell.html'>xyFromCell</a></span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>,
                    <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/cellFrom.html'>cellFromXY</a></span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>,
                                       <span class='va'>dat_dcpf_histories</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>origin</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;             x       y
 #&gt; [1,] 708897.1 6254392</div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>paths_5a</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   path_id timestep cell_id   cell_x  cell_y   cell_z    cell_pr      dist
-#&gt; 1       1        0    3241 708897.1 6254392 135.0958 1.00000000        NA
-#&gt; 2       1        1    3722 708922.1 6254242 134.0199 0.06891651 152.06906
-#&gt; 3       1        2    3243 708947.1 6254392 133.6996 0.06891651 152.06906
-#&gt; 4       1        3    3166 709022.1 6254416 133.6938 0.74022781  79.05694
-#&gt; 5       1        4    3006 709022.1 6254466 134.0630 0.92414182  50.00000
-#&gt; 6       1        5    3009 709097.1 6254466 134.9762 0.77729986  75.00000</div><div class='input'><span class='co'># If specified, the origin is dropped with add_origin = FALSE</span>
+</div><div class='output co'>#&gt;   path_id timestep cell_id   cell_x  cell_y   cell_z      cell_pr      dist
+#&gt; 1       1        0    3241 708897.1 6254392 135.0958 1.000000e+00        NA
+#&gt; 2       1        1    3722 708922.1 6254242 134.0199 1.808832e-05 152.06906
+#&gt; 3       1        2    3243 708947.1 6254392 133.6996 1.663445e-05 152.06906
+#&gt; 4       1        3    3166 709022.1 6254416 133.6938 1.569277e-04  79.05694
+#&gt; 5       1        4    3006 709022.1 6254466 134.0630 1.826367e-04  50.00000
+#&gt; 6       1        5    3009 709097.1 6254466 134.9762 1.547789e-04  75.00000</div><div class='input'><span class='co'># If specified, the origin is dropped with add_origin = FALSE</span>
 <span class='va'>paths_5b</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>, add_origin <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:34)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:26)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:34) after ~0 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>paths_5b</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   path_id timestep cell_id   cell_x  cell_y   cell_z    cell_pr      dist
-#&gt; 1       1        1    3722 708922.1 6254242 134.0199 0.06891651 152.06906
-#&gt; 2       1        2    3243 708947.1 6254392 133.6996 0.06891651 152.06906
-#&gt; 3       1        3    3166 709022.1 6254416 133.6938 0.74022781  79.05694
-#&gt; 4       1        4    3006 709022.1 6254466 134.0630 0.92414182  50.00000
-#&gt; 5       1        5    3009 709097.1 6254466 134.9762 0.77729986  75.00000
-#&gt; 6       1        6    3329 709097.1 6254366 135.3115 0.50000000 100.00000</div><div class='input'>
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:26) after ~0 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>paths_5b</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   path_id timestep cell_id   cell_x  cell_y   cell_z      cell_pr      dist
+#&gt; 1       1        1    3722 708922.1 6254242 134.0199 1.808832e-05 152.06906
+#&gt; 2       1        2    3243 708947.1 6254392 133.6996 1.663445e-05 152.06906
+#&gt; 3       1        3    3166 709022.1 6254416 133.6938 1.569277e-04  79.05694
+#&gt; 4       1        4    3006 709022.1 6254466 134.0630 1.826367e-04  50.00000
+#&gt; 5       1        5    3009 709097.1 6254466 134.9762 1.547789e-04  75.00000
+#&gt; 6       1        6    3329 709097.1 6254366 135.3115 1.049538e-04 100.00000</div><div class='input'>
 <span class='co'>#### Example (6) Get particle samples for connected particles</span>
 <span class='co'>## Implement DCPF with more particles for demonstration purposes</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
@@ -753,7 +758,7 @@
 <span class='va'>dcpf_args</span><span class='op'>$</span><span class='va'>calc_distance_euclid_fast</span> <span class='op'>&lt;-</span> <span class='cn'>TRUE</span>
 <span class='va'>dcpf_args</span><span class='op'>$</span><span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>250</span>
 <span class='va'>out_dcpf_6a</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/do.call.html'>do.call</a></span><span class='op'>(</span><span class='va'>pf</span>, <span class='va'>dcpf_args</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:45:34)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2022-05-28 18:15:26)... 
 #&gt; ... Setting up function... 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
 #&gt; ... Implementing algorithm iteratively over time steps... 
@@ -810,30 +815,30 @@
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:45:43) after ~0.15 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>out_dcpf_6a</span><span class='op'>$</span><span class='va'>history</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   id_current pr_current timestep
-#&gt; 1       3243  0.9241418        1
-#&gt; 2       2921  0.5000000        1
-#&gt; 3       3396  0.1504014        1
-#&gt; 4       3159  0.9006900        1
-#&gt; 5       3320  0.9620294        1
-#&gt; 6       3237  0.5000000        1</div><div class='input'><span class='co'>## Extract particle samples for connected particles</span>
+#&gt; ... flapper::pf() call completed (@ 2022-05-28 18:15:35) after ~0.16 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>out_dcpf_6a</span><span class='op'>$</span><span class='va'>history</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   id_current   pr_current timestep
+#&gt; 1       3243 2.425569e-04        1
+#&gt; 2       2921 1.312336e-04        1
+#&gt; 3       3396 3.947544e-05        1
+#&gt; 4       3159 2.364016e-04        1
+#&gt; 5       3320 2.525012e-04        1
+#&gt; 6       3237 1.312336e-04        1</div><div class='input'><span class='co'>## Extract particle samples for connected particles</span>
 <span class='co'># There may be multiple records of any given cell at any given time step</span>
 <span class='co'># ... due to sampling with replacement.</span>
 <span class='va'>out_dcpf_6b</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>out_dcpf_6a</span>, return <span class='op'>=</span> <span class='st'>"archive"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:43)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:35)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... ... Processing connected cells for return = 'archive'... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:43) after ~0 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>out_dcpf_6b</span><span class='op'>$</span><span class='va'>history</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   timestep id_previous id_current dist_current pr_current
-#&gt; 1        1        3241       2838     145.7738  0.0920640
-#&gt; 2        1        3241       2839     134.6291  0.1504014
-#&gt; 3        1        3241       2841     125.0000  0.2227001
-#&gt; 4        1        3241       2842     127.4755  0.2020107
-#&gt; 5        1        3241       2917     141.4214  0.1119408
-#&gt; 6        1        3241       2918     125.0000  0.2227001</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/duplicated.html'>duplicated</a></span><span class='op'>(</span><span class='va'>out_dcpf_6b</span><span class='op'>$</span><span class='va'>history</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>$</span><span class='va'>id_current</span><span class='op'>)</span><span class='op'>)</span>
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:36) after ~0 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>out_dcpf_6b</span><span class='op'>$</span><span class='va'>history</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   timestep id_previous id_current dist_current   pr_current
+#&gt; 1        1        3241       2838     145.7738 2.416378e-05
+#&gt; 2        1        3241       2839     134.6291 3.947544e-05
+#&gt; 3        1        3241       2841     125.0000 5.845148e-05
+#&gt; 4        1        3241       2842     127.4755 5.302119e-05
+#&gt; 5        1        3241       2917     141.4214 2.938080e-05
+#&gt; 6        1        3241       2918     125.0000 5.845148e-05</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/duplicated.html'>duplicated</a></span><span class='op'>(</span><span class='va'>out_dcpf_6b</span><span class='op'>$</span><span class='va'>history</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>$</span><span class='va'>id_current</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; FALSE 
 #&gt;    90 </div><div class='input'><span class='co'>## Extract particle samples for connected particles,</span>
@@ -845,16 +850,16 @@
 <span class='va'>out_dcpf_6c</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>out_dcpf_6b</span>,
                            summarise_pr <span class='op'>=</span> <span class='cn'>TRUE</span>,
                            return <span class='op'>=</span> <span class='st'>"archive"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:43)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:36)... 
 #&gt; ... ... Processing connected cells for return = 'archive'... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:44) after ~0.01 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>out_dcpf_6c</span><span class='op'>$</span><span class='va'>history</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   timestep id_previous id_current dist_current pr_current
-#&gt; 1        1        3241       2838     145.7738 0.09268433
-#&gt; 2        1        3241       2839     134.6291 0.15141483
-#&gt; 3        1        3241       2841     125.0000 0.22420068
-#&gt; 4        1        3241       2842     127.4755 0.20337186
-#&gt; 5        1        3241       2917     141.4214 0.11269509
-#&gt; 6        1        3241       2918     125.0000 0.22420068</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/duplicated.html'>duplicated</a></span><span class='op'>(</span><span class='va'>out_dcpf_6c</span><span class='op'>$</span><span class='va'>history</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>$</span><span class='va'>id_current</span><span class='op'>)</span><span class='op'>)</span>
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:36) after ~0.01 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>out_dcpf_6c</span><span class='op'>$</span><span class='va'>history</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   timestep id_previous id_current dist_current  pr_current
+#&gt; 1        1        3241       2838     145.7738 0.002078627
+#&gt; 2        1        3241       2839     134.6291 0.003395774
+#&gt; 3        1        3241       2841     125.0000 0.005028139
+#&gt; 4        1        3241       2842     127.4755 0.004561012
+#&gt; 5        1        3241       2917     141.4214 0.002527408
+#&gt; 6        1        3241       2918     125.0000 0.005028139</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/duplicated.html'>duplicated</a></span><span class='op'>(</span><span class='va'>out_dcpf_6c</span><span class='op'>$</span><span class='va'>history</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>$</span><span class='va'>id_current</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; FALSE 
 #&gt;    90 </div><div class='input'><span class='co'>## Make movement paths</span>
@@ -862,11 +867,11 @@
 <span class='va'>out_dcpf_6d</span> <span class='op'>&lt;-</span> <span class='fu'>pf_simplify</span><span class='op'>(</span><span class='va'>out_dcpf_6b</span>,
                            max_n_copies <span class='op'>=</span> <span class='fl'>2L</span>,
                            return <span class='op'>=</span> <span class='st'>"path"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:45:44)... 
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:15:36)... 
 #&gt; ... Assembling paths... 
 #&gt; ... Formatting paths... 
 #&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:45:44) after ~0.01 minutes. </div><div class='input'><span class='co'>## Compare resultant maps</span>
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:15:37) after ~0.01 minutes. </div><div class='input'><span class='co'>## Compare resultant maps</span>
 <span class='co'># The map for all particles is influenced by particles that were 'dead ends',</span>
 <span class='co'># ... which isn't ideal for a map of space use.</span>
 <span class='co'># The map for connected samples deals with this problem, but is influenced by</span>
@@ -901,11 +906,11 @@
 <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/unique.html'>unique</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span><span class='op'>(</span><span class='va'>h_6a</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%in%</span> <span class='va'>out_dcpf_6d</span><span class='op'>$</span><span class='va'>cell_id</span><span class='op'>[</span><span class='va'>out_dcpf_6d</span><span class='op'>$</span><span class='va'>timestep</span> <span class='op'>!=</span> <span class='fl'>0</span><span class='op'>]</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; FALSE  TRUE 
-#&gt;  1602   339 </div><div class='input'><span class='va'>h_6b</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>out_dcpf_6b</span><span class='op'>$</span><span class='va'>history</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>elm</span><span class='op'>)</span> <span class='va'>elm</span><span class='op'>[</span>, <span class='st'>"id_current"</span><span class='op'>]</span><span class='op'>)</span>
+#&gt;  1588   353 </div><div class='input'><span class='va'>h_6b</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>out_dcpf_6b</span><span class='op'>$</span><span class='va'>history</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>elm</span><span class='op'>)</span> <span class='va'>elm</span><span class='op'>[</span>, <span class='st'>"id_current"</span><span class='op'>]</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/unique.html'>unique</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span><span class='op'>(</span><span class='va'>h_6b</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%in%</span> <span class='va'>out_dcpf_6d</span><span class='op'>$</span><span class='va'>cell_id</span><span class='op'>[</span><span class='va'>out_dcpf_6d</span><span class='op'>$</span><span class='va'>timestep</span> <span class='op'>!=</span> <span class='fl'>0</span><span class='op'>]</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; FALSE  TRUE 
-#&gt;  1285   339 </div><div class='input'>
+#&gt;  1271   353 </div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

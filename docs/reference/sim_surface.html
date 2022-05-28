@@ -168,24 +168,24 @@
     <pre class="examples"><div class='input'><span class='co'>#### Example (1): Simulate values across the whole raster</span>
 <span class='fu'>sim_surface</span><span class='op'>(</span><span class='va'>dat_gebco</span>,
             sim_values <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='va'>n</span>, <span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='img'><img src='sim_surface-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; class      : RasterLayer 
-#&gt; dimensions : 57, 74, 4218  (nrow, ncol, ncell)
-#&gt; resolution : 257, 463  (x, y)
-#&gt; extent     : 695492.1, 714510.1, 6246657, 6273048  (xmin, xmax, ymin, ymax)
-#&gt; crs        : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
+</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=longlat +datum=WGS84 +no_defs'.</span></div><div class='img'><img src='sim_surface-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; class      : RasterLayer 
+#&gt; dimensions : 36, 36, 1296  (nrow, ncol, ncell)
+#&gt; resolution : 0.004166667, 0.004166667  (x, y)
+#&gt; extent     : -5.545833, -5.395833, 56.34167, 56.49167  (xmin, xmax, ymin, ymax)
+#&gt; crs        : +proj=longlat +datum=WGS84 +no_defs 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0.0001124728, 0.9997921  (min, max)
+#&gt; values     : 0.003074374, 0.99993  (min, max)
 #&gt; </div><div class='input'><span class='fu'>sim_surface</span><span class='op'>(</span><span class='va'>dat_gebco</span>,
             sim_values <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='va'>n</span>, <span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='img'><img src='sim_surface-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; class      : RasterLayer 
-#&gt; dimensions : 57, 74, 4218  (nrow, ncol, ncell)
-#&gt; resolution : 257, 463  (x, y)
-#&gt; extent     : 695492.1, 714510.1, 6246657, 6273048  (xmin, xmax, ymin, ymax)
-#&gt; crs        : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
+</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=longlat +datum=WGS84 +no_defs'.</span></div><div class='img'><img src='sim_surface-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; class      : RasterLayer 
+#&gt; dimensions : 36, 36, 1296  (nrow, ncol, ncell)
+#&gt; resolution : 0.004166667, 0.004166667  (x, y)
+#&gt; extent     : -5.545833, -5.395833, 56.34167, 56.49167  (xmin, xmax, ymin, ymax)
+#&gt; crs        : +proj=longlat +datum=WGS84 +no_defs 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : -3.913901, 3.498305  (min, max)
+#&gt; values     : -3.392097, 3.403319  (min, max)
 #&gt; </div><div class='input'>
 <span class='co'>#### Example (2): Simulate values differently across different areas</span>
 <span class='co'># .. by defining the number of areas into which to split the raster</span>
@@ -194,14 +194,14 @@
             n <span class='op'>=</span> <span class='fl'>2</span>, sim_values <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='va'>n</span>, <span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span>,
                                      <span class='kw'>function</span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='va'>n</span>, <span class='fl'>10</span>, <span class='fl'>11</span><span class='op'>)</span><span class='op'>)</span>
             <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='img'><img src='sim_surface-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; class      : RasterLayer 
-#&gt; dimensions : 57, 58, 3306  (nrow, ncol, ncell)
-#&gt; resolution : 257, 463  (x, y)
-#&gt; extent     : 697548.1, 712454.1, 6246657, 6273048  (xmin, xmax, ymin, ymax)
-#&gt; crs        : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
+</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=longlat +datum=WGS84 +no_defs'.</span></div><div class='img'><img src='sim_surface-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; class      : RasterLayer 
+#&gt; dimensions : 36, 34, 1224  (nrow, ncol, ncell)
+#&gt; resolution : 0.004166667, 0.004166667  (x, y)
+#&gt; extent     : -5.541667, -5.4, 56.34167, 56.49167  (xmin, xmax, ymin, ymax)
+#&gt; crs        : +proj=longlat +datum=WGS84 +no_defs 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0.0002976551, 10.99983  (min, max)
+#&gt; values     : 0.0006700254, 10.9997  (min, max)
 #&gt; </div><div class='input'>
 <span class='co'>#### Example (3): Include a spatial mask</span>
 <span class='fu'>sim_surface</span><span class='op'>(</span><span class='va'>dat_gebco</span>,
@@ -209,14 +209,14 @@
                                     <span class='kw'>function</span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='va'>n</span>, <span class='fl'>10</span>, <span class='fl'>11</span><span class='op'>)</span><span class='op'>)</span>,
             mask <span class='op'>=</span> <span class='va'>dat_coast</span>, mask_inside <span class='op'>=</span> <span class='cn'>TRUE</span>
             <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='img'><img src='sim_surface-4.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; class      : RasterLayer 
-#&gt; dimensions : 57, 58, 3306  (nrow, ncol, ncell)
-#&gt; resolution : 257, 463  (x, y)
-#&gt; extent     : 697548.1, 712454.1, 6246657, 6273048  (xmin, xmax, ymin, ymax)
-#&gt; crs        : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
+</div><div class='output co'>#&gt; <span class='warning'>Warning: spgeom1 and spgeom2 have different proj4 strings</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=longlat +datum=WGS84 +no_defs'.</span></div><div class='img'><img src='sim_surface-4.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; class      : RasterLayer 
+#&gt; dimensions : 36, 34, 1224  (nrow, ncol, ncell)
+#&gt; resolution : 0.004166667, 0.004166667  (x, y)
+#&gt; extent     : -5.541667, -5.4, 56.34167, 56.49167  (xmin, xmax, ymin, ymax)
+#&gt; crs        : +proj=longlat +datum=WGS84 +no_defs 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 9.00047, 10.99976  (min, max)
+#&gt; values     : 9.000707, 10.99942  (min, max)
 #&gt; </div><div class='input'>
 </div></pre>
   </div>

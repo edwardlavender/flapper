@@ -161,9 +161,87 @@
 </div><div class='img'><img src='invert_poly-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>graphics</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span><span class='va'>pp</span><span class='op'>)</span>
 <span class='co'># The CRS of the two objects is identical</span>
 <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/projection.html'>crs</a></span><span class='op'>(</span><span class='va'>dat_coast</span><span class='op'>)</span>; <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/projection.html'>crs</a></span><span class='op'>(</span><span class='va'>dat_sea</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; CRS arguments:
-#&gt;  +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </div><div class='output co'>#&gt; CRS arguments:
-#&gt;  +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </div><div class='input'><span class='co'># Compare the classes of the two objects</span>
+</div><div class='output co'>#&gt; Coordinate Reference System:
+#&gt; Deprecated Proj.4 representation:
+#&gt;  +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
+#&gt; WKT2 2019 representation:
+#&gt; PROJCRS["unknown",
+#&gt;     BASEGEOGCRS["unknown",
+#&gt;         DATUM["World Geodetic System 1984",
+#&gt;             ELLIPSOID["WGS 84",6378137,298.257223563,
+#&gt;                 LENGTHUNIT["metre",1]],
+#&gt;             ID["EPSG",6326]],
+#&gt;         PRIMEM["Greenwich",0,
+#&gt;             ANGLEUNIT["degree",0.0174532925199433],
+#&gt;             ID["EPSG",8901]]],
+#&gt;     CONVERSION["UTM zone 29N",
+#&gt;         METHOD["Transverse Mercator",
+#&gt;             ID["EPSG",9807]],
+#&gt;         PARAMETER["Latitude of natural origin",0,
+#&gt;             ANGLEUNIT["degree",0.0174532925199433],
+#&gt;             ID["EPSG",8801]],
+#&gt;         PARAMETER["Longitude of natural origin",-9,
+#&gt;             ANGLEUNIT["degree",0.0174532925199433],
+#&gt;             ID["EPSG",8802]],
+#&gt;         PARAMETER["Scale factor at natural origin",0.9996,
+#&gt;             SCALEUNIT["unity",1],
+#&gt;             ID["EPSG",8805]],
+#&gt;         PARAMETER["False easting",500000,
+#&gt;             LENGTHUNIT["metre",1],
+#&gt;             ID["EPSG",8806]],
+#&gt;         PARAMETER["False northing",0,
+#&gt;             LENGTHUNIT["metre",1],
+#&gt;             ID["EPSG",8807]],
+#&gt;         ID["EPSG",16029]],
+#&gt;     CS[Cartesian,2],
+#&gt;         AXIS["(E)",east,
+#&gt;             ORDER[1],
+#&gt;             LENGTHUNIT["metre",1,
+#&gt;                 ID["EPSG",9001]]],
+#&gt;         AXIS["(N)",north,
+#&gt;             ORDER[2],
+#&gt;             LENGTHUNIT["metre",1,
+#&gt;                 ID["EPSG",9001]]]] </div><div class='output co'>#&gt; Coordinate Reference System:
+#&gt; Deprecated Proj.4 representation:
+#&gt;  +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs 
+#&gt; WKT2 2019 representation:
+#&gt; PROJCRS["unknown",
+#&gt;     BASEGEOGCRS["unknown",
+#&gt;         DATUM["World Geodetic System 1984",
+#&gt;             ELLIPSOID["WGS 84",6378137,298.257223563,
+#&gt;                 LENGTHUNIT["metre",1]],
+#&gt;             ID["EPSG",6326]],
+#&gt;         PRIMEM["Greenwich",0,
+#&gt;             ANGLEUNIT["degree",0.0174532925199433],
+#&gt;             ID["EPSG",8901]]],
+#&gt;     CONVERSION["UTM zone 29N",
+#&gt;         METHOD["Transverse Mercator",
+#&gt;             ID["EPSG",9807]],
+#&gt;         PARAMETER["Latitude of natural origin",0,
+#&gt;             ANGLEUNIT["degree",0.0174532925199433],
+#&gt;             ID["EPSG",8801]],
+#&gt;         PARAMETER["Longitude of natural origin",-9,
+#&gt;             ANGLEUNIT["degree",0.0174532925199433],
+#&gt;             ID["EPSG",8802]],
+#&gt;         PARAMETER["Scale factor at natural origin",0.9996,
+#&gt;             SCALEUNIT["unity",1],
+#&gt;             ID["EPSG",8805]],
+#&gt;         PARAMETER["False easting",500000,
+#&gt;             LENGTHUNIT["metre",1],
+#&gt;             ID["EPSG",8806]],
+#&gt;         PARAMETER["False northing",0,
+#&gt;             LENGTHUNIT["metre",1],
+#&gt;             ID["EPSG",8807]],
+#&gt;         ID["EPSG",16029]],
+#&gt;     CS[Cartesian,2],
+#&gt;         AXIS["(E)",east,
+#&gt;             ORDER[1],
+#&gt;             LENGTHUNIT["metre",1,
+#&gt;                 ID["EPSG",9001]]],
+#&gt;         AXIS["(N)",north,
+#&gt;             ORDER[2],
+#&gt;             LENGTHUNIT["metre",1,
+#&gt;                 ID["EPSG",9001]]]] </div><div class='input'><span class='co'># Compare the classes of the two objects</span>
 <span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='va'>dat_coast</span><span class='op'>)</span>; <span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='va'>dat_sea</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] "SpatialPolygonsDataFrame"
 #&gt; attr(,"package")

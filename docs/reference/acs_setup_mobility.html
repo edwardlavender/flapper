@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="Examine the constant `mobility' assumption of the AC* algorithm(s) — acs_setup_mobility" />
-<meta property="og:description" content="In the simplest and fastest (and only) version of the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms currently implemented by flapper, the rate at which acoustic centroids expand and contract depends on a single `mobility' parameter that describes how the uncertainty in an individual's location changes through time according to the passive acoustic telemetry data. These changes essentially reflect the maximum horizontal distance that an individual can move in the regularised time steps between sequential detections. However, in some situations, a fixed parameter for horizontal movement may not be well supported. For instance, in cases with archival data (the ACDC algorithm), animals changes dramatically in depth and for which changes in depth are likely to curtail the extent of horizontal movement*. Thus, this function investigates the extent to which the horizontal distance an animal could travel changes through time if the mobility parameter is instead conceptualised as the diagonal distance between sequential depth observations." />
+<meta property="og:description" content="In the simplest and fastest (and only) version of the acoustic-container (AC) and acoustic-container depth-contour (ACDC) algorithms currently implemented by flapper, the rate at which acoustic containers expand and contract depends on a single `mobility' parameter that describes how the set of possible locations for an individual changes through time according to the passive acoustic telemetry data. These changes essentially reflect the maximum horizontal distance that an individual can move in the regularised time steps between sequential detections. However, in some situations, a fixed parameter for horizontal movement may not be well supported. For instance, in cases with archival data (the ACDC algorithm), animals changes dramatically in depth and for which changes in depth are likely to curtail the extent of horizontal movement*. Thus, this function investigates the extent to which the horizontal distance an animal could travel changes through time if the mobility parameter is instead conceptualised as the diagonal distance between sequential depth observations." />
 
 
 
@@ -120,7 +120,7 @@
     </div>
 
     <div class="ref-description">
-    <p>In the simplest and fastest (and only) version of the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms currently implemented by <code><a href='flapper.html'>flapper</a></code>, the rate at which acoustic centroids expand and contract depends on a single `mobility' parameter that describes how the uncertainty in an individual's location changes through time according to the passive acoustic telemetry data. These changes essentially reflect the maximum horizontal distance that an individual can move in the regularised time steps between sequential detections. However, in some situations, a fixed parameter for horizontal movement may not be well supported. For instance, in cases with archival data (the ACDC algorithm), animals changes dramatically in depth and for which changes in depth are likely to curtail the extent of horizontal movement*. Thus, this function investigates the extent to which the horizontal distance an animal could travel changes through time if the mobility parameter is instead conceptualised as the diagonal distance between sequential depth observations.</p>
+    <p>In the simplest and fastest (and only) version of the acoustic-container (AC) and acoustic-container depth-contour (ACDC) algorithms currently implemented by <code><a href='flapper.html'>flapper</a></code>, the rate at which acoustic containers expand and contract depends on a single `mobility' parameter that describes how the set of possible locations for an individual changes through time according to the passive acoustic telemetry data. These changes essentially reflect the maximum horizontal distance that an individual can move in the regularised time steps between sequential detections. However, in some situations, a fixed parameter for horizontal movement may not be well supported. For instance, in cases with archival data (the ACDC algorithm), animals changes dramatically in depth and for which changes in depth are likely to curtail the extent of horizontal movement*. Thus, this function investigates the extent to which the horizontal distance an animal could travel changes through time if the mobility parameter is instead conceptualised as the diagonal distance between sequential depth observations.</p>
     </div>
 
     <pre class="usage"><span class='fu'>acs_setup_mobility</span><span class='op'>(</span>
@@ -142,7 +142,7 @@
     </tr>
     <tr>
       <th>mobility</th>
-      <td><p>A number, in the same units as <code>depth</code>, that defines the maximum horizontal distance that an individual could move in the time period between archival observations (see <code><a href='acs_setup_centroids.html'>acs_setup_centroids</a></code>).</p></td>
+      <td><p>A number, in the same units as <code>depth</code>, that defines the maximum horizontal distance that an individual could move in the time period between archival observations (see <code><a href='acs_setup_containers.html'>acs_setup_containers</a></code>).</p></td>
     </tr>
     <tr>
       <th>plot</th>
@@ -170,10 +170,10 @@
     <p>The function uses a Pythagorean approximation to estimate the \(distance\) that an individual could travel in each time step (\(t\)), given the maximum horizontal distance that the individual could move (\(mobility\)) and sequential changes in \(depth\), according to the equation:</p>
 <p>$$distance_{t + 1} = \sqrt{mobility^2 + (depth_{t + 1} - depth_{t})^2},$$</p>
 <p>where \(depth_{t + 1}\) for the final (\(n^{th}\)) observation is defined as \(depth_{t = n}\) and thus \(distance_{t = n} = mobility\).</p>
-<p>*If the horizontal distances that an individual could travel are not very variable, then the benefits of a single mobility parameter are likely to outweigh the costs. On the other hand, substantial variation in the horizontal distances that an individual could travel may suggest that a constant mobility parameter is inappropriate; in this situation, the correct centroids could be computed on-the-fly within the ACDC algorithm, but this is not currently implemented. However, the particle filtering algorithms can account for this by the incorporation of movement models within/between acoustic centroids.</p>
+<p>*If the horizontal distances that an individual could travel are not very variable, then the benefits of a single mobility parameter are likely to outweigh the costs. On the other hand, substantial variation in the horizontal distances that an individual could travel may suggest that a constant mobility parameter is inappropriate; in this situation, the correct containers could be computed on-the-fly within the ACDC algorithm, but this is not currently implemented. However, the particle filtering algorithms can account for this by the incorporation of movement models within/between acoustic containers.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code>acs_setup_mobility</code>, <code><a href='acs_setup_centroids.html'>acs_setup_centroids</a></code> and <code><a href='acs_setup_detection_kernels.html'>acs_setup_detection_kernels</a></code> are used to set up the AC and ACDC algorithms as implemented by <code><a href='ac.html'>ac</a></code> and <code><a href='acdc.html'>acdc</a></code>.</p></div>
+    <div class='dont-index'><p><code>acs_setup_mobility</code>, <code><a href='acs_setup_containers.html'>acs_setup_containers</a></code> and <code><a href='acs_setup_detection_kernels.html'>acs_setup_detection_kernels</a></code> are used to set up the AC and ACDC algorithms as implemented by <code><a href='ac.html'>ac</a></code> and <code><a href='acdc.html'>acdc</a></code>.</p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Edward Lavender</p>
@@ -213,7 +213,7 @@
 <span class='co'># ... is reasonable without further information (e.g., models of the underlying</span>
 <span class='co'># ... behavioural state of the animal). However, it is still likely to be</span>
 <span class='co'># ... beneficial to include a movement model to join locations within/</span>
-<span class='co'># ... between acoustic centroids for some applications via particle filtering.</span>
+<span class='co'># ... between acoustic containers for some applications via particle filtering.</span>
 
 </div></pre>
   </div>

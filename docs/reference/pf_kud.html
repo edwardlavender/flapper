@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Apply kernel smoothing to particles or paths from a PF algorithm — pf_kud • flapper</title>
+<title>Smooth POU maps — pf_kud • flapper</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Apply kernel smoothing to particles or paths from a PF algorithm — pf_kud" />
-<meta property="og:description" content="These functions are wrappers designed to apply kernel utilisation distribution (KUD) estimation to the outputs of a particle filtering (PF) algorithm. To implement these routines, an (a) pf_archive-class object from pf (plus pf_simplify with the return = &quot;archive&quot; argument) containing particle histories for connected particles or (b) a pf_path-class object containing reconstructed paths must be supplied. Depending on the implementation, using a subset, all or an expanded sample of sampled locations, the functions apply KUD smoother(s) via a user-supplied estimation routine (i.e., kernelUD or kud_around_coastline). The functions extract the utilisation distribution(s) as raster(s), combine distribution(s) (if necessary), apply a spatial mask (e.g. coastline), plot the processed distribution (if specified) and return this as a raster." />
+<meta property="og:title" content="Smooth POU maps — pf_kud" />
+<meta property="og:description" content="This function smooths proportion-of-use (POU) maps (from pf_plot_map) by applying kernel utilisation distribution (KUD) estimation. Depending on the implementation, following optional initial time trials, using a subset, all or an expanded sample of POU locations, the function applies a KUD smoother via a user-supplied estimation routine (i.e., kernelUD or kud_around_coastline). The function extracts the KUD as a raster, applies a spatial mask (e.g., coastline), plots the processed KUD (if specified) and returns this as a raster." />
 
 
 
@@ -114,40 +114,23 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Apply kernel smoothing to particles or paths from a PF algorithm</h1>
-    <small class="dont-index">Source: <a href='https://github.com/edwardlavender/flapper/blob/master/R/pf_analyse_either.R'><code>R/pf_analyse_either.R</code></a></small>
+    <h1>Smooth POU maps</h1>
+    <small class="dont-index">Source: <a href='https://github.com/edwardlavender/flapper/blob/master/R/pf_kud.R'><code>R/pf_kud.R</code></a></small>
     <div class="hidden name"><code>pf_kud.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>These functions are wrappers designed to apply kernel utilisation distribution (KUD) estimation to the outputs of a particle filtering (PF) algorithm. To implement these routines, an (a) <code><a href='pf_archive-class.html'>pf_archive-class</a></code> object from <code><a href='pf.html'>pf</a></code> (plus <code><a href='pf_simplify.html'>pf_simplify</a></code> with the <code>return = "archive"</code> argument) containing particle histories for connected particles or (b) a <code><a href='pf_path-class.html'>pf_path-class</a></code> object containing reconstructed paths must be supplied. Depending on the implementation, using a subset, all or an expanded sample of sampled locations, the functions apply KUD smoother(s) via a user-supplied estimation routine (i.e., <code><a href='https://rdrr.io/pkg/adehabitatHR/man/kernelUD.html'>kernelUD</a></code> or <code><a href='kud_around_coastline.html'>kud_around_coastline</a></code>). The functions extract the utilisation distribution(s) as <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code>(s), combine distribution(s) (if necessary), apply a spatial mask (e.g. coastline), plot the processed distribution (if specified) and return this as a <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code>.</p>
+    <p>This function smooths proportion-of-use (POU) maps (from <code><a href='pf_plot_map.html'>pf_plot_map</a></code>) by applying kernel utilisation distribution (KUD) estimation. Depending on the implementation, following optional initial time trials, using a subset, all or an expanded sample of POU locations, the function applies a KUD smoother via a user-supplied estimation routine (i.e., <code><a href='https://rdrr.io/pkg/adehabitatHR/man/kernelUD.html'>kernelUD</a></code> or <code><a href='kud_around_coastline.html'>kud_around_coastline</a></code>). The function extracts the KUD as a <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code>, applies a spatial mask (e.g., coastline), plots the processed KUD (if specified) and returns this as a <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>pf_kud_1</span><span class='op'>(</span>
+    <pre class="usage"><span class='fu'>pf_kud</span><span class='op'>(</span>
   <span class='va'>xpf</span>,
-  <span class='va'>bathy</span>,
   sample_size <span class='op'>=</span> <span class='cn'>NULL</span>,
   estimate_ud <span class='op'>=</span> <span class='fu'>adehabitatHR</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/adehabitatHR/man/kernelUD.html'>kernelUD</a></span>,
   <span class='va'>grid</span>,
   <span class='va'>...</span>,
-  scale <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  plot_by_time <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  prompt <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  chunks <span class='op'>=</span> <span class='fl'>1L</span>,
-  cl <span class='op'>=</span> <span class='cn'>NULL</span>,
-  varlist <span class='op'>=</span> <span class='cn'>NULL</span>,
-  mask <span class='op'>=</span> <span class='cn'>NULL</span>,
-  plot <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
-<span class='op'>)</span>
-
-<span class='fu'>pf_kud_2</span><span class='op'>(</span>
-  <span class='va'>xpf</span>,
-  <span class='va'>bathy</span>,
-  sample_size <span class='op'>=</span> <span class='cn'>NULL</span>,
-  estimate_ud <span class='op'>=</span> <span class='fu'>adehabitatHR</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/adehabitatHR/man/kernelUD.html'>kernelUD</a></span>,
-  <span class='va'>grid</span>,
-  <span class='va'>...</span>,
+  trial_cells <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  trial_grids <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
   mask <span class='op'>=</span> <span class='cn'>NULL</span>,
   plot <span class='op'>=</span> <span class='cn'>TRUE</span>,
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
@@ -158,35 +141,23 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>xpf</th>
-      <td><p>A <code><a href='pf_archive-class.html'>pf_archive-class</a></code> object (from <code><a href='pf.html'>pf</a></code> plus <code><a href='pf_simplify.html'>pf_simplify</a></code> with <code>return = "archive"</code>) or a <code><a href='pf_path-class.html'>pf_path-class</a></code> object (from <code><a href='pf.html'>pf</a></code> plus <code><a href='pf_simplify.html'>pf_simplify</a></code> with <code>return = "path"</code>). For particle-based implementations, for <code>pf_kud_1</code>, <code><a href='pf_simplify.html'>pf_simplify</a></code> should be implemented with <code>summarise_pr = FALSE</code>; for <code>pf_kud_2</code>, <code><a href='pf_simplify.html'>pf_simplify</a></code> should be implemented with <code>summarise_pr = TRUE</code> (see Details).</p></td>
-    </tr>
-    <tr>
-      <th>bathy</th>
-      <td><p>A <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code> that defines the grid across which <code><a href='pf.html'>pf</a></code> was applied. This used to extract cell coordinates and to express KUD(s).</p></td>
+      <td><p>A POU <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code> object (from <code><a href='pf_plot_map.html'>pf_plot_map</a></code>).</p></td>
     </tr>
     <tr>
       <th>sample_size</th>
-      <td><p>(optional) An integer that defines the number of particles to sample from (a) particle histories or (b) each path in <code>xpf</code> for KUD estimation. For <code>pf_kud_1</code>, sampling is used to account for particle uncertainty so <code>sample_size</code> should be greater than the number of particle samples at each time step (see Details). If specified, for each time step, <code>sample_size</code> particles are sampled from (a) particle histories or (b) reconstructed paths with replacement in line with their probability. For <code>pf_kud_2</code>, sampling is used to reduce memory requirements and computation time, so <code>sample_size</code> should be lower than the total number of particle samples (per path, if applicable). If specified, <code>sample_size</code> particles are sampled from (a) particle histories or (b) each path with replacement in line with their probability. If <code>sample_size = NULL</code>, all particles are used.</p></td>
+      <td><p>(optional) An integer expansion factor for the number of locations used for KUD estimation. If supplied, \(n\) locations are randomly sampled from <code>xpf</code> with replacement in line with their probability, where \(n = n_{pou} \times sample_size\) and \(n_{pou}\) is the number of non-zero POU scores. This resampling approach avoids treating locations as `relocations'.</p></td>
     </tr>
     <tr>
       <th>estimate_ud</th>
-      <td><p>A function (either <code><a href='https://rdrr.io/pkg/adehabitatHR/man/kernelUD.html'>kernelUD</a></code> or <code><a href='kud_around_coastline.html'>kud_around_coastline</a></code>) that estimates kernel utilisation distributions. For <code>pf_kud_1</code>, <code><a href='kud_around_coastline.html'>kud_around_coastline_fast</a></code> can also be used for faster estimation.</p></td>
+      <td><p>A function (either <code><a href='https://rdrr.io/pkg/adehabitatHR/man/kernelUD.html'>kernelUD</a></code> or <code><a href='kud_around_coastline.html'>kud_around_coastline</a></code>) that estimates the KUD.</p></td>
     </tr>
     <tr>
       <th>grid, ...</th>
-      <td><p>Arguments passed to <code>estimate_ud</code> (and ultimately <code><a href='https://rdrr.io/pkg/adehabitatHR/man/kernelUD.html'>kernelUD</a></code>, where they are defined) to estimate the kernel utilisation distribution. If <code><a href='kud_around_coastline.html'>kud_around_coastline</a></code> or <code><a href='kud_around_coastline.html'>kud_around_coastline_fast</a></code> is supplied to <code>estimate_ud</code>, then <code>grid</code> must be a <code><a href='https://rdrr.io/pkg/sp/man/SpatialGridDataFrame.html'>SpatialPixelsDataFrame</a></code>. However, note that in all cases, KUD(s) are resampled onto <code>bathy</code>.</p></td>
+      <td><p>Arguments passed to <code>estimate_ud</code> (and ultimately <code><a href='https://rdrr.io/pkg/adehabitatHR/man/kernelUD.html'>kernelUD</a></code>, where they are defined) to estimate the KUD. If <code><a href='kud_around_coastline.html'>kud_around_coastline</a></code> is supplied to <code>estimate_ud</code>, then <code>grid</code> must be a <code><a href='https://rdrr.io/pkg/sp/man/SpatialGridDataFrame.html'>SpatialPixelsDataFrame</a></code>. The resultant KUD is resampled onto <code>xpf</code>.</p></td>
     </tr>
     <tr>
-      <th>scale</th>
-      <td><p>For <code>pf_kud_1</code>, <code>scale</code> is a logical input that defines whether or not to scale the KUD for each time step such that the most probable locations are assigned a score of one.</p></td>
-    </tr>
-    <tr>
-      <th>plot_by_time, prompt</th>
-      <td><p>For <code>pf_kud_1</code>, <code>plot_by_time</code> is a logical variable that defines whether or not to plot the cumulative (un-normalised) KUD for each time step. If supplied, <code>prompt</code> is a logical variable that defines whether or not to pause function execution between sequential plots. These arguments are not implemented in parallel (see <code>cl</code>, below).</p></td>
-    </tr>
-    <tr>
-      <th>chunks, cl, varlist</th>
-      <td><p>For <code>pf_kud_1</code>, <code>chunks</code>, <code>cl</code> and <code>varlist</code> are chunk-wise implementation controls. <code>chunks</code> is an integer that defines the number of chunks into which to split particle/path time series. To minimise memory requirements, within each chunk, a blank map is sequentially updated with the KUD for each time step; the cumulative KUD for each chunk is then summed across chunks to create a single KUD. This approach minimises memory use while facilitating improvements in computation time through the parallel processing of each chunk via <code>cl</code> and <code>varlist</code>. <code>cl</code> is (a) a cluster object from <code><a href='https://rdrr.io/r/parallel/makeCluster.html'>makeCluster</a></code> or (b) an integer that defines the number of child processes. <code>varlist</code> is a character vector of variables for export (see <code><a href='cl.html'>cl_export</a></code>). Exported variables must be located in the global environment. If a cluster is supplied, the connection to the cluster is closed within the function (see <code><a href='cl.html'>cl_stop</a></code>). For further information, see <code><a href='cl.html'>cl_lapply</a></code> and <code><a href='flapper-tips-parallel.html'>flapper-tips-parallel</a></code>.</p></td>
+      <th>trial_cells, trial_grids</th>
+      <td><p>(Optional) Lists that define the numbers of locations (cells) and the grids used for time trials. If either <code>trial_cells</code> or <code>trial_grids</code> is supplied, the function implements <code>estimate_ud</code> for small (trial) numbers of cells and any grid(s) specified. If <code>trial_cells</code> is supplied, but not <code>trial_grids</code>, then <code>grid</code> is used for estimation. If <code>trial_grids</code> is supplied but not <code>trial_cells</code>, then time trials are implemented for each grid with 10, 50 and 100 locations. For each grid, the linear regression of the time required to estimate the KUD is plotted against the number of locations and used to predict the time required to fit the KUD to all locations. The user is then asked whether or not to continue with estimation across all locations.</p></td>
     </tr>
     <tr>
       <th>mask</th>
@@ -204,317 +175,90 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The functions return a <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code> of the KUD.</p>
+    <p>The function (a) plots the outcomes of time trials (if requested), (b) estimates and plots a KUD (if requested) and (c) returns a <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code> of the KUD.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    
-<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Methods</h3>
-<p>These function create smooth KUD representations of particle or path samples from a PF algorithm (see <code><a href='pf_plot_map.html'>pf_plot_map</a></code>). Two different methods are implemented.</p>
-
-<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method (1)</h3>
-<p><code>pf_kud_1</code> implements KUD estimation by fitting a single kernel to sampled locations at each time step; time step-specific kernels are then summed and re-normalised. This method can be implemented for (a) the sampled particles that formed continuous paths from the start to the end of the time series (see <code><a href='pf_simplify.html'>pf_simplify</a></code>) or (b) reconstructed paths. The method has two main advantages. First, the kernel bandwidth is allowed to vary through time. Second, this implementation permits a Bayesian-style resampling process that can be used to account for particle uncertainty. Specifically, at each time step, large numbers of particles can be re-sampled, in line with their probability and with replacement, from the initial list of sampled particles; more probable locations are sampled more often and consequently have more influence on the KUD for each time step, thus accounting for particle probability.</p>
-<p>A limitation with this method is that the fitting a KUD to each time step can be memory intensive and computationally intensive. To minimise memory requirements, by default (<code>chunks = 1L</code>), the function starts with a blank map and iterates over each time step, sequentially adding KUDs to the map at each step. By continuously updating a single map, this option minimises memory requirements but is slow. A faster option is to split the time series into chunks, implement an iterative option within each chunk, and then join maps for each chunk. The advantage of this option is that memory use remains limited while computation time can be improved by the parallel processing of each chunk. This is implemented via <code>chunks</code>, <code>cl</code> and <code>varlist</code>.</p>
-
-<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method (2)</h3>
-<p><code>pf_kud_2</code> implements KUD estimation by fitting a single kernel to all sampled locations or to each path (and then aggregating KUDs across paths). The main advantage of this method is speed: unlike <code>pf_kud_1</code>, KUDs are not fitted to the locations for each time step. The limitations are that kernel bandwidth is constant for all time steps and in most situations re-sampling cannot be used in the same way to account for particle uncertainty (due to memory limitations).</p>
-<p>For particle-based implementations, this method is designed to be implemented for the subset of unique, sampled particles that formed continuous paths from the start to the end of the time series (see <code><a href='pf_simplify.html'>pf_simplify</a></code> and <code><a href='pf_plot_map.html'>pf_plot_map</a></code>). These particles are used for KUD estimation. By default, all particles are used, but \(n =\) <code>sample_size</code> particles can be sampled at random, in line with their probability, if specified, for faster KUD estimation. Selected particles are then used to estimate a KUD by effectively treating samples as `relocations', ultimately via <code><a href='https://rdrr.io/pkg/adehabitatHR/man/kernelUD.html'>kernelUD</a></code>. This distribution is then processed, plotted and returned.</p>
-<p>For path-based implementations, this function is designed to be implemented for paths reconstructed by <code><a href='pf_simplify.html'>pf_simplify</a></code>. As for the particle-based implementation, for each path, all locations, or random sample of <code>sample_size</code> locations are used to estimate a KUD by treating sampled locations as `relocations'. KUDs are processed and combined across paths into a single, average KUD. The advantage of this approach is that the overall probability of the paths can be incorporated in the estimation procedure via sampling or weights when path-specific KUDs are averaged (although that is not yet implemented).</p>
-
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='pf.html'>pf</a></code>, <code><a href='pf_simplify.html'>pf_simplify</a></code>, <code><a href='pf_plot_map.html'>pf_plot_map</a></code>, <code><a href='https://rdrr.io/pkg/adehabitatHR/man/kernelUD.html'>kernelUD</a></code>, <code><a href='kud_around_coastline.html'>kud_around_coastline</a></code>, <code><a href='kud_around_coastline.html'>kud_around_coastline_fast</a></code>, <code><a href='eval_by_kud.html'>eval_by_kud</a></code></p></div>
+    <p>For computational efficiency, it may be necessary to aggregate (and renormalise) POU scores across the <code>grid</code> used for estimation before implementing this function.</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Edward Lavender</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>#### Define particle samples for smoothing</span>
-<span class='co'># To do this, we will re-implement the pf() for the example dat_dcpf_histories</span>
-<span class='co'># ... dataset, but with a larger number of particles. This is necessary</span>
-<span class='co'># ... because kernel smoothing is only appropriate if there are</span>
-<span class='co'># ... enough locations to permit smoothing.</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
-<span class='va'>dcpf_args</span> <span class='op'>&lt;-</span> <span class='va'>dat_dcpf_histories</span><span class='op'>$</span><span class='va'>args</span>
-<span class='va'>dcpf_args</span><span class='op'>$</span><span class='va'>calc_distance_euclid_fast</span> <span class='op'>&lt;-</span> <span class='cn'>TRUE</span>
-<span class='va'>dcpf_args</span><span class='op'>$</span><span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>250L</span>
-<span class='va'>out_dcpf_particles</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/do.call.html'>do.call</a></span><span class='op'>(</span><span class='va'>pf</span>, <span class='va'>dcpf_args</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:44:38)... 
-#&gt; ... Setting up function... 
-#&gt; ... Determining the set of possible starting locations (t = 1)... 
-#&gt; ... Implementing algorithm iteratively over time steps... 
-#&gt; ... ... Time = 1... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 2... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 3... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 4... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 5... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 6... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 7... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 8... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 9... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 10... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 11... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 12... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 13... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 14... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 15... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 16... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 17... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
-#&gt; ... ... Time = 18... 
-#&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:44:47) after ~0.15 minutes. </div><div class='input'>
-<span class='co'>#### Process particles and paths</span>
-<span class='va'>out_dcpf_particles_1</span> <span class='op'>&lt;-</span>
-  <span class='fu'><a href='pf_simplify.html'>pf_simplify</a></span><span class='op'>(</span><span class='va'>out_dcpf_particles</span>, return <span class='op'>=</span> <span class='st'>"archive"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:44:47)... 
+    <pre class="examples"><div class='input'><span class='co'>#### Define POU map for examples</span>
+<span class='va'>out_dcpf_s</span>   <span class='op'>&lt;-</span> <span class='fu'><a href='pf_simplify.html'>pf_simplify</a></span><span class='op'>(</span><span class='va'>dat_dcpf_histories</span>,
+                            summarise_pr <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                            return <span class='op'>=</span> <span class='st'>"archive"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2022-05-28 18:14:13)... 
 #&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
 #&gt; ... ... Stepping through time steps to join coordinate pairs... 
 #&gt; ... ... Identifying connected cells... 
 #&gt; ... ... Processing connected cells for return = 'archive'... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:44:47) after ~0 minutes. </div><div class='input'><span class='va'>out_dcpf_particles_2</span> <span class='op'>&lt;-</span>
-  <span class='fu'><a href='pf_simplify.html'>pf_simplify</a></span><span class='op'>(</span><span class='va'>out_dcpf_particles</span>, summarise_pr <span class='op'>=</span> <span class='cn'>TRUE</span>, return <span class='op'>=</span> <span class='st'>"archive"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:44:47)... 
-#&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
-#&gt; ... ... Stepping through time steps to join coordinate pairs... 
-#&gt; ... ... Identifying connected cells... 
-#&gt; ... ... Processing connected cells for return = 'archive'... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:44:47) after ~0.01 minutes. </div><div class='input'><span class='va'>out_dcpf_paths</span> <span class='op'>&lt;-</span>
-  <span class='fu'><a href='pf_simplify.html'>pf_simplify</a></span><span class='op'>(</span><span class='va'>out_dcpf_particles</span>, max_n_paths <span class='op'>=</span> <span class='fl'>100L</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_simplify() called (@ 2021-12-02 14:44:47)... 
-#&gt; ... Getting pairwise cell movements based on calc_distance = 'euclid'... 
-#&gt; ... ... Stepping through time steps to join coordinate pairs... 
-#&gt; ... ... Identifying connected cells... 
-#&gt; ... Assembling paths... 
-#&gt; ... Formatting paths... 
-#&gt; ... Adding cell coordinates and depths... 
-#&gt; ... flapper::pf_simplify() call completed (@ 2021-12-02 14:44:47) after ~0 minutes. </div><div class='input'>
-<span class='co'>#### Define a grid across which to implement estimation</span>
-<span class='co'># This grid takes values of 0 on land and values of 1 in the sea</span>
-<span class='va'>bathy</span> <span class='op'>&lt;-</span> <span class='va'>out_dcpf_particles</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>
-<span class='va'>grid</span> <span class='op'>&lt;-</span> <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></span><span class='op'>(</span><span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/extent.html'>extent</a></span><span class='op'>(</span><span class='va'>bathy</span><span class='op'>)</span>, nrows <span class='op'>=</span> <span class='fl'>100</span>, ncols <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
-<span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/getValues.html'>values</a></span><span class='op'>(</span><span class='va'>grid</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fl'>0</span>
-<span class='va'>grid</span> <span class='op'>&lt;-</span> <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/mask.html'>mask</a></span><span class='op'>(</span><span class='va'>grid</span>, <span class='va'>dat_coast</span>, updatevalue <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-<span class='va'>grid</span> <span class='op'>&lt;-</span> <span class='fu'>methods</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/methods/as.html'>as</a></span><span class='op'>(</span><span class='va'>grid</span>, <span class='st'>"SpatialPixelsDataFrame"</span><span class='op'>)</span>
-
-<span class='co'>#### Example (1): Implement pf_kud_1() using default options</span>
-<span class='co'>## Implementation based on particles</span>
-<span class='va'>pp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span>mfrow <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>, mar <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>3</span>, <span class='fl'>3</span>, <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>pf_kud_1</span><span class='op'>(</span><span class='va'>out_dcpf_particles_1</span>,
-         bathy <span class='op'>=</span> <span class='va'>bathy</span>,
-         sample_size <span class='op'>=</span> <span class='fl'>500</span>,
-         estimate_ud <span class='op'>=</span> <span class='va'>kud_around_coastline_fast</span>, grid <span class='op'>=</span> <span class='va'>grid</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_kud_1() called (@ 2021-12-02 14:44:47)... 
-#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... Processing sampled locations... 
-#&gt; ... Defining chunk(s)... 
-#&gt; ... Implementing KUD estimation over chunk(s)... 
+#&gt; ... flapper::pf_simplify() call completed (@ 2022-05-28 18:14:14) after ~0 minutes. </div><div class='input'><span class='va'>out_dcpf_pou</span> <span class='op'>&lt;-</span> <span class='fu'><a href='pf_plot_map.html'>pf_plot_map</a></span><span class='op'>(</span><span class='va'>out_dcpf_s</span>, <span class='va'>dat_dcpf_histories</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='img'><img src='pf_kud-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'>#### Example (1): Implement function using default options</span>
+<span class='fu'>pf_kud</span><span class='op'>(</span>xpf <span class='op'>=</span> <span class='va'>out_dcpf_pou</span>, grid <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; flapper::pf_kud called (@ 2022-05-28 18:14:14)... 
+#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... Getting POU scores... 
+#&gt; ... .... POU scores extracted for 41 locations... 
+#&gt; ... Building SpatialPointsDataFrame... 
+#&gt; ... Implementing KUD estimation based on 41 cells... 
 #&gt; ... Processing KUD(s)... 
-#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... flapper::pf_kud_1() call completed (@ 2021-12-02 14:44:49) after ~0.02 minutes. </div><div class='output co'>#&gt; class      : RasterLayer 
-#&gt; dimensions : 80, 80, 6400  (nrow, ncol, ncell)
-#&gt; resolution : 25, 25  (x, y)
-#&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
-#&gt; crs        : NA 
-#&gt; source     : memory
-#&gt; names      : layer 
-#&gt; values     : 0, 0.005175899  (min, max)
-#&gt; </div><div class='input'><span class='co'>## Implementation based on paths</span>
-<span class='kw'>if</span><span class='op'>(</span><span class='va'>flapper_run_parallel</span><span class='op'>)</span><span class='op'>{</span>
-  <span class='fu'>pf_kud_1</span><span class='op'>(</span><span class='va'>out_dcpf_paths</span>,
-           bathy <span class='op'>=</span> <span class='va'>bathy</span>,
-           sample_size <span class='op'>=</span> <span class='fl'>500</span>,
-           estimate_ud <span class='op'>=</span> <span class='va'>kud_around_coastline_fast</span>, grid <span class='op'>=</span> <span class='va'>grid</span><span class='op'>)</span>
-  <span class='fu'>prettyGraphics</span><span class='fu'>::</span><span class='fu'><a href='https://edwardlavender.github.io/prettyGraphics/reference/add_sp.html'>add_sp_path</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>out_dcpf_paths</span><span class='op'>$</span><span class='va'>cell_x</span>,
-                              y <span class='op'>=</span> <span class='va'>out_dcpf_paths</span><span class='op'>$</span><span class='va'>cell_y</span>,
-                              length <span class='op'>=</span> <span class='fl'>0.01</span><span class='op'>)</span>
+#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='img'><img src='pf_kud-2.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'>#### Example (2): Implement function using resampling</span>
+<span class='fu'>pf_kud</span><span class='op'>(</span>xpf <span class='op'>=</span> <span class='va'>out_dcpf_pou</span>, sample_size <span class='op'>=</span> <span class='fl'>100</span>, grid <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; flapper::pf_kud called (@ 2022-05-28 18:14:14)... 
+#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... Getting POU scores... 
+#&gt; ... .... POU scores extracted for 41 locations... 
+#&gt; ... Sampling cells... 
+#&gt; ... ... POU locations expanded to 4100 locations... 
+#&gt; ... Building SpatialPointsDataFrame... 
+#&gt; ... Implementing KUD estimation based on 4100 cells... 
+#&gt; ... Processing KUD(s)... 
+#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='img'><img src='pf_kud-3.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'>#### Example (3): Implement time trials</span>
+<span class='kw'>if</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='co'># Implement time trials for specified numbers of cells</span>
+  <span class='fu'>pf_kud</span><span class='op'>(</span>xpf <span class='op'>=</span> <span class='va'>out_dcpf_pou</span>,
+         sample_size <span class='op'>=</span> <span class='fl'>100</span>,
+         grid <span class='op'>=</span> <span class='fl'>60</span>,
+         trial_cells <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>10</span>, <span class='fl'>100</span>, <span class='fl'>1000</span>, <span class='fl'>10000</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='co'># Implement time trials for specified grids</span>
+  <span class='fu'>pf_kud</span><span class='op'>(</span>xpf <span class='op'>=</span> <span class='va'>out_dcpf_pou</span>,
+         sample_size <span class='op'>=</span> <span class='fl'>100</span>,
+         grid <span class='op'>=</span> <span class='fl'>180</span>,
+         trial_grids <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>60</span>, <span class='fl'>120</span>, <span class='fl'>180</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='co'># Implement time trials for specified numbers of cells and grids</span>
+  <span class='fu'>pf_kud</span><span class='op'>(</span>xpf <span class='op'>=</span> <span class='va'>out_dcpf_pou</span>,
+         sample_size <span class='op'>=</span> <span class='fl'>100</span>,
+         grid <span class='op'>=</span> <span class='fl'>10</span>,
+         trial_cells <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>10</span>, <span class='fl'>100</span>, <span class='fl'>1000</span>, <span class='fl'>10000</span><span class='op'>)</span>,
+         trial_grids <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>10</span>, <span class='fl'>30</span>, <span class='fl'>60</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span><span class='va'>pp</span><span class='op'>)</span>
-</div><div class='img'><img src='pf_kud-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'>#### Example (2): Implement pf_kud_2() using default options</span>
-<span class='co'>## Implementation based on particles</span>
-<span class='va'>pp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span>mfrow <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>, mar <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>3</span>, <span class='fl'>3</span>, <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>pf_kud_2</span><span class='op'>(</span><span class='va'>out_dcpf_particles_2</span>,
-         bathy <span class='op'>=</span> <span class='va'>bathy</span>,
-         estimate_ud <span class='op'>=</span> <span class='va'>kud_around_coastline</span>, grid <span class='op'>=</span> <span class='va'>grid</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_kud_2() called (@ 2021-12-02 14:44:49)... 
-#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... Processing sampled locations... 
-#&gt; ... Implementing KUD estimation... 
-#&gt; ... Processing KUD(s)... 
-#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... flapper::pf_kud_2() call completed (@ 2021-12-02 14:44:49) after ~0 minutes. </div><div class='output co'>#&gt; class      : RasterLayer 
-#&gt; dimensions : 80, 80, 6400  (nrow, ncol, ncell)
-#&gt; resolution : 25, 25  (x, y)
-#&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
-#&gt; crs        : NA 
-#&gt; source     : memory
-#&gt; names      : ud 
-#&gt; values     : 0, 0.00101676  (min, max)
-#&gt; </div><div class='input'><span class='co'>## Implementation based on paths</span>
-<span class='fu'>pf_kud_2</span><span class='op'>(</span><span class='va'>out_dcpf_paths</span>,
-         bathy <span class='op'>=</span> <span class='va'>bathy</span>,
-         estimate_ud <span class='op'>=</span> <span class='va'>kud_around_coastline</span>, grid <span class='op'>=</span> <span class='va'>grid</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_kud_2() called (@ 2021-12-02 14:44:49)... 
-#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... Implementing KUD estimation... 
-#&gt; ... Processing KUD(s)... 
-#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... flapper::pf_kud_2() call completed (@ 2021-12-02 14:44:56) after ~0.11 minutes. </div><div class='output co'>#&gt; class      : RasterLayer 
-#&gt; dimensions : 80, 80, 6400  (nrow, ncol, ncell)
-#&gt; resolution : 25, 25  (x, y)
-#&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
-#&gt; crs        : NA 
-#&gt; source     : memory
-#&gt; names      : layer 
-#&gt; values     : 0, 0.0008742036  (min, max)
-#&gt; </div><div class='input'><span class='fu'>prettyGraphics</span><span class='fu'>::</span><span class='fu'><a href='https://edwardlavender.github.io/prettyGraphics/reference/add_sp.html'>add_sp_path</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>out_dcpf_paths</span><span class='op'>$</span><span class='va'>cell_x</span>, y <span class='op'>=</span> <span class='va'>out_dcpf_paths</span><span class='op'>$</span><span class='va'>cell_y</span>,
-                            length <span class='op'>=</span> <span class='fl'>0.01</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='output co'>#&gt; <span class='warning'>Warning: zero-length arrow is of indeterminate angle and so skipped</span></div><div class='img'><img src='pf_kud-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span><span class='va'>pp</span><span class='op'>)</span>
 
-<span class='co'>#### Example (3): For improved speed with pf_kud_1(), use parallelisation</span>
-<span class='co'>## Implementation based on particles</span>
-<span class='va'>pp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span>mfrow <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>, mar <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>3</span>, <span class='fl'>3</span>, <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>pf_kud_1</span><span class='op'>(</span><span class='va'>out_dcpf_particles_1</span>,
-         bathy <span class='op'>=</span> <span class='va'>bathy</span>,
-         sample_size <span class='op'>=</span> <span class='fl'>500</span>,
-         estimate_ud <span class='op'>=</span> <span class='fu'>flapper</span><span class='fu'>::</span><span class='va'><a href='kud_around_coastline.html'>kud_around_coastline_fast</a></span>, grid <span class='op'>=</span> <span class='va'>grid</span>,
-         chunks <span class='op'>=</span> <span class='fl'>2L</span>,
-         cl <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/makeCluster.html'>makeCluster</a></span><span class='op'>(</span><span class='fl'>2L</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_kud_1() called (@ 2021-12-02 14:44:56)... 
-#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... Processing sampled locations... 
-#&gt; ... Defining chunk(s)... 
-#&gt; ... Implementing KUD estimation over chunk(s)... 
+<span class='co'>#### Example (4): Force alignment between POU scores and grids for speed</span>
+<span class='co'># Example with numeric grid</span>
+<span class='va'>out_dcpf_pou_agg</span> <span class='op'>&lt;-</span>
+  <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/aggregate.html'>aggregate</a></span><span class='op'>(</span><span class='va'>out_dcpf_pou</span>, fact <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+<span class='va'>out_dcpf_pou_agg</span> <span class='op'>&lt;-</span>
+  <span class='va'>out_dcpf_pou_agg</span><span class='op'>/</span><span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/cellStats.html'>cellStats</a></span><span class='op'>(</span><span class='va'>out_dcpf_pou_agg</span>, <span class='st'>"sum"</span><span class='op'>)</span>
+<span class='va'>grid</span> <span class='op'>&lt;-</span> <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/resolution.html'>res</a></span><span class='op'>(</span><span class='va'>out_dcpf_pou_agg</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>
+<span class='fu'>pf_kud</span><span class='op'>(</span><span class='va'>out_dcpf_pou_agg</span>, grid <span class='op'>=</span> <span class='va'>grid</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; flapper::pf_kud called (@ 2022-05-28 18:14:14)... 
+#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... Getting POU scores... 
+#&gt; ... .... POU scores extracted for 31 locations... 
+#&gt; ... Building SpatialPointsDataFrame... 
+#&gt; ... Implementing KUD estimation based on 31 cells... 
 #&gt; ... Processing KUD(s)... 
-#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... flapper::pf_kud_1() call completed (@ 2021-12-02 14:44:59) after ~0.05 minutes. </div><div class='output co'>#&gt; class      : RasterLayer 
-#&gt; dimensions : 80, 80, 6400  (nrow, ncol, ncell)
-#&gt; resolution : 25, 25  (x, y)
-#&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
-#&gt; crs        : NA 
-#&gt; source     : memory
-#&gt; names      : layer 
-#&gt; values     : 0, 0.004951759  (min, max)
-#&gt; </div><div class='input'><span class='co'>## Implementation based on paths</span>
-<span class='kw'>if</span><span class='op'>(</span><span class='va'>flapper_run_parallel</span><span class='op'>)</span><span class='op'>{</span>
-  <span class='va'>cl</span> <span class='op'>&lt;-</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/makeCluster.html'>makeCluster</a></span><span class='op'>(</span><span class='fl'>2L</span><span class='op'>)</span>
-  <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/clusterApply.html'>clusterEvalQ</a></span><span class='op'>(</span>cl <span class='op'>=</span> <span class='va'>cl</span>, <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://rspatial.org/raster'>raster</a></span><span class='op'>)</span><span class='op'>)</span>
-  <span class='fu'>pf_kud_1</span><span class='op'>(</span><span class='va'>out_dcpf_paths</span>,
-           bathy <span class='op'>=</span> <span class='va'>bathy</span>,
-           sample_size <span class='op'>=</span> <span class='fl'>500</span>,
-           estimate_ud <span class='op'>=</span> <span class='fu'>flapper</span><span class='fu'>::</span><span class='va'><a href='kud_around_coastline.html'>kud_around_coastline_fast</a></span>, grid <span class='op'>=</span> <span class='va'>grid</span>,
-           chunks <span class='op'>=</span> <span class='fl'>2L</span>,
-           cl <span class='op'>=</span> <span class='va'>cl</span><span class='op'>)</span>
-<span class='op'>}</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span><span class='va'>pp</span><span class='op'>)</span>
-</div><div class='img'><img src='pf_kud-3.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'>#### Example (4): For improved speed with pf_kud_2(), use sample_size</span>
-<span class='co'>## Implementation based on particles</span>
-<span class='va'>pp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span>mfrow <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>, mar <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>3</span>, <span class='fl'>3</span>, <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>pf_kud_2</span><span class='op'>(</span><span class='va'>out_dcpf_particles_2</span>,
-         bathy <span class='op'>=</span> <span class='va'>bathy</span>,
-         sample_size <span class='op'>=</span> <span class='fl'>50</span>, <span class='co'># sample 50 particles overall</span>
-         estimate_ud <span class='op'>=</span> <span class='va'>kud_around_coastline</span>, grid <span class='op'>=</span> <span class='va'>grid</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_kud_2() called (@ 2021-12-02 14:44:59)... 
-#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... Processing sampled locations... 
-#&gt; ... Implementing KUD estimation... 
+#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='img'><img src='pf_kud-4.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># Example with SpatialPixels grid</span>
+<span class='va'>grid</span> <span class='op'>&lt;-</span> <span class='fu'><a href='kud_habitat.html'>kud_habitat</a></span><span class='op'>(</span><span class='va'>out_dcpf_pou_agg</span><span class='op'>)</span>
+</div><div class='img'><img src='pf_kud-5.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>pf_kud</span><span class='op'>(</span><span class='va'>out_dcpf_pou_agg</span>, grid <span class='op'>=</span> <span class='va'>grid</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; flapper::pf_kud called (@ 2022-05-28 18:14:14)... 
+#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... Getting POU scores... 
+#&gt; ... .... POU scores extracted for 31 locations... 
+#&gt; ... Building SpatialPointsDataFrame... 
+#&gt; ... Implementing KUD estimation based on 31 cells... 
 #&gt; ... Processing KUD(s)... 
-#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... flapper::pf_kud_2() call completed (@ 2021-12-02 14:44:59) after ~0 minutes. </div><div class='output co'>#&gt; class      : RasterLayer 
-#&gt; dimensions : 80, 80, 6400  (nrow, ncol, ncell)
-#&gt; resolution : 25, 25  (x, y)
-#&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
-#&gt; crs        : NA 
-#&gt; source     : memory
-#&gt; names      : ud 
-#&gt; values     : 0, 0.001311408  (min, max)
-#&gt; </div><div class='input'><span class='co'>## Implementation based on paths</span>
-<span class='fu'>pf_kud_2</span><span class='op'>(</span><span class='va'>out_dcpf_paths</span>,
-         bathy <span class='op'>=</span> <span class='va'>bathy</span>,
-         sample_size <span class='op'>=</span> <span class='fl'>50</span>, <span class='co'># sample 50 particles per path</span>
-         estimate_ud <span class='op'>=</span> <span class='va'>kud_around_coastline</span>, grid <span class='op'>=</span> <span class='va'>grid</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_kud_2() called (@ 2021-12-02 14:44:59)... 
-#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'sample_size' is greater than the number of particles.</span></div><div class='output co'>#&gt; ... Implementing KUD estimation... 
-#&gt; ... Processing KUD(s)... 
-#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='img'><img src='pf_kud-4.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::pf_kud_2() call completed (@ 2021-12-02 14:45:05) after ~0.1 minutes. </div><div class='output co'>#&gt; class      : RasterLayer 
-#&gt; dimensions : 80, 80, 6400  (nrow, ncol, ncell)
-#&gt; resolution : 25, 25  (x, y)
-#&gt; extent     : 707884.6, 709884.6, 6253404, 6255404  (xmin, xmax, ymin, ymax)
-#&gt; crs        : NA 
-#&gt; source     : memory
-#&gt; names      : layer 
-#&gt; values     : 0, 0.001188206  (min, max)
-#&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span><span class='va'>pp</span><span class='op'>)</span>
-
-<span class='co'>#### Example (5): Compare pf_kud_1() and pf_kud_2()</span>
-<span class='va'>pp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span>mfrow <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>2</span><span class='op'>)</span>, mar <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>3</span>, <span class='fl'>3</span>, <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>kud_1a</span> <span class='op'>&lt;-</span> <span class='fu'>pf_kud_1</span><span class='op'>(</span>xpf <span class='op'>=</span> <span class='va'>out_dcpf_particles_1</span>,
-                   bathy <span class='op'>=</span> <span class='va'>out_dcpf_particles</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>,
-                   sample_size <span class='op'>=</span> <span class='va'>out_dcpf_particles</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>n</span>,
-                   estimate_ud <span class='op'>=</span> <span class='va'>kud_around_coastline_fast</span>, grid <span class='op'>=</span> <span class='va'>grid</span>,
-                   plot <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_kud_1() called (@ 2021-12-02 14:45:05)... 
-#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... Processing sampled locations... 
-#&gt; ... Defining chunk(s)... 
-#&gt; ... Implementing KUD estimation over chunk(s)... 
-#&gt; ... Processing KUD(s)... 
-#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... flapper::pf_kud_1() call completed (@ 2021-12-02 14:45:07) after ~0.02 minutes. </div><div class='input'>
-<span class='va'>kud_1b</span> <span class='op'>&lt;-</span> <span class='fu'>pf_kud_1</span><span class='op'>(</span>xpf <span class='op'>=</span> <span class='va'>out_dcpf_particles_1</span>,
-                   bathy <span class='op'>=</span> <span class='va'>out_dcpf_particles</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>,
-                   sample_size <span class='op'>=</span> <span class='fl'>500</span>,
-                   estimate_ud <span class='op'>=</span> <span class='va'>kud_around_coastline_fast</span>, grid <span class='op'>=</span> <span class='va'>grid</span>,
-                   plot <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_kud_1() called (@ 2021-12-02 14:45:07)... 
-#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... Processing sampled locations... 
-#&gt; ... Defining chunk(s)... 
-#&gt; ... Implementing KUD estimation over chunk(s)... 
-#&gt; ... Processing KUD(s)... 
-#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... flapper::pf_kud_1() call completed (@ 2021-12-02 14:45:08) after ~0.02 minutes. </div><div class='input'>
-<span class='va'>kud_1c</span> <span class='op'>&lt;-</span> <span class='fu'>pf_kud_1</span><span class='op'>(</span>xpf <span class='op'>=</span> <span class='va'>out_dcpf_particles_1</span>,
-                   bathy <span class='op'>=</span> <span class='va'>out_dcpf_particles</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>,
-                   sample_size <span class='op'>=</span> <span class='fl'>5000</span>,
-                   estimate_ud <span class='op'>=</span> <span class='va'>kud_around_coastline_fast</span>, grid <span class='op'>=</span> <span class='va'>grid</span>,
-                   plot <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_kud_1() called (@ 2021-12-02 14:45:08)... 
-#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... Processing sampled locations... 
-#&gt; ... Defining chunk(s)... 
-#&gt; ... Implementing KUD estimation over chunk(s)... 
-#&gt; ... Processing KUD(s)... 
-#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... flapper::pf_kud_1() call completed (@ 2021-12-02 14:45:11) after ~0.05 minutes. </div><div class='input'>
-<span class='va'>kud_1d</span> <span class='op'>&lt;-</span> <span class='fu'>pf_kud_2</span><span class='op'>(</span>xpf <span class='op'>=</span> <span class='va'>out_dcpf_particles_2</span>,
-                 bathy <span class='op'>=</span> <span class='va'>out_dcpf_particles</span><span class='op'>$</span><span class='va'>args</span><span class='op'>$</span><span class='va'>bathy</span>,
-                 estimate_ud <span class='op'>=</span> <span class='va'>kud_around_coastline</span>, grid <span class='op'>=</span> <span class='va'>grid</span>,
-                 plot <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf_kud_2() called (@ 2021-12-02 14:45:11)... 
-#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>CRS taken as: 'NA'.</span></div><div class='output co'>#&gt; ... Processing sampled locations... 
-#&gt; ... Implementing KUD estimation... 
-#&gt; ... Processing KUD(s)... 
-#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='img'><img src='pf_kud-5.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::pf_kud_2() call completed (@ 2021-12-02 14:45:11) after ~0 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span><span class='va'>pp</span><span class='op'>)</span>
-
+#&gt; ... Plotting KUD... </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: 'NA'.</span></div><div class='img'><img src='pf_kud-6.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

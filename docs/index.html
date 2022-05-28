@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Explore Animal Space Use Within Passive Acoustic Telemetry Arrays • flapper</title>
+<title>Routines for the analysis of passive acoustic telemetry data • flapper</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="Explore Animal Space Use Within Passive Acoustic Telemetry Arrays">
-<meta property="og:description" content="Algorithms which facilitate the use of passive acoustic telemetry (PAT) data for ecological inferences, especially those pertaining to animal space use. This includes functions for processing PAT data, spatial tools such as least-cost pathway calculations, new algorithms for inferring space use and simulations designed to evaluate the efficacy of algorithms for inferring space use. Package development has been motivated by the collection of PAT data for a Critically Endangered benthopelagic elasmobranch off the west coast of Scotland. ">
+<script src="pkgdown.js"></script><meta property="og:title" content="Routines for the analysis of passive acoustic telemetry data">
+<meta property="og:description" content="Routines for the analysis of passive acoustic telemetry data, including for data processing, description (via detection statistics and movement metrics), modelling and simulation. These routines are supported by a series of helper functions (including distance calculators, spatial tools and parallelisation options). The main contribution is the provision of a family of algorithms for movement modelling in passive acoustic telemetry systems that permits the reconstruction of fine-scale movement paths and emergent patterns of space use. Package development has been motivated by passive acoustic telemetry data from a Critically Endangered benthic elasmobranch off the west coast of Scotland. ">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -75,9 +75,9 @@
 <div id="flapper" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#flapper" class="anchor"></a>flapper</h1></div>
-<p><strong>From passive acoustic telemetry to space use: an <code>R</code> package of algorithms for reconstructing movement paths and patterns of space use from acoustic and archival time series. <a href="https://edwardlavender.github.io/flapper/" class="uri">https://edwardlavender.github.io/flapper/</a></strong></p>
+<p><strong>Routines for the analysis of passive acoustic telemetry data, including the reconstruction of fine-scale movement paths and emergent patterns of space use. <a href="https://edwardlavender.github.io/flapper/" class="uri">https://edwardlavender.github.io/flapper/</a></strong></p>
 <p><a href="https://www.repostatus.org/#wip"><img src="https://www.repostatus.org/badges/latest/wip.svg" alt="Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public."></a> <a href="https://cran.r-project.org/package=flapper"><img src="http://www.r-pkg.org/badges/version/flapper" alt="CRAN_Status_Badge"></a></p>
-<p><a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> is an <code>R</code> package which provides tools for passive acoustic telemetry (PAT) data. The package has been particularly motivated by the collection of new acoustic and archival data from a Critically Endangered elasmobranch, the flapper skate (<em>Dipturus intermedius</em>), off the west coast of Scotland where a static PAT array has been established to examine the movements of individuals within a Marine Protected Area. <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> has been designed to complement existing packages for the analyses of these data (e.g. <a href="https://github.com/RossDwyer/VTrack">VTrack</a>, <a href="https://gitlab.oceantrack.org/GreatLakes/glatos">glatos</a> and <a href="https://github.com/aspillaga/fishtrack3d">fishtrack3d</a> and <a href="https://github.com/hugomflavio/actel">actel</a>), with a particular focus on the provision of tools that integrate PAT and archival data for improved inference of patterns of space use, including for pelagic and benthic/demersal species. To this end, <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> contains functions in the following themes:</p>
+<p><a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> is an <code>R</code> package which provides tools for passive acoustic telemetry data. The package has been particularly motivated by the collection of acoustic and archival data from a Critically Endangered elasmobranch, the flapper skate (<em>Dipturus intermedius</em>), off the west coast of Scotland where a static passive acoustic telemetry array was established to examine the movements of individuals within a Marine Protected Area. <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> has been designed to complement existing packages for the analysis of these data (e.g. <a href="https://github.com/RossDwyer/VTrack">VTrack</a>, <a href="https://gitlab.oceantrack.org/GreatLakes/glatos">glatos</a> and <a href="https://github.com/aspillaga/fishtrack3d">fishtrack3d</a> and <a href="https://github.com/hugomflavio/actel">actel</a>), with a particular focus on the provision of movement modelling methods for passive acoustic telemetry systems that permit the reconstruction of fine-scale movement paths and emergent patterns of space use. To this end, <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> contains functions in the following themes:</p>
 <ul>
 <li>
 <strong>Data processing tools</strong>, including data assembly (e.g., range-testing datasets), the evaluation of false detections and quality checks;</li>
@@ -88,53 +88,53 @@
 <li>
 <strong>Detection statistics</strong>, including metrics of sampling effort, such as detection area; and individual detection metrics, such as detection days and co-occurrence;</li>
 <li>
-<strong>Space use algorithms</strong>, including a straightforward implementation of the mean-position algorithm for the estimation of centres of activity and new algorithms designed for improved estimates of space use and the reconstruction of movement paths;</li>
+<strong>Modelling methods</strong>, including a straightforward implementation of the mean-position algorithm for the estimation of centres of activity and new algorithms designed for improved estimates of space use and the reconstruction of movement paths;</li>
 <li>
-<strong>Simulation tools</strong>, including tools for the simulation of passive acoustic telemetry arrays, movement paths, detections and the comparison of simulated and inferred patterns of space use under different conditions;</li>
+<strong>Simulation tools</strong>, including tools for the simulation of passive acoustic telemetry arrays, movement paths, detections and the comparison of simulated and reconstructed patterns of space use under different conditions;</li>
 </ul>
-<p><img src="articles/readme_context.png"><em>flapper: An <code>R</code> package designed to facilitate the integration of acoustic and archival datasets to improve estimates of space use. Inserted sample depth and acoustic time series were collected as part of the Movement Ecology of Flapper Skate project by Marine Scotland Science and NatureScot. The insert of the flapper skate is also courtesy of this project. The bathymetry data are sourced from the Ireland, Northern Island and Scotland Hydrographic survey (Howe et al., 2015). Plots were produced using the <a href="https://github.com/edwardlavender/prettyGraphics">prettyGraphics</a> package.</em></p>
+<p><img src="articles/readme_context.png"><em>flapper: An <code>R</code> package of routines for the analysis of passive acoustic telemetry data, especially the reconstruction of fine-scale movement paths and emergent patterns of space use. Inserted sample depth and acoustic time series were collected as part of the Movement Ecology of Flapper Skate project by Marine Scotland Science and NatureScot. The insert of the flapper skate is also courtesy of this project. The bathymetry data are sourced from the Ireland, Northern Island and Scotland Hydrographic survey (Howe et al., 2014). Plots were produced using the <a href="https://github.com/edwardlavender/prettyGraphics">prettyGraphics</a> package.</em></p>
 <p><strong>For full package details, vignettes and illustrated examples, go to <a href="https://edwardlavender.github.io/flapper/" class="uri">https://edwardlavender.github.io/flapper/</a>.</strong></p>
 <div id="highlights" class="section level2">
 <h2 class="hasAnchor">
 <a href="#highlights" class="anchor"></a>Highlights</h2>
-<p>The main highlights of the package are the provision of routines for the rapid calculation of biologically meaningful distances in area with complex barriers to movement (e.g., coastline) alongside algorithms (most of which are exclusive to <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a>) for inferring space use from discrete detections at receivers, especially:</p>
+<p>The main highlights of the package are the provision of routines for the rapid calculation of biologically meaningful distances in areas with complex barriers to movement (e.g., coastline) alongside algorithms (most of which are exclusive to <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a>) for reconstructing movements and patterns of space use from discrete detections at receivers, especially:</p>
 <ul>
 <li>
 <strong><code>lcp_*()</code>.</strong> These functions facilitate the calculation of shortest paths and their distances between and around points using efficient <code>C++</code> algorithms from the <a href="https://github.com/vlarmet/cppRouting">cppRouting</a> package. This makes it easy to use biologically meaningful distances (that account for the bathymetric surface over which a benthic animal must move, if applicable, and barriers to movement) in movement models.</li>
 <li>
 <strong><code><a href="reference/coa.html">coa()</a></code>.</strong> This function implements the arithmetic version of the mean-position algorithm to estimate centres of activity (COAs) from discrete detections at receivers, given a detection matrix and the locations of receivers.</li>
 <li>
-<strong><code><a href="reference/ac.html">ac()</a></code>.</strong> The function implements the acoustic-centroid (AC) algorithm to examine patterns of space use. This is a new approach which utilises the information provided by acoustic detections in the form of acoustic centroids to infer where animals could have spent more or less time over the period of observations. Key innovations of this approach include the natural incorporation of barriers to movement (such as coastline), detection probability and information provided by the gaps between detections.</li>
+<strong><code><a href="reference/ac.html">ac()</a></code>.</strong> The function implements the acoustic-container (AC) algorithm. This is a new approach which utilises the information provided by acoustic detections in the form of acoustic containers to reconstruct the expected time spent in different parts of a study area over the period of observations. Key innovations of this approach include the natural incorporation of barriers to movement (such as coastline), detection probability and information provided by the gaps between detections.</li>
 <li>
-<strong><code><a href="reference/dc.html">dc()</a></code>.</strong> This function implements the ‘depth-contour’ (DC) algorithm to examine patterns of space use. This relates one-dimensional depth time series to a two-dimensional bathymetry surface to determine the extent to which different parts of an area might have (or have not) been used, or effectively represent occupied depths, over time.</li>
+<strong><code><a href="reference/dc.html">dc()</a></code>.</strong> This function implements the ‘depth-contour’ (DC) algorithm. This relates one-dimensional depth time series to a two-dimensional bathymetry surface to determine the extent to which different parts of an area might have (or have not) been used, or effectively represent occupied depths, over time.</li>
 <li>
-<strong><code><a href="reference/acdc.html">acdc()</a></code>.</strong> This function implements the ‘acoustic-centroid depth-contour’ (ACDC) algorithm to examine patterns of space use. This integrates the locational information provided by acoustic detections and concurrent depth observations to infer where tagged animals could have spent more or less time over the period of observations.</li>
+<strong><code><a href="reference/acdc.html">acdc()</a></code>.</strong> This function implements the ‘acoustic-container depth-contour’ (ACDC) algorithm. This integrates the locational information provided by acoustic detections and concurrent depth observations to refine expectations of the time spent in different parts of a study area over the period of observations.</li>
 <li>
 <strong><code><a href="reference/pf.html">pf()</a></code></strong> is a particle filtering routine that refines time-specific maps of the possible locations of an animal (from <code><a href="reference/ac.html">ac()</a></code>, <code><a href="reference/dc.html">dc()</a></code> or <code><a href="reference/acdc.html">acdc()</a></code>) via a particle simulation and filtering process that permits the reconstruction of movement paths over landscape.</li>
 <li>
-<strong><code>sim_*()</code>.</strong> These functions provide flexible, joined-up routines for the simulation of receiver arrays, movement paths and detections and can be used to evaluate alternative algorithms for inferences about patterns of space use under different conditions.</li>
+<strong><code>sim_*()</code>.</strong> These functions provide flexible, joined-up routines for the simulation of receiver arrays, movement paths and detections.</li>
 </ul>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>This package requires <code>R</code> version ≥ 4.0. You can check your current version with <code>R.version.string</code>. Subsequent installation steps (may) require the <code>devtools</code> and <code>pkgbuild</code> packages, which can be installed with <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages(c("devtools", "pkgbuild"))</a></code>. On Windows, package building requires <code>Rtools</code>. You can check whether <code>Rtools</code> is installed with <code><a href="https://rdrr.io/pkg/pkgbuild/man/has_rtools.html">pkgbuild::has_rtools()</a></code>. If <code>Rtools</code> is not installed, it is necessary to download and install the appropriate version of <code>Rtools</code> before proceeding by following the instructions <a href="https://cran.r-project.org/bin/windows/Rtools/">here</a>.</p>
-<p>Four packages (<a href="https://github.com/edwardlavender/prettyGraphics">prettyGraphics</a>, <a href="https://github.com/edwardlavender/Tools4ETS">Tools4ETS</a> and <a href="https://gitlab.oceantrack.org/GreatLakes/glatos">glatos</a>) are required or suggested from <a href="https://github.com">GitHub</a> repositories (since they are not currently available from <a href="https://cran.r-project.org">CRAN</a>). These can be installed during the installation process (see below), but it is safer to install them sequentially as follows:</p>
+<p>Four packages (<a href="https://github.com/edwardlavender/prettyGraphics">prettyGraphics</a>, <a href="https://github.com/edwardlavender/Tools4ETS">Tools4ETS</a>, <a href="https://github.com/adamlilith/fasterRaster">fasterRaster</a> and <a href="https://gitlab.oceantrack.org/GreatLakes/glatos">glatos</a>) are required or suggested from <a href="https://github.com">GitHub</a> repositories (since they are not currently available from <a href="https://cran.r-project.org">CRAN</a>). These can be installed during the installation process (see below), but it is safer to install them sequentially as follows:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"edwardlavender/prettyGraphics"</span>) <span class="co"># required</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"edwardlavender/Tools4ETS"</span>)      <span class="co"># currently required</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"edwardlavender/Tools4ETS"</span>)      <span class="co"># required</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"adamlilith/fasterRaster"</span>)       <span class="co"># suggested</span></span>
 <span id="cb1-4"><a href="#cb1-4"></a>devtools<span class="op">::</span><span class="kw">install_url</span>(                                    <span class="co"># suggested</span></span>
 <span id="cb1-5"><a href="#cb1-5"></a>  <span class="st">"https://gitlab.oceantrack.org/GreatLakes/glatos/repository/master/archive.zip"</span>,</span>
 <span id="cb1-6"><a href="#cb1-6"></a>   <span class="dt">build_opts =</span> <span class="kw">c</span>(<span class="st">"--no-resave-data"</span>, <span class="st">"--no-manual"</span>)) </span></code></pre></div>
-<p>To install these packages with their vignettes, add <code>dependencies = TRUE</code> and <code>build_vignettes = TRUE</code> as arguments to the code above (see <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">?devtools::install_github</a></code> or <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">?devtools::install_url</a></code> for further information). Then, you can install the development version of <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> from <a href="https://github.com/edwardlavender/flapper">GitHub</a> as shown below:</p>
+<p>To install these packages with their vignettes, add <code>dependencies = TRUE</code> and <code>build_vignettes = TRUE</code> as arguments to the code above (see <code><a href="https://devtools.r-lib.org/reference/remote-reexports.html">?devtools::install_github</a></code> or <code><a href="https://devtools.r-lib.org/reference/remote-reexports.html">?devtools::install_url</a></code> for further information). Then, you can install the development version of <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> from <a href="https://github.com/edwardlavender/flapper">GitHub</a> as shown below:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"edwardlavender/flapper"</span>, dependencies <span class="op">=</span> <span class="cn">TRUE</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"edwardlavender/flapper"</span>, dependencies <span class="op">=</span> <span class="cn">TRUE</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>The <code>dependencies = TRUE</code> argument will also install any suggested packages, which are required by some functions/examples and to build vignettes (which will be added to the package in due course). To access the vignettes, use <code>vignette("flapper_intro", package = "flapper")</code> for a general introduction to the package. <em>Note that vignettes have not yet been added to the package.</em></p>
 </div>
 <div id="example-datasets" class="section level2">
 <h2 class="hasAnchor">
 <a href="#example-datasets" class="anchor"></a>Example datasets</h2>
-<p>A key feature of the <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> package is that almost all functions are designed to be implemented using standard object types (e.g., dataframes and matrices) rather than package-specific object classes. For simplicity, <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> makes some assumptions about variable names that follow a consistent and logical structure (e.g., individual IDs are given as <code>individual_id</code> and receiver IDs are given as <code>receiver_id</code>) but, notwithstanding this framework, this structure means that the functions in the package are accessible and straightforward to use.</p>
+<p>A key feature of the <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> package is that most functions are designed to be implemented using standard object types (e.g., dataframes and matrices) rather than package-specific object classes. For simplicity, <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> makes some assumptions about variable names that follow a consistent and logical structure (e.g., individual IDs are given as <code>individual_id</code> and receiver IDs are given as <code>receiver_id</code>) but, notwithstanding this framework, this structure means that the functions in the package are accessible and straightforward to use.</p>
 <p>Functions are illustrated using simulated data and the following sample data collected from flapper skate off the west coast of Scotland:</p>
 <ul>
 <li>
@@ -205,10 +205,12 @@
 <div id="spatial-tools" class="section level2">
 <h2 class="hasAnchor">
 <a href="#spatial-tools" class="anchor"></a>Spatial tools</h2>
-<p>A number of functions facilitate spatial operations that support ecological investigations and space use algorithms:</p>
+<p>A number of functions facilitate spatial operations that support common tasks and modelling algorithms:</p>
 <ul>
 <li>
 <code><a href="reference/buffer_and_crop.html">buffer_and_crop()</a></code> buffers a spatial object (e.g., receiver locations) and uses this buffered object to crop another (e.g., the local bathymetry);</li>
+<li>
+<code><a href="reference/get_intersection.html">get_intersection()</a></code> intersects spatial geometries;</li>
 <li>
 <code><a href="reference/xy_from_click.html">xy_from_click()</a></code> gets location coordinates from mouse clicks;</li>
 <li>
@@ -226,7 +228,7 @@
 <li>
 <code><a href="reference/update_extent.html">update_extent()</a></code>shrinks or inflates an extent object;</li>
 <li>
-<code><a href="reference/segments_cross_barrier.html">segments_cross_barrier()</a></code> determines if Euclidean path segments cross a barrier;</li>
+<code><a href="reference/segments_cross_barrier.html">segments_cross_barrier()</a></code> determines if Euclidean transects cross a barrier;</li>
 </ul>
 </div>
 <div id="distance-calculations" class="section level2">
@@ -256,7 +258,7 @@
 <li>
 <code><a href="reference/lcp_interp.html">lcp_interp()</a></code> interpolates paths between sequential locations using least-cost paths analysis;</li>
 <li>
-<code><a href="reference/lcp_comp.html">lcp_comp()</a></code> compares Euclidean and shortest distance metrics for an area;</li>
+<code><a href="reference/lcp_comp.html">lcp_comp()</a></code> compares Euclidean and shortest-distance metrics for an area;</li>
 </ul>
 </div>
 <div id="detection-statistics" class="section level2">
@@ -267,11 +269,11 @@
 <li>
 <code><a href="reference/get_detection_pr.html">get_detection_pr()</a></code> calculates detection probability given a model for detection probability with distance;</li>
 <li>
-<code><a href="reference/get_detection_centroids.html">get_detection_centroids()</a></code> defines detection centroids (areas within the maximum detection range) around receivers;</li>
+<code><a href="reference/get_detection_containers.html">get_detection_containers()</a></code> defines detection containers (areas within the maximum detection range) around receivers;</li>
 <li>
-<code>get_detection_centroids_overlap</code> identifies receivers with overlapping detection centroids in space and time;</li>
+<code><a href="reference/get_detection_containers_overlap.html">get_detection_containers_overlap()</a></code> identifies receivers with overlapping detection containers in space and time;</li>
 <li>
-<code><a href="reference/get_detection_centroids_envir.html">get_detection_centroids_envir()</a></code> extracts environmental conditions from within receiver detection ranges, accounting for detection probability;</li>
+<code><a href="reference/get_detection_containers_envir.html">get_detection_containers_envir()</a></code> extracts environmental conditions from within receiver detection ranges, accounting for detection probability;</li>
 <li>
 <code><a href="reference/get_detection_area_sum.html">get_detection_area_sum()</a></code> calculates the total area surveyed by receivers;</li>
 <li>
@@ -308,16 +310,29 @@
 </li>
 <li>
 <code><a href="reference/get_mvt_resting.html">get_mvt_resting()</a></code> identifies ‘resting’ behaviour from archival time series;</li>
+<li>
+<code>get_hr_*()</code> functions get animal ‘home ranges’:
+<ul>
+<li>
+<code><a href="reference/get_hr.html">get_hr_prop()</a></code> gets a custom range from a utilisation distribution (UD);</li>
+<li>
+<code><a href="reference/get_hr.html">get_hr_core()</a></code> gets the ‘core range’ from a UD;</li>
+<li>
+<code><a href="reference/get_hr.html">get_hr_home()</a></code> gets the ‘home range’ from a UD;</li>
+<li>
+<code><a href="reference/get_hr.html">get_hr_full()</a></code> gets the ‘full range’ from a UD;</li>
+</ul>
+</li>
 </ul>
 </div>
-<div id="space-use-algorithms" class="section level2">
+<div id="modelling-algorithms" class="section level2">
 <h2 class="hasAnchor">
-<a href="#space-use-algorithms" class="anchor"></a>Space use algorithms</h2>
-<p>The main thrust of <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> is the implementation of algorithms designed to infer space use from PAT data and their evaluation under different circumstances (e.g., array designs, movement models and detection models).</p>
+<a href="#modelling-algorithms" class="anchor"></a>Modelling algorithms</h2>
+<p>The main thrust of <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> is the implementation of algorithms designed to reconstruct fine-scale movement paths and emergent patterns of space use in passive acoustic telemetry systems.</p>
 <div id="the-centres-of-activity-coa-algorithm" class="section level3">
 <h3 class="hasAnchor">
 <a href="#the-centres-of-activity-coa-algorithm" class="anchor"></a>The centres of activity (COA) algorithm</h3>
-<p>Centres of activity (COA) are one of the most widely used metrics for the reconstruction of patterns of space use from PAT data. Several methods have been developed to calculate COAs, but the mean-position algorithm is the commonest. To generate estimates of space use, COAs are usually taken as point estimates from which utilisation distributions (typically kernel utilisation distributions, KUDs) are estimated. <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> facilitates the implementation of this approach with the following functions:</p>
+<p>Centres of activity (COA) are one of the most widely used metrics for the reconstruction of patterns of space use from passive acoustic telemetry data. Several methods have been developed to calculate COAs, but the mean-position algorithm is the commonest. To generate estimates of space use, COAs are usually taken as point estimates from which UDs (typically kernel UDs or KUDs) are estimated. <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> facilitates the implementation of this approach with the following functions:</p>
 <ul>
 <li>
 <code><a href="reference/coa_setup_delta_t.html">coa_setup_delta_t()</a></code> informs decisions as to an appropriate time interval over which to calculate COAs;</li>
@@ -333,7 +348,7 @@
 <h3 class="hasAnchor">
 <a href="#the-flapper-family-of-algorithms" class="anchor"></a>The <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> family of algorithms</h3>
 <p>Alongside the COA algorithm, this package introduces the <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> of algorithms for the inferring patterns of space use.</p>
-<p><img src="articles/readme_flapper_family_implementation.png"><em>The `flapper’ family of algorithms. The acoustic-centroid depth-contour (ACDC) branch utilises acoustic and/or archival data to map the possible locations of an animal through time. The particle filtering (PF) branch refines these maps via the implementation of a particle simulation and filtering approach for the reconstruction of possible movement paths.</em></p>
+<p><img src="articles/readme_flapper_family_implementation.png"><em>The ‘flapper’ family of algorithms. The acoustic-container (AC) branch utilises acoustic data (and/or ancillary information) to reconstruct the set of possible locations for an individual through time. The particle filtering (PF) branch refines this set via the implementation of a particle simulation and filtering approach for the reconstruction of possible movement paths.</em></p>
 </div>
 <div id="acdc-branch-algorithms" class="section level3">
 <h3 class="hasAnchor">
@@ -341,17 +356,17 @@
 <div id="the-depth-contour-dc-algorithm" class="section level4">
 <h4 class="hasAnchor">
 <a href="#the-depth-contour-dc-algorithm" class="anchor"></a>The depth-contour (DC) algorithm</h4>
-<p>The depth-contour (DC) algorithm is the simplest. Whereas the COA approach only makes use of detections, the DC approach only uses depth observations. Specifically, this algorithm uses observed depths (± some error) to define the subset of possible locations of each individual within a defined area: for pelagic species, tagged individuals must be in an area where the depth is at least as deep as the observed depth; for benthic/demersal species, tagged individuals must be in an area close in depth to the observed depth. This is implemented via <code><a href="reference/dc.html">dc()</a></code>. The ‘quick’ depth-contour (DCQ) algorithm, implemented via <code><a href="reference/dcq.html">dcq()</a></code>, uses a modified version of this algorithm for quicker run times.</p>
+<p>The depth-contour (DC) algorithm is the simplest. Whereas the COA approach only makes use of detections, the DC approach only uses depth observations. Specifically, this algorithm uses observed depths (± some error) to define the subset of possible locations of each individual within a defined area: for pelagic species, tagged individuals must be in an area where the seabed depth is at least as deep as the observed depth; for benthic/demersal species, tagged individuals must be in an area where the seabed depth is close to the observed depth. This is implemented via <code><a href="reference/dc.html">dc()</a></code>. The ‘quick’ depth-contour (DCQ) algorithm, implemented via <code><a href="reference/dcq.html">dcq()</a></code>, uses a modified version of this algorithm for quicker run times.</p>
 </div>
-<div id="the-acoustic-contour-ac-algorithms" class="section level4">
+<div id="the-acoustic-container-ac-algorithms" class="section level4">
 <h4 class="hasAnchor">
-<a href="#the-acoustic-contour-ac-algorithms" class="anchor"></a>The acoustic-contour* (AC*) algorithm(s)</h4>
-<p>The <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> family-equivalent of the COA algorithm is the acoustic-contour (AC) algorithm. This approach represents the information from acoustic detections in the form of acoustic centroids, which contract and expand in line with the distribution of uncertainty in the individual’s location when it is detected and in the gaps between detections. The acoustic-centroid depth-contour (ACDC) algorithm combines the AC and DC algorithms, using PAT data to inform the area within which depth contours are most likely to be found. These algorithms are implemented with the <code>acdc*()</code> family of functions:</p>
+<a href="#the-acoustic-container-ac-algorithms" class="anchor"></a>The acoustic-container* (AC*) algorithm(s)</h4>
+<p>The <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> family-equivalent of the COA algorithm is the acoustic-container (AC) algorithm. This approach represents the information from acoustic detections in the form of acoustic containers, which contract and expand in line with our uncertainty in an individual’s location when it is detected and in the gaps between detections. The acoustic-container depth-contour (ACDC) algorithm combines the AC and DC algorithms, using passive acoustic telemetry data to inform the area within which depth contours are most likely to be found. These algorithms are implemented with the <code>ac*()</code> family of functions:</p>
 <ul>
 <li>
 <code><a href="reference/acs_setup_mobility.html">acs_setup_mobility()</a></code> examines the assumption of a constant ‘mobility’ parameter;</li>
 <li>
-<code><a href="reference/acs_setup_centroids.html">acs_setup_centroids()</a></code> defines the detection centroids for the algorithm(s);</li>
+<code><a href="reference/acs_setup_containers.html">acs_setup_containers()</a></code> defines the detection containers for the algorithm(s);</li>
 <li>
 <code><a href="reference/acs_setup_detection_kernels.html">acs_setup_detection_kernels()</a></code> defines detection probability kernels for the algorithm(s);</li>
 <li>
@@ -361,7 +376,7 @@
 <div id="acdc-post-processing-and-analysis" class="section level4">
 <h4 class="hasAnchor">
 <a href="#acdc-post-processing-and-analysis" class="anchor"></a>AC/DC post-processing and analysis</h4>
-<p>The AC/DC branch functions (<code><a href="reference/ac.html">ac()</a></code>, <code><a href="reference/dc.html">dc()</a></code> and <code><a href="reference/acdc.html">acdc()</a></code>) all return objects of class <code>acdc_archive</code>. These can be processed and analysed using several key functions:</p>
+<p>The AC-branch functions (<code><a href="reference/ac.html">ac()</a></code>, <code><a href="reference/dc.html">dc()</a></code> and <code><a href="reference/acdc.html">acdc()</a></code>) all return objects of class <code>acdc_archive</code>. These can be processed and analysed using several key functions:</p>
 <ul>
 <li>
 <code><a href="reference/acdc_simplify.html">acdc_simplify()</a></code> simplifies <code>acdc_archive-class</code> objects into <code>acdc_record-class</code> objects;</li>
@@ -376,6 +391,8 @@
 <code><a href="reference/acdc_access.html">acdc_access_maps()</a></code> accesses stored maps;</li>
 </ul>
 </li>
+<li>
+<code><a href="reference/acdc_plot_trace.html">acdc_plot_trace()</a></code> plots acoustic container dynamics;</li>
 <li>
 <code><a href="reference/acdc_plot_record.html">acdc_plot_record()</a></code> plots the results of the algorithm(s);</li>
 <li>
@@ -403,17 +420,19 @@
 <li>
 <code><a href="reference/pf_access_particles_unique.html">pf_access_particles_unique()</a></code> accesses unique particle samples;</li>
 <li>
-<code><a href="reference/pf_plot_history.html">pf_plot_history()</a></code> plots simulated particle histories;</li>
+<code><a href="reference/pf_plot_history.html">pf_plot_history()</a></code> plots particle histories;</li>
 <li>
-<code><a href="reference/pf_animate_history.html">pf_animate_history()</a></code> animates simulated particle histories;</li>
+<code><a href="reference/pf_animate_history.html">pf_animate_history()</a></code> animates particle histories;</li>
 <li>
-<code><a href="reference/pf_simplify.html">pf_simplify()</a></code> assembles movement paths from particle histories;</li>
+<code><a href="reference/pf_simplify.html">pf_simplify()</a></code> processes particle histories and assembles movement paths;</li>
 <li>
-<code><a href="reference/pf_plot_map.html">pf_plot_map()</a></code> maps the ‘probability of use’ across an area based on sampled particles or reconstructed paths;</li>
+<code><a href="reference/pf_plot_map.html">pf_plot_map()</a></code> maps the expected ‘proportion-of-use’ (POU) across an area based on sampled particles or reconstructed paths;</li>
 <li>
-<code><a href="reference/pf_kud.html">pf_kud_1()</a></code> and <code><a href="reference/pf_kud.html">pf_kud_2()</a></code> apply kernel smoothers to sampled particles or reconstructed paths;</li>
+<code><a href="reference/pf_kud.html">pf_kud()</a></code> smooths POU maps using kernel smoothing;</li>
 <li>
-<code><a href="reference/pf_loglik.html">pf_loglik()</a></code> calculates the log-likelihood of reconstructed paths, given the movement model;</li>
+<code><a href="reference/pf_kud_.html">pf_kud_1()</a></code> and <code><a href="reference/pf_kud_.html">pf_kud_2()</a></code> apply kernel smoothing to sampled particles or reconstructed paths;</li>
+<li>
+<code><a href="reference/pf_loglik.html">pf_loglik()</a></code> calculates the log-probability of reconstructed paths, given the movement model;</li>
 <li>
 <code><a href="reference/pf_plot_1d.html">pf_plot_1d()</a></code> plots the depth time series from observed and reconstructed paths;</li>
 <li>
@@ -426,7 +445,7 @@
 <div id="simulation-tools" class="section level2">
 <h2 class="hasAnchor">
 <a href="#simulation-tools" class="anchor"></a>Simulation tools</h2>
-<p>Simulations are a valuable tool in ecology which can elucidate the relative performance of alternative methods for ecological inferences (e.g., the <code>COA</code> approach versus the <code>DC</code> approach for inferring patterns of space use) and the extent to which new data sources influence ecological inferences under different circumstances (e.g. the extent to which sparse or regular PAT detections improve estimates of space use). To this end, <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> provides joined-up routines for the evaluation of approaches for the estimation of patterns of space use under different conditions; namely:</p>
+<p><a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> provides joined-up routines for the simulation of acoustic arrays, movement paths and detections at receivers:</p>
 <ul>
 <li>
 <code><a href="reference/sim_array.html">sim_array()</a></code> simulates alternative array designs;<br>
@@ -443,7 +462,29 @@
 <li>
 <code><a href="reference/sim_detections.html">sim_detections()</a></code> simulates detections at receivers arising from movement paths under a diversity of detection probability models;</li>
 </ul>
-<p>To evaluate the performance of alternative algorithms for inferring patterns of space use under different array designs, movement models and detections models, <code><a href="reference/eval_by_kud.html">eval_by_kud()</a></code> compares patterns of space use inferred from simulated and estimated movement paths using kernel utilisation distributions.</p>
+<p>To evaluate the performance of alternative algorithms for reconstructing patterns of space use under different array designs, movement models and detections models, <code><a href="reference/eval_by_kud.html">eval_by_kud()</a></code> compares patterns of space use reconstructed from simulated and estimated movement paths using KUDs.</p>
+</div>
+<div id="parallelisation-routines" class="section level2">
+<h2 class="hasAnchor">
+<a href="#parallelisation-routines" class="anchor"></a>Parallelisation routines</h2>
+<p>Parallelisation in <a href="https://edwardlavender.github.io/flapper/"><code>flapper</code></a> is facilitated by the <code>cl_*()</code> function family:</p>
+<ul>
+<li>
+<code><a href="reference/cl.html">cl_lapply()</a></code> is a wrapper for <code><a href="https://rdrr.io/pkg/pbapply/man/pbapply.html">pbapply::pblapply()</a></code> that handles cluster checking set up and closure, using the following functions:
+<ul>
+<li>
+<code><a href="reference/cl.html">cl_check()</a></code> checks a cluster;</li>
+<li>
+<code><a href="reference/cl.html">cl_cores()</a></code> identifies the number of cores;</li>
+<li>
+<code><a href="reference/cl.html">cl_chunks()</a></code> defines chunks for parallelisation;</li>
+<li>
+<code><a href="reference/cl.html">cl_export()</a></code> exports objects required by a cluster;</li>
+<li>
+<code><a href="reference/cl.html">cl_stop()</a></code> closes a cluster;</li>
+</ul>
+</li>
+</ul>
 </div>
 <div id="associated-packages" class="section level2">
 <h2 class="hasAnchor">
@@ -460,13 +501,13 @@
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
-<p>Howe, J.A., Anderton, R., Arosio, R., Dove, D., Bradwell, T., Crump, P., Cooper, R., Cocuccio, A., 2014. The seabed geomorphology and geological structure of the Firth of Lorn, western Scotland, UK, as revealed by multibeam echo-sounder survey. Earth Environ. Sci. Trans. R. Soc. Edinburgh 105, 273–284. <a href="https://doi.org/10.1017/S1755691015000146" class="uri">https://doi.org/10.1017/S1755691015000146</a></p>
+<p>Howe, J. A. et al. (2014). The seabed geomorphology and geological structure of the Firth of Lorn, western Scotland, UK, as revealed by multibeam echo-sounder survey. Earth Environ. Sci. Trans. R. Soc. Edinburgh 105, 273–284. <a href="https://doi.org/10.1017/S1755691015000146" class="uri">https://doi.org/10.1017/S1755691015000146</a></p>
 </div>
 <div id="citation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#citation" class="anchor"></a>Citation</h2>
 <p>Lavender, E. et al. (in prep). A semi-stochastic modelling framework for passive acoustic telemetry.</p>
-<p>Lavender, E. (2021). flapper: Explore Animal Space Use Within Passive Acoustic Telemetry Arrays. R package version 0.0.9000. <a href="https://github.com/edwardlavender/flapper/" class="uri">https://github.com/edwardlavender/flapper/</a></p>
+<p>Lavender, E. (2021). flapper: Routines for the analysis of passive acoustic telemetry data. R package version 0.0.9000. <a href="https://github.com/edwardlavender/flapper/" class="uri">https://github.com/edwardlavender/flapper/</a></p>
 </div>
 </div>
   </div>

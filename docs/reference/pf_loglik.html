@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Calculate the log-likelihood of movement paths from a PF algorithm — pf_loglik • flapper</title>
+<title>Calculate the log-probability of movement paths from a PF algorithm — pf_loglik • flapper</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Calculate the log-likelihood of movement paths from a PF algorithm — pf_loglik" />
-<meta property="og:description" content="This function calculates the total log-likelihood of each movement path reconstructed by a particle filtering (PF) algorithm, including the acoustic-centroid (AC), depth-contour (DC) or acoustic-centroid depth-contour (ACDC) algorithms." />
+<meta property="og:title" content="Calculate the log-probability of movement paths from a PF algorithm — pf_loglik" />
+<meta property="og:description" content="This function calculates the total log-probability of each movement path reconstructed by a particle filtering (PF) algorithm, including the acoustic-container (AC), depth-contour (DC) or acoustic-container depth-contour (ACDC) algorithms." />
 
 
 
@@ -114,13 +114,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Calculate the log-likelihood of movement paths from a PF algorithm</h1>
+    <h1>Calculate the log-probability of movement paths from a PF algorithm</h1>
     <small class="dont-index">Source: <a href='https://github.com/edwardlavender/flapper/blob/master/R/pf_analyse_path.R'><code>R/pf_analyse_path.R</code></a></small>
     <div class="hidden name"><code>pf_loglik.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function calculates the total log-likelihood of each movement path reconstructed by a particle filtering (PF) algorithm, including the acoustic-centroid (AC), depth-contour (DC) or acoustic-centroid depth-contour (ACDC) algorithms.</p>
+    <p>This function calculates the total log-probability of each movement path reconstructed by a particle filtering (PF) algorithm, including the acoustic-container (AC), depth-contour (DC) or acoustic-container depth-contour (ACDC) algorithms.</p>
     </div>
 
     <pre class="usage"><span class='fu'>pf_loglik</span><span class='op'>(</span><span class='va'>paths</span><span class='op'>)</span></pre>
@@ -136,7 +136,7 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The function returns a dataframe with the log likelihood (`loglik') of each path (`path_id'). Rows are ordered by log-likelihood and a `delta' column is provided with the differences in log-likelihood between the most likely path and every other path.</p>
+    <p>The function returns a dataframe with the log likelihood (`loglik') of each path (`path_id'). Rows are ordered by log-probability and a `delta' column is provided with the differences in log-probability between the most likely path and every other path.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>For each path, at each time step the probability associated with the sampled location depends on (a) the `intrinsic' probability associated with each cell (assigned by the AC, DC or ACDC algorithm) and (b) a user-defined movement model that is driven by the distance between the sampled locations for the individual at the previous and current time steps (and other user-defined parameters). This function simply sums the logarithms of these probabilities for each path as a measure of their relative likelihood, given the movement model.</p>
@@ -148,31 +148,31 @@
     <pre class="examples"><div class='input'><span class='co'># An example with the DCPF paths dataset included in flapper</span>
 <span class='fu'>pf_loglik</span><span class='op'>(</span><span class='va'>dat_dcpf_paths</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    path_id    loglik      delta
-#&gt; 1        4 -22.65582 0.00000000
-#&gt; 2        5 -22.69600 0.04017947
-#&gt; 3        3 -22.72799 0.07217439
-#&gt; 4        2 -22.81958 0.16376265
-#&gt; 5        1 -23.77829 1.12246741
-#&gt; 6       19 -24.54311 1.88729381
-#&gt; 7       24 -24.54930 1.89348096
-#&gt; 8       18 -24.55858 1.90275861
-#&gt; 9       23 -24.56477 1.90894575
-#&gt; 10       9 -24.56695 1.91112531
-#&gt; 11      14 -24.57313 1.91731246
-#&gt; 12       8 -24.58241 1.92659011
-#&gt; 13      13 -24.58860 1.93277725
-#&gt; 14      16 -24.62446 1.96864247
-#&gt; 15      17 -24.62446 1.96864247
-#&gt; 16      21 -24.63065 1.97482962
-#&gt; 17      22 -24.63065 1.97482962
-#&gt; 18       6 -24.64829 1.99247397
-#&gt; 19       7 -24.64829 1.99247397
-#&gt; 20      11 -24.65448 1.99866112
-#&gt; 21      12 -24.65448 1.99866112
-#&gt; 22      20 -28.86000 6.20417920
-#&gt; 23      25 -28.86619 6.21036635
-#&gt; 24      10 -28.88383 6.22801070
-#&gt; 25      15 -28.89002 6.23419785</div></pre>
+#&gt; 1        4 -145.7709 0.00000000
+#&gt; 2        5 -145.8111 0.04017947
+#&gt; 3        3 -145.8431 0.07217439
+#&gt; 4        2 -145.9346 0.16376265
+#&gt; 5        1 -146.8934 1.12246741
+#&gt; 6       19 -147.6582 1.88729381
+#&gt; 7       24 -147.6644 1.89348096
+#&gt; 8       18 -147.6736 1.90275861
+#&gt; 9       23 -147.6798 1.90894575
+#&gt; 10       9 -147.6820 1.91112531
+#&gt; 11      14 -147.6882 1.91731246
+#&gt; 12       8 -147.6975 1.92659011
+#&gt; 13      13 -147.7037 1.93277725
+#&gt; 14      16 -147.7395 1.96864247
+#&gt; 15      17 -147.7395 1.96864247
+#&gt; 16      21 -147.7457 1.97482962
+#&gt; 17      22 -147.7457 1.97482962
+#&gt; 18       6 -147.7634 1.99247397
+#&gt; 19       7 -147.7634 1.99247397
+#&gt; 20      11 -147.7695 1.99866112
+#&gt; 21      12 -147.7695 1.99866112
+#&gt; 22      20 -151.9751 6.20417920
+#&gt; 23      25 -151.9813 6.21036635
+#&gt; 24      10 -151.9989 6.22801070
+#&gt; 25      15 -152.0051 6.23419785</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

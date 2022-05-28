@@ -196,7 +196,7 @@
 
     
 <h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Acoustic estimates</h3>
-<p>Speed estimates from passive acoustic telemetry time series are derived from examination of detection patterns via <code>get_mvt_mobility_from_acoustics</code>. For each <code>fct</code> group (e.g., individual), the function identifies sequential detections, which exceeded the maximum transmission interval, at receivers with non-overlapping detection centroids (areas within the detection range of each receiver). Assuming that all detections are true, these can only result from movement between receivers. For these movements, transition distances are calculated as Euclidean distances, via <code><a href='https://rdrr.io/pkg/raster/man/pointDistance.html'>pointDistance</a></code>, or shortest swimming distances, assuming movement over a surface, via <code><a href='lcp_over_surface.html'>lcp_over_surface</a></code>. Given that detections can arise from movement anywhere within the detection range of a receiver, three distances are calculated: an average distance, from receiver to receiver; a lower-bound distance, between the closest edges of receiver detection centroids (i.e., the average distance minus two times the detection range); and an upper-bound distance from the furthest edges of receiver detection ranges (i.e., the average distance plus two times the detection range). These estimates assume a uniform detection ranges over space. For each transition, distances are converted into an average, lower and upper speed (m/s) estimate (termed `speed_avg_ms`, `speed_min_ms` and `speed_max_ms` respectively). If <code>step</code> is supplied, speeds are also expressed per step. On many occasions, individuals will take indirect routes between receivers, resulting in inappropriately low speed estimates. However, if receivers are sufficiently close together such that individuals sometimes effectively transition directly between receivers, the faster speed estimates derived via this method may be quite informative about actual swimming speeds.</p>
+<p>Speed estimates from passive acoustic telemetry time series are derived from examination of detection patterns via <code>get_mvt_mobility_from_acoustics</code>. For each <code>fct</code> group (e.g., individual), the function identifies sequential detections, which exceeded the maximum transmission interval, at receivers with non-overlapping detection containers (areas within the detection range of each receiver). Assuming that all detections are true, these can only result from movement between receivers. For these movements, transition distances are calculated as Euclidean distances, via <code><a href='https://rdrr.io/pkg/raster/man/pointDistance.html'>pointDistance</a></code>, or shortest swimming distances, assuming movement over a surface, via <code><a href='lcp_over_surface.html'>lcp_over_surface</a></code>. Given that detections can arise from movement anywhere within the detection range of a receiver, three distances are calculated: an average distance, from receiver to receiver; a lower-bound distance, between the closest edges of receiver detection containers (i.e., the average distance minus two times the detection range); and an upper-bound distance from the furthest edges of receiver detection ranges (i.e., the average distance plus two times the detection range). These estimates assume a uniform detection ranges over space. For each transition, distances are converted into an average, lower and upper speed (m/s) estimate (termed `speed_avg_ms`, `speed_min_ms` and `speed_max_ms` respectively). If <code>step</code> is supplied, speeds are also expressed per step. On many occasions, individuals will take indirect routes between receivers, resulting in inappropriately low speed estimates. However, if receivers are sufficiently close together such that individuals sometimes effectively transition directly between receivers, the faster speed estimates derived via this method may be quite informative about actual swimming speeds.</p>
 
 <h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Archival estimates</h3>
 <p>Speed estimates from <code>archival</code> time series are derived from examination of changes in depth through time (vertical activity) via <code>get_mvt_mobility_from_archival</code>. For each individual, speed is calculated from the vertical distances (m) between sequential, regular depth (m) observations over time (s). Speeds are also expressed per step, where `step' is the duration (s) between sequential observations.</p>
@@ -223,15 +223,15 @@
 </div><div class='output co'>#&gt; <span class='message'>Mobility estimates from n = 315 observation(s).</span></div><div class='output co'>#&gt; --------------------------------------
 #&gt; Estimates (m/s)-----------------------
 #&gt;       variable min mean  max
-#&gt; 1 speed_min_ms   0 0.07 0.85
-#&gt; 2 speed_avg_ms   0 0.14 1.07
-#&gt; 3 speed_max_ms   0 0.22 1.56
+#&gt; 1 speed_min_ms   0 0.07 0.84
+#&gt; 2 speed_avg_ms   0 0.14 1.06
+#&gt; 3 speed_max_ms   0 0.21 1.50
 #&gt; --------------------------------------
 #&gt; Estimates (m/step)--------------------
 #&gt;          variable  min  mean    max
-#&gt; 1 speed_min_mstep 0.01  8.55 101.64
-#&gt; 2 speed_avg_mstep 0.07 17.18 128.05
-#&gt; 3 speed_max_mstep 0.11 25.80 187.03
+#&gt; 1 speed_min_mstep 0.01  8.55 101.26
+#&gt; 2 speed_avg_mstep 0.07 17.15 127.58
+#&gt; 3 speed_max_mstep 0.11 25.76 180.39
 #&gt; --------------------------------------</div><div class='input'>
 <span class='co'>#### Estimate mobility from acoustic data using LCP distances</span>
 <span class='co'>## (A) Define receiver coordinates</span>
@@ -254,13 +254,13 @@
 #&gt;       variable min mean  max
 #&gt; 1 speed_min_ms   0 0.08 0.85
 #&gt; 2 speed_avg_ms   0 0.15 1.07
-#&gt; 3 speed_max_ms   0 0.22 1.61
+#&gt; 3 speed_max_ms   0 0.22 1.55
 #&gt; --------------------------------------
 #&gt; Estimates (m/step)--------------------
 #&gt;          variable  min  mean    max
-#&gt; 1 speed_min_mstep 0.02  9.31 102.23
-#&gt; 2 speed_avg_mstep 0.07 17.89 128.65
-#&gt; 3 speed_max_mstep 0.12 26.47 193.01
+#&gt; 1 speed_min_mstep 0.02  9.30 101.86
+#&gt; 2 speed_avg_mstep 0.07 17.86 128.18
+#&gt; 3 speed_max_mstep 0.12 26.42 186.15
 #&gt; --------------------------------------</div><div class='input'>
 <span class='co'>#### Estimate mobility from archival data</span>
 <span class='co'># Note the use of 'individual_id' for 'fct' here is only appropriate</span>

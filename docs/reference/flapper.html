@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>flapper: An R Package to Explore Animal Space Use Within Passive Acoustic Telemetry Arrays — flapper • flapper</title>
+<title>flapper: Routines for the analysis of passive acoustic telemetry data — flapper • flapper</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="flapper: An R Package to Explore Animal Space Use Within Passive Acoustic Telemetry Arrays — flapper" />
-<meta property="og:description" content="flapper is an R package designed to facilitate the use of passive acoustic telemetry (PAT) data for ecological inferences, especially those pertaining to animal space use. This includes functions for processing PAT data, spatial tools, new algorithms for inferring space use and simulations designed to evaluate the efficacy of existing and new algorithms for inferring space use. Package development has been motivated by the collection of PAT data for a Critically Endangered benthopelagic elasmobranch (the flapper skate, Dipturus intermedius) off the west coast of Scotland." />
+<meta property="og:title" content="flapper: Routines for the analysis of passive acoustic telemetry data — flapper" />
+<meta property="og:description" content="flapper is an R package that provides routines for the analysis of passive acoustic telemetry data, including for data processing, description (via detection statistics and movement metrics), modelling and simulation. These routines are supported by a series of helper functions (including distance calculators, spatial tools and parallelisation options). The main contribution is the provision of a family of algorithms for movement modelling in passive acoustic telemetry systems that permits the reconstruction of fine-scale movement paths and emergent patterns of space use. Package development has been motivated by passive acoustic telemetry data from a Critically Endangered benthic elasmobranch (the flapper skate, Dipturus intermedius) off the west coast of Scotland." />
 
 
 
@@ -114,13 +114,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>flapper: An R Package to Explore Animal Space Use Within Passive Acoustic Telemetry Arrays</h1>
+    <h1><code>flapper</code>: Routines for the analysis of passive acoustic telemetry data</h1>
     <small class="dont-index">Source: <a href='https://github.com/edwardlavender/flapper/blob/master/R/flapper-package.R'><code>R/flapper-package.R</code></a></small>
     <div class="hidden name"><code>flapper.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>flapper is an R package designed to facilitate the use of passive acoustic telemetry (PAT) data for ecological inferences, especially those pertaining to animal space use. This includes functions for processing PAT data, spatial tools, new algorithms for inferring space use and simulations designed to evaluate the efficacy of existing and new algorithms for inferring space use. Package development has been motivated by the collection of PAT data for a Critically Endangered benthopelagic elasmobranch (the flapper skate, <em>Dipturus intermedius</em>) off the west coast of Scotland.</p>
+    <p><code>flapper</code> is an R package that provides routines for the analysis of passive acoustic telemetry data, including for data processing, description (via detection statistics and movement metrics), modelling and simulation. These routines are supported by a series of helper functions (including distance calculators, spatial tools and parallelisation options). The main contribution is the provision of a family of algorithms for movement modelling in passive acoustic telemetry systems that permits the reconstruction of fine-scale movement paths and emergent patterns of space use. Package development has been motivated by passive acoustic telemetry data from a Critically Endangered benthic elasmobranch (the flapper skate, <em>Dipturus intermedius</em>) off the west coast of Scotland.</p>
     </div>
 
 
@@ -152,8 +152,9 @@
 
     
 
-<p>Some functions facilitate spatial operations that support ecological investigations and space use algorithms:</p><ul>
+<p>Some functions facilitate spatial operations that support common tasks and modelling algorithms:</p><ul>
 <li><p><a href='buffer_and_crop.html'>buffer_and_crop</a> buffers a spatial object (e.g., receiver locations) and uses this buffered object to crop another (e.g., the local bathymetry);</p></li>
+<li><p><a href='get_intersection.html'>get_intersection</a> intersects spatial geometries;</p></li>
 <li><p><a href='xy_from_click.html'>xy_from_click</a> gets location coordinates from mouse clicks;</p></li>
 <li><p><a href='crop_from_click.html'>crop_from_click</a> crops a <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code> to an area defined by mouse clicks;</p></li>
 <li><p><a href='cells_from_val.html'>cells_from_val</a> returns the cells (or a <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code> of the cells) of a <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code> that are equal to a specified value or lie within a specified range of values;</p></li>
@@ -162,7 +163,7 @@
 <li><p><a href='sim_surface.html'>sim_surface</a> populates a <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code> with simulated values;</p></li>
 <li><p><a href='split_raster_equally.html'>split_raster_equally</a> splits a <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code> into equal pieces (using code from the greenbrown (http://greenbrown.r-forge.r-project.org) package);</p></li>
 <li><p><a href='update_extent.html'>update_extent</a> shrinks or inflates an extent object;</p></li>
-<li><p><a href='segments_cross_barrier.html'>segments_cross_barrier</a> determines if Euclidean path segments cross a barrier;</p></li>
+<li><p><a href='segments_cross_barrier.html'>segments_cross_barrier</a> determines if Euclidean transects cross a barrier;</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="distance-calculations"><a class="anchor" href="#distance-calculations"></a>Distance calculations</h2>
@@ -192,9 +193,9 @@
 
 <p>Some functions facilitate the calculation of detection statistics, including those related to sampling effort and to detections of individuals:</p><ul>
 <li><p><a href='get_detection_pr.html'>get_detection_pr</a> calculates detection probability given a model for detection probability with distance;</p></li>
-<li><p><a href='get_detection_centroids.html'>get_detection_centroids</a> defines detection centroids (areas within the maximum detection range) around receivers;</p></li>
-<li><p><a href='get_detection_centroids_overlap.html'>get_detection_centroids_overlap</a> identifies receivers with overlapping detection centroids in space and time;</p></li>
-<li><p><a href='get_detection_centroids_envir.html'>get_detection_centroids_envir</a> extracts environmental conditions from within receiver detection ranges, accounting for detection probability;</p></li>
+<li><p><a href='get_detection_containers.html'>get_detection_containers</a> defines detection containers (areas within the maximum detection range) around receivers;</p></li>
+<li><p><a href='get_detection_containers_overlap.html'>get_detection_containers_overlap</a> identifies receivers with overlapping detection containers in space and time;</p></li>
+<li><p><a href='get_detection_containers_envir.html'>get_detection_containers_envir</a> extracts environmental conditions from within receiver detection ranges, accounting for detection probability;</p></li>
 <li><p><a href='get_detection_area_sum.html'>get_detection_area_sum</a> calculates the total area surveyed by receivers;</p></li>
 <li><p><a href='get_detection_area_ts.html'>get_detection_area_ts</a> defines a time series of the area surveyed by receivers;</p></li>
 <li><p><a href='get_n_operational_ts.html'>get_n_operational_ts</a> defines a time series of the number of operational units (e.g., individuals at liberty or active receivers);</p></li>
@@ -215,19 +216,26 @@
 <li><p><a href='get_mvt_mobility.html'>get_mvt_mobility_from_acoustics</a> estimates swimming speeds from acoustic detections;</p></li>
 <li><p><a href='get_mvt_mobility.html'>get_mvt_mobility_from_archival</a> estimates swimming speeds from archival time series;</p></li>
 </ul></li>
-<li><p><a href='get_mvt_resting.html'>get_mvt_resting</a> identifies `resting' behaviour from archival time series;</p></li>
+<li><p><a href='get_mvt_resting.html'>get_mvt_resting</a> identifies `resting' behaviour from archival time series;</p><ul>
+<li><p><a href='get_hr.html'>get_hr</a> functions get animal `home ranges':</p><ul>
+<li><p><a href='get_hr.html'>get_hr_prop</a> gets a custom range from a utilisation distribution (UD);</p></li>
+<li><p><a href='get_hr.html'>get_hr_core</a> gets the `core range' from a UD;</p></li>
+<li><p><a href='get_hr.html'>get_hr_home</a> gets the `home range' from a UD;</p></li>
+<li><p><a href='get_hr.html'>get_hr_full</a> gets the `full range' from a UD;</p></li>
+</ul></li>
+</ul></li>
 </ul>
 
-    <h2 class="hasAnchor" id="space-use-algorithms"><a class="anchor" href="#space-use-algorithms"></a>Space use algorithms</h2>
+    <h2 class="hasAnchor" id="modelling-algorithms"><a class="anchor" href="#modelling-algorithms"></a>Modelling algorithms</h2>
 
     
 
-<p>The main thrust of flapper is the implementation of existing and new algorithms designed to infer space use from PAT and archival data:</p><ul>
+<p>The main thrust of flapper is the implementation of existing and new algorithms designed to reconstruct fine-scale movement paths and emergent patterns of space use in passive acoustic telemetry systems:</p><ul>
 <li><p>The centres of activity (COA) algorithm</p><ul>
 <li><p><a href='coa_setup_delta_t.html'>coa_setup_delta_t</a> informs decisions as to an appropriate time interval over which to calculate COAs;</p></li>
 <li><p><a href='make_matrix_detections.html'>make_matrix_detections</a> summarises matrices over time intervals (see above);</p></li>
 <li><p><a href='coa.html'>coa</a> implements the arithmetic version of the mean-position algorithm to calculate COAs;</p></li>
-<li><p><a href='kud_habitat.html'>kud_habitat</a>, <a href='kud_around_coastline.html'>kud_around_coastline</a> and <code>kud_around_coastline_fast</code> facilitate the estimation of home ranges (e.g., from estimated COAs) in areas of complex coastline;</p></li>
+<li><p><a href='kud_habitat.html'>kud_habitat</a>, <a href='kud_around_coastline.html'>kud_around_coastline</a> and <a href='kud_around_coastline.html'>kud_around_coastline_fast</a> facilitate the estimation of home ranges (e.g., from estimated COAs) in areas of complex coastline;</p></li>
 </ul></li>
 <li><p>The `flapper` family of algorithms</p><ul>
 <li><p>The AC/DC branch</p><ul>
@@ -235,11 +243,11 @@
 <li><p><a href='dc.html'>dc</a> implements the DC algorithm;</p></li>
 <li><p><a href='dcq.html'>dcq</a> implements the quick DC (DCQ) algorithm;</p></li>
 </ul></li>
-<li><p>The acoustic-centroid* (AC*) algorithms</p><ul>
+<li><p>The acoustic-container* (AC*) algorithms</p><ul>
 <li><p><a href='acs_setup_mobility.html'>acs_setup_mobility</a> examines the assumption of a constant `mobility' parameter;</p></li>
-<li><p><a href='acs_setup_centroids.html'>acs_setup_centroids</a> defines the detection centroids for the algorithm(s);</p></li>
+<li><p><a href='acs_setup_containers.html'>acs_setup_containers</a> defines the detection containers for the algorithm(s);</p></li>
 <li><p><a href='acs_setup_detection_kernels.html'>acs_setup_detection_kernels</a> defines detection probability kernels for the algorithm(s);</p></li>
-<li><p><a href='ac.html'>ac</a> and <a href='acdc.html'>acdc</a> implement the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms, via <a href='.acs_pl.html'>.acs_pl</a> and <a href='.acs.html'>.acs</a>;</p></li>
+<li><p><a href='ac.html'>ac</a> and <a href='acdc.html'>acdc</a> implement the acoustic-container (AC) and acoustic-container depth-contour (ACDC) algorithms, via <a href='.acs_pl.html'>.acs_pl</a> and <a href='.acs.html'>.acs</a>;</p></li>
 </ul></li>
 <li><p>AC/DC processing</p><ul>
 <li><p><a href='acdc_simplify.html'>acdc_simplify</a> simplifies <a href='acdc_archive-class.html'>acdc_archive-class</a> objects into <a href='acdc_record-class.html'>acdc_record-class</a> objects;</p></li>
@@ -247,6 +255,7 @@
 <li><p><a href='acdc_access.html'>acdc_access_dat</a> accesses stored dataframes in an <a href='acdc_record-class.html'>acdc_record-class</a> object object;</p></li>
 <li><p><a href='acdc_access.html'>acdc_access_timesteps</a> accesses the total number of time steps in an <a href='acdc_record-class.html'>acdc_record-class</a> object;</p></li>
 <li><p><a href='acdc_access.html'>acdc_access_maps</a> accesses stored maps in an <a href='acdc_record-class.html'>acdc_record-class</a> object;</p></li>
+<li><p><a href='acdc_plot_trace.html'>acdc_plot_trace</a> plots acoustic container dynamics;</p></li>
 <li><p><a href='acdc_plot_record.html'>acdc_plot_record</a> plots the results of the algorithm(s);</p></li>
 <li><p><a href='acdc_animate_record.html'>acdc_animate_record</a> creates html animations of the algorithm(s);</p></li>
 </ul></li>
@@ -259,12 +268,13 @@
 <li><p><a href='pf_access_history_files.html'>pf_access_history_files</a> lists particle histories saved to file;</p></li>
 <li><p><a href='pf_access_history.html'>pf_access_history</a> accesses particle histories;</p></li>
 <li><p><a href='pf_access_particles_unique.html'>pf_access_particles_unique</a> accesses unique particle samples;</p></li>
-<li><p><a href='pf_plot_history.html'>pf_plot_history</a> plots simulated particle histories;</p></li>
-<li><p><a href='pf_animate_history.html'>pf_animate_history</a> animates simulated particle histories;</p></li>
+<li><p><a href='pf_plot_history.html'>pf_plot_history</a> plots particle histories;</p></li>
+<li><p><a href='pf_animate_history.html'>pf_animate_history</a> animates particle histories;</p></li>
 <li><p><a href='pf_simplify.html'>pf_simplify</a> assembles movement paths from particle histories;</p></li>
-<li><p><a href='pf_plot_map.html'>pf_plot_map</a> maps the `probability of use' across an area based on sampled particles or reconstructed paths;</p></li>
-<li><p><a href='pf_kud.html'>pf_kud_1</a> and <a href='pf_kud.html'>pf_kud_2</a> apply kernel smoothers to sampled particles or reconstructed paths;</p></li>
-<li><p><a href='pf_loglik.html'>pf_loglik</a> calculates the log-likelihood of reconstructed paths, given the movement model;</p></li>
+<li><p><a href='pf_plot_map.html'>pf_plot_map</a> maps the `proportion-of =use' across an area based on sampled particles or reconstructed paths;</p></li>
+<li><p><a href='pf_kud.html'>pf_kud</a> smooths POU maps using kernel smoothing;</p></li>
+<li><p><a href='pf_kud_.html'>pf_kud_1</a> and <a href='pf_kud_.html'>pf_kud_2</a> apply kernel smoothing to sampled particles or reconstructed paths;</p></li>
+<li><p><a href='pf_loglik.html'>pf_loglik</a> calculates the log-probability of reconstructed paths, given the movement model;</p></li>
 <li><p><a href='pf_plot_1d.html'>pf_plot_1d</a> plots the depth time series from observed and reconstructed paths;</p></li>
 <li><p><a href='pf_plot_2d.html'>pf_plot_2d</a> maps the reconstructed paths in two-dimensions;</p></li>
 <li><p><a href='pf_plot_3d.html'>pf_plot_3d</a> maps the reconstructed paths in three-dimensions;</p></li>
@@ -276,7 +286,7 @@
 
     
 
-<p>A set of <code>sim_*()</code> functions provide an integrated workflow for the simulation of receiver arrays, movement paths and detections under different array designs, movement models and detection models for the evaluation of data processing decisions and the relative merits of alternative space use algorithms under different conditions:</p><ul>
+<p>A set of <code>sim_*()</code> functions provide an integrated workflow for the simulation of receiver arrays, movement paths and detections under different array designs, movement models and detection models:</p><ul>
 <li><p><a href='sim_array.html'>sim_array</a> simulates alternative array designs;</p></li>
 <li><p><a href='sim_path_*.html'>sim_path_*</a> functions simulate discrete-time movement paths, including:</p><ul>
 <li><p><a href='sim_path_sa.html'>sim_path_sa</a>, supported by <a href='sim_path_sa.html'>sim_steps</a> and <a href='sim_path_sa.html'>sim_angles</a>, simulates movement paths (possibly in restricted areas) from step lengths and turning angles;</p></li>
@@ -287,6 +297,20 @@
 
 <p>Another set of functions facilitate the evaluation of the performance of alternative algorithms for inferring patterns of space use under different array designs, movement models and detections models:</p><ul>
 <li><p><a href='eval_by_kud.html'>eval_by_kud</a> compares patterns of space use inferred from simulated and estimated movement paths using kernel utilisation distributions;</p></li>
+</ul>
+
+    <h2 class="hasAnchor" id="parallelisation"><a class="anchor" href="#parallelisation"></a>Parallelisation</h2>
+
+    
+
+<p>Parallelisation is facilitated by the <code>cl_*()</code> function family:</p><ul>
+<li><p><a href='cl.html'>cl_lapply</a> is a wrapper for <code><a href='https://rdrr.io/pkg/pbapply/man/pbapply.html'>pblapply</a></code> that handles cluster checking set up and closure (see <a href='flapper-tips-parallel.html'>flapper-tips-parallel</a>) using the following functions:</p><ul>
+<li><p><a href='cl.html'>cl_check</a> checks a cluster;</p></li>
+<li><p><a href='cl.html'>cl_cores</a> identifies the number of cores;</p></li>
+<li><p><a href='cl.html'>cl_chunks</a> defines chunks for parallelisation;</p></li>
+<li><p><a href='cl.html'>cl_export</a> exports objects required by a cluster;</p></li>
+<li><p><a href='cl.html'>cl_stop</a> closes a cluster;</p></li>
+</ul></li>
 </ul>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

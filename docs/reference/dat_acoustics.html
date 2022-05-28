@@ -128,10 +128,11 @@
 
     <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>A dataframe with 59,420 observations and 8 variables:</p><dl>
-  <dt>timestamp</dt><dd><p>A POSIXct object which defines the time of each observation.</p></dd>
+    <p>A dataframe with 39,242 observations and 9 variables:</p><dl>
   <dt>individual_id</dt><dd><p>A unique identifier of the individual that was detected (see <code><a href='dat_ids.html'>dat_ids</a></code>).</p></dd>
   <dt>transmitter_id</dt><dd><p>The acoustic transmitter that was detected (see <code><a href='dat_ids.html'>dat_ids</a></code>).</p></dd>
+  <dt>index</dt><dd><p>An integer individual-specific cumulative detection index.</p></dd>
+  <dt>timestamp</dt><dd><p>A POSIXct object which defines the time of each observation.</p></dd>
   <dt>receiver_id</dt><dd><p>A unique identifier of the receiver at which the individual was detected (see <code><a href='dat_moorings.html'>dat_moorings</a></code>).</p></dd>
   <dt>receiver</dt><dd><p>The receiver at which the individual was detected (see <code><a href='dat_moorings.html'>dat_moorings</a></code>).</p></dd>
   <dt>receiver_long</dt><dd><p>The longitude of the receiver at which the individual was detected (see <code><a href='dat_moorings.html'>dat_moorings</a></code>).</p></dd>
@@ -143,6 +144,9 @@
     <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
 
     <p>Data were collected by, and belong to, Marine Scotland Science and NatureScot. Data were processed by Edward Lavender. If you wish to use these data, please contact Marine Scotland Science and NatureScot for further information.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Time stamps are expressed to the nearest two minutes. `Duplicate' detections (of the same individual at the same receiver in the same time step) are excluded. This supports the implementation of the acoustic-container (AC) and acoustic-container depth-contour (ACDC) algorithms (see <code><a href='ac.html'>ac</a></code> and <code><a href='acdc.html'>acdc</a></code>).</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Data collection and processing is described in Lavender (in prep). Fine-scale habitat use of the Critically Endangered flapper skate (<em>Dipturus intermedius</em>). [Doctoral dissertation, University of St Andrews].</p>

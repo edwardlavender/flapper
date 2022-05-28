@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="Simplify the outputs of the AC/DC algorithms — acdc_simplify" />
-<meta property="og:description" content="This function simplifies the output of ac, dc and acdc, by processing information from the 'archive' elements of an acdc_archive-class object that hold the results of calls to the workhorse routines. This is especially useful if the algorithm(s) have been applied chunk-wise, in which case the results for each chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series." />
+<meta property="og:description" content="This function simplifies the output of ac, dc and acdc, by processing information from the 'archive' elements of an acdc_archive-class object that hold the results of calls to the workhorse routines. This is especially useful if the algorithm(s) have been applied chunk-wise, in which case the results for each chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of the expected proportion of time steps spent in each grid cell." />
 
 
 
@@ -120,14 +120,14 @@
     </div>
 
     <div class="ref-description">
-    <p>This function simplifies the output of <code><a href='ac.html'>ac</a></code>, <code><a href='dc.html'>dc</a></code> and <code><a href='acdc.html'>acdc</a></code>, by processing information from the 'archive' elements of an <code><a href='acdc_archive-class.html'>acdc_archive-class</a></code> object that hold the results of calls to the workhorse routines. This is especially useful if the algorithm(s) have been applied chunk-wise, in which case the results for each chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series.</p>
+    <p>This function simplifies the output of <code><a href='ac.html'>ac</a></code>, <code><a href='dc.html'>dc</a></code> and <code><a href='acdc.html'>acdc</a></code>, by processing information from the 'archive' elements of an <code><a href='acdc_archive-class.html'>acdc_archive-class</a></code> object that hold the results of calls to the workhorse routines. This is especially useful if the algorithm(s) have been applied chunk-wise, in which case the results for each chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of the expected proportion of time steps spent in each grid cell.</p>
     </div>
 
     <pre class="usage"><span class='fu'>acdc_simplify</span><span class='op'>(</span>
   <span class='va'>archive</span>,
   type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"acs"</span>, <span class='st'>"dc"</span><span class='op'>)</span>,
   mask <span class='op'>=</span> <span class='cn'>NULL</span>,
-  normalise <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  normalise <span class='op'>=</span> <span class='cn'>TRUE</span>,
   keep_chunks <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
@@ -148,7 +148,7 @@
     </tr>
     <tr>
       <th>normalise</th>
-      <td><p>A logical input that defines whether or not to normalise the overall map so that cell scores sum to one.</p></td>
+      <td><p>A logical input that defines whether or not to normalise the overall map so that cell scores sum to one. If <code>normalise = FALSE</code>, the overall map represents the expected number of time steps spent in each grid cell; if <code>normalise = TRUE</code>, the overall map represents the expected proportion of time steps spent in each grid cell.</p></td>
     </tr>
     <tr>
       <th>keep_chunks</th>
@@ -164,7 +164,7 @@
     <p>If the <code><a href='ac.html'>ac</a></code>, <code><a href='dc.html'>dc</a></code> or <code><a href='acdc.html'>acdc</a></code> function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an <code><a href='acdc_record-class.html'>acdc_record-class</a></code> object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps) and (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series (for AC* algorithm(s)) to return an <code><a href='acdc_record-class.html'>acdc_record-class</a></code> object.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>The AC, DC and ACDC algorithms are implemented by <code><a href='ac.html'>ac</a></code>, <code><a href='dc.html'>dc</a></code> and <code><a href='acdc.html'>acdc</a></code>. After simplification, <code><a href='acdc_plot_record.html'>acdc_plot_record</a></code> and <code><a href='acdc_animate_record.html'>acdc_animate_record</a></code> can be implemented to visualise time-specific results.</p></div>
+    <div class='dont-index'><p>The AC, DC and ACDC algorithms are implemented by <code><a href='ac.html'>ac</a></code>, <code><a href='dc.html'>dc</a></code> and <code><a href='acdc.html'>acdc</a></code>. After simplification, <code><a href='acdc_plot_trace.html'>acdc_plot_trace</a></code>, <code><a href='acdc_plot_record.html'>acdc_plot_record</a></code> and <code><a href='acdc_animate_record.html'>acdc_animate_record</a></code> can be implemented to visualise time-specific results.</p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Edward Lavender</p>

@@ -209,28 +209,28 @@
                                           val <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>200</span>, <span class='fl'>300</span><span class='op'>)</span><span class='op'>)</span>
 <span class='co'>## Examine erroneous data:</span>
 <span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>acoustics_wth_errors</span>, <span class='fl'>10</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                 timestamp individual_id transmitter_id receiver_id     receiver
-#&gt; 59419 2017-04-19 23:22:09            35   A69-1303-540          48 VR2AR-546134
-#&gt; 59420 2017-04-19 23:22:45            35   A69-1303-540          48 VR2AR-546134
-#&gt; 59421 2017-04-19 23:22:45            35   A69-1303-540         100 VR2AR-546134
-#&gt; 59422 2017-04-19 23:22:45            35   A69-1303-540         200 VR2AR-546134
-#&gt; 59423 2017-04-19 23:22:45            35   A69-1303-540         300 VR2AR-546134
-#&gt; 59424 2019-01-01 00:00:00            35   A69-1303-540          48 VR2AR-546134
-#&gt; 59425 2019-03-01 00:00:00            35   A69-1303-540          48 VR2AR-546134
-#&gt; 59426 2017-04-19 23:22:45           100   A69-1303-540          48 VR2AR-546134
-#&gt; 59427 2017-04-19 23:22:45           200   A69-1303-540          48 VR2AR-546134
-#&gt; 59428 2017-04-19 23:22:45           300   A69-1303-540          48 VR2AR-546134
-#&gt;       receiver_long receiver_lat receiver_depth passed_filter
-#&gt; 59419     -5.643867     56.38278            145             1
-#&gt; 59420     -5.643867     56.38278            145             1
-#&gt; 59421     -5.643867     56.38278            145             1
-#&gt; 59422     -5.643867     56.38278            145             1
-#&gt; 59423     -5.643867     56.38278            145             1
-#&gt; 59424     -5.643867     56.38278            145             1
-#&gt; 59425     -5.643867     56.38278            145             1
-#&gt; 59426     -5.643867     56.38278            145             1
-#&gt; 59427     -5.643867     56.38278            145             1
-#&gt; 59428     -5.643867     56.38278            145             1</div><div class='input'>
+</div><div class='output co'>#&gt;       individual_id transmitter_id index           timestamp receiver_id
+#&gt; 39241            35   A69-1303-540 19903 2017-04-12 22:12:00          57
+#&gt; 39242            35   A69-1303-540 19904 2017-04-19 23:22:00          48
+#&gt; 39243            35   A69-1303-540 19904 2017-04-19 23:22:00         100
+#&gt; 39244            35   A69-1303-540 19904 2017-04-19 23:22:00         200
+#&gt; 39245            35   A69-1303-540 19904 2017-04-19 23:22:00         300
+#&gt; 39246            35   A69-1303-540 19904 2019-01-01 00:00:00          48
+#&gt; 39247            35   A69-1303-540 19904 2019-03-01 00:00:00          48
+#&gt; 39248           100   A69-1303-540 19904 2017-04-19 23:22:00          48
+#&gt; 39249           200   A69-1303-540 19904 2017-04-19 23:22:00          48
+#&gt; 39250           300   A69-1303-540 19904 2017-04-19 23:22:00          48
+#&gt;           receiver receiver_long receiver_lat receiver_depth passed_filter
+#&gt; 39241 VR2AR-546585     -5.623995     56.37436             75             1
+#&gt; 39242 VR2AR-546134     -5.643867     56.38278            145             1
+#&gt; 39243 VR2AR-546134     -5.643867     56.38278            145             1
+#&gt; 39244 VR2AR-546134     -5.643867     56.38278            145             1
+#&gt; 39245 VR2AR-546134     -5.643867     56.38278            145             1
+#&gt; 39246 VR2AR-546134     -5.643867     56.38278            145             1
+#&gt; 39247 VR2AR-546134     -5.643867     56.38278            145             1
+#&gt; 39248 VR2AR-546134     -5.643867     56.38278            145             1
+#&gt; 39249 VR2AR-546134     -5.643867     56.38278            145             1
+#&gt; 39250 VR2AR-546134     -5.643867     56.38278            145             1</div><div class='input'>
 <span class='co'>#### Implement process_quality_check()</span>
 <span class='fu'>process_quality_check</span><span class='op'>(</span><span class='va'>acoustics_wth_errors</span>, <span class='va'>dat_moorings</span>, <span class='va'>dat_ids</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='warning'>Warning: Check 1 (receiver identity): failed. 3 receiver identities unknown (100, 200, 300), corresponding to 3 observations in acoustics. </span></div><div class='output co'>#&gt; <span class='warning'>Warning: Check 3 (receiver deployment windows): failed. 2 observations in acoustics outside of receiver deployment windows. </span></div><div class='output co'>#&gt; <span class='warning'>Warning: Check 3 (tag identity): failed. 3 tag identities unknown (100, 200, 300), corresponding to 3 observations in acoustics. </span></div><div class='output co'>#&gt; <span class='message'>Check 4 (tag deployment windows): passed. </span></div><div class='output co'>#&gt; <span class='message'>Check 5 (false detections) passed: acoustics$passed_filter does not contain false detections. </span></div><div class='input'>

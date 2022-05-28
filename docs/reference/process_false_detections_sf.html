@@ -188,8 +188,8 @@ This function passes false detections flagged by false_detections through a spat
 <span class='co'>#### Compute false detections</span>
 <span class='co'># 3 false detections returned, as expected:</span>
 <span class='va'>det</span> <span class='op'>&lt;-</span> <span class='fu'>glatos</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/glatos/man/false_detections.html'>false_detections</a></span><span class='op'>(</span><span class='va'>det</span>, tf <span class='op'>=</span> <span class='fl'>3600</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>The filter identified 3 (0.01%) of 59423 detections as potentially false.</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>tail</a></span><span class='op'>(</span><span class='va'>det</span><span class='op'>$</span><span class='va'>passed_filter</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 1 1 1 0 0 0</div><div class='input'>
+</div><div class='output co'>#&gt; <span class='message'>The filter identified 23 (0.06%) of 39245 detections as potentially false.</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>tail</a></span><span class='op'>(</span><span class='va'>det</span><span class='op'>$</span><span class='va'>passed_filter</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 1 1 0 0 0 0</div><div class='input'>
 <span class='co'>#### Pass false detections through a spatial filter</span>
 <span class='co'># distances between receivers are required</span>
 <span class='va'>dist_btw_receivers_km</span> <span class='op'>&lt;-</span>
@@ -200,24 +200,24 @@ This function passes false detections flagged by false_detections through a spat
                                             tf <span class='op'>=</span> <span class='fl'>3600</span>,
                                             sf <span class='op'>=</span> <span class='fl'>0.5</span>,
                                             dist_btw_receivers <span class='op'>=</span> <span class='va'>dist_btw_receivers_km</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>The spatial filter retained 1 detections, out of 3 previously identified false detections  (33.33 %) as 'true' false detections.</span></div><div class='input'><span class='co'># Only the last observation failed the spatial filter, as expected:</span>
+</div><div class='output co'>#&gt; <span class='message'>The spatial filter retained 21 detections, out of 23 previously identified false detections  (91.3 %) as 'true' false detections.</span></div><div class='input'><span class='co'># Only the last observation failed the spatial filter, as expected:</span>
 <span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>tail</a></span><span class='op'>(</span><span class='va'>det</span><span class='op'>$</span><span class='va'>passed_filter_sf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] NA NA NA  1  1  0</div><div class='input'><span class='co'># Additional information is available from the attributes dataframe:</span>
+</div><div class='output co'>#&gt; [1] NA NA  0  1  1  0</div><div class='input'><span class='co'># Additional information is available from the attributes dataframe:</span>
 <span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>tail</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span><span class='op'>(</span><span class='va'>det</span><span class='op'>$</span><span class='va'>passed_filter_sf</span>, <span class='st'>"details"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;       passed_filter_sf n_wn_sf receiver_sn_sf detection_timestamp_utc_sf
-#&gt; 59418               NA      NA             NA                       &lt;NA&gt;
-#&gt; 59419               NA      NA             NA                       &lt;NA&gt;
-#&gt; 59420               NA      NA             NA                       &lt;NA&gt;
-#&gt; 59421                1       1             33        2017-04-22 12:22:45
-#&gt; 59422                1       1             48        2017-04-22 12:22:45
-#&gt; 59423                0      NA             NA                       &lt;NA&gt;
+#&gt; 39240               NA      NA             NA                       &lt;NA&gt;
+#&gt; 39241               NA      NA             NA                       &lt;NA&gt;
+#&gt; 39242                0      NA             NA                       &lt;NA&gt;
+#&gt; 39243                1       1             33        2017-04-22 12:22:00
+#&gt; 39244                1       1             48        2017-04-22 12:22:00
+#&gt; 39245                0      NA             NA                       &lt;NA&gt;
 #&gt;         dist_sf
-#&gt; 59418        NA
-#&gt; 59419        NA
-#&gt; 59420        NA
-#&gt; 59421 0.3400774
-#&gt; 59422 0.3400774
-#&gt; 59423        NA</div><div class='input'>
+#&gt; 39240        NA
+#&gt; 39241        NA
+#&gt; 39242        NA
+#&gt; 39243 0.3400774
+#&gt; 39244 0.3400774
+#&gt; 39245        NA</div><div class='input'>
 
 </div></pre>
   </div>

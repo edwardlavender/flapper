@@ -159,14 +159,14 @@
 <span class='va'>l</span> <span class='op'>&lt;-</span> <span class='fu'>split_raster_equally</span><span class='op'>(</span><span class='va'>dat_gebco</span>, <span class='fl'>3</span><span class='op'>)</span>
 <span class='va'>pp</span> <span class='op'>&lt;-</span> <span class='fu'>graphics</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span>mfrow <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>l</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>r</span><span class='op'>)</span> <span class='fu'>prettyGraphics</span><span class='fu'>::</span><span class='fu'><a href='https://edwardlavender.github.io/prettyGraphics/reference/pretty_map.html'>pretty_map</a></span><span class='op'>(</span>add_rasters <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>r</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='img'><img src='split_raster_equally-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; [[1]]
+</div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=longlat +datum=WGS84 +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=longlat +datum=WGS84 +no_defs'.</span></div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=longlat +datum=WGS84 +no_defs'.</span></div><div class='img'><img src='split_raster_equally-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; [[1]]
 #&gt; [[1]]$`1`
 #&gt; [[1]]$`1`$axis
 #&gt; [[1]]$`1`$axis$at
-#&gt; [1] 698000 700000 702000 704000
+#&gt; [1] -5.54 -5.53 -5.52 -5.51 -5.50
 #&gt; 
 #&gt; [[1]]$`1`$axis$labels
-#&gt; expression("698000", "700000", "702000", "704000")
+#&gt; [1] "-5.54" "-5.53" "-5.52" "-5.51" "-5.50"
 #&gt; 
 #&gt; [[1]]$`1`$axis$side
 #&gt; [1] 1
@@ -175,11 +175,11 @@
 #&gt; [1] TRUE
 #&gt; 
 #&gt; [[1]]$`1`$axis$pos
-#&gt; [1] 6246657
+#&gt; [1] 56.34167
 #&gt; 
 #&gt; 
 #&gt; [[1]]$`1`$lim
-#&gt; [1] 697548.1 705772.1
+#&gt; [1] -5.541667 -5.495833
 #&gt; attr(,"user")
 #&gt; [1] TRUE TRUE
 #&gt; 
@@ -187,10 +187,10 @@
 #&gt; [[1]]$`2`
 #&gt; [[1]]$`2`$axis
 #&gt; [[1]]$`2`$axis$at
-#&gt; [1] 6250000 6255000 6260000 6265000 6270000
+#&gt; [1] 56.35 56.40 56.45
 #&gt; 
 #&gt; [[1]]$`2`$axis$labels
-#&gt; expression("6250000", "6255000", "6260000", "6265000", "6270000")
+#&gt; [1] "56.35" "56.40" "56.45"
 #&gt; 
 #&gt; [[1]]$`2`$axis$side
 #&gt; [1] 2
@@ -199,11 +199,11 @@
 #&gt; [1] TRUE
 #&gt; 
 #&gt; [[1]]$`2`$axis$pos
-#&gt; [1] 697548.1
+#&gt; [1] -5.541667
 #&gt; 
 #&gt; 
 #&gt; [[1]]$`2`$lim
-#&gt; [1] 6246657 6273048
+#&gt; [1] 56.34167 56.49167
 #&gt; attr(,"user")
 #&gt; [1] TRUE TRUE
 #&gt; 
@@ -214,7 +214,7 @@
 #&gt; [1] FALSE
 #&gt; 
 #&gt; [[1]]$`3`$axis$at
-#&gt; [1] 698000 700000 702000 704000
+#&gt; [1] -5.54 -5.53 -5.52 -5.51 -5.50
 #&gt; 
 #&gt; [[1]]$`3`$axis$side
 #&gt; [1] 3
@@ -223,11 +223,11 @@
 #&gt; [1] TRUE
 #&gt; 
 #&gt; [[1]]$`3`$axis$pos
-#&gt; [1] 6273048
+#&gt; [1] 56.49167
 #&gt; 
 #&gt; 
 #&gt; [[1]]$`3`$lim
-#&gt; [1] 697548.1 705772.1
+#&gt; [1] -5.541667 -5.495833
 #&gt; attr(,"user")
 #&gt; [1] TRUE TRUE
 #&gt; 
@@ -238,7 +238,7 @@
 #&gt; [1] FALSE
 #&gt; 
 #&gt; [[1]]$`4`$axis$at
-#&gt; [1] 6250000 6255000 6260000 6265000 6270000
+#&gt; [1] 56.35 56.40 56.45
 #&gt; 
 #&gt; [[1]]$`4`$axis$side
 #&gt; [1] 4
@@ -247,11 +247,11 @@
 #&gt; [1] TRUE
 #&gt; 
 #&gt; [[1]]$`4`$axis$pos
-#&gt; [1] 705772.1
+#&gt; [1] -5.495833
 #&gt; 
 #&gt; 
 #&gt; [[1]]$`4`$lim
-#&gt; [1] 6246657 6273048
+#&gt; [1] 56.34167 56.49167
 #&gt; attr(,"user")
 #&gt; [1] TRUE TRUE
 #&gt; 
@@ -261,11 +261,10 @@
 #&gt; [[2]]$`1`
 #&gt; [[2]]$`1`$axis
 #&gt; [[2]]$`1`$axis$at
-#&gt; [1] 706000 706500 707000 707500 708000 708500
+#&gt; [1] -5.49 -5.48 -5.47 -5.46 -5.45
 #&gt; 
 #&gt; [[2]]$`1`$axis$labels
-#&gt; expression("706000", "706500", "707000", "707500", "708000", 
-#&gt;     "708500")
+#&gt; [1] "-5.49" "-5.48" "-5.47" "-5.46" "-5.45"
 #&gt; 
 #&gt; [[2]]$`1`$axis$side
 #&gt; [1] 1
@@ -274,11 +273,11 @@
 #&gt; [1] TRUE
 #&gt; 
 #&gt; [[2]]$`1`$axis$pos
-#&gt; [1] 6246657
+#&gt; [1] 56.34167
 #&gt; 
 #&gt; 
 #&gt; [[2]]$`1`$lim
-#&gt; [1] 705772.1 708856.1
+#&gt; [1] -5.495833 -5.445833
 #&gt; attr(,"user")
 #&gt; [1] TRUE TRUE
 #&gt; 
@@ -286,10 +285,10 @@
 #&gt; [[2]]$`2`
 #&gt; [[2]]$`2`$axis
 #&gt; [[2]]$`2`$axis$at
-#&gt; [1] 6250000 6255000 6260000 6265000 6270000
+#&gt; [1] 56.35 56.40 56.45
 #&gt; 
 #&gt; [[2]]$`2`$axis$labels
-#&gt; expression("6250000", "6255000", "6260000", "6265000", "6270000")
+#&gt; [1] "56.35" "56.40" "56.45"
 #&gt; 
 #&gt; [[2]]$`2`$axis$side
 #&gt; [1] 2
@@ -298,11 +297,11 @@
 #&gt; [1] TRUE
 #&gt; 
 #&gt; [[2]]$`2`$axis$pos
-#&gt; [1] 705772.1
+#&gt; [1] -5.495833
 #&gt; 
 #&gt; 
 #&gt; [[2]]$`2`$lim
-#&gt; [1] 6246657 6273048
+#&gt; [1] 56.34167 56.49167
 #&gt; attr(,"user")
 #&gt; [1] TRUE TRUE
 #&gt; 
@@ -313,7 +312,7 @@
 #&gt; [1] FALSE
 #&gt; 
 #&gt; [[2]]$`3`$axis$at
-#&gt; [1] 706000 706500 707000 707500 708000 708500
+#&gt; [1] -5.49 -5.48 -5.47 -5.46 -5.45
 #&gt; 
 #&gt; [[2]]$`3`$axis$side
 #&gt; [1] 3
@@ -322,11 +321,11 @@
 #&gt; [1] TRUE
 #&gt; 
 #&gt; [[2]]$`3`$axis$pos
-#&gt; [1] 6273048
+#&gt; [1] 56.49167
 #&gt; 
 #&gt; 
 #&gt; [[2]]$`3`$lim
-#&gt; [1] 705772.1 708856.1
+#&gt; [1] -5.495833 -5.445833
 #&gt; attr(,"user")
 #&gt; [1] TRUE TRUE
 #&gt; 
@@ -337,7 +336,7 @@
 #&gt; [1] FALSE
 #&gt; 
 #&gt; [[2]]$`4`$axis$at
-#&gt; [1] 6250000 6255000 6260000 6265000 6270000
+#&gt; [1] 56.35 56.40 56.45
 #&gt; 
 #&gt; [[2]]$`4`$axis$side
 #&gt; [1] 4
@@ -346,11 +345,11 @@
 #&gt; [1] TRUE
 #&gt; 
 #&gt; [[2]]$`4`$axis$pos
-#&gt; [1] 708856.1
+#&gt; [1] -5.445833
 #&gt; 
 #&gt; 
 #&gt; [[2]]$`4`$lim
-#&gt; [1] 6246657 6273048
+#&gt; [1] 56.34167 56.49167
 #&gt; attr(,"user")
 #&gt; [1] TRUE TRUE
 #&gt; 
@@ -360,10 +359,10 @@
 #&gt; [[3]]$`1`
 #&gt; [[3]]$`1`$axis
 #&gt; [[3]]$`1`$axis$at
-#&gt; [1] 709000 710000 711000 712000
+#&gt; [1] -5.44 -5.43 -5.42 -5.41 -5.40
 #&gt; 
 #&gt; [[3]]$`1`$axis$labels
-#&gt; expression("709000", "710000", "711000", "712000")
+#&gt; [1] "-5.44" "-5.43" "-5.42" "-5.41" "-5.40"
 #&gt; 
 #&gt; [[3]]$`1`$axis$side
 #&gt; [1] 1
@@ -372,11 +371,11 @@
 #&gt; [1] TRUE
 #&gt; 
 #&gt; [[3]]$`1`$axis$pos
-#&gt; [1] 6246657
+#&gt; [1] 56.34167
 #&gt; 
 #&gt; 
 #&gt; [[3]]$`1`$lim
-#&gt; [1] 708856.1 712454.1
+#&gt; [1] -5.445833 -5.400000
 #&gt; attr(,"user")
 #&gt; [1] TRUE TRUE
 #&gt; 
@@ -384,10 +383,10 @@
 #&gt; [[3]]$`2`
 #&gt; [[3]]$`2`$axis
 #&gt; [[3]]$`2`$axis$at
-#&gt; [1] 6250000 6255000 6260000 6265000 6270000
+#&gt; [1] 56.35 56.40 56.45
 #&gt; 
 #&gt; [[3]]$`2`$axis$labels
-#&gt; expression("6250000", "6255000", "6260000", "6265000", "6270000")
+#&gt; [1] "56.35" "56.40" "56.45"
 #&gt; 
 #&gt; [[3]]$`2`$axis$side
 #&gt; [1] 2
@@ -396,11 +395,11 @@
 #&gt; [1] TRUE
 #&gt; 
 #&gt; [[3]]$`2`$axis$pos
-#&gt; [1] 708856.1
+#&gt; [1] -5.445833
 #&gt; 
 #&gt; 
 #&gt; [[3]]$`2`$lim
-#&gt; [1] 6246657 6273048
+#&gt; [1] 56.34167 56.49167
 #&gt; attr(,"user")
 #&gt; [1] TRUE TRUE
 #&gt; 
@@ -411,7 +410,7 @@
 #&gt; [1] FALSE
 #&gt; 
 #&gt; [[3]]$`3`$axis$at
-#&gt; [1] 709000 710000 711000 712000
+#&gt; [1] -5.44 -5.43 -5.42 -5.41 -5.40
 #&gt; 
 #&gt; [[3]]$`3`$axis$side
 #&gt; [1] 3
@@ -420,11 +419,11 @@
 #&gt; [1] TRUE
 #&gt; 
 #&gt; [[3]]$`3`$axis$pos
-#&gt; [1] 6273048
+#&gt; [1] 56.49167
 #&gt; 
 #&gt; 
 #&gt; [[3]]$`3`$lim
-#&gt; [1] 708856.1 712454.1
+#&gt; [1] -5.445833 -5.400000
 #&gt; attr(,"user")
 #&gt; [1] TRUE TRUE
 #&gt; 
@@ -435,7 +434,7 @@
 #&gt; [1] FALSE
 #&gt; 
 #&gt; [[3]]$`4`$axis$at
-#&gt; [1] 6250000 6255000 6260000 6265000 6270000
+#&gt; [1] 56.35 56.40 56.45
 #&gt; 
 #&gt; [[3]]$`4`$axis$side
 #&gt; [1] 4
@@ -444,11 +443,11 @@
 #&gt; [1] TRUE
 #&gt; 
 #&gt; [[3]]$`4`$axis$pos
-#&gt; [1] 712454.1
+#&gt; [1] -5.4
 #&gt; 
 #&gt; 
 #&gt; [[3]]$`4`$lim
-#&gt; [1] 6246657 6273048
+#&gt; [1] 56.34167 56.49167
 #&gt; attr(,"user")
 #&gt; [1] TRUE TRUE
 #&gt; 

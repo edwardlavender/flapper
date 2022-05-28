@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="Plot time-specific maps from the AC/DC algorithm(s) — acdc_plot_record" />
-<meta property="og:description" content="This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, an acdc_record-class list from ac, dc or acdc plus acdc_simplify must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using plot and pretty_axis and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids (if applicable) can be added and customised and the finalised plots can be returned or saved to file." />
+<meta property="og:description" content="This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, an acdc_record-class list from ac, dc or acdc plus acdc_simplify must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using plot and pretty_axis and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of expected time spent in different parts of the study area (from the start of the algorithm to each time point). Coastline, receivers and acoustic containers (if applicable) can be added and customised and the finalised plots can be returned or saved to file." />
 
 
 
@@ -120,7 +120,7 @@
     </div>
 
     <div class="ref-description">
-    <p>This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, an <code><a href='acdc_record-class.html'>acdc_record-class</a></code> list from <code><a href='ac.html'>ac</a></code>, <code><a href='dc.html'>dc</a></code> or <code><a href='acdc.html'>acdc</a></code> plus <code><a href='acdc_simplify.html'>acdc_simplify</a></code> must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using <code><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></code> and <code><a href='https://edwardlavender.github.io/prettyGraphics/reference/pretty_axis.html'>pretty_axis</a></code> and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids (if applicable) can be added and customised and the finalised plots can be returned or saved to file.</p>
+    <p>This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, an <code><a href='acdc_record-class.html'>acdc_record-class</a></code> list from <code><a href='ac.html'>ac</a></code>, <code><a href='dc.html'>dc</a></code> or <code><a href='acdc.html'>acdc</a></code> plus <code><a href='acdc_simplify.html'>acdc_simplify</a></code> must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using <code><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></code> and <code><a href='https://edwardlavender.github.io/prettyGraphics/reference/pretty_axis.html'>pretty_axis</a></code> and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of expected time spent in different parts of the study area (from the start of the algorithm to each time point). Coastline, receivers and acoustic containers (if applicable) can be added and customised and the finalised plots can be returned or saved to file.</p>
     </div>
 
     <pre class="usage"><span class='fu'>acdc_plot_record</span><span class='op'>(</span>
@@ -130,7 +130,7 @@
   add_coastline <span class='op'>=</span> <span class='cn'>NULL</span>,
   add_receivers <span class='op'>=</span> <span class='cn'>NULL</span>,
   add_raster <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>col <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rev.html'>rev</a></span><span class='op'>(</span><span class='fu'>grDevices</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/grDevices/palettes.html'>terrain.colors</a></span><span class='op'>(</span><span class='fl'>255</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>,
-  add_centroids <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  add_containers <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
   add_additional <span class='op'>=</span> <span class='cn'>NULL</span>,
   crop_spatial <span class='op'>=</span> <span class='cn'>FALSE</span>,
   xlim <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -161,7 +161,7 @@
     </tr>
     <tr>
       <th>plot</th>
-      <td><p>An integer vector that defines the time steps for which to make plots. If <code>plot = NULL</code>, the function will make a plot for all time steps for which the necessary information is available in <code>archive</code>.</p></td>
+      <td><p>An integer vector that defines the time steps for which to make plots. If <code>plot = NULL</code>, the function will make a plot for all time steps for which the necessary information is available in <code>record</code>.</p></td>
     </tr>
     <tr>
       <th>add_coastline</th>
@@ -173,11 +173,11 @@
     </tr>
     <tr>
       <th>add_raster</th>
-      <td><p>(optional) A named list of arguments, passed to <code><a href='https://rdrr.io/pkg/fields/man/image.plot.html'>image.plot</a></code>, to plot the RasterLayer of possible locations that is extracted from <code>archive</code>.</p></td>
+      <td><p>(optional) A named list of arguments, passed to <code><a href='https://rdrr.io/pkg/fields/man/image.plot.html'>image.plot</a></code>, to plot the RasterLayer of possible locations that is extracted from <code>record</code>.</p></td>
     </tr>
     <tr>
-      <th>add_centroids</th>
-      <td><p>(optional) For outputs from the AC* algorithms (<code><a href='ac.html'>ac</a></code> or <code><a href='acdc.html'>acdc</a></code>), <code>centroids</code> is a named list of arguments, passed to <code><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></code>, to add the acoustic centroid to the plot.</p></td>
+      <th>add_containers</th>
+      <td><p>(optional) For outputs from the AC* algorithms (<code><a href='ac.html'>ac</a></code> or <code><a href='acdc.html'>acdc</a></code>), <code>containers</code> is a named list of arguments, passed to <code><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></code>, to add the acoustic containers to the plot.</p></td>
     </tr>
     <tr>
       <th>add_additional</th>
@@ -238,8 +238,7 @@
 <span class='fu'>acdc_plot_record</span><span class='op'>(</span>record <span class='op'>=</span> <span class='va'>dat_acdc</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; flapper::acdc_plot_record() called... 
 #&gt; ... Checking function inputs... 
-#&gt; ... Defining data for background plot... 
-#&gt; ... Setting plotting window... 
+#&gt; ... Defining data for background plot... </div><div class='output co'>#&gt; <span class='message'>add_containers = NULL implemented: 'record' does not contain containers.</span></div><div class='output co'>#&gt; ... Setting plotting window... 
 #&gt; ... Making plots for each time step ... </div><div class='output co'>#&gt; <span class='warning'>Warning: Nothing to summarize if you provide a single RasterLayer; see cellStats</span></div><div class='img'><img src='acdc_plot_record-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>#### Example (2): Define the number of plots to be produced and control the plotting window</span>
 <span class='fu'>acdc_plot_record</span><span class='op'>(</span>record <span class='op'>=</span> <span class='va'>dat_acdc</span>,
@@ -247,8 +246,7 @@
                  par_param <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>mfrow <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>, mar <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>8</span>, <span class='fl'>8</span>, <span class='fl'>8</span>, <span class='fl'>8</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; flapper::acdc_plot_record() called... 
 #&gt; ... Checking function inputs... 
-#&gt; ... Defining data for background plot... 
-#&gt; ... Setting plotting window... 
+#&gt; ... Defining data for background plot... </div><div class='output co'>#&gt; <span class='message'>add_containers = NULL implemented: 'record' does not contain containers.</span></div><div class='output co'>#&gt; ... Setting plotting window... 
 #&gt; ... Making plots for each time step ... </div><div class='output co'>#&gt; <span class='warning'>Warning: Nothing to summarize if you provide a single RasterLayer; see cellStats</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Nothing to summarize if you provide a single RasterLayer; see cellStats</span></div><div class='img'><img src='acdc_plot_record-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>#### Example (3): Add and customise spatial information via add_* args</span>
 <span class='co'>## Define a SpatialPoints object of receiver locations</span>
@@ -256,17 +254,16 @@
 <span class='va'>proj_utm</span>   <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span>SRS_string <span class='op'>=</span> <span class='st'>"EPSG:32629"</span><span class='op'>)</span>
 <span class='va'>rsp</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPoints</a></span><span class='op'>(</span><span class='va'>dat_moorings</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"receiver_long"</span>, <span class='st'>"receiver_lat"</span><span class='op'>)</span><span class='op'>]</span>, <span class='va'>proj_wgs84</span><span class='op'>)</span>
 <span class='va'>rsp</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/spTransform.html'>spTransform</a></span><span class='op'>(</span><span class='va'>rsp</span>, <span class='va'>proj_utm</span><span class='op'>)</span>
-<span class='co'>## Plot with receiver locations and coastline, customise the centroids and the raster</span>
+<span class='co'>## Plot with receiver locations and coastline, customise the containers and the raster</span>
 <span class='fu'>acdc_plot_record</span><span class='op'>(</span>record <span class='op'>=</span> <span class='va'>dat_acdc</span>,
                  add_coastline <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>dat_coast</span>, col <span class='op'>=</span> <span class='st'>"darkgreen"</span><span class='op'>)</span>,
                  add_receivers <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>rsp</span>, pch <span class='op'>=</span> <span class='fl'>4</span>, col <span class='op'>=</span> <span class='st'>"royalblue"</span><span class='op'>)</span>,
-                 add_centroids <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>col <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span>,
+                 add_containers <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>col <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span>,
                  add_raster <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>col <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rev.html'>rev</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/grDevices/palettes.html'>topo.colors</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
                  <span class='op'>)</span>
 </div><div class='output co'>#&gt; flapper::acdc_plot_record() called... 
 #&gt; ... Checking function inputs... 
-#&gt; ... Defining data for background plot... 
-#&gt; ... Setting plotting window... 
+#&gt; ... Defining data for background plot... </div><div class='output co'>#&gt; <span class='message'>add_containers = NULL implemented: 'record' does not contain containers.</span></div><div class='output co'>#&gt; ... Setting plotting window... 
 #&gt; ... Making plots for each time step ... </div><div class='output co'>#&gt; <span class='warning'>Warning: Nothing to summarize if you provide a single RasterLayer; see cellStats</span></div><div class='input'>
 <span class='co'>#### Example (4): Control axis properties</span>
 <span class='co'># ... via smallplot argument for raster, pretty_axis_args, xlim, ylim and fix_zlim</span>
@@ -274,7 +271,7 @@
 <span class='fu'>acdc_plot_record</span><span class='op'>(</span>record <span class='op'>=</span> <span class='va'>dat_acdc</span>,
                  add_coastline <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>dat_coast</span>, col <span class='op'>=</span> <span class='st'>"darkgreen"</span><span class='op'>)</span>,
                  add_receivers <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>rsp</span>, pch <span class='op'>=</span> <span class='fl'>4</span>, col <span class='op'>=</span> <span class='st'>"royalblue"</span><span class='op'>)</span>,
-                 add_centroids <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>col <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span>,
+                 add_containers <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>col <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span>,
                  add_raster <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>smallplot<span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.85</span>, <span class='fl'>0.9</span>, <span class='fl'>0.25</span>, <span class='fl'>0.75</span><span class='op'>)</span><span class='op'>)</span>,
                  crop_spatial <span class='op'>=</span> <span class='cn'>TRUE</span>,
                  pretty_axis_args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>side <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,
@@ -286,8 +283,7 @@
                  <span class='op'>)</span>
 </div><div class='output co'>#&gt; flapper::acdc_plot_record() called... 
 #&gt; ... Checking function inputs... 
-#&gt; ... Defining data for background plot... 
-#&gt; ... Setting plotting window... 
+#&gt; ... Defining data for background plot... </div><div class='output co'>#&gt; <span class='message'>add_containers = NULL implemented: 'record' does not contain containers.</span></div><div class='output co'>#&gt; ... Setting plotting window... 
 #&gt; ... Making plots for each time step ... </div><div class='output co'>#&gt; <span class='warning'>Warning: Nothing to summarize if you provide a single RasterLayer; see cellStats</span></div><div class='img'><img src='acdc_plot_record-3.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>#### Example (5): Modify each plot after it is produced via add_additional</span>
 <span class='co'># Specify a function to add titles to a plot</span>
@@ -301,7 +297,7 @@
                  par_param <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>mfrow <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>, mar <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>8</span>, <span class='fl'>8</span>, <span class='fl'>8</span>, <span class='fl'>8</span><span class='op'>)</span><span class='op'>)</span>,
                  add_coastline <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>dat_coast</span>, col <span class='op'>=</span> <span class='st'>"darkgreen"</span><span class='op'>)</span>,
                  add_receivers <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>rsp</span>, pch <span class='op'>=</span> <span class='fl'>4</span>, col <span class='op'>=</span> <span class='st'>"royalblue"</span><span class='op'>)</span>,
-                 add_centroids <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>col <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span>,
+                 add_containers <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>col <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span>,
                  add_raster <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
                  crop_spatial <span class='op'>=</span> <span class='cn'>TRUE</span>,
                  xlim <span class='op'>=</span> <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/extent.html'>extent</a></span><span class='op'>(</span><span class='va'>dat_coast</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span><span class='op'>]</span>,
@@ -310,8 +306,7 @@
                  <span class='op'>)</span>
 </div><div class='output co'>#&gt; flapper::acdc_plot_record() called... 
 #&gt; ... Checking function inputs... 
-#&gt; ... Defining data for background plot... 
-#&gt; ... Setting plotting window... 
+#&gt; ... Defining data for background plot... </div><div class='output co'>#&gt; <span class='message'>add_containers = NULL implemented: 'record' does not contain containers.</span></div><div class='output co'>#&gt; ... Setting plotting window... 
 #&gt; ... Making plots for each time step ... </div><div class='output co'>#&gt; <span class='warning'>Warning: Nothing to summarize if you provide a single RasterLayer; see cellStats</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Nothing to summarize if you provide a single RasterLayer; see cellStats</span></div><div class='img'><img src='acdc_plot_record-4.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>#### Example (6) Save plots via png_param</span>
 <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
@@ -321,16 +316,14 @@
 #&gt;  [7] "dot_acdc_log_1.txt"       "dot_acdc_log_2.txt"      
 #&gt;  [9] "dot_acdc_log_3.txt"       "dot_acdc_log_4.txt"      
 #&gt; [11] "dot_acdc_log_5.txt"       "downlit"                 
-#&gt; [13] "file13f6c1f494b16.so"     "file13f6c3784320a"       
-#&gt; [15] "file13f6c7f8e2861"        "file13f6ca6459dc"        
-#&gt; [17] "file13f6cfc5f1f9"         "images"                  
-#&gt; [19] "js"                      </div><div class='input'><span class='fu'>acdc_plot_record</span><span class='op'>(</span>record <span class='op'>=</span> <span class='va'>dat_acdc</span>,
+#&gt; [13] "file16ae112203e38.so"     "file16ae11339cbd2"       
+#&gt; [15] "file16ae11554aa5d"        "file16ae163a5a0bf"       
+#&gt; [17] "images"                   "js"                      </div><div class='input'><span class='fu'>acdc_plot_record</span><span class='op'>(</span>record <span class='op'>=</span> <span class='va'>dat_acdc</span>,
                  plot <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>,
                  png_param <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>filename <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
                  <span class='op'>)</span>
 </div><div class='output co'>#&gt; flapper::acdc_plot_record() called... 
-#&gt; ... Checking function inputs... </div><div class='output co'>#&gt; <span class='message'>'/' added to the directory inputted to the argument 'png_param$filename' ('/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum').</span></div><div class='output co'>#&gt; ... Defining data for background plot... 
-#&gt; ... Setting plotting window... 
+#&gt; ... Checking function inputs... </div><div class='output co'>#&gt; <span class='message'>'/' added to the directory inputted to the argument 'png_param$filename' ('/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E').</span></div><div class='output co'>#&gt; ... Defining data for background plot... </div><div class='output co'>#&gt; <span class='message'>add_containers = NULL implemented: 'record' does not contain containers.</span></div><div class='output co'>#&gt; ... Setting plotting window... 
 #&gt; ... Making plots for each time step ... </div><div class='output co'>#&gt; <span class='warning'>Warning: Nothing to summarize if you provide a single RasterLayer; see cellStats</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Nothing to summarize if you provide a single RasterLayer; see cellStats</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;  [1] "1.png"                    "2.png"                   
 #&gt;  [3] "25"                       "28"                      
@@ -339,10 +332,9 @@
 #&gt;  [9] "dot_acdc_log_1.txt"       "dot_acdc_log_2.txt"      
 #&gt; [11] "dot_acdc_log_3.txt"       "dot_acdc_log_4.txt"      
 #&gt; [13] "dot_acdc_log_5.txt"       "downlit"                 
-#&gt; [15] "file13f6c1f494b16.so"     "file13f6c3784320a"       
-#&gt; [17] "file13f6c7f8e2861"        "file13f6ca6459dc"        
-#&gt; [19] "file13f6cfc5f1f9"         "images"                  
-#&gt; [21] "js"                      </div><div class='input'>
+#&gt; [15] "file16ae112203e38.so"     "file16ae11339cbd2"       
+#&gt; [17] "file16ae11554aa5d"        "file16ae163a5a0bf"       
+#&gt; [19] "images"                   "js"                      </div><div class='input'>
 <span class='co'>#### Example (7) To plot the overall map, you can also just use a</span>
 <span class='co'># ... a raster plotting function like prettyGraphics::pretty_map()</span>
 <span class='va'>ext</span> <span class='op'>&lt;-</span> <span class='fu'><a href='update_extent.html'>update_extent</a></span><span class='op'>(</span><span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/extent.html'>extent</a></span><span class='op'>(</span><span class='va'>dat_coast</span><span class='op'>)</span>, <span class='op'>-</span><span class='fl'>1000</span><span class='op'>)</span>

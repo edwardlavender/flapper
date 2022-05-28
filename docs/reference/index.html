@@ -141,13 +141,13 @@
         <td>
           <p><code><a href="ac.html">ac()</a></code> </p>
         </td>
-        <td><p>The acoustic-centroid (AC) algorithm</p></td>
+        <td><p>The acoustic-container (AC) algorithm</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="acdc.html">acdc()</a></code> </p>
         </td>
-        <td><p>The acoustic-centroid depth-contour (ACDC) algorithm</p></td>
+        <td><p>The acoustic-container depth-contour (ACDC) algorithm</p></td>
       </tr><tr>
         
         <td>
@@ -175,6 +175,12 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="acdc_plot_trace.html">acdc_plot_trace()</a></code> </p>
+        </td>
+        <td><p>Plot AC* container dynamics</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="acdc_record-class.html">acdc_record-class</a></code> </p>
         </td>
         <td><p>"acdc_record" class</p></td>
@@ -187,9 +193,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="acs_setup_centroids.html">acs_setup_centroids()</a></code> </p>
+          <p><code><a href="acs_setup_containers.html">acs_setup_containers()</a></code> </p>
         </td>
-        <td><p>Setup the detection centroids required for the AC* algorithm(s)</p></td>
+        <td><p>Setup the detection containers required for the AC* algorithm(s)</p></td>
       </tr><tr>
         
         <td>
@@ -223,7 +229,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="cl.html">cl_lapply()</a></code> <code><a href="cl.html">cl_check()</a></code> <code><a href="cl.html">cl_chunks()</a></code> <code><a href="cl.html">cl_export()</a></code> <code><a href="cl.html">cl_stop()</a></code> </p>
+          <p><code><a href="cl.html">cl_lapply()</a></code> <code><a href="cl.html">cl_check()</a></code> <code><a href="cl.html">cl_cores()</a></code> <code><a href="cl.html">cl_chunks()</a></code> <code><a href="cl.html">cl_export()</a></code> <code><a href="cl.html">cl_stop()</a></code> </p>
         </td>
         <td><p>Parallelisation helpers</p></td>
       </tr><tr>
@@ -265,15 +271,15 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="dat_centroids.html">dat_centroids</a></code> </p>
-        </td>
-        <td><p>Example detection centroids from <code><a href='https://edwardlavender.github.io/flapper/reference/acs_setup_centroids.html'>acs_setup_centroids</a></code></p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="dat_coast.html">dat_coast</a></code> </p>
         </td>
         <td><p>The coastline around the MEFS Firth of Lorn acoustic array</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="dat_containers.html">dat_containers</a></code> </p>
+        </td>
+        <td><p>Example detection containers from <code><a href='https://edwardlavender.github.io/flapper/reference/acs_setup_containers.html'>acs_setup_containers</a></code></p></td>
       </tr><tr>
         
         <td>
@@ -369,7 +375,7 @@
         <td>
           <p><code><a href="flapper.html">flapper</a></code> </p>
         </td>
-        <td><p>flapper: An R Package to Explore Animal Space Use Within Passive Acoustic Telemetry Arrays</p></td>
+        <td><p><code>flapper</code>: Routines for the analysis of passive acoustic telemetry data</p></td>
       </tr><tr>
         
         <td>
@@ -391,27 +397,27 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="get_detection_centroids.html">get_detection_centroids()</a></code> </p>
+          <p><code><a href="get_detection_clumps.html">get_detection_clumps()</a></code> </p>
         </td>
-        <td><p>Define detection centroids around receivers</p></td>
+        <td><p>Get detection clumps</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="get_detection_centroids_envir.html">get_detection_centroids_envir()</a></code> </p>
+          <p><code><a href="get_detection_containers.html">get_detection_containers()</a></code> </p>
+        </td>
+        <td><p>Define detection containers around receivers</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_detection_containers_envir.html">get_detection_containers_envir()</a></code> </p>
         </td>
         <td><p>Sample environmental conditions around receivers</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="get_detection_centroids_overlap.html">get_detection_centroids_overlap()</a></code> </p>
+          <p><code><a href="get_detection_containers_overlap.html">get_detection_containers_overlap()</a></code> </p>
         </td>
-        <td><p>Get detection centroid overlaps</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_detection_clumps.html">get_detection_clumps()</a></code> </p>
-        </td>
-        <td><p>Get detection clumps</p></td>
+        <td><p>Get detection container overlaps</p></td>
       </tr><tr>
         
         <td>
@@ -433,9 +439,21 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="get_hr.html">get_hr_prop()</a></code> <code><a href="get_hr.html">get_hr_core()</a></code> <code><a href="get_hr.html">get_hr_home()</a></code> <code><a href="get_hr.html">get_hr_full()</a></code> </p>
+        </td>
+        <td><p>Get animal `home ranges'</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="get_id_rec_overlap.html">get_id_rec_overlap()</a></code> </p>
         </td>
         <td><p>Calculate the overlap between individuals' time at liberty and receivers' operational periods</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_intersection.html">get_intersection()</a></code> </p>
+        </td>
+        <td><p>Spatial intersections with one or more geometries</p></td>
       </tr><tr>
         
         <td>
@@ -589,15 +607,21 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="pf_kud.html">pf_kud_1()</a></code> <code><a href="pf_kud.html">pf_kud_2()</a></code> </p>
+          <p><code><a href="pf_kud.html">pf_kud()</a></code> </p>
         </td>
-        <td><p>Apply kernel smoothing to particles or paths from a PF algorithm</p></td>
+        <td><p>Smooth POU maps</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pf_kud_.html">pf_kud_1()</a></code> <code><a href="pf_kud_.html">pf_kud_2()</a></code> </p>
+        </td>
+        <td><p>(Experimental) Alternative kernel smoothing routines for particles or paths from a PF algorithm</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="pf_loglik.html">pf_loglik()</a></code> </p>
         </td>
-        <td><p>Calculate the log-likelihood of movement paths from a PF algorithm</p></td>
+        <td><p>Calculate the log-probability of movement paths from a PF algorithm</p></td>
       </tr><tr>
         
         <td>

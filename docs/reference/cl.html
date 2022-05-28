@@ -127,6 +127,8 @@
 
 <span class='fu'>cl_check</span><span class='op'>(</span>cl <span class='op'>=</span> <span class='cn'>NULL</span>, varlist <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
+<span class='fu'>cl_cores</span><span class='op'>(</span>cl <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
+
 <span class='fu'>cl_chunks</span><span class='op'>(</span>cl <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>length</span><span class='op'>)</span>
 
 <span class='fu'>cl_export</span><span class='op'>(</span>cl <span class='op'>=</span> <span class='cn'>NULL</span>, varlist <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
@@ -167,6 +169,7 @@
     
 <ul>
 <li><p><code>cl_lapply</code> returns a list.</p></li>
+<li><p><code>cl_cores</code> returns an integer.</p></li>
 <li><p><code>cl_chunks</code> returns a list of integers.</p></li>
 <li><p><code>cl_check</code>, <code>cl_export</code> and <code>cl_stop</code> return <code><a href='https://rdrr.io/r/base/invisible.html'>invisible()</a></code>.</p></li>
 </ul>
@@ -176,6 +179,7 @@
     <p><code>cl_lapply</code> is a wrapper for <code><a href='https://rdrr.io/pkg/pbapply/man/pbapply.html'>pblapply</a></code> that handles cluster checking, set up and closure, using the following functions:</p>
 <ul>
 <li><p><code>cl_check</code> checks <code>cl</code> and <code>varlist</code> arguments, as inputted to a parent function. For example, if <code>cl = NULL</code>, <code>varlist</code> should also be <code>NULL</code>.</p></li>
+<li><p><code>cl_cores</code> identifies the number of cores specified.</p></li>
 <li><p><code>cl_chunks</code> defines a list, with one element for core specified, that contains an integer vector of the positions of an object over which to iterate serially in each chunk.</p></li>
 <li><p><code>cl_export</code> implements <code><a href='https://rdrr.io/r/parallel/clusterApply.html'>clusterExport</a></code> if both <code>cl</code> and <code>varlist</code> are specified.</p></li>
 <li><p><code>cl_stop</code> implements <code><a href='https://rdrr.io/r/parallel/makeCluster.html'>stopCluster</a></code> if <code>cl</code> is a cluster object from <code><a href='https://rdrr.io/r/parallel/makeCluster.html'>makeCluster</a></code>.</p></li>
@@ -247,7 +251,16 @@
   <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='op'>)</span>
 
 <span class='op'>}</span>
-
+</div><div class='output co'>#&gt; <span class='message'>Loading required package: dplyr</span></div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'>Attaching package: ‘dplyr’</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:stats’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    filter, lag</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:base’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    intersect, setdiff, setequal, union</span></div><div class='output co'>#&gt;       n method cores use_chunks      time
+#&gt; 1 10000   fork     2       TRUE  7.072716
+#&gt; 2 10000   fork     2      FALSE  7.107800
+#&gt; 3 10000 socket     2       TRUE 10.709451
+#&gt; 4 10000 socket     2      FALSE 10.771874</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

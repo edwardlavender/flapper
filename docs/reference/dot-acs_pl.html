@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="Intermediate wrapper for .acs that supports parallelisation — .acs_pl" />
-<meta property="og:description" content="This function implements the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms. This is called via a front-end function (i.e. ac or acdc). It checks and processes inputs and implements the selected algorithm via calls to .acs. Outputs are returned in a named list." />
+<meta property="og:description" content="This function implements the acoustic-container (AC) and acoustic-container depth-contour (ACDC) algorithms. This is called via a front-end function (i.e. ac or acdc). It checks and processes inputs and implements the selected algorithm via calls to .acs. Outputs are returned in a named list." />
 
 
 
@@ -120,7 +120,7 @@
     </div>
 
     <div class="ref-description">
-    <p>This function implements the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms. This is called via a front-end function (i.e. <code><a href='ac.html'>ac</a></code> or <code><a href='acdc.html'>acdc</a></code>). It checks and processes inputs and implements the selected algorithm via calls to <code><a href='.acs.html'>.acs</a></code>. Outputs are returned in a named list.</p>
+    <p>This function implements the acoustic-container (AC) and acoustic-container depth-contour (ACDC) algorithms. This is called via a front-end function (i.e. <code><a href='ac.html'>ac</a></code> or <code><a href='acdc.html'>acdc</a></code>). It checks and processes inputs and implements the selected algorithm via calls to <code><a href='.acs.html'>.acs</a></code>. Outputs are returned in a named list.</p>
     </div>
 
     <pre class="usage"><span class='fu'>.acs_pl</span><span class='op'>(</span>
@@ -129,13 +129,13 @@
   step <span class='op'>=</span> <span class='fl'>120</span>,
   plot_ts <span class='op'>=</span> <span class='cn'>TRUE</span>,
   <span class='va'>bathy</span>,
-  <span class='va'>detection_centroids</span>,
+  <span class='va'>detection_containers</span>,
   detection_kernels <span class='op'>=</span> <span class='cn'>NULL</span>,
   detection_kernels_overlap <span class='op'>=</span> <span class='cn'>NULL</span>,
   detection_time_window <span class='op'>=</span> <span class='fl'>5</span>,
   <span class='va'>mobility</span>,
   calc_depth_error <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>2.5</span>, <span class='fl'>2.5</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>,
-  normalise <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  normalise <span class='op'>=</span> <span class='cn'>TRUE</span>,
   save_record_spatial <span class='op'>=</span> <span class='fl'>1L</span>,
   write_record_spatial_for_pf <span class='op'>=</span> <span class='cn'>NULL</span>,
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>,
@@ -151,7 +151,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>acoustics</th>
-      <td><p>A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see <code><a href='dat_acoustics.html'>dat_acoustics</a></code> for an example) for a single individual. Each dataframe should contain the following columns: an integer vector of receiver IDs, named `receiver_id'; and a POSIXct vector of time stamps when detections were made, named `timestamp'. If a list of dataframes is supplied, dataframes must be refer to the detections of a single individual and be ordered by time (e.g., in hourly chunks). The algorithm will be implemented on each dataframe, termed `chunk', either in sequence or parallel. Any empty or <code>NULL</code> elements will be removed automatically.</p></td>
+      <td><p>A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see <code><a href='dat_acoustics.html'>dat_acoustics</a></code> for an example) for a single individual. Each dataframe should contain the following columns: an integer vector of receiver IDs, named `receiver_id'; an integer vector of detection indices, named `index'; and a POSIXct vector of time stamps when detections were made, named `timestamp'. If a list of dataframes is supplied, dataframes must be refer to the detections of a single individual and be ordered by time (e.g., in hourly chunks). In addition, sequential list elements must be linked by identical receiver pairs (i.e., the final receiver at which the individual was detected for any given chunk must be the same as the receiver at which the individual was next detected at the start of the next chunk) because it is only in this specific scenario that information does not need to be shared across time steps (see <code>split</code>). The algorithm will be implemented on each dataframe, termed `chunk', either in sequence or parallel. Any empty or <code>NULL</code> elements will be removed automatically.</p></td>
     </tr>
     <tr>
       <th>archival</th>
@@ -170,8 +170,8 @@
       <td><p>A <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code> that defines the area (for the AC algorithm) or bathymetry (for the ACDC algorithm) across the area within which the individual could have moved (see <code><a href='.acs.html'>.acs</a></code>).</p></td>
     </tr>
     <tr>
-      <th>detection_centroids</th>
-      <td><p>A list of detection centroids (see <code><a href='.acs.html'>.acs</a></code>).</p></td>
+      <th>detection_containers</th>
+      <td><p>A list of detection containers (see <code><a href='.acs.html'>.acs</a></code>).</p></td>
     </tr>
     <tr>
       <th>detection_kernels</th>
@@ -179,7 +179,7 @@
     </tr>
     <tr>
       <th>detection_kernels_overlap</th>
-      <td><p>A named list of detection probability kernel overlaps, directly from <code><a href='get_detection_centroids_overlap.html'>get_detection_centroids_overlap</a></code>. This must contain an element named `list_by_receiver' with the data for each receiver.</p></td>
+      <td><p>A named list of detection probability kernel overlaps, directly from <code><a href='get_detection_containers_overlap.html'>get_detection_containers_overlap</a></code>. This must contain an element named `list_by_receiver' with the data for each receiver.</p></td>
     </tr>
     <tr>
       <th>detection_time_window</th>
@@ -219,7 +219,7 @@
     </tr>
     <tr>
       <th>split</th>
-      <td><p>A character string that defines the time unit used to split acoustic time series into chunks (e.g., <code>"12 hours"</code>). If provided, this must be supported by <code><a href='https://lubridate.tidyverse.org/reference/round_date.html'>floor_date</a></code> (otherwise, a pre-defined list of acoustic time series can be passed to <code>acoustics</code>, e.g., specifying seasonal chunks). If <code>split = NULL</code> and a cluster has been specified (see <code>cl</code>) (and <code>acoustics</code> is a dataframe), then the acoustic time series is automatically split into chunks and the algorithm implemented for each chunk in parallel.</p></td>
+      <td><p>A character string that defines the (approximate) time unit used to split acoustic time series into chunks (e.g., <code>"12 hours"</code>). If provided, this must be supported by <code><a href='https://rdrr.io/r/base/cut.POSIXt.html'>cut.POSIXt</a></code> (otherwise, a pre-defined list of acoustic time series can be passed to <code>acoustics</code>, e.g., specifying seasonal chunks). If <code>split = NULL</code> and a cluster has been specified (see <code>cl</code>) (and <code>acoustics</code> is a dataframe), then the acoustic time series is automatically split into chunks and the algorithm implemented for each chunk in parallel. In all cases, splitting is subject to the constraint that  chunks must join at identical receiver pairs (i.e., the last receiver at which the individual was detected on one chunk must match the first receiver at which the individual was next detected at the start of the next chunk): in these specific scenarios, information does not need to transfer from one time step to the next.</p></td>
     </tr>
     <tr>
       <th>cl, varlist</th>
@@ -232,7 +232,7 @@
     <p>The function returns an <code><a href='acdc_archive-class.html'>acdc_archive-class</a></code> object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to <code><a href='.acs.html'>.acs</a></code>, if applicable, are written to file.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>The front-end functions <code><a href='ac.html'>ac</a></code> and <code><a href='acdc.html'>acdc</a></code> call this function, which in turn calls <code><a href='.acs.html'>.acs</a></code>. <code><a href='acs_setup_centroids.html'>acs_setup_centroids</a></code> defines the detection centroids required by this function. <code><a href='acs_setup_mobility.html'>acs_setup_mobility</a></code> is used to examine the assumption of the constant `mobility' parameter. <code><a href='acs_setup_detection_kernels.html'>acs_setup_detection_kernels</a></code> produces detection probability kernels for incorporation into the function. For calls via <code><a href='ac.html'>ac</a></code> and <code><a href='acdc.html'>acdc</a></code>, <code><a href='acdc_simplify.html'>acdc_simplify</a></code> simplifies the outputs and <code><a href='acdc_plot_record.html'>acdc_plot_record</a></code> and <code><a href='acdc_animate_record.html'>acdc_animate_record</a></code> visualise the results.</p></div>
+    <div class='dont-index'><p>The front-end functions <code><a href='ac.html'>ac</a></code> and <code><a href='acdc.html'>acdc</a></code> call this function, which in turn calls <code><a href='.acs.html'>.acs</a></code>. <code><a href='acs_setup_containers.html'>acs_setup_containers</a></code> defines the detection containers required by this function. <code><a href='acs_setup_mobility.html'>acs_setup_mobility</a></code> is used to examine the assumption of the constant `mobility' parameter. <code><a href='acs_setup_detection_kernels.html'>acs_setup_detection_kernels</a></code> produces detection probability kernels for incorporation into the function. For calls via <code><a href='ac.html'>ac</a></code> and <code><a href='acdc.html'>acdc</a></code>, <code><a href='acdc_simplify.html'>acdc_simplify</a></code> simplifies the outputs and <code><a href='acdc_plot_trace.html'>acdc_plot_trace</a></code>, <code><a href='acdc_plot_record.html'>acdc_plot_record</a></code> and <code><a href='acdc_animate_record.html'>acdc_animate_record</a></code> visualise the results.</p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Edward Lavender</p>

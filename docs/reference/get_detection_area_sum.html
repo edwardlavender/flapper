@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="Calculate the total area sampled by acoustic receivers — get_detection_area_sum" />
-<meta property="og:description" content="This function calculates the total area sampled by receivers, under the assumption of a constant detection range. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The get_detection_centroids is used to calculate the detection centroids around receivers, given a specified detection range (m) and any barriers to detection, such as coastline, and then the total area covered by receivers is calculated, accounting for overlapping centroids." />
+<meta property="og:description" content="This function calculates the total area sampled by receivers, under the assumption of a constant detection range. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The get_detection_containers is used to calculate the detection containers around receivers, given a specified detection range (m) and any barriers to detection, such as coastline, and then the total area covered by receivers is calculated, accounting for overlapping containers." />
 
 
 
@@ -120,7 +120,7 @@
     </div>
 
     <div class="ref-description">
-    <p>This function calculates the total area sampled by receivers, under the assumption of a constant detection range. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The <code><a href='get_detection_centroids.html'>get_detection_centroids</a></code> is used to calculate the detection centroids around receivers, given a specified detection range (m) and any barriers to detection, such as coastline, and then the total area covered by receivers is calculated, accounting for overlapping centroids.</p>
+    <p>This function calculates the total area sampled by receivers, under the assumption of a constant detection range. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The <code><a href='get_detection_containers.html'>get_detection_containers</a></code> is used to calculate the detection containers around receivers, given a specified detection range (m) and any barriers to detection, such as coastline, and then the total area covered by receivers is calculated, accounting for overlapping containers.</p>
     </div>
 
     <pre class="usage"><span class='fu'>get_detection_area_sum</span><span class='op'>(</span>
@@ -137,7 +137,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>xy, detection_range, coastline, plot, ...</th>
-      <td><p>Arguments required to calculate and visualise detection centroids via <code><a href='get_detection_centroids.html'>get_detection_centroids</a></code>; namely, receiver locations (<code>xy</code>), the detection range (<code>detection_range</code>), barriers to detection (<code>coastline</code>), and whether or not to plot the centroids (<code>plot</code>).</p></td>
+      <td><p>Arguments required to calculate and visualise detection containers via <code><a href='get_detection_containers.html'>get_detection_containers</a></code>; namely, receiver locations (<code>xy</code>), the detection range (<code>detection_range</code>), barriers to detection (<code>coastline</code>), and whether or not to plot the containers (<code>plot</code>).</p></td>
     </tr>
     <tr>
       <th>scale</th>
@@ -153,7 +153,7 @@
     <p>This is a simple metric of the overall receiver sampling effort. This may be a poor metric if the assumption of a single detection range across all receivers is substantially incorrect or if there are substantial changes in the receiver array over the course of a study.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='get_detection_centroids.html'>get_detection_centroids</a></code> defines detection centroids, across which the detection area is calculated. <code><a href='get_detection_area_ts.html'>get_detection_area_ts</a></code> calculates the area sampled by receivers through time.</p></div>
+    <div class='dont-index'><p><code><a href='get_detection_containers.html'>get_detection_containers</a></code> defines detection containers, across which the detection area is calculated. <code><a href='get_detection_area_ts.html'>get_detection_area_ts</a></code> calculates the area sampled by receivers through time.</p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Edward Lavender</p>

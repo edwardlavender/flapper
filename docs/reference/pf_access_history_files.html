@@ -169,13 +169,13 @@
 <span class='co'># Define a directory in which to save files from PF</span>
 <span class='va'>root</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"/pf/"</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.create</a></span><span class='op'>(</span><span class='va'>root</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: '/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/pf' already exists</span></div><div class='input'><span class='co'># Implement the PF algorithm with write_history specified</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: '/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf' already exists</span></div><div class='input'><span class='co'># Implement the PF algorithm with write_history specified</span>
 <span class='co'># ... For speed, we will implement the algorithm using pre-defined data</span>
 <span class='va'>pf_args</span> <span class='op'>&lt;-</span> <span class='va'>dat_dcpf_histories</span><span class='op'>$</span><span class='va'>args</span>
 <span class='va'>pf_args</span><span class='op'>$</span><span class='va'>calc_distance_euclid_fast</span> <span class='op'>&lt;-</span> <span class='cn'>TRUE</span>
 <span class='va'>pf_args</span><span class='op'>$</span><span class='va'>write_history</span>             <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>file <span class='op'>=</span> <span class='va'>root</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/do.call.html'>do.call</a></span><span class='op'>(</span><span class='va'>pf</span>, <span class='va'>pf_args</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2021-12-02 14:44:32)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2022-05-28 18:14:07)... 
 #&gt; ... Setting up function... 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
 #&gt; ... Implementing algorithm iteratively over time steps... 
@@ -232,240 +232,240 @@
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2021-12-02 14:44:33) after ~0.01 minutes. </div><div class='output co'>#&gt; $history
+#&gt; ... flapper::pf() call completed (@ 2022-05-28 18:14:07) after ~0.01 minutes. </div><div class='output co'>#&gt; $history
 #&gt; $history[[1]]
-#&gt;    id_current pr_current timestep
-#&gt; 1        3243 0.92414182        1
-#&gt; 2        2921 0.50000000        1
-#&gt; 3        3396 0.15040143        1
-#&gt; 4        3159 0.90069001        1
-#&gt; 5        3320 0.96202941        1
-#&gt; 6        3237 0.50000000        1
-#&gt; 7        3318 0.74022781        1
-#&gt; 8        3559 0.35659586        1
-#&gt; 9        3722 0.06891651        1
-#&gt; 10       3320 0.96202941        1
+#&gt;    id_current   pr_current timestep
+#&gt; 1        3243 2.425569e-04        1
+#&gt; 2        2921 1.312336e-04        1
+#&gt; 3        3396 3.947544e-05        1
+#&gt; 4        3159 2.364016e-04        1
+#&gt; 5        3320 2.525012e-04        1
+#&gt; 6        3237 1.312336e-04        1
+#&gt; 7        3318 1.942855e-04        1
+#&gt; 8        3559 9.359471e-05        1
+#&gt; 9        3722 1.808832e-05        1
+#&gt; 10       3320 2.525012e-04        1
 #&gt; 
 #&gt; $history[[2]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       3312  0.4616052        2
-#&gt; 2           NA          NA       3634  0.6208272        2
-#&gt; 3           NA          NA       3167  0.4616052        2
-#&gt; 4           NA          NA       3397  0.9770226        2
-#&gt; 5           NA          NA       3244  0.9770226        2
-#&gt; 6           NA          NA       3003  0.9006900        2
-#&gt; 7           NA          NA       2999  0.9241418        2
-#&gt; 8           NA          NA       3398  0.9770226        2
-#&gt; 9           NA          NA       2997  0.8122148        2
-#&gt; 10          NA          NA       3647  0.2020107        2
+#&gt;    id_previous pr_previous id_current   pr_current timestep
+#&gt; 1           NA          NA       3312 1.114181e-04        2
+#&gt; 2           NA          NA       3634 1.498497e-04        2
+#&gt; 3           NA          NA       3167 1.114181e-04        2
+#&gt; 4           NA          NA       3397 2.358249e-04        2
+#&gt; 5           NA          NA       3244 2.358249e-04        2
+#&gt; 6           NA          NA       3003 2.174004e-04        2
+#&gt; 7           NA          NA       2999 2.230610e-04        2
+#&gt; 8           NA          NA       3398 2.358249e-04        2
+#&gt; 9           NA          NA       2997 1.960451e-04        2
+#&gt; 10          NA          NA       3647 4.875953e-05        2
 #&gt; 
 #&gt; $history[[3]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       3557  0.9241418        3
-#&gt; 2           NA          NA       3250  0.7402278        3
-#&gt; 3           NA          NA       3089  0.9006900        3
-#&gt; 4           NA          NA       3713  0.9620294        3
-#&gt; 5           NA          NA       2835  0.8122148        3
-#&gt; 6           NA          NA       2844  0.9006900        3
-#&gt; 7           NA          NA       3470  0.8122148        3
-#&gt; 8           NA          NA       3951  0.2227001        3
-#&gt; 9           NA          NA       2923  0.9770226        3
-#&gt; 10          NA          NA       3395  0.9241418        3
+#&gt;    id_previous pr_previous id_current   pr_current timestep
+#&gt; 1           NA          NA       3557 1.959173e-04        3
+#&gt; 2           NA          NA       3250 1.569277e-04        3
+#&gt; 3           NA          NA       3089 1.909455e-04        3
+#&gt; 4           NA          NA       3713 2.039494e-04        3
+#&gt; 5           NA          NA       2835 1.721888e-04        3
+#&gt; 6           NA          NA       2844 1.909455e-04        3
+#&gt; 7           NA          NA       3470 1.721888e-04        3
+#&gt; 8           NA          NA       3951 4.721224e-05        3
+#&gt; 9           NA          NA       2923 2.071280e-04        3
+#&gt; 10          NA          NA       3395 1.959173e-04        3
 #&gt; 
 #&gt; $history[[4]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       2921  0.9241418        4
-#&gt; 2           NA          NA       3570  0.5000000        4
-#&gt; 3           NA          NA       2603  0.7402278        4
-#&gt; 4           NA          NA       3555  0.9241418        4
-#&gt; 5           NA          NA       2598  0.4247508        4
-#&gt; 6           NA          NA       2515  0.5000000        4
-#&gt; 7           NA          NA       3796  0.7402278        4
-#&gt; 8           NA          NA       4189  0.6208272        4
-#&gt; 9           NA          NA       3472  0.9241418        4
-#&gt; 10          NA          NA       3004  0.9620294        4
+#&gt;    id_previous pr_previous id_current   pr_current timestep
+#&gt; 1           NA          NA       2921 1.826367e-04        4
+#&gt; 2           NA          NA       3570 9.881423e-05        4
+#&gt; 3           NA          NA       2603 1.462901e-04        4
+#&gt; 4           NA          NA       3555 1.826367e-04        4
+#&gt; 5           NA          NA       2598 8.394284e-05        4
+#&gt; 6           NA          NA       2515 9.881423e-05        4
+#&gt; 7           NA          NA       3796 1.462901e-04        4
+#&gt; 8           NA          NA       4189 1.226931e-04        4
+#&gt; 9           NA          NA       3472 1.826367e-04        4
+#&gt; 10          NA          NA       3004 1.901244e-04        4
 #&gt; 
 #&gt; $history[[5]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       3244  0.7772999        5
-#&gt; 2           NA          NA       2355  0.9241418        5
-#&gt; 3           NA          NA       3626  0.0518728        5
-#&gt; 4           NA          NA       2360  0.6208272        5
-#&gt; 5           NA          NA       2522  0.9620294        5
-#&gt; 6           NA          NA       3325  0.4616052        5
-#&gt; 7           NA          NA       3477  0.9006900        5
-#&gt; 8           NA          NA       4508  0.4616052        5
-#&gt; 9           NA          NA       2839  0.9006900        5
-#&gt; 10          NA          NA       4432  0.4247508        5
+#&gt;    id_previous pr_previous id_current   pr_current timestep
+#&gt; 1           NA          NA       3244 1.547789e-04        5
+#&gt; 2           NA          NA       2355 1.840187e-04        5
+#&gt; 3           NA          NA       3626 1.032911e-05        5
+#&gt; 4           NA          NA       2360 1.236215e-04        5
+#&gt; 5           NA          NA       2522 1.915630e-04        5
+#&gt; 6           NA          NA       3325 9.191661e-05        5
+#&gt; 7           NA          NA       3477 1.793489e-04        5
+#&gt; 8           NA          NA       4508 9.191661e-05        5
+#&gt; 9           NA          NA       2839 1.793489e-04        5
+#&gt; 10          NA          NA       4432 8.457801e-05        5
 #&gt; 
 #&gt; $history[[6]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       4348  0.9241418        6
-#&gt; 2           NA          NA       2433  0.9006900        6
-#&gt; 3           NA          NA       2756  0.7402278        6
-#&gt; 4           NA          NA       2522  0.9933071        6
-#&gt; 5           NA          NA       4185  0.2227001        6
-#&gt; 6           NA          NA       2363  0.9006900        6
-#&gt; 7           NA          NA       3159  0.5000000        6
-#&gt; 8           NA          NA       3640  0.6208272        6
-#&gt; 9           NA          NA       2353  0.9241418        6
-#&gt; 10          NA          NA       3164  0.9770226        6
+#&gt;    id_previous pr_previous id_current   pr_current timestep
+#&gt; 1           NA          NA       4348 1.939844e-04        6
+#&gt; 2           NA          NA       2433 1.890617e-04        6
+#&gt; 3           NA          NA       2756 1.553795e-04        6
+#&gt; 4           NA          NA       2522 2.085028e-04        6
+#&gt; 5           NA          NA       4185 4.674646e-05        6
+#&gt; 6           NA          NA       2363 1.890617e-04        6
+#&gt; 7           NA          NA       3159 1.049538e-04        6
+#&gt; 8           NA          NA       3640 1.303164e-04        6
+#&gt; 9           NA          NA       2353 1.939844e-04        6
+#&gt; 10          NA          NA       3164 2.050845e-04        6
 #&gt; 
 #&gt; $history[[7]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       3877 0.42475076        7
-#&gt; 2           NA          NA       2444 0.96202941        7
-#&gt; 3           NA          NA       3078 0.96202941        7
-#&gt; 4           NA          NA       1963 0.22270014        7
-#&gt; 5           NA          NA       3485 0.46160523        7
-#&gt; 6           NA          NA       3316 0.62082724        7
-#&gt; 7           NA          NA       3002 0.81221480        7
-#&gt; 8           NA          NA       3561 0.96202941        7
-#&gt; 9           NA          NA       3887 0.01077475        7
-#&gt; 10          NA          NA       3959 0.46160523        7
+#&gt;    id_previous pr_previous id_current   pr_current timestep
+#&gt; 1           NA          NA       3877 1.203601e-04        7
+#&gt; 2           NA          NA       2444 2.726068e-04        7
+#&gt; 3           NA          NA       3078 2.726068e-04        7
+#&gt; 4           NA          NA       1963 6.310574e-05        7
+#&gt; 5           NA          NA       3485 1.308034e-04        7
+#&gt; 6           NA          NA       3316 1.759216e-04        7
+#&gt; 7           NA          NA       3002 2.301544e-04        7
+#&gt; 8           NA          NA       3561 2.726068e-04        7
+#&gt; 9           NA          NA       3887 3.053203e-06        7
+#&gt; 10          NA          NA       3959 1.308034e-04        7
 #&gt; 
 #&gt; $history[[8]]
 #&gt;    id_previous pr_previous id_current  pr_current timestep
-#&gt; 1           NA          NA       4372 0.008469216        8
-#&gt; 2           NA          NA       4293 0.008469216        8
-#&gt; 3           NA          NA       4372 0.008469216        8
-#&gt; 4           NA          NA       4372 0.008469216        8
-#&gt; 5           NA          NA       4372 0.008469216        8
-#&gt; 6           NA          NA       4293 0.008469216        8
-#&gt; 7           NA          NA       4293 0.008469216        8
-#&gt; 8           NA          NA       4293 0.008469216        8
-#&gt; 9           NA          NA       4293 0.008469216        8
-#&gt; 10          NA          NA       4293 0.008469216        8
+#&gt; 1           NA          NA       4372 4.63305e-06        8
+#&gt; 2           NA          NA       4293 4.63305e-06        8
+#&gt; 3           NA          NA       4372 4.63305e-06        8
+#&gt; 4           NA          NA       4372 4.63305e-06        8
+#&gt; 5           NA          NA       4372 4.63305e-06        8
+#&gt; 6           NA          NA       4293 4.63305e-06        8
+#&gt; 7           NA          NA       4293 4.63305e-06        8
+#&gt; 8           NA          NA       4293 4.63305e-06        8
+#&gt; 9           NA          NA       4293 4.63305e-06        8
+#&gt; 10          NA          NA       4293 4.63305e-06        8
 #&gt; 
 #&gt; $history[[9]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       4618 0.04724976        9
-#&gt; 2           NA          NA       4776 0.04724976        9
-#&gt; 3           NA          NA       4379 0.06891651        9
-#&gt; 4           NA          NA       4697 0.04724976        9
-#&gt; 5           NA          NA       4777 0.02106536        9
-#&gt; 6           NA          NA       4458 0.15040143        9
-#&gt; 7           NA          NA       4459 0.05187280        9
-#&gt; 8           NA          NA       4776 0.04724976        9
-#&gt; 9           NA          NA       4697 0.04724976        9
-#&gt; 10          NA          NA       4538 0.09206400        9
+#&gt;    id_previous pr_previous id_current   pr_current timestep
+#&gt; 1           NA          NA       4618 4.901427e-05        9
+#&gt; 2           NA          NA       4776 4.901427e-05        9
+#&gt; 3           NA          NA       4379 7.149016e-05        9
+#&gt; 4           NA          NA       4697 4.901427e-05        9
+#&gt; 5           NA          NA       4777 2.185204e-05        9
+#&gt; 6           NA          NA       4458 1.560181e-04        9
+#&gt; 7           NA          NA       4459 5.380996e-05        9
+#&gt; 8           NA          NA       4776 4.901427e-05        9
+#&gt; 9           NA          NA       4697 4.901427e-05        9
+#&gt; 10          NA          NA       4538 9.550208e-05        9
 #&gt; 
 #&gt; $history[[10]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       4939  0.8122148       10
-#&gt; 2           NA          NA       5099  0.3565959       10
-#&gt; 3           NA          NA       5098  0.4616052       10
-#&gt; 4           NA          NA       4621  0.8122148       10
-#&gt; 5           NA          NA       4699  0.9620294       10
-#&gt; 6           NA          NA       4304  0.2020107       10
-#&gt; 7           NA          NA       5100  0.2227001       10
-#&gt; 8           NA          NA       4383  0.5000000       10
-#&gt; 9           NA          NA       4701  0.7402278       10
-#&gt; 10          NA          NA       4700  0.9006900       10
+#&gt;    id_previous pr_previous id_current   pr_current timestep
+#&gt; 1           NA          NA       4939 0.0009488491       10
+#&gt; 2           NA          NA       5099 0.0004165840       10
+#&gt; 3           NA          NA       5098 0.0005392584       10
+#&gt; 4           NA          NA       4621 0.0009488491       10
+#&gt; 5           NA          NA       4699 0.0011238661       10
+#&gt; 6           NA          NA       4304 0.0002359938       10
+#&gt; 7           NA          NA       5100 0.0002601637       10
+#&gt; 8           NA          NA       4383 0.0005841121       10
+#&gt; 9           NA          NA       4701 0.0008647521       10
+#&gt; 10          NA          NA       4700 0.0010522080       10
 #&gt; 
 #&gt; $history[[11]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       4308 0.50000000       11
-#&gt; 2           NA          NA       5266 0.05187280       11
-#&gt; 3           NA          NA       5258 0.92414182       11
-#&gt; 4           NA          NA       4229 0.20201072       11
-#&gt; 5           NA          NA       5659 0.02297737       11
-#&gt; 6           NA          NA       4781 0.97702263       11
-#&gt; 7           NA          NA       5102 0.92414182       11
-#&gt; 8           NA          NA       4468 0.35659586       11
-#&gt; 9           NA          NA       4466 0.81221480       11
-#&gt; 10          NA          NA       5345 0.09206400       11
+#&gt;    id_previous pr_previous id_current   pr_current timestep
+#&gt; 1           NA          NA       4308 6.361323e-04       11
+#&gt; 2           NA          NA       5266 6.599593e-05       11
+#&gt; 3           NA          NA       5258 1.175753e-03       11
+#&gt; 4           NA          NA       4229 2.570111e-04       11
+#&gt; 5           NA          NA       5659 2.923330e-05       11
+#&gt; 6           NA          NA       4781 1.243031e-03       11
+#&gt; 7           NA          NA       5102 1.175753e-03       11
+#&gt; 8           NA          NA       4468 4.536843e-04       11
+#&gt; 9           NA          NA       4466 1.033352e-03       11
+#&gt; 10          NA          NA       5345 1.171298e-04       11
 #&gt; 
 #&gt; $history[[12]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       5820  0.9006900       12
-#&gt; 2           NA          NA       4628  0.9241418       12
-#&gt; 3           NA          NA       5022  0.9770226       12
-#&gt; 4           NA          NA       4154  0.2020107       12
-#&gt; 5           NA          NA       5667  0.3565959       12
-#&gt; 6           NA          NA       5430  0.3565959       12
-#&gt; 7           NA          NA       4310  0.9620294       12
-#&gt; 8           NA          NA       5508  0.6208272       12
-#&gt; 9           NA          NA       5030  0.2227001       12
-#&gt; 10          NA          NA       5586  0.7402278       12
+#&gt;    id_previous pr_previous id_current   pr_current timestep
+#&gt; 1           NA          NA       5820 0.0013383210       12
+#&gt; 2           NA          NA       4628 0.0013731676       12
+#&gt; 3           NA          NA       5022 0.0014517424       12
+#&gt; 4           NA          NA       4154 0.0003001645       12
+#&gt; 5           NA          NA       5667 0.0005298601       12
+#&gt; 6           NA          NA       5430 0.0005298601       12
+#&gt; 7           NA          NA       4310 0.0014294642       12
+#&gt; 8           NA          NA       5508 0.0009224773       12
+#&gt; 9           NA          NA       5030 0.0003309066       12
+#&gt; 10          NA          NA       5586 0.0010998927       12
 #&gt; 
 #&gt; $history[[13]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       5826  0.9006900       13
-#&gt; 2           NA          NA       5027  0.7772999       13
-#&gt; 3           NA          NA       4155  0.9770226       13
-#&gt; 4           NA          NA       5905  0.6208272       13
-#&gt; 5           NA          NA       5910  0.4247508       13
-#&gt; 6           NA          NA       5108  0.9006900       13
-#&gt; 7           NA          NA       5666  0.9770226       13
-#&gt; 8           NA          NA       5821  0.9770226       13
-#&gt; 9           NA          NA       3995  0.9006900       13
-#&gt; 10          NA          NA       4869  0.9006900       13
+#&gt;    id_previous pr_previous id_current   pr_current timestep
+#&gt; 1           NA          NA       5826 0.0016741450       13
+#&gt; 2           NA          NA       5027 0.0014447953       13
+#&gt; 3           NA          NA       4155 0.0018160272       13
+#&gt; 4           NA          NA       5905 0.0011539540       13
+#&gt; 5           NA          NA       5910 0.0007894996       13
+#&gt; 6           NA          NA       5108 0.0016741450       13
+#&gt; 7           NA          NA       5666 0.0018160272       13
+#&gt; 8           NA          NA       5821 0.0018160272       13
+#&gt; 9           NA          NA       3995 0.0016741450       13
+#&gt; 10          NA          NA       4869 0.0016741450       13
 #&gt; 
 #&gt; $history[[14]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       5908 0.92414182       14
-#&gt; 2           NA          NA       5905 0.99330715       14
-#&gt; 3           NA          NA       5111 0.77729986       14
-#&gt; 4           NA          NA       5916 0.07585818       14
-#&gt; 5           NA          NA       6071 0.90069001       14
-#&gt; 6           NA          NA       5747 0.96202941       14
-#&gt; 7           NA          NA       6226 0.46160523       14
-#&gt; 8           NA          NA       5825 0.97702263       14
-#&gt; 9           NA          NA       6065 0.92414182       14
-#&gt; 10          NA          NA       5909 0.97702263       14
+#&gt;    id_previous pr_previous id_current  pr_current timestep
+#&gt; 1           NA          NA       5908 0.002710093       14
+#&gt; 2           NA          NA       5905 0.002912924       14
+#&gt; 3           NA          NA       5111 0.002279472       14
+#&gt; 4           NA          NA       5916 0.000222458       14
+#&gt; 5           NA          NA       6071 0.002641320       14
+#&gt; 6           NA          NA       5747 0.002821201       14
+#&gt; 7           NA          NA       6226 0.001353681       14
+#&gt; 8           NA          NA       5825 0.002865169       14
+#&gt; 9           NA          NA       6065 0.002710093       14
+#&gt; 10          NA          NA       5909 0.002865169       14
 #&gt; 
 #&gt; $history[[15]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       5915  0.9770226       15
-#&gt; 2           NA          NA       5355  0.2227001       15
-#&gt; 3           NA          NA       6306  0.9770226       15
-#&gt; 4           NA          NA       6229  0.8122148       15
-#&gt; 5           NA          NA       6159  0.4247508       15
-#&gt; 6           NA          NA       6228  0.9241418       15
-#&gt; 7           NA          NA       6071  0.9933071       15
-#&gt; 8           NA          NA       5835  0.9620294       15
-#&gt; 9           NA          NA       5829  0.9770226       15
-#&gt; 10          NA          NA       6151  0.9770226       15
+#&gt;    id_previous pr_previous id_current  pr_current timestep
+#&gt; 1           NA          NA       5915 0.004175310       15
+#&gt; 2           NA          NA       5355 0.000951710       15
+#&gt; 3           NA          NA       6306 0.004175310       15
+#&gt; 4           NA          NA       6229 0.003471003       15
+#&gt; 5           NA          NA       6159 0.001815174       15
+#&gt; 6           NA          NA       6228 0.003949324       15
+#&gt; 7           NA          NA       6071 0.004244902       15
+#&gt; 8           NA          NA       5835 0.004111237       15
+#&gt; 9           NA          NA       5829 0.004175310       15
+#&gt; 10          NA          NA       6151 0.004175310       15
 #&gt; 
 #&gt; $history[[16]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       6390  0.9006900       16
-#&gt; 2           NA          NA       5994  0.9620294       16
-#&gt; 3           NA          NA       6398  0.7402278       16
-#&gt; 4           NA          NA       6312  0.9006900       16
-#&gt; 5           NA          NA       5197  0.8122148       16
-#&gt; 6           NA          NA       5917  0.9241418       16
-#&gt; 7           NA          NA       5998  0.9006900       16
-#&gt; 8           NA          NA       6079  0.9770226       16
-#&gt; 9           NA          NA       6158  0.9770226       16
-#&gt; 10          NA          NA       6158  0.9770226       16
+#&gt;    id_previous pr_previous id_current  pr_current timestep
+#&gt; 1           NA          NA       6390 0.006772105       16
+#&gt; 2           NA          NA       5994 0.007233304       16
+#&gt; 3           NA          NA       6398 0.005565623       16
+#&gt; 4           NA          NA       6312 0.006772105       16
+#&gt; 5           NA          NA       5197 0.006106878       16
+#&gt; 6           NA          NA       5917 0.006948435       16
+#&gt; 7           NA          NA       5998 0.006772105       16
+#&gt; 8           NA          NA       6079 0.007346035       16
+#&gt; 9           NA          NA       6158 0.007346035       16
+#&gt; 10          NA          NA       6158 0.007346035       16
 #&gt; 
 #&gt; $history[[17]]
-#&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       5840  0.8122148       17
-#&gt; 2           NA          NA       6239  0.9620294       17
-#&gt; 3           NA          NA       5920  0.9006900       17
-#&gt; 4           NA          NA       5839  0.9006900       17
-#&gt; 5           NA          NA       6078  0.9770226       17
-#&gt; 6           NA          NA       6078  0.9770226       17
-#&gt; 7           NA          NA       5919  0.9620294       17
-#&gt; 8           NA          NA       6397  0.9770226       17
-#&gt; 9           NA          NA       5520  0.2227001       17
-#&gt; 10          NA          NA       6159  0.9770226       17
+#&gt;    id_previous pr_previous id_current  pr_current timestep
+#&gt; 1           NA          NA       5840 0.015619515       17
+#&gt; 2           NA          NA       6239 0.018500566       17
+#&gt; 3           NA          NA       5920 0.017320962       17
+#&gt; 4           NA          NA       5839 0.017320962       17
+#&gt; 5           NA          NA       6078 0.018788897       17
+#&gt; 6           NA          NA       6078 0.018788897       17
+#&gt; 7           NA          NA       5919 0.018500566       17
+#&gt; 8           NA          NA       6397 0.018788897       17
+#&gt; 9           NA          NA       5520 0.004282695       17
+#&gt; 10          NA          NA       6159 0.018788897       17
 #&gt; 
 #&gt; $history[[18]]
 #&gt;    id_previous pr_previous id_current pr_current timestep
-#&gt; 1           NA          NA       5680  0.9241418       18
-#&gt; 2           NA          NA       5680  0.9241418       18
-#&gt; 3           NA          NA       5759  0.9770226       18
-#&gt; 4           NA          NA       6399  0.9241418       18
-#&gt; 5           NA          NA       6079  0.9770226       18
-#&gt; 6           NA          NA       5600  0.9770226       18
-#&gt; 7           NA          NA       5519  0.9770226       18
-#&gt; 8           NA          NA       5440  0.9770226       18
-#&gt; 9           NA          NA       6240  0.9770226       18
-#&gt; 10          NA          NA       6000  0.9770226       18
+#&gt; 1           NA          NA       5680 0.02369594       18
+#&gt; 2           NA          NA       5680 0.02369594       18
+#&gt; 3           NA          NA       5759 0.02505186       18
+#&gt; 4           NA          NA       6399 0.02369594       18
+#&gt; 5           NA          NA       6079 0.02505186       18
+#&gt; 6           NA          NA       5600 0.02505186       18
+#&gt; 7           NA          NA       5519 0.02505186       18
+#&gt; 8           NA          NA       5440 0.02505186       18
+#&gt; 9           NA          NA       6240 0.02505186       18
+#&gt; 10          NA          NA       6000 0.02505186       18
 #&gt; 
 #&gt; 
 #&gt; $method
@@ -481,7 +481,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.0002624672  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[2]]
@@ -492,7 +492,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.000241371  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[3]]
@@ -503,7 +503,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.0002119992  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[4]]
@@ -514,7 +514,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.0001976285  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[5]]
@@ -525,7 +525,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.0001991239  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[6]]
@@ -536,7 +536,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.0002099076  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[7]]
@@ -547,7 +547,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.0002833664  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[8]]
@@ -558,7 +558,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.000547046  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[9]]
@@ -569,7 +569,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.001037344  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[10]]
@@ -580,7 +580,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.001168224  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[11]]
@@ -591,7 +591,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.001272265  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[12]]
@@ -602,7 +602,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.001485884  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[13]]
@@ -613,7 +613,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.001858736  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[14]]
@@ -624,7 +624,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.002932551  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[15]]
@@ -635,7 +635,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.004273504  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[16]]
@@ -646,7 +646,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.007518797  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[17]]
@@ -657,7 +657,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.01923077  (min, max)
 #&gt; 
 #&gt; 
 #&gt; $args$record[[18]]
@@ -668,7 +668,7 @@
 #&gt; crs        : NA 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0, 1  (min, max)
+#&gt; values     : 0, 0.02564103  (min, max)
 #&gt; 
 #&gt; 
 #&gt; 
@@ -705,7 +705,7 @@
 #&gt;                  pr[distance &gt; 200] &lt;- 0
 #&gt;                  return(pr)
 #&gt;                }
-#&gt; &lt;bytecode: 0x7f965b1e90b0&gt;
+#&gt; &lt;bytecode: 0x7fea3cf8dfe8&gt;
 #&gt; 
 #&gt; $args$calc_movement_pr_from_origin
 #&gt; function(distance,...) {
@@ -713,7 +713,7 @@
 #&gt;                  pr[distance &gt; 200] &lt;- 0
 #&gt;                  return(pr)
 #&gt;                }
-#&gt; &lt;bytecode: 0x7f965b1e3270&gt;
+#&gt; &lt;bytecode: 0x7fea9b422428&gt;
 #&gt; 
 #&gt; $args$mobility
 #&gt; [1] 200
@@ -735,7 +735,7 @@
 #&gt; 
 #&gt; $args$write_history
 #&gt; $args$write_history$file
-#&gt; [1] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/pf/"
+#&gt; [1] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf/"
 #&gt; 
 #&gt; 
 #&gt; $args$cl
@@ -768,12 +768,12 @@
 #&gt; [1] "list"       "pf_archive"</div><div class='input'><span class='co'># List the files</span>
 <span class='va'>files</span> <span class='op'>&lt;-</span> <span class='fu'>pf_access_history_files</span><span class='op'>(</span><span class='va'>root</span><span class='op'>)</span>
 <span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>files</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/pf//pf_1.rds"
-#&gt; [2] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/pf//pf_2.rds"
-#&gt; [3] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/pf//pf_3.rds"
-#&gt; [4] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/pf//pf_4.rds"
-#&gt; [5] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/pf//pf_5.rds"
-#&gt; [6] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/pf//pf_6.rds"</div><div class='input'>
+</div><div class='output co'>#&gt; [1] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf//pf_1.rds"
+#&gt; [2] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf//pf_2.rds"
+#&gt; [3] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf//pf_3.rds"
+#&gt; [4] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf//pf_4.rds"
+#&gt; [5] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf//pf_5.rds"
+#&gt; [6] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf//pf_6.rds"</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

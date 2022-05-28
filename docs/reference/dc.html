@@ -129,7 +129,7 @@
   plot_ts <span class='op'>=</span> <span class='cn'>TRUE</span>,
   calc_depth_error <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>2.5</span>, <span class='fl'>2.5</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>,
   check_availability <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  normalise <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  normalise <span class='op'>=</span> <span class='cn'>TRUE</span>,
   save_record_spatial <span class='op'>=</span> <span class='fl'>1L</span>,
   write_record_spatial_for_pf <span class='op'>=</span> <span class='cn'>NULL</span>,
   save_args <span class='op'>=</span> <span class='cn'>TRUE</span>,
@@ -203,7 +203,7 @@
 <p>†Under the default options (<code>split = NULL</code>), the function starts with a blank map of the area and iterates over each time step, adding the `possible positions' of the individual to the map at each step. By continuously updating a single map, this approach is slow but minimises memory requirements. An alternative approach is to split the time series into chunks, implement an iterative approach within each chunk, and then join the maps for each chunk. This is implemented by <code>split</code> (plus <code><a href='acdc_simplify.html'>acdc_simplify</a></code>).</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='acdc_simplify.html'>acdc_simplify</a></code> simplifies the outputs of the algorithm. <code><a href='acdc_plot_record.html'>acdc_plot_record</a></code> and <code><a href='acdc_animate_record.html'>acdc_animate_record</a></code> provide plotting routines. <code><a href='dcq.html'>dcq</a></code> implements a faster version of this algorithm termed the `quick depth-contour' (DCQ) algorithm. Rather than considering the depth interval that the individual could have occupied at each time step, the DCQ algorithm considers a sequence of depth bins (e.g., 10 m bins), isolates these on the bathymetry <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code> (<code>bathy</code>) and counts the number of matches in each cell. The DCPF algorithm (see <code><a href='pf.html'>pf</a></code>) extends the DC algorithm via particle filtering to reconstruct possible movement paths over <code>bathy</code>. The ACDC algorithm (see <code><a href='acdc.html'>acdc</a></code>) extends the depth-contour algorithm by integrating information from acoustic detections of individuals at each time step to restrict the locations in which depth contours are identified.</p></div>
+    <div class='dont-index'><p><code><a href='acdc_simplify.html'>acdc_simplify</a></code> simplifies the outputs of the algorithm. <code><a href='acdc_plot_trace.html'>acdc_plot_trace</a></code>, <code><a href='acdc_plot_record.html'>acdc_plot_record</a></code> and <code><a href='acdc_animate_record.html'>acdc_animate_record</a></code> provide plotting routines. <code><a href='dcq.html'>dcq</a></code> implements a faster version of this algorithm termed the `quick depth-contour' (DCQ) algorithm. Rather than considering the depth interval that the individual could have occupied at each time step, the DCQ algorithm considers a sequence of depth bins (e.g., 10 m bins), isolates these on the bathymetry <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></code> (<code>bathy</code>) and counts the number of matches in each cell. The DCPF algorithm (see <code><a href='pf.html'>pf</a></code>) extends the DC algorithm via particle filtering to reconstruct possible movement paths over <code>bathy</code>. The ACDC algorithm (see <code><a href='acdc.html'>acdc</a></code>) extends the depth-contour algorithm by integrating information from acoustic detections of individuals at each time step to restrict the locations in which depth contours are identified.</p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Edward Lavender</p>
@@ -217,10 +217,10 @@
 <span class='co'>#### Example (1): Implement algorithm with default options</span>
 <span class='co'>## Implement algorithm</span>
 <span class='va'>out_dc</span> <span class='op'>&lt;-</span> <span class='fu'>dc</span><span class='op'>(</span>archival <span class='op'>=</span> <span class='va'>depth</span>, bathy <span class='op'>=</span> <span class='va'>dat_gebco</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:39)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2022-05-28 18:06:57)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Plotting movement time series (for each chunk)... </div><div class='img'><img src='dc-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Implementing algorithm over time steps... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:39) after ~0.01 minutes. </div><div class='input'><span class='co'>## dc() returns a named list that is an 'acdc_archive' class object</span>
+#&gt; ... flapper::dc() call completed (@ 2022-05-28 18:06:58) after ~0.02 minutes. </div><div class='input'><span class='co'>## dc() returns a named list that is an 'acdc_archive' class object</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>out_dc</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;             Length Class      Mode
 #&gt; archive      1     -none-     list
@@ -243,10 +243,9 @@
 <span class='fu'><a href='acdc_plot_record.html'>acdc_plot_record</a></span><span class='op'>(</span><span class='va'>dc_summary</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; flapper::acdc_plot_record() called... 
 #&gt; ... Checking function inputs... 
-#&gt; ... Defining data for background plot... </div><div class='output co'>#&gt; <span class='message'>add_centroids = NULL implemented: 'record' does not contain centroids.</span></div><div class='output co'>#&gt; ... Setting plotting window... 
+#&gt; ... Defining data for background plot... </div><div class='output co'>#&gt; <span class='message'>add_containers = NULL implemented: 'record' does not contain containers.</span></div><div class='output co'>#&gt; ... Setting plotting window... 
 #&gt; ... Making plots for each time step ... </div><div class='output co'>#&gt; <span class='warning'>Warning: Nothing to summarize if you provide a single RasterLayer; see cellStats</span></div><div class='img'><img src='dc-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'>## Examine overall map via a raster* plotting function</span>
-<span class='co'># Each cell shows the number of time steps when the bathymetry data</span>
-<span class='co'># ... in each cell matches the archival data</span>
+<span class='co'># Each cell shows expected proportion of time steps spent in each cell</span>
 <span class='fu'>prettyGraphics</span><span class='fu'>::</span><span class='fu'><a href='https://edwardlavender.github.io/prettyGraphics/reference/pretty_map.html'>pretty_map</a></span><span class='op'>(</span>add_rasters <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>dc_summary</span><span class='op'>$</span><span class='va'>map</span><span class='op'>)</span>,
                            add_polys <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>dat_coast</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span></div><div class='img'><img src='dc-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># Convert counts on map to percentages</span>
@@ -273,129 +272,130 @@
 <span class='va'>cde</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Vectorize.html'>Vectorize</a></span><span class='op'>(</span><span class='va'>cde</span><span class='op'>)</span>
 <span class='co'>## Implement algorithm with  depth-dependent error</span>
 <span class='va'>out_dc</span> <span class='op'>&lt;-</span> <span class='fu'>dc</span><span class='op'>(</span>archival <span class='op'>=</span> <span class='va'>depth</span>, bathy <span class='op'>=</span> <span class='va'>dat_gebco</span>, calc_depth_error <span class='op'>=</span> <span class='va'>cde</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:40)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2022-05-28 18:06:58)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' taken to depend on depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Plotting movement time series (for each chunk)... </div><div class='img'><img src='dc-5.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Implementing algorithm over time steps... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:40) after ~0.01 minutes. </div><div class='input'>
+#&gt; ... flapper::dc() call completed (@ 2022-05-28 18:06:59) after ~0.02 minutes. </div><div class='input'>
 <span class='co'>#### Example (3): Write timestep-specific maps of allowed positions to file</span>
 <span class='va'>out_dc</span> <span class='op'>&lt;-</span> <span class='fu'>dc</span><span class='op'>(</span>archival <span class='op'>=</span> <span class='va'>depth</span>, bathy <span class='op'>=</span> <span class='va'>dat_gebco</span>,
              write_record_spatial_for_pf <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>filename <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:40)... 
-#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; <span class='message'>'/' added to the directory inputted to the argument 'write_record_spatial_for_pf$filename' ('/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum').</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2022-05-28 18:06:59)... 
+#&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; <span class='message'>'/' added to the directory inputted to the argument 'write_record_spatial_for_pf$filename' ('/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E').</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Plotting movement time series (for each chunk)... </div><div class='img'><img src='dc-6.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Implementing algorithm over time steps... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:43) after ~0.04 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+#&gt; ... flapper::dc() call completed (@ 2022-05-28 18:07:02) after ~0.04 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;   [1] "1.png"                    "2.png"                   
 #&gt;   [3] "25"                       "28"                      
 #&gt;   [5] "35"                       "ACDC_algorithm_demo.html"
-#&gt;   [7] "acdc_log.txt"             "arc_1.grd"               
-#&gt;   [9] "arc_1.gri"                "arc_10.grd"              
-#&gt;  [11] "arc_10.gri"               "arc_100.grd"             
-#&gt;  [13] "arc_100.gri"              "arc_11.grd"              
-#&gt;  [15] "arc_11.gri"               "arc_12.grd"              
-#&gt;  [17] "arc_12.gri"               "arc_13.grd"              
-#&gt;  [19] "arc_13.gri"               "arc_14.grd"              
-#&gt;  [21] "arc_14.gri"               "arc_15.grd"              
-#&gt;  [23] "arc_15.gri"               "arc_16.grd"              
-#&gt;  [25] "arc_16.gri"               "arc_17.grd"              
-#&gt;  [27] "arc_17.gri"               "arc_18.grd"              
-#&gt;  [29] "arc_18.gri"               "arc_19.grd"              
-#&gt;  [31] "arc_19.gri"               "arc_2.grd"               
-#&gt;  [33] "arc_2.gri"                "arc_20.grd"              
-#&gt;  [35] "arc_20.gri"               "arc_21.grd"              
-#&gt;  [37] "arc_21.gri"               "arc_22.grd"              
-#&gt;  [39] "arc_22.gri"               "arc_23.grd"              
-#&gt;  [41] "arc_23.gri"               "arc_24.grd"              
-#&gt;  [43] "arc_24.gri"               "arc_25.grd"              
-#&gt;  [45] "arc_25.gri"               "arc_26.grd"              
-#&gt;  [47] "arc_26.gri"               "arc_27.grd"              
-#&gt;  [49] "arc_27.gri"               "arc_28.grd"              
-#&gt;  [51] "arc_28.gri"               "arc_29.grd"              
-#&gt;  [53] "arc_29.gri"               "arc_3.grd"               
-#&gt;  [55] "arc_3.gri"                "arc_30.grd"              
-#&gt;  [57] "arc_30.gri"               "arc_31.grd"              
-#&gt;  [59] "arc_31.gri"               "arc_32.grd"              
-#&gt;  [61] "arc_32.gri"               "arc_33.grd"              
-#&gt;  [63] "arc_33.gri"               "arc_34.grd"              
-#&gt;  [65] "arc_34.gri"               "arc_35.grd"              
-#&gt;  [67] "arc_35.gri"               "arc_36.grd"              
-#&gt;  [69] "arc_36.gri"               "arc_37.grd"              
-#&gt;  [71] "arc_37.gri"               "arc_38.grd"              
-#&gt;  [73] "arc_38.gri"               "arc_39.grd"              
-#&gt;  [75] "arc_39.gri"               "arc_4.grd"               
-#&gt;  [77] "arc_4.gri"                "arc_40.grd"              
-#&gt;  [79] "arc_40.gri"               "arc_41.grd"              
-#&gt;  [81] "arc_41.gri"               "arc_42.grd"              
-#&gt;  [83] "arc_42.gri"               "arc_43.grd"              
-#&gt;  [85] "arc_43.gri"               "arc_44.grd"              
-#&gt;  [87] "arc_44.gri"               "arc_45.grd"              
-#&gt;  [89] "arc_45.gri"               "arc_46.grd"              
-#&gt;  [91] "arc_46.gri"               "arc_47.grd"              
-#&gt;  [93] "arc_47.gri"               "arc_48.grd"              
-#&gt;  [95] "arc_48.gri"               "arc_49.grd"              
-#&gt;  [97] "arc_49.gri"               "arc_5.grd"               
-#&gt;  [99] "arc_5.gri"                "arc_50.grd"              
-#&gt; [101] "arc_50.gri"               "arc_51.grd"              
-#&gt; [103] "arc_51.gri"               "arc_52.grd"              
-#&gt; [105] "arc_52.gri"               "arc_53.grd"              
-#&gt; [107] "arc_53.gri"               "arc_54.grd"              
-#&gt; [109] "arc_54.gri"               "arc_55.grd"              
-#&gt; [111] "arc_55.gri"               "arc_56.grd"              
-#&gt; [113] "arc_56.gri"               "arc_57.grd"              
-#&gt; [115] "arc_57.gri"               "arc_58.grd"              
-#&gt; [117] "arc_58.gri"               "arc_59.grd"              
-#&gt; [119] "arc_59.gri"               "arc_6.grd"               
-#&gt; [121] "arc_6.gri"                "arc_60.grd"              
-#&gt; [123] "arc_60.gri"               "arc_61.grd"              
-#&gt; [125] "arc_61.gri"               "arc_62.grd"              
-#&gt; [127] "arc_62.gri"               "arc_63.grd"              
-#&gt; [129] "arc_63.gri"               "arc_64.grd"              
-#&gt; [131] "arc_64.gri"               "arc_65.grd"              
-#&gt; [133] "arc_65.gri"               "arc_66.grd"              
-#&gt; [135] "arc_66.gri"               "arc_67.grd"              
-#&gt; [137] "arc_67.gri"               "arc_68.grd"              
-#&gt; [139] "arc_68.gri"               "arc_69.grd"              
-#&gt; [141] "arc_69.gri"               "arc_7.grd"               
-#&gt; [143] "arc_7.gri"                "arc_70.grd"              
-#&gt; [145] "arc_70.gri"               "arc_71.grd"              
-#&gt; [147] "arc_71.gri"               "arc_72.grd"              
-#&gt; [149] "arc_72.gri"               "arc_73.grd"              
-#&gt; [151] "arc_73.gri"               "arc_74.grd"              
-#&gt; [153] "arc_74.gri"               "arc_75.grd"              
-#&gt; [155] "arc_75.gri"               "arc_76.grd"              
-#&gt; [157] "arc_76.gri"               "arc_77.grd"              
-#&gt; [159] "arc_77.gri"               "arc_78.grd"              
-#&gt; [161] "arc_78.gri"               "arc_79.grd"              
-#&gt; [163] "arc_79.gri"               "arc_8.grd"               
-#&gt; [165] "arc_8.gri"                "arc_80.grd"              
-#&gt; [167] "arc_80.gri"               "arc_81.grd"              
-#&gt; [169] "arc_81.gri"               "arc_82.grd"              
-#&gt; [171] "arc_82.gri"               "arc_83.grd"              
-#&gt; [173] "arc_83.gri"               "arc_84.grd"              
-#&gt; [175] "arc_84.gri"               "arc_85.grd"              
-#&gt; [177] "arc_85.gri"               "arc_86.grd"              
-#&gt; [179] "arc_86.gri"               "arc_87.grd"              
-#&gt; [181] "arc_87.gri"               "arc_88.grd"              
-#&gt; [183] "arc_88.gri"               "arc_89.grd"              
-#&gt; [185] "arc_89.gri"               "arc_9.grd"               
-#&gt; [187] "arc_9.gri"                "arc_90.grd"              
-#&gt; [189] "arc_90.gri"               "arc_91.grd"              
-#&gt; [191] "arc_91.gri"               "arc_92.grd"              
-#&gt; [193] "arc_92.gri"               "arc_93.grd"              
-#&gt; [195] "arc_93.gri"               "arc_94.grd"              
-#&gt; [197] "arc_94.gri"               "arc_95.grd"              
-#&gt; [199] "arc_95.gri"               "arc_96.grd"              
-#&gt; [201] "arc_96.gri"               "arc_97.grd"              
-#&gt; [203] "arc_97.gri"               "arc_98.grd"              
-#&gt; [205] "arc_98.gri"               "arc_99.grd"              
-#&gt; [207] "arc_99.gri"               "css"                     
-#&gt; [209] "dot_acdc_log_1.txt"       "dot_acdc_log_2.txt"      
-#&gt; [211] "dot_acdc_log_3.txt"       "dot_acdc_log_4.txt"      
-#&gt; [213] "dot_acdc_log_5.txt"       "downlit"                 
-#&gt; [215] "file13f6c19d43aa9"        "file13f6c1f494b16.so"    
-#&gt; [217] "file13f6c3784320a"        "file13f6c584d015a"       
-#&gt; [219] "file13f6c7f8e2861"        "file13f6ca6459dc"        
-#&gt; [221] "file13f6cfc5f1f9"         "images"                  
-#&gt; [223] "js"                      </div><div class='input'>
+#&gt;   [7] "acdc_log.txt"             "acdc_trace"              
+#&gt;   [9] "arc_1.grd"                "arc_1.gri"               
+#&gt;  [11] "arc_10.grd"               "arc_10.gri"              
+#&gt;  [13] "arc_100.grd"              "arc_100.gri"             
+#&gt;  [15] "arc_11.grd"               "arc_11.gri"              
+#&gt;  [17] "arc_12.grd"               "arc_12.gri"              
+#&gt;  [19] "arc_13.grd"               "arc_13.gri"              
+#&gt;  [21] "arc_14.grd"               "arc_14.gri"              
+#&gt;  [23] "arc_15.grd"               "arc_15.gri"              
+#&gt;  [25] "arc_16.grd"               "arc_16.gri"              
+#&gt;  [27] "arc_17.grd"               "arc_17.gri"              
+#&gt;  [29] "arc_18.grd"               "arc_18.gri"              
+#&gt;  [31] "arc_19.grd"               "arc_19.gri"              
+#&gt;  [33] "arc_2.grd"                "arc_2.gri"               
+#&gt;  [35] "arc_20.grd"               "arc_20.gri"              
+#&gt;  [37] "arc_21.grd"               "arc_21.gri"              
+#&gt;  [39] "arc_22.grd"               "arc_22.gri"              
+#&gt;  [41] "arc_23.grd"               "arc_23.gri"              
+#&gt;  [43] "arc_24.grd"               "arc_24.gri"              
+#&gt;  [45] "arc_25.grd"               "arc_25.gri"              
+#&gt;  [47] "arc_26.grd"               "arc_26.gri"              
+#&gt;  [49] "arc_27.grd"               "arc_27.gri"              
+#&gt;  [51] "arc_28.grd"               "arc_28.gri"              
+#&gt;  [53] "arc_29.grd"               "arc_29.gri"              
+#&gt;  [55] "arc_3.grd"                "arc_3.gri"               
+#&gt;  [57] "arc_30.grd"               "arc_30.gri"              
+#&gt;  [59] "arc_31.grd"               "arc_31.gri"              
+#&gt;  [61] "arc_32.grd"               "arc_32.gri"              
+#&gt;  [63] "arc_33.grd"               "arc_33.gri"              
+#&gt;  [65] "arc_34.grd"               "arc_34.gri"              
+#&gt;  [67] "arc_35.grd"               "arc_35.gri"              
+#&gt;  [69] "arc_36.grd"               "arc_36.gri"              
+#&gt;  [71] "arc_37.grd"               "arc_37.gri"              
+#&gt;  [73] "arc_38.grd"               "arc_38.gri"              
+#&gt;  [75] "arc_39.grd"               "arc_39.gri"              
+#&gt;  [77] "arc_4.grd"                "arc_4.gri"               
+#&gt;  [79] "arc_40.grd"               "arc_40.gri"              
+#&gt;  [81] "arc_41.grd"               "arc_41.gri"              
+#&gt;  [83] "arc_42.grd"               "arc_42.gri"              
+#&gt;  [85] "arc_43.grd"               "arc_43.gri"              
+#&gt;  [87] "arc_44.grd"               "arc_44.gri"              
+#&gt;  [89] "arc_45.grd"               "arc_45.gri"              
+#&gt;  [91] "arc_46.grd"               "arc_46.gri"              
+#&gt;  [93] "arc_47.grd"               "arc_47.gri"              
+#&gt;  [95] "arc_48.grd"               "arc_48.gri"              
+#&gt;  [97] "arc_49.grd"               "arc_49.gri"              
+#&gt;  [99] "arc_5.grd"                "arc_5.gri"               
+#&gt; [101] "arc_50.grd"               "arc_50.gri"              
+#&gt; [103] "arc_51.grd"               "arc_51.gri"              
+#&gt; [105] "arc_52.grd"               "arc_52.gri"              
+#&gt; [107] "arc_53.grd"               "arc_53.gri"              
+#&gt; [109] "arc_54.grd"               "arc_54.gri"              
+#&gt; [111] "arc_55.grd"               "arc_55.gri"              
+#&gt; [113] "arc_56.grd"               "arc_56.gri"              
+#&gt; [115] "arc_57.grd"               "arc_57.gri"              
+#&gt; [117] "arc_58.grd"               "arc_58.gri"              
+#&gt; [119] "arc_59.grd"               "arc_59.gri"              
+#&gt; [121] "arc_6.grd"                "arc_6.gri"               
+#&gt; [123] "arc_60.grd"               "arc_60.gri"              
+#&gt; [125] "arc_61.grd"               "arc_61.gri"              
+#&gt; [127] "arc_62.grd"               "arc_62.gri"              
+#&gt; [129] "arc_63.grd"               "arc_63.gri"              
+#&gt; [131] "arc_64.grd"               "arc_64.gri"              
+#&gt; [133] "arc_65.grd"               "arc_65.gri"              
+#&gt; [135] "arc_66.grd"               "arc_66.gri"              
+#&gt; [137] "arc_67.grd"               "arc_67.gri"              
+#&gt; [139] "arc_68.grd"               "arc_68.gri"              
+#&gt; [141] "arc_69.grd"               "arc_69.gri"              
+#&gt; [143] "arc_7.grd"                "arc_7.gri"               
+#&gt; [145] "arc_70.grd"               "arc_70.gri"              
+#&gt; [147] "arc_71.grd"               "arc_71.gri"              
+#&gt; [149] "arc_72.grd"               "arc_72.gri"              
+#&gt; [151] "arc_73.grd"               "arc_73.gri"              
+#&gt; [153] "arc_74.grd"               "arc_74.gri"              
+#&gt; [155] "arc_75.grd"               "arc_75.gri"              
+#&gt; [157] "arc_76.grd"               "arc_76.gri"              
+#&gt; [159] "arc_77.grd"               "arc_77.gri"              
+#&gt; [161] "arc_78.grd"               "arc_78.gri"              
+#&gt; [163] "arc_79.grd"               "arc_79.gri"              
+#&gt; [165] "arc_8.grd"                "arc_8.gri"               
+#&gt; [167] "arc_80.grd"               "arc_80.gri"              
+#&gt; [169] "arc_81.grd"               "arc_81.gri"              
+#&gt; [171] "arc_82.grd"               "arc_82.gri"              
+#&gt; [173] "arc_83.grd"               "arc_83.gri"              
+#&gt; [175] "arc_84.grd"               "arc_84.gri"              
+#&gt; [177] "arc_85.grd"               "arc_85.gri"              
+#&gt; [179] "arc_86.grd"               "arc_86.gri"              
+#&gt; [181] "arc_87.grd"               "arc_87.gri"              
+#&gt; [183] "arc_88.grd"               "arc_88.gri"              
+#&gt; [185] "arc_89.grd"               "arc_89.gri"              
+#&gt; [187] "arc_9.grd"                "arc_9.gri"               
+#&gt; [189] "arc_90.grd"               "arc_90.gri"              
+#&gt; [191] "arc_91.grd"               "arc_91.gri"              
+#&gt; [193] "arc_92.grd"               "arc_92.gri"              
+#&gt; [195] "arc_93.grd"               "arc_93.gri"              
+#&gt; [197] "arc_94.grd"               "arc_94.gri"              
+#&gt; [199] "arc_95.grd"               "arc_95.gri"              
+#&gt; [201] "arc_96.grd"               "arc_96.gri"              
+#&gt; [203] "arc_97.grd"               "arc_97.gri"              
+#&gt; [205] "arc_98.grd"               "arc_98.gri"              
+#&gt; [207] "arc_99.grd"               "arc_99.gri"              
+#&gt; [209] "css"                      "dot_acdc_log_1.txt"      
+#&gt; [211] "dot_acdc_log_2.txt"       "dot_acdc_log_3.txt"      
+#&gt; [213] "dot_acdc_log_4.txt"       "dot_acdc_log_5.txt"      
+#&gt; [215] "downlit"                  "file16ae112203e38.so"    
+#&gt; [217] "file16ae11339cbd2"        "file16ae11554aa5d"       
+#&gt; [219] "file16ae135f141b9"        "file16ae163a5a0bf"       
+#&gt; [221] "file16ae17211f459"        "file16ae1769d834"        
+#&gt; [223] "file16ae1772ab8cb"        "images"                  
+#&gt; [225] "js"                      </div><div class='input'>
 <span class='co'>#### Example (4): Implement the algorithm in parallel</span>
 <span class='co'>## Trial different options for 'split' and compare speed</span>
 <span class='co'># Approach (1)</span>
@@ -414,10 +414,10 @@
              plot_ts <span class='op'>=</span> <span class='cn'>FALSE</span>,
              split <span class='op'>=</span> <span class='fl'>1</span>,
              cl <span class='op'>=</span> <span class='va'>cl</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:44)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2022-05-28 18:07:05)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Implementing algorithm over chunks... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:44) after ~0.01 minutes. </div><div class='input'><span class='va'>at2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span><span class='op'>(</span><span class='op'>)</span>
+#&gt; ... flapper::dc() call completed (@ 2022-05-28 18:07:06) after ~0.01 minutes. </div><div class='input'><span class='va'>at2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='co'># Approach (2)</span>
 <span class='va'>bt1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='va'>cl</span> <span class='op'>&lt;-</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/makeCluster.html'>makeCluster</a></span><span class='op'>(</span><span class='fl'>2L</span><span class='op'>)</span>
@@ -434,24 +434,24 @@
              plot_ts <span class='op'>=</span> <span class='cn'>FALSE</span>,
              split <span class='op'>=</span> <span class='fl'>5</span>,
              cl <span class='op'>=</span> <span class='va'>cl</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:46)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2022-05-28 18:07:09)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Implementing algorithm over chunks... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:46) after ~0.01 minutes. </div><div class='input'><span class='va'>bt2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span><span class='op'>(</span><span class='op'>)</span>
+#&gt; ... flapper::dc() call completed (@ 2022-05-28 18:07:10) after ~0.01 minutes. </div><div class='input'><span class='va'>bt2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='co'># Compare timings</span>
 <span class='fu'><a href='https://rdrr.io/r/base/difftime.html'>difftime</a></span><span class='op'>(</span><span class='va'>at2</span>, <span class='va'>at1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Time difference of 1.816631 secs</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/difftime.html'>difftime</a></span><span class='op'>(</span><span class='va'>bt2</span>, <span class='va'>bt1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Time difference of 1.793341 secs</div><div class='input'>
+</div><div class='output co'>#&gt; Time difference of 4.361611 secs</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/difftime.html'>difftime</a></span><span class='op'>(</span><span class='va'>bt2</span>, <span class='va'>bt1</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Time difference of 4.302974 secs</div><div class='input'>
 <span class='co'>#### Example (5): Write messages to file via con</span>
 <span class='va'>out_dc</span> <span class='op'>&lt;-</span> <span class='fu'>dc</span><span class='op'>(</span>archival <span class='op'>=</span> <span class='va'>depth</span>, bathy <span class='op'>=</span> <span class='va'>dat_gebco</span>,
              con <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"/dc_log.txt"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpoGmbum/dc_log.txt does not exist: attempting to write file in specified directory...</span></div><div class='output co'>#&gt; <span class='message'>... Blank file successfully written to file.</span></div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"/dc_log.txt"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "flapper::dc() called (@ 2021-12-02 14:36:46)... "                              
+</div><div class='output co'>#&gt; <span class='message'>/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/dc_log.txt does not exist: attempting to write file in specified directory...</span></div><div class='output co'>#&gt; <span class='message'>... Blank file successfully written to file.</span></div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"/dc_log.txt"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "flapper::dc() called (@ 2022-05-28 18:07:10)... "                              
 #&gt; [2] "... Setting up function... "                                                   
 #&gt; [3] "... Implementing calc_depth_error()... "                                       
 #&gt; [4] "... Plotting movement time series (for each chunk)... "                        
 #&gt; [5] "... Implementing algorithm over time steps... "                                
-#&gt; [6] "... flapper::dc() call completed (@ 2021-12-02 14:36:47) after ~0.01 minutes. "</div><div class='input'>
+#&gt; [6] "... flapper::dc() call completed (@ 2022-05-28 18:07:11) after ~0.02 minutes. "</div><div class='input'>
 <span class='co'>#### Example (6) Compare an automated vs. manual implementation of DC</span>
 
 <span class='co'>## (A) Compare step-wise results for randomly select time steps</span>
@@ -459,10 +459,10 @@
 <span class='va'>out_dc</span> <span class='op'>&lt;-</span> <span class='fu'>dc</span><span class='op'>(</span>archival <span class='op'>=</span> <span class='va'>depth</span>,
              bathy <span class='op'>=</span> <span class='va'>dat_gebco</span>,
              save_record_spatial <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:47)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2022-05-28 18:07:11)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Plotting movement time series (for each chunk)... </div><div class='output co'>#&gt; ... Implementing algorithm over time steps... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:48) after ~0.01 minutes. </div><div class='input'><span class='co'># Compare results for randomly selected time steps to manual implementation</span>
+#&gt; ... flapper::dc() call completed (@ 2022-05-28 18:07:12) after ~0.02 minutes. </div><div class='input'><span class='co'># Compare results for randomly selected time steps to manual implementation</span>
 <span class='co'># ... with the same simple calc_depth_error model</span>
 <span class='va'>pp</span> <span class='op'>&lt;-</span> <span class='fu'>graphics</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span>mfrow <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 <span class='kw'>for</span><span class='op'>(</span><span class='va'>i</span> <span class='kw'>in</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/ncell.html'>nrow</a></span><span class='op'>(</span><span class='va'>depth</span><span class='op'>)</span>, <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
@@ -479,10 +479,10 @@
              bathy <span class='op'>=</span> <span class='va'>dat_gebco</span>,
              save_record_spatial <span class='op'>=</span> <span class='cn'>NULL</span>,
              split <span class='op'>=</span> <span class='fl'>10L</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::dc() called (@ 2021-12-02 14:36:48)... 
+</div><div class='output co'>#&gt; flapper::dc() called (@ 2022-05-28 18:07:13)... 
 #&gt; ... Setting up function... </div><div class='output co'>#&gt; <span class='message'>'calc_depth_error' function taken to be independent of depth.</span></div><div class='output co'>#&gt; ... Implementing calc_depth_error()... 
 #&gt; ... Plotting movement time series (for each chunk)... </div><div class='img'><img src='dc-8.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Implementing algorithm over chunks... 
-#&gt; ... flapper::dc() call completed (@ 2021-12-02 14:36:49) after ~0.01 minutes. </div><div class='input'><span class='co'># Get overall map via acdc_simplify()</span>
+#&gt; ... flapper::dc() call completed (@ 2022-05-28 18:07:14) after ~0.02 minutes. </div><div class='input'><span class='co'># Get overall map via acdc_simplify()</span>
 <span class='va'>map_1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='acdc_simplify.html'>acdc_simplify</a></span><span class='op'>(</span><span class='va'>out_dc</span>, type <span class='op'>=</span> <span class='st'>"dc"</span>, mask <span class='op'>=</span> <span class='va'>dat_gebco</span><span class='op'>)</span><span class='op'>$</span><span class='va'>map</span>
 </div><div class='output co'>#&gt; <span class='message'>acdc_simplify() implemented for type = 'dc'.</span></div><div class='input'><span class='co'># Get overall map via a simple custom approach</span>
 <span class='va'>map_2</span> <span class='op'>&lt;-</span> <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/setValues.html'>setValues</a></span><span class='op'>(</span><span class='va'>dat_gebco</span>, <span class='fl'>0</span><span class='op'>)</span>
