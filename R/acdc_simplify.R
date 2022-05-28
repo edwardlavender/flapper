@@ -19,7 +19,7 @@
 acdc_simplify <- function(archive,
                           type = c("acs", "dc"),
                           mask = NULL,
-                          normalise = FALSE,
+                          normalise = TRUE,
                           keep_chunks = FALSE) {
 
   #### Checks
