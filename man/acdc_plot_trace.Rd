@@ -54,14 +54,14 @@ acdc_plot_trace(
 \item{prompt}{If \code{png_param} is not specified, \code{prompt} is a logical variable that defines whether or not to pause function execution between plots and between containers within plots to facilitate interpretation.}
 }
 \value{
-The function returns, for each time step, a plot of the location-probability surface and acoustic containers.
+The function returns, for each time step, a plot of the probability surface and acoustic containers.
 }
 \description{
-This function visually reconstructs the dynamics of an acoustic-container algorithm (i.e., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).
+This function visually reconstructs the dynamics of an acoustic-container* (AC*) algorithm (i.e., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).
 
 To implement the function, an \code{\link[flapper]{acdc_record-class}} object (\code{record}) from \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} that defines the outputs of the AC* algorithm is required. A \code{\link[sp]{SpatialPointsDataFrame}} that defines receiver locations and a matrix that defines the daily operational status of each receiver are also required.
 
-For each time step, the function plots the location-probability surface, the receiver(s) at which the individual was detected and the acoustic containers, illustrating how the expansion, contraction and intersection of acoustic containers capture the boundaries of an individual's location through time.
+For each time step, the function plots the probability surface, the receiver(s) at which the individual was detected and the acoustic containers, illustrating how the expansion, contraction and intersection of acoustic containers capture the set of possible locations for an individual through time.
 }
 \examples{
 #### Prepare example AC algorithm outputs with spatial files

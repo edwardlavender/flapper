@@ -19,7 +19,7 @@ acdc_simplify(
 
 \item{mask}{(optional) A spatial mask (e.g., the argument passed to \code{bathy} in \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}) to mask areas (e.g., land) from the overall map. If implemented, cells in masked areas are assigned NAs rather than a score of 0.}
 
-\item{normalise}{A logical input that defines whether or not to normalise the overall map so that cell scores sum to one.}
+\item{normalise}{A logical input that defines whether or not to normalise the overall map so that cell scores sum to one. If \code{normalise = FALSE}, the overall map represents the expected number of time steps spent in each grid cell; if \code{normalise = TRUE}, the overall map represents the expected proportion of time steps spent in each grid cell.}
 
 \item{keep_chunks}{A logical variable that defines whether or not to retain all chunk-specific information.}
 }
@@ -27,7 +27,7 @@ acdc_simplify(
 The function returns an object of class \code{\link[flapper]{acdc_record-class}}.
 }
 \description{
-This function simplifies the output of \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}, by processing information from the 'archive' elements of an \code{\link[flapper]{acdc_archive-class}} object that hold the results of calls to the workhorse routines. This is especially useful if the algorithm(s) have been applied chunk-wise, in which case the results for each chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of where the individual could have spend more or less time over the entire time series.
+This function simplifies the output of \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}, by processing information from the 'archive' elements of an \code{\link[flapper]{acdc_archive-class}} object that hold the results of calls to the workhorse routines. This is especially useful if the algorithm(s) have been applied chunk-wise, in which case the results for each chunk are returned in a list. The function aggregates information across chunks to generate a continuous time series of results and a map of the expected proportion of time steps spent in each grid cell.
 }
 \details{
 If the \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} function was implemented step-wise, this function simply extracts the necessary information and re-packages it into an \code{\link[flapper]{acdc_record-class}} object. For a chunk-wise implementation, the function (a) computes the map of where the individual could have spent more or less time by aggregating the chunk-specific maps) and (b) simplifies chunk-specific records into a single contiguous time series, with re-defined time stamps from the start to the end of the time series (for AC* algorithm(s)) to return an \code{\link[flapper]{acdc_record-class}} object.

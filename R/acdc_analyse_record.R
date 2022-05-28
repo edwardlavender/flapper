@@ -102,11 +102,11 @@ acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"),
 #### acdc_plot_trace()
 
 #' @title Plot AC* container dynamics
-#' @description This function visually reconstructs the dynamics of an acoustic-container algorithm (i.e., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).
+#' @description This function visually reconstructs the dynamics of an acoustic-container* (AC*) algorithm (i.e., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).
 #'
 #' To implement the function, an \code{\link[flapper]{acdc_record-class}} object (\code{record}) from \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} that defines the outputs of the AC* algorithm is required. A \code{\link[sp]{SpatialPointsDataFrame}} that defines receiver locations and a matrix that defines the daily operational status of each receiver are also required.
 #'
-#' For each time step, the function plots the location-probability surface, the receiver(s) at which the individual was detected and the acoustic containers, illustrating how the expansion, contraction and intersection of acoustic containers capture the boundaries of an individual's location through time.
+#' For each time step, the function plots the probability surface, the receiver(s) at which the individual was detected and the acoustic containers, illustrating how the expansion, contraction and intersection of acoustic containers capture the set of possible locations for an individual through time.
 #'
 #' @param record A \code{\link[flapper]{acdc_record-class}} object from \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}}.
 #' @param plot An integer vector that defines the time steps for which to make plots. If \code{plot = NULL}, the function will make a plot for all time steps for which the necessary information is available in \code{record}.
@@ -122,7 +122,7 @@ acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"),
 #' @param png_param (optional) A named list of arguments, passed to \code{\link[grDevices]{png}}, to save plots to file. If supplied, the plot for each time step is saved separately. The `filename' argument should be the directory in which plots are saved. Plots are then saved as "1.png", "2.png" and so on. If supplied, \code{prompt} is ignored (see below).
 #' @param prompt If \code{png_param} is not specified, \code{prompt} is a logical variable that defines whether or not to pause function execution between plots and between containers within plots to facilitate interpretation.
 #'
-#' @return The function returns, for each time step, a plot of the location-probability surface and acoustic containers.
+#' @return The function returns, for each time step, a plot of the probability surface and acoustic containers.
 #'
 #' @examples
 #' #### Prepare example AC algorithm outputs with spatial files
@@ -454,14 +454,14 @@ acdc_plot_trace <- function(record,
 #### acdc_plot_record()
 
 #' @title Plot time-specific maps from the AC/DC algorithm(s)
-#' @description This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, an \code{\link[flapper]{acdc_record-class}} list from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic containers (if applicable) can be added and customised and the finalised plots can be returned or saved to file.
+#' @description This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, an \code{\link[flapper]{acdc_record-class}} list from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of expected time spent in different parts of the study area (from the start of the algorithm to each time point). Coastline, receivers and acoustic containers (if applicable) can be added and customised and the finalised plots can be returned or saved to file.
 #' @param record An \code{\link[flapper]{acdc_record-class}} object.
 #' @param type A character that defines the plotted surface(s): \code{"map_cumulative"} plots the cumulative surface and \code{"map_timestep"} plots time step-specific surfaces.
 #' @param plot An integer vector that defines the time steps for which to make plots. If \code{plot = NULL}, the function will make a plot for all time steps for which the necessary information is available in \code{record}.
 #' @param add_coastline (optional) A named list of arguments, passed to \code{\link[raster]{plot}}, to add a polygon (i.e., of the coastline), to the plot. If provided, this must contain an `x' element that contains the coastline as a spatial object (e.g., a SpatialPolygonsDataFrame: see \code{\link[flapper]{dat_coast}} for an example).
 #' @param add_receivers (optional) A named list of arguments, passed to \code{\link[graphics]{points}}, to add points (i.e., receivers) to the plot. If provided, this must contain an `x' element that is a SpatialPoints object that specifies receiver locations (in the same coordinate reference system as other spatial data).
 #' @param add_raster (optional) A named list of arguments, passed to \code{\link[fields]{image.plot}}, to plot the RasterLayer of possible locations that is extracted from \code{record}.
-#' @param add_containers (optional) For outputs from the AC* algorithms (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), \code{containers} is a named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic container to the plot.
+#' @param add_containers (optional) For outputs from the AC* algorithms (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), \code{containers} is a named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic containers to the plot.
 #' @param add_additional (optional) A stand-alone function, to be executed after the background plot has been made and any specified spatial layers have been added to this, to customise the result (see Examples).
 #' @param crop_spatial A logical variable that defines whether or not to crop spatial data to lie within the axis limits.
 #' @param xlim,ylim,fix_zlim,pretty_axis_args Axis control arguments. \code{xlim} and \code{ylim} control the axis limits, following the rules of the \code{lim} argument in \code{\link[prettyGraphics]{pretty_axis}}. \code{fix_zlim} is a logical input that defines whether or not to fix z axis limits across all plots (to facilitate comparisons), or a vector of two numbers that define a custom range for the z axis which is fixed across all plots. \code{fix_zlim = FALSE} produces plots in which the z axis is allowed to vary flexibly between time units. Other axis options supported by \code{\link[prettyGraphics]{pretty_axis}} are implemented by passing a named list of arguments to this function via \code{pretty_axis_args}.
