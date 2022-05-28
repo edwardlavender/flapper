@@ -1,10 +1,10 @@
 Package: flapper
 Type: Package
-Title: Explore Animal Space Use Within Passive Acoustic Telemetry Arrays
+Title: Routines for the analysis of passive acoustic telemetry data
 Version: 0.0.9000
 Author: Edward Lavender
 Maintainer: Edward Lavender <el72@st-andrews.ac.uk>
-Description: Algorithms which facilitate the use of passive acoustic telemetry (PAT) data for ecological inferences, especially those pertaining to animal space use. This includes functions for processing PAT data, spatial tools such as least-cost pathway calculations, new algorithms for inferring space use and simulations designed to evaluate the efficacy of algorithms for inferring space use. Package development has been motivated by the collection of PAT data for a Critically Endangered benthopelagic elasmobranch off the west coast of Scotland. 
+Description: Routines for the analysis of passive acoustic telemetry data, including for data processing, description (via detection statistics and movement metrics), modelling and simulation. These routines are supported by a series of helper functions (including distance calculators, spatial tools and parallelisation options). The main contribution is the provision of a family of algorithms for movement modelling in passive acoustic telemetry systems that permits the reconstruction of fine-scale movement paths and emergent patterns of space use. Package development has been motivated by passive acoustic telemetry data from a Critically Endangered benthic elasmobranch (the flapper skate, \emph{Dipturus intermedius}) off the west coast of Scotland. 
 Imports:
     magrittr, dplyr, rlang, lubridate, purrr, 
     methods, data.table, Matrix, pbapply,

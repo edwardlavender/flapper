@@ -1,10 +1,9 @@
 
 # flapper
 
-**From passive acoustic telemetry to space use: an `R` package of
-algorithms for reconstructing movement paths and patterns of space use
-from acoustic and archival time series.
-<https://edwardlavender.github.io/flapper/>**
+**Routines for the analysis of passive acoustic telemetry data,
+including the reconstruction of fine-scale movement paths and emergent
+patterns of space use. <https://edwardlavender.github.io/flapper/>**
 
 [![Project Status: WIP – Initial development is in progress, but there
 has not yet been a stable, usable release suitable for the
@@ -12,21 +11,21 @@ public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostat
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/flapper)](https://cran.r-project.org/package=flapper)
 
 [`flapper`](https://edwardlavender.github.io/flapper/) is an `R` package
-which provides tools for passive acoustic telemetry (PAT) data. The
-package has been particularly motivated by the collection of new
-acoustic and archival data from a Critically Endangered elasmobranch,
-the flapper skate (*Dipturus intermedius*), off the west coast of
-Scotland where a static PAT array has been established to examine the
+which provides tools for passive acoustic telemetry data. The package
+has been particularly motivated by the collection of acoustic and
+archival data from a Critically Endangered elasmobranch, the flapper
+skate (*Dipturus intermedius*), off the west coast of Scotland where a
+static passive acoustic telemetry array was established to examine the
 movements of individuals within a Marine Protected Area.
 [`flapper`](https://edwardlavender.github.io/flapper/) has been designed
-to complement existing packages for the analyses of these data
+to complement existing packages for the analysis of these data
 (e.g. [VTrack](https://github.com/RossDwyer/VTrack),
 [glatos](https://gitlab.oceantrack.org/GreatLakes/glatos) and
 [fishtrack3d](https://github.com/aspillaga/fishtrack3d) and
 [actel](https://github.com/hugomflavio/actel)), with a particular focus
-on the provision of tools that integrate PAT and archival data for
-improved inference of patterns of space use, including for pelagic and
-benthic/demersal species. To this end,
+on the provision of movement modelling methods for passive acoustic
+telemetry systems that permit the reconstruction of fine-scale movement
+paths and emergent patterns of space use. To this end,
 [`flapper`](https://edwardlavender.github.io/flapper/) contains
 functions in the following themes:
 
@@ -41,23 +40,24 @@ functions in the following themes:
   - **Detection statistics**, including metrics of sampling effort, such
     as detection area; and individual detection metrics, such as
     detection days and co-occurrence;
-  - **Space use algorithms**, including a straightforward implementation
-    of the mean-position algorithm for the estimation of centres of
+  - **Modelling methods**, including a straightforward implementation of
+    the mean-position algorithm for the estimation of centres of
     activity and new algorithms designed for improved estimates of space
     use and the reconstruction of movement paths;
   - **Simulation tools**, including tools for the simulation of passive
     acoustic telemetry arrays, movement paths, detections and the
-    comparison of simulated and inferred patterns of space use under
-    different conditions;
+    comparison of simulated and reconstructed patterns of space use
+    under different conditions;
 
-<img src="vignettes/readme_context.png"/> *flapper: An `R` package
-designed to facilitate the integration of acoustic and archival datasets
-to improve estimates of space use. Inserted sample depth and acoustic
-time series were collected as part of the Movement Ecology of Flapper
-Skate project by Marine Scotland Science and NatureScot. The insert of
-the flapper skate is also courtesy of this project. The bathymetry data
-are sourced from the Ireland, Northern Island and Scotland Hydrographic
-survey (Howe et al., 2015). Plots were produced using the
+<img src="vignettes/readme_context.png"/> *flapper: An `R` package of
+routines for the analysis of passive acoustic telemetry data, especially
+the reconstruction of fine-scale movement paths and emergent patterns of
+space use. Inserted sample depth and acoustic time series were collected
+as part of the Movement Ecology of Flapper Skate project by Marine
+Scotland Science and NatureScot. The insert of the flapper skate is also
+courtesy of this project. The bathymetry data are sourced from the
+Ireland, Northern Island and Scotland Hydrographic survey (Howe et al.,
+2014). Plots were produced using the
 [prettyGraphics](https://github.com/edwardlavender/prettyGraphics)
 package.*
 
@@ -67,11 +67,12 @@ package.*
 ## Highlights
 
 The main highlights of the package are the provision of routines for the
-rapid calculation of biologically meaningful distances in area with
+rapid calculation of biologically meaningful distances in areas with
 complex barriers to movement (e.g., coastline) alongside algorithms
 (most of which are exclusive to
-[`flapper`](https://edwardlavender.github.io/flapper/)) for inferring
-space use from discrete detections at receivers, especially:
+[`flapper`](https://edwardlavender.github.io/flapper/)) for
+reconstructing movements and patterns of space use from discrete
+detections at receivers, especially:
 
   - **`lcp_*()`.** These functions facilitate the calculation of
     shortest paths and their distances between and around points using
@@ -85,34 +86,31 @@ space use from discrete detections at receivers, especially:
     discrete detections at receivers, given a detection matrix and the
     locations of receivers.
   - **`ac()`.** The function implements the acoustic-container (AC)
-    algorithm to examine patterns of space use. This is a new approach
-    which utilises the information provided by acoustic detections in
-    the form of acoustic containers to infer where animals could have
-    spent more or less time over the period of observations. Key
-    innovations of this approach include the natural incorporation of
-    barriers to movement (such as coastline), detection probability and
-    information provided by the gaps between detections.
+    algorithm. This is a new approach which utilises the information
+    provided by acoustic detections in the form of acoustic containers
+    to reconstruct the expected time spent in different parts of a study
+    area over the period of observations. Key innovations of this
+    approach include the natural incorporation of barriers to movement
+    (such as coastline), detection probability and information provided
+    by the gaps between detections.
   - **`dc()`.** This function implements the ‘depth-contour’ (DC)
-    algorithm to examine patterns of space use. This relates
-    one-dimensional depth time series to a two-dimensional bathymetry
-    surface to determine the extent to which different parts of an area
-    might have (or have not) been used, or effectively represent
-    occupied depths, over time.
+    algorithm. This relates one-dimensional depth time series to a
+    two-dimensional bathymetry surface to determine the extent to which
+    different parts of an area might have (or have not) been used, or
+    effectively represent occupied depths, over time.
   - **`acdc()`.** This function implements the ‘acoustic-container
-    depth-contour’ (ACDC) algorithm to examine patterns of space use.
-    This integrates the locational information provided by acoustic
-    detections and concurrent depth observations to infer where tagged
-    animals could have spent more or less time over the period of
-    observations.
+    depth-contour’ (ACDC) algorithm. This integrates the locational
+    information provided by acoustic detections and concurrent depth
+    observations to refine expectations of the time spent in different
+    parts of a study area over the period of observations.
   - **`pf()`** is a particle filtering routine that refines
     time-specific maps of the possible locations of an animal (from
     `ac()`, `dc()` or `acdc()`) via a particle simulation and filtering
     process that permits the reconstruction of movement paths over
     landscape.
   - **`sim_*()`.** These functions provide flexible, joined-up routines
-    for the simulation of receiver arrays, movement paths and detections
-    and can be used to evaluate alternative algorithms for inferences
-    about patterns of space use under different conditions.
+    for the simulation of receiver arrays, movement paths and
+    detections.
 
 ## Installation
 
@@ -128,7 +126,8 @@ before proceeding by following the instructions
 
 Four packages
 ([prettyGraphics](https://github.com/edwardlavender/prettyGraphics),
-[Tools4ETS](https://github.com/edwardlavender/Tools4ETS) and
+[Tools4ETS](https://github.com/edwardlavender/Tools4ETS),
+[fasterRaster](https://github.com/adamlilith/fasterRaster) and
 [glatos](https://gitlab.oceantrack.org/GreatLakes/glatos)) are required
 or suggested from [GitHub](https://github.com) repositories (since they
 are not currently available from [CRAN](https://cran.r-project.org)).
@@ -136,7 +135,7 @@ These can be installed during the installation process (see below), but
 it is safer to install them sequentially as follows:
 
     devtools::install_github("edwardlavender/prettyGraphics") # required
-    devtools::install_github("edwardlavender/Tools4ETS")      # currently required
+    devtools::install_github("edwardlavender/Tools4ETS")      # required
     devtools::install_github("adamlilith/fasterRaster")       # suggested
     devtools::install_url(                                    # suggested
       "https://gitlab.oceantrack.org/GreatLakes/glatos/repository/master/archive.zip",
@@ -164,9 +163,9 @@ been added to the package.*
 
 A key feature of the
 [`flapper`](https://edwardlavender.github.io/flapper/) package is that
-almost all functions are designed to be implemented using standard
-object types (e.g., dataframes and matrices) rather than
-package-specific object classes. For simplicity,
+most functions are designed to be implemented using standard object
+types (e.g., dataframes and matrices) rather than package-specific
+object classes. For simplicity,
 [`flapper`](https://edwardlavender.github.io/flapper/) makes some
 assumptions about variable names that follow a consistent and logical
 structure (e.g., individual IDs are given as `individual_id` and
@@ -229,8 +228,8 @@ and checking of passive acoustic telemetry time series:
 
 ## Spatial tools
 
-A number of functions facilitate spatial operations that support
-ecological investigations and space use algorithms:
+A number of functions facilitate spatial operations that support common
+tasks and modelling algorithms:
 
   - `buffer_and_crop()` buffers a spatial object (e.g., receiver
     locations) and uses this buffered object to crop another (e.g., the
@@ -251,8 +250,8 @@ ecological investigations and space use algorithms:
     code from the [greenbrown](http://greenbrown.r-forge.r-project.org)
     package);
   - `update_extent()`shrinks or inflates an extent object;
-  - `segments_cross_barrier()` determines if Euclidean path segments
-    cross a barrier;
+  - `segments_cross_barrier()` determines if Euclidean transects cross a
+    barrier;
 
 ## Distance calculations
 
@@ -287,7 +286,7 @@ calculation of shortest paths/distances:
     destination coordinates;
   - `lcp_interp()` interpolates paths between sequential locations using
     least-cost paths analysis;
-  - `lcp_comp()` compares Euclidean and shortest distance metrics for an
+  - `lcp_comp()` compares Euclidean and shortest-distance metrics for an
     area;
 
 ## Detection statistics
@@ -300,7 +299,7 @@ of individuals:
     for detection probability with distance;
   - `get_detection_containers()` defines detection containers (areas
     within the maximum detection range) around receivers;
-  - `get_detection_containers_overlap` identifies receivers with
+  - `get_detection_containers_overlap()` identifies receivers with
     overlapping detection containers in space and time;
   - `get_detection_containers_envir()` extracts environmental conditions
     from within receiver detection ranges, accounting for detection
@@ -341,22 +340,22 @@ Building on the analysis of detection time series, some functions
       - `get_hr_home()` gets the ‘home range’ from a UD;
       - `get_hr_full()` gets the ‘full range’ from a UD;
 
-## Space use algorithms
+## Modelling algorithms
 
 The main thrust of
 [`flapper`](https://edwardlavender.github.io/flapper/) is the
-implementation of algorithms designed to infer space use from PAT data
-and their evaluation under different circumstances (e.g., array designs,
-movement models and detection models).
+implementation of algorithms designed to reconstruct fine-scale movement
+paths and emergent patterns of space use in passive acoustic telemetry
+systems.
 
 ### The centres of activity (COA) algorithm
 
 Centres of activity (COA) are one of the most widely used metrics for
-the reconstruction of patterns of space use from PAT data. Several
-methods have been developed to calculate COAs, but the mean-position
-algorithm is the commonest. To generate estimates of space use, COAs are
-usually taken as point estimates from which utilisation distributions
-(typically kernel utilisation distributions, KUDs) are estimated.
+the reconstruction of patterns of space use from passive acoustic
+telemetry data. Several methods have been developed to calculate COAs,
+but the mean-position algorithm is the commonest. To generate estimates
+of space use, COAs are usually taken as point estimates from which UDs
+(typically kernel UDs or KUDs) are estimated.
 [`flapper`](https://edwardlavender.github.io/flapper/) facilitates the
 implementation of this approach with the following functions:
 
@@ -377,11 +376,12 @@ Alongside the COA algorithm, this package introduces the
 the inferring patterns of space use.
 
 <img src="vignettes/readme_flapper_family_implementation.png"/> *The
-\`flapper’ family of algorithms. The acoustic-container depth-contour
-(ACDC) branch utilises acoustic and/or archival data to map the possible
-locations of an animal through time. The particle filtering (PF) branch
-refines these maps via the implementation of a particle simulation and
-filtering approach for the reconstruction of possible movement paths.*
+‘flapper’ family of algorithms. The acoustic-container (AC) branch
+utilises acoustic data (and/or ancillary information) to reconstruct the
+set of possible locations for an individual through time. The particle
+filtering (PF) branch refines this set via the implementation of a
+particle simulation and filtering approach for the reconstruction of
+possible movement paths.*
 
 ### AC/DC branch algorithms
 
@@ -392,24 +392,25 @@ approach only makes use of detections, the DC approach only uses depth
 observations. Specifically, this algorithm uses observed depths (± some
 error) to define the subset of possible locations of each individual
 within a defined area: for pelagic species, tagged individuals must be
-in an area where the depth is at least as deep as the observed depth;
-for benthic/demersal species, tagged individuals must be in an area
-close in depth to the observed depth. This is implemented via `dc()`.
-The ‘quick’ depth-contour (DCQ) algorithm, implemented via `dcq()`, uses
-a modified version of this algorithm for quicker run times.
+in an area where the seabed depth is at least as deep as the observed
+depth; for benthic/demersal species, tagged individuals must be in an
+area where the seabed depth is close to the observed depth. This is
+implemented via `dc()`. The ‘quick’ depth-contour (DCQ) algorithm,
+implemented via `dcq()`, uses a modified version of this algorithm for
+quicker run times.
 
-#### The acoustic-contour\* (AC\*) algorithm(s)
+#### The acoustic-container\* (AC\*) algorithm(s)
 
 The [`flapper`](https://edwardlavender.github.io/flapper/)
-family-equivalent of the COA algorithm is the acoustic-contour (AC)
+family-equivalent of the COA algorithm is the acoustic-container (AC)
 algorithm. This approach represents the information from acoustic
 detections in the form of acoustic containers, which contract and expand
-in line with the distribution of uncertainty in the individual’s
-location when it is detected and in the gaps between detections. The
-acoustic-container depth-contour (ACDC) algorithm combines the AC and DC
-algorithms, using PAT data to inform the area within which depth
+in line with our uncertainty in an individual’s location when it is
+detected and in the gaps between detections. The acoustic-container
+depth-contour (ACDC) algorithm combines the AC and DC algorithms, using
+passive acoustic telemetry data to inform the area within which depth
 contours are most likely to be found. These algorithms are implemented
-with the `acdc*()` family of functions:
+with the `ac*()` family of functions:
 
   - `acs_setup_mobility()` examines the assumption of a constant
     ‘mobility’ parameter;
@@ -422,9 +423,9 @@ with the `acdc*()` family of functions:
 
 #### AC/DC post-processing and analysis
 
-The AC/DC branch functions (`ac()`, `dc()` and `acdc()`) all return
-objects of class `acdc_archive`. These can be processed and analysed
-using several key functions:
+The AC-branch functions (`ac()`, `dc()` and `acdc()`) all return objects
+of class `acdc_archive`. These can be processed and analysed using
+several key functions:
 
   - `acdc_simplify()` simplifies `acdc_archive-class` objects into
     `acdc_record-class` objects;
@@ -456,14 +457,16 @@ process provided by the `pf*()` family of functions:
   - `pf_access_history_files()` lists particle histories saved to file;
   - `pf_access_history()` accesses particle histories;
   - `pf_access_particles_unique()` accesses unique particle samples;
-  - `pf_plot_history()` plots simulated particle histories;
-  - `pf_animate_history()` animates simulated particle histories;
-  - `pf_simplify()` assembles movement paths from particle histories;
-  - `pf_plot_map()` maps the ‘probability of use’ across an area based
-    on sampled particles or reconstructed paths;
-  - `pf_kud_1()` and `pf_kud_2()` apply kernel smoothers to sampled
+  - `pf_plot_history()` plots particle histories;
+  - `pf_animate_history()` animates particle histories;
+  - `pf_simplify()` processes particle histories and assembles movement
+    paths;
+  - `pf_plot_map()` maps the expected ‘proportion-of-use’ (POU) across
+    an area based on sampled particles or reconstructed paths;
+  - `pf_kud()` smooths POU maps using kernel smoothing;
+  - `pf_kud_1()` and `pf_kud_2()` apply kernel smoothing to sampled
     particles or reconstructed paths;
-  - `pf_loglik()` calculates the log-likelihood of reconstructed paths,
+  - `pf_loglik()` calculates the log-probability of reconstructed paths,
     given the movement model;
   - `pf_plot_1d()` plots the depth time series from observed and
     reconstructed paths;
@@ -472,16 +475,9 @@ process provided by the `pf*()` family of functions:
 
 ## Simulation tools
 
-Simulations are a valuable tool in ecology which can elucidate the
-relative performance of alternative methods for ecological inferences
-(e.g., the `COA` approach versus the `DC` approach for inferring
-patterns of space use) and the extent to which new data sources
-influence ecological inferences under different circumstances (e.g. the
-extent to which sparse or regular PAT detections improve estimates of
-space use). To this end,
 [`flapper`](https://edwardlavender.github.io/flapper/) provides
-joined-up routines for the evaluation of approaches for the estimation
-of patterns of space use under different conditions; namely:
+joined-up routines for the simulation of acoustic arrays, movement paths
+and detections at receivers:
 
   - `sim_array()` simulates alternative array designs;  
   - `sim_path_*()` functions simulate discrete-time movement paths,
@@ -494,11 +490,10 @@ of patterns of space use under different conditions; namely:
   - `sim_detections()` simulates detections at receivers arising from
     movement paths under a diversity of detection probability models;
 
-To evaluate the performance of alternative algorithms for inferring
+To evaluate the performance of alternative algorithms for reconstructing
 patterns of space use under different array designs, movement models and
 detections models, `eval_by_kud()` compares patterns of space use
-inferred from simulated and estimated movement paths using kernel
-utilisation distributions.
+reconstructed from simulated and estimated movement paths using KUDs.
 
 ## Parallelisation routines
 
@@ -541,8 +536,7 @@ the `cl_*()` function family:
 
 ## References
 
-Howe, J.A., Anderton, R., Arosio, R., Dove, D., Bradwell, T., Crump, P.,
-Cooper, R., Cocuccio, A., 2014. The seabed geomorphology and geological
+Howe, J. A. et al. (2014). The seabed geomorphology and geological
 structure of the Firth of Lorn, western Scotland, UK, as revealed by
 multibeam echo-sounder survey. Earth Environ. Sci. Trans. R. Soc.
 Edinburgh 105, 273–284. <https://doi.org/10.1017/S1755691015000146>
@@ -552,6 +546,6 @@ Edinburgh 105, 273–284. <https://doi.org/10.1017/S1755691015000146>
 Lavender, E. et al. (in prep). A semi-stochastic modelling framework for
 passive acoustic telemetry.
 
-Lavender, E. (2021). flapper: Explore Animal Space Use Within Passive
-Acoustic Telemetry Arrays. R package version 0.0.9000.
+Lavender, E. (2021). flapper: Routines for the analysis of passive
+acoustic telemetry data. R package version 0.0.9000.
 <https://github.com/edwardlavender/flapper/>

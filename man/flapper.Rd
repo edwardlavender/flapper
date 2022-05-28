@@ -3,9 +3,9 @@
 \docType{package}
 \name{flapper}
 \alias{flapper}
-\title{flapper: An R Package to Explore Animal Space Use Within Passive Acoustic Telemetry Arrays}
+\title{\code{flapper}: Routines for the analysis of passive acoustic telemetry data}
 \description{
-flapper is an R package designed to facilitate the use of passive acoustic telemetry (PAT) data for ecological inferences, especially those pertaining to animal space use. This includes functions for processing PAT data, spatial tools, new algorithms for inferring space use and simulations designed to evaluate the efficacy of existing and new algorithms for inferring space use. Package development has been motivated by the collection of PAT data for a Critically Endangered benthopelagic elasmobranch (the flapper skate, \emph{Dipturus intermedius}) off the west coast of Scotland.
+\code{flapper} is an R package that provides routines for the analysis of passive acoustic telemetry data, including for data processing, description (via detection statistics and movement metrics), modelling and simulation. These routines are supported by a series of helper functions (including distance calculators, spatial tools and parallelisation options). The main contribution is the provision of a family of algorithms for movement modelling in passive acoustic telemetry systems that permits the reconstruction of fine-scale movement paths and emergent patterns of space use. Package development has been motivated by passive acoustic telemetry data from a Critically Endangered benthic elasmobranch (the flapper skate, \emph{Dipturus intermedius}) off the west coast of Scotland.
 }
 \section{Data processing}{
 
@@ -35,7 +35,7 @@ Some functions facilitate the acquisition, assembly, processing and checking of 
 
 \section{Spatial tools}{
 
-Some functions facilitate spatial operations that support ecological investigations and space use algorithms:
+Some functions facilitate spatial operations that support common tasks and modelling algorithms:
 \itemize{
   \item \link{buffer_and_crop} buffers a spatial object (e.g., receiver locations) and uses this buffered object to crop another (e.g., the local bathymetry);
   \item \link{get_intersection} intersects spatial geometries;
@@ -47,7 +47,7 @@ Some functions facilitate spatial operations that support ecological investigati
   \item \link{sim_surface} populates a \code{\link[raster]{raster}} with simulated values;
   \item \link{split_raster_equally} splits a \code{\link[raster]{raster}} into equal pieces (using code from the greenbrown (http://greenbrown.r-forge.r-project.org) package);
   \item \link{update_extent} shrinks or inflates an extent object;
-  \item \link{segments_cross_barrier} determines if Euclidean path segments cross a barrier;
+  \item \link{segments_cross_barrier} determines if Euclidean transects cross a barrier;
 }
 }
 
@@ -116,9 +116,9 @@ Building on the analysis of detection time series, some functions provide moveme
 }
 }
 
-\section{Space use algorithms}{
+\section{Modelling algorithms}{
 
-The main thrust of flapper is the implementation of existing and new algorithms designed to infer space use from PAT and archival data:
+The main thrust of flapper is the implementation of existing and new algorithms designed to reconstruct fine-scale movement paths and emergent patterns of space use in passive acoustic telemetry systems:
 \itemize{
   \item The centres of activity (COA) algorithm
   \itemize{
@@ -164,12 +164,13 @@ The main thrust of flapper is the implementation of existing and new algorithms 
       \item \link{pf_access_history_files} lists particle histories saved to file;
       \item \link{pf_access_history} accesses particle histories;
       \item \link{pf_access_particles_unique} accesses unique particle samples;
-      \item \link{pf_plot_history} plots simulated particle histories;
-      \item \link{pf_animate_history} animates simulated particle histories;
+      \item \link{pf_plot_history} plots particle histories;
+      \item \link{pf_animate_history} animates particle histories;
       \item \link{pf_simplify} assembles movement paths from particle histories;
-      \item \link{pf_plot_map} maps the `probability of use' across an area based on sampled particles or reconstructed paths;
-      \item \link{pf_kud_1} and \link{pf_kud_2} apply kernel smoothers to sampled particles or reconstructed paths;
-      \item \link{pf_loglik} calculates the log-likelihood of reconstructed paths, given the movement model;
+      \item \link{pf_plot_map} maps the `proportion-of =use' across an area based on sampled particles or reconstructed paths;
+      \item \link{pf_kud} smooths POU maps using kernel smoothing;
+      \item \link{pf_kud_1} and \link{pf_kud_2} apply kernel smoothing to sampled particles or reconstructed paths;
+      \item \link{pf_loglik} calculates the log-probability of reconstructed paths, given the movement model;
       \item \link{pf_plot_1d} plots the depth time series from observed and reconstructed paths;
       \item \link{pf_plot_2d} maps the reconstructed paths in two-dimensions;
       \item \link{pf_plot_3d} maps the reconstructed paths in three-dimensions;
@@ -180,7 +181,7 @@ The main thrust of flapper is the implementation of existing and new algorithms 
 
 \section{Simulations}{
 
-A set of \code{sim_*()} functions provide an integrated workflow for the simulation of receiver arrays, movement paths and detections under different array designs, movement models and detection models for the evaluation of data processing decisions and the relative merits of alternative space use algorithms under different conditions:
+A set of \code{sim_*()} functions provide an integrated workflow for the simulation of receiver arrays, movement paths and detections under different array designs, movement models and detection models:
 \itemize{
   \item \link{sim_array} simulates alternative array designs;
   \item \link{sim_path_*} functions simulate discrete-time movement paths, including:
