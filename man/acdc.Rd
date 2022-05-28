@@ -30,9 +30,9 @@ acdc(
 \arguments{
 \item{acoustics}{A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{ac}}).}
 
-\item{archival}{A dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; and a POSIXct vector of time stamps when observations were made, named `timestamp'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Both acoustic and archival time series are rounded to the resolution of \code{archival} observations to ensure alignment (see Details). `Duplicate' observations (of the same individual at the same receiver, if applicable, in the same time step) are dropped.}
+\item{archival}{A dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example) for a specific individual. This should contain the following columns: a numeric vector of observed depths, named `depth'; and a POSIXct vector of time stamps when observations were made, named `timestamp'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals. Both acoustic and archival time series are rounded to the resolution of \code{archival} observations to ensure alignment (see Details). `Duplicate' observations (of the same individual at the same receiver, if applicable, in the same time step) are dropped.}
 
-\item{plot_ts}{A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.}
+\item{plot_ts}{A logical input that defines whether or not to plot the detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.}
 
 \item{bathy}{A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acs_setup_containers}}).}
 
@@ -70,12 +70,12 @@ acdc(
 The function returns an \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
 }
 \description{
-This function implements the acoustic-container depth-contour (ACDC) algorithm. This is an extension of the AC algorithm implemented by \code{\link[flapper]{ac}} that that integrates acoustic detections and depth observations to infer where tagged animals could have spent more or less time over the period of observations. To implement the function, a dataframe (or list) of passive acoustic telemetry detections is required (\code{acoustics}), alongside a dataframe of depth observations (\code{archival}). At each time step, the algorithm integrates information from past and future acoustic detections in the form of acoustic containers and information from depth observations in the form of depth contours to determine the possible locations of an individual in an area (see Details). As for the AC algorithm (\code{\link[flapper]{ac}}), the function can be implemented step-wise or chunk-wise and the outputs can be processed via \code{\link[flapper]{acdc_simplify}}.
+This function implements the acoustic-container depth-contour (ACDC) algorithm. This is an extension of the AC algorithm implemented by \code{\link[flapper]{ac}} that that integrates acoustic detections and depth observations to the expected time spent in different parts of a study area over the period of observations. To implement the function, a dataframe (or list) of passive acoustic telemetry detections is required (\code{acoustics}), alongside a dataframe of depth observations (\code{archival}). At each time step, the algorithm integrates information from past and future acoustic detections in the form of acoustic containers and information from depth observations in the form of depth contours to determine the possible locations of an individual in an area (see Details). As for the AC algorithm (\code{\link[flapper]{ac}}), the function can be implemented step-wise or chunk-wise and the outputs can be processed via \code{\link[flapper]{acdc_simplify}}.
 }
 \details{
 The acoustic-container depth-contour (ACDC) algorithm is an approach which integrates acoustic detections and depth observations to infer the possible locations of tagged animals within an area over some time interval. The locational information provided by acoustic detections is represented by acoustic containers, which are areas around receivers that define where an individual could have been at each time point given the spatiotemporal pattern of detections at receivers, a model of detection probability and a movement parameter (see \code{\link[flapper]{ac}}). The locational information provided by depth observations is represented by depth contours, which are areas that define where an individual could have been at each time point given its depth and the local bathymetry (see \code{\link[flapper]{dc}}).
 
-In outline, the crux of the approach is the recognition that acoustic detections typically occur irregularly, while archival observations occur at regular intervals. Each detection anchors our knowledge of the location of an individual around a particular receiver (assuming that all detections are true detections). As time passes between acoustic detections, our uncertainty about the geographical location of an individual expands around the receiver at which it was detected before shrinking towards the receiver at which it was next detected. (This is the AC algorithm.) During this time, regular depth observations restrict the number of possible locations in which the individual could have been located at each time step, assuming that the bathymetric landscape is non-homogeneous. This is true both for pelagic species, which must be in an area where the depth is at least as deep as the observed depth, and for benthic/demersal species, which must be in an area relatively close in depth to the observed depth. (This is the DC algorithm.) In reality, the timing of acoustic and archival detections may not align perfectly between two detections; this is currently resolved by rounding the acoustic time series to the resolution of depth observations (see also \code{\link[flapper]{ac}}). In this way, the ACDC algorithm moves over acoustic and archival time steps, summing the positions in which individuals could have been located based on these two sources of data, to generate a map of that shows where the individual could have spent more or less (or no) time over the time interval under consideration.
+In outline, the crux of the approach is the recognition that acoustic detections typically occur irregularly, while archival observations occur at regular intervals. Each detection anchors our knowledge of the location of an individual around a particular receiver (assuming that all detections are true detections). As time passes between acoustic detections, our uncertainty about the geographical location of an individual expands around the receiver at which it was detected before shrinking towards the receiver at which it was next detected. (This is the AC algorithm.) During this time, regular depth observations restrict the number of possible locations in which the individual could have been located at each time step, assuming that the bathymetric landscape is non-homogeneous. This is true both for pelagic species, which must be in an area where the depth of the seabed is at least as deep as the observed depth, and for benthic/demersal species, which must be in an area where the depth of the seabed is relatively close to the observed depth. (This is the DC algorithm.) In reality, the timing of acoustic and archival observations may not align perfectly; this is currently resolved by rounding the acoustic time series to the temporal resolution of depth observations (see also \code{\link[flapper]{ac}}). In this way, the ACDC algorithm moves over acoustic and archival time steps, summing the positions in which individuals could have been located based on these two sources of data, to generate a map of that shows expected time spent in different parts of the study area over the time interval under consideration.
 }
 \examples{
 #### Step (1) Implement setup_acdc_*() steps
@@ -142,7 +142,7 @@ out_acdc <- acdc(acoustics = acc,
                  save_record_spatial = NULL
                  )
 
-#### Example (4): Implement the algorithm in parallel by supplying a cluster
+#### Example (4): Implement the algorithm in parallel e.g. by supplying a cluster
 # If verbose = TRUE (the default), it is necessary to specify a directory
 # ... into which dot_acdc_log_*.txt files are saved (i.e., messages
 # ... cannot be written to the console in parallel)
@@ -189,68 +189,69 @@ out_acdc <- acdc(acoustics = acc,
                  split = "2 hours"
                  )
 ## Passing a list of dataframes
-# This option can provide more flexibility than split, which only
-# ... understands time categories supported by lubridate::floor_date()
+# This option can provide more flexibility than split.
 # ... This example could also be used using split, as described above,
 # ... but this is not the case for all time categories (e.g., seasons).
 acc$chunk <- cut(acc$timestamp, "2 hours")
-acc_ls <- split(acc, acc$chunk)
-out_acdc <- acdc(acoustics = acc_ls,
-                 archival = arc,
-                 bathy = dat_gebco,
-                 detection_containers = dat_containers,
-                 mobility = 200,
-                 calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                 con = tempdir(),
-                 cl = parallel::makeCluster(2L)
-                 )
+acc_ls    <- split(acc, acc$chunk)
+out_acdc  <- acdc(acoustics = acc_ls,
+                  archival = arc,
+                  bathy = dat_gebco,
+                  detection_containers = dat_containers,
+                  mobility = 200,
+                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+                  con = tempdir(),
+                  cl = parallel::makeCluster(2L)
+                  )
 
 #### Example (5) Implement the algorithm for multiple individuals
 # ... To do this, it is necessary to apply the function iteratively
 # ... to each individual.
 # Pre-processing to define computation time
 # ... E.g., careful definition of time series
-# Define cluster
-cluster <- FALSE
-if(cluster){
-  cl <- parallel::makeCluster(2L)
-  parallel::clusterExport(cl = cl, varlist = c("acdc",
-                                               "dat_archival",
-                                               "dat_gebco",
-                                               "dat_containers"
-                                                ))
-} else cl <- NULL
-# Implement algorithm for each individual
-acdc_out_by_id <-
-  pbapply::pblapply(split(dat_acoustics, dat_acoustics$individual_id), cl = cl, function(acc){
-    # Define individual-specific folder in which to save function logs
-    dir_global <- paste0(tempdir(), "/")
-    dir_id     <- paste0(dir_global, acc$individual_id[1], "/")
-    if(!dir.exists(dir_id)) dir.create(dir_id)
-    # Focus on a small sample of time series for speed
-    acc <- acc[1:3, ]
-    # Isolate archival data for individual
-    arc <- dat_archival[dat_archival$individual_id == acc$id[1], ]
-    # Implement algorithm
-    acdc_out <- acdc(acoustics = acc,
-                     archival = dat_archival,
-                     bathy = dat_gebco,
-                     detection_containers = dat_containers,
-                     mobility = 200,
-                     calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                     save_record_spatial = 1:10L,
-                     con = dir_id
-                     )
-    # Include logs in output
-    acdc_log <- lapply(list.files(dir_id, full.names = TRUE), readLines)
-    # Simplify the results at this stage or outside of this loop
-    # ... using acdc_simplify()
-    # Return results for specified individual
-    out <- list(acdc_id = acc$individual_id[1], acdc_out = acdc_out, acdc_log = acdc_log)
-    return(out)
-  })
-if(!is.null(cl)) parallel::stopCluster(cl)
-summary(acdc_out_by_id)
+if(flapper_run_slow){
+  # Define cluster
+  cluster <- FALSE
+  if(cluster){
+    cl <- parallel::makeCluster(2L)
+    parallel::clusterExport(cl = cl, varlist = c("acdc",
+                                                 "dat_archival",
+                                                 "dat_gebco",
+                                                 "dat_containers"
+                                                  ))
+  } else cl <- NULL
+  # Implement algorithm for each individual
+  acdc_out_by_id <-
+    pbapply::pblapply(split(dat_acoustics, dat_acoustics$individual_id), cl = cl, function(acc){
+      # Define individual-specific folder in which to save function logs
+      dir_global <- paste0(tempdir(), "/")
+      dir_id     <- paste0(dir_global, acc$individual_id[1], "/")
+      if(!dir.exists(dir_id)) dir.create(dir_id)
+      # Focus on a small sample of time series for speed
+      acc <- acc[1:3, ]
+      # Isolate archival data for individual
+      arc <- dat_archival[dat_archival$individual_id == acc$id[1], ]
+      # Implement algorithm
+      acdc_out <- acdc(acoustics = acc,
+                       archival = dat_archival,
+                       bathy = dat_gebco,
+                       detection_containers = dat_containers,
+                       mobility = 200,
+                       calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+                       save_record_spatial = 1:10L,
+                       con = dir_id
+                       )
+      # Include logs in output
+      acdc_log <- lapply(list.files(dir_id, full.names = TRUE), readLines)
+      # Simplify the results at this stage or outside of this loop
+      # ... using acdc_simplify()
+      # Return results for specified individual
+      out <- list(acdc_id = acc$individual_id[1], acdc_out = acdc_out, acdc_log = acdc_log)
+      return(out)
+    })
+  if(!is.null(cl)) parallel::stopCluster(cl)
+  summary(acdc_out_by_id)
+}
 
 #### Step (3) Simplify the function outputs
 # This step aggregates information across chunks, which is necessary to
