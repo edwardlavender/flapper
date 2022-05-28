@@ -4,7 +4,7 @@
 \alias{pf_kud_}
 \alias{pf_kud_1}
 \alias{pf_kud_2}
-\title{Apply kernel smoothing to particles or paths from a PF algorithm}
+\title{(Experimental) Alternative kernel smoothing routines for particles or paths from a PF algorithm}
 \usage{
 pf_kud_1(
   xpf,
