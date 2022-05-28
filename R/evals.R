@@ -22,7 +22,7 @@
 #'
 #' @examples
 #' #### Steps
-#' # We need to simulate an array, a movement path through this arra
+#' # We need to simulate an array, a movement path through this array
 #' # ... and detections arising at receivers given this path. Then, we need to
 #' # ... implement a space use algorithm (e.g., coa()) to estimate the movement
 #' # ... 'path' from the observed data (detections). With the simulated and
