@@ -2,7 +2,7 @@
 % Please edit documentation in R/acdc_analyse_record.R
 \name{acdc_plot_trace}
 \alias{acdc_plot_trace}
-\title{Plot AC* centroid dynamics}
+\title{Plot AC* container dynamics}
 \usage{
 acdc_plot_trace(
   record,
@@ -14,10 +14,10 @@ acdc_plot_trace(
   add_receiver_2 = list(pch = 4, lwd = 2, col = "darkorange"),
   add_receiver_3 = list(pch = 4, lwd = 1, col = "darkred"),
   add_receiver_n = list(pch = 4, lwd = 2),
-  add_centroid_ap = list(col = "darkgreen"),
-  add_centroid_an = list(col = "darkgreen"),
-  add_centroid_b = list(col = "darkorange"),
-  add_centroid_c = list(col = scales::alpha("forestgreen", 0.5), density = 20),
+  add_container_ap = list(col = "darkgreen"),
+  add_container_an = list(col = "darkgreen"),
+  add_container_b = list(col = "darkorange"),
+  add_container_c = list(col = scales::alpha("forestgreen", 0.5), density = 20),
   add_coastline = list(),
   add_main = list(),
   ...,
@@ -39,11 +39,11 @@ acdc_plot_trace(
 
 \item{add_receiver_1, add_receiver_2, add_receiver_3, add_receiver_n}{Named lists of arguments, passed to \code{\link[graphics]{points}}, to customise the appearance of receivers. \code{add_receiver_1} controls the appearance of the `current' receiver (at which the individual was last or has just been detected); \code{add_receiver_2} controls the appearance of the receiver at which the individual was next detected; \code{add_receiver_3} controls the appearance of the third receiver at which the individual was detected; and \code{add_receiver_n} controls the appearance of all remaining active receivers.}
 
-\item{add_centroid_ap, add_centroid_an, add_centroid_b, add_centroid_c}{Named lists of arguments that control the appearance of acoustic centroids. (\code{centroid_ap} defines the boundaries of the individual's location from the perspective of its previous location; \code{centroid_an} defines the boundaries of the individual's location at the moment of detection from the perspective of the receiver that recorded the detection; \code{centroid_b} defines the boundaries of the individual's location from the perspective of the receiver at which the individual was next detected; and \code{centroid_c} defines the boundaries of the individual's location integrated across all of these perspectives; see \code{\link[flapper]{acdc_record-class}}.) \code{add_centroid_ap,add_centroid_an} and \code{add_centroid_b} are passed to \code{\link[raster]{lines,SpatialPolygons-method}} and \code{add_centroid_c} is passed to \code{\link[raster]{plot}}.}
+\item{add_container_ap, add_container_an, add_container_b, add_container_c}{Named lists of arguments that control the appearance of acoustic containers. (\code{container_ap} defines the boundaries of the individual's location from the perspective of its previous location; \code{container_an} defines the boundaries of the individual's location at the moment of detection from the perspective of the receiver that recorded the detection; \code{container_b} defines the boundaries of the individual's location from the perspective of the receiver at which the individual was next detected; and \code{container_c} defines the boundaries of the individual's location integrated across all of these perspectives; see \code{\link[flapper]{acdc_record-class}}.) \code{add_container_ap,add_container_an} and \code{add_container_b} are passed to \code{\link[raster]{lines,SpatialPolygons-method}} and \code{add_container_c} is passed to \code{\link[raster]{plot}}.}
 
 \item{add_coastline}{A named list of arguments, passed to \code{\link[raster]{plot}}, to add coastline to each plot.}
 
-\item{add_main}{A named list of arguments, passed to \code{\link[graphics]{mtext}}, to customise the appearance of the plot title. Default plot titles are structured as follows: `Map for t = cumulative time step (detection time step [intermediate time step] time stamp'. When the intermediate time step is one, the individual is detected. At subsequent intermediate time steps, acoustic centroids expand and contract.}
+\item{add_main}{A named list of arguments, passed to \code{\link[graphics]{mtext}}, to customise the appearance of the plot title. Default plot titles are structured as follows: `Map for t = cumulative time step (detection time step [intermediate time step] time stamp'. When the intermediate time step is one, the individual is detected. At subsequent intermediate time steps, acoustic containers expand and contract.}
 
 \item{...}{Additional plot customisation options passed to \code{\link[prettyGraphics]{pretty_map}}.}
 
@@ -51,17 +51,17 @@ acdc_plot_trace(
 
 \item{png_param}{(optional) A named list of arguments, passed to \code{\link[grDevices]{png}}, to save plots to file. If supplied, the plot for each time step is saved separately. The `filename' argument should be the directory in which plots are saved. Plots are then saved as "1.png", "2.png" and so on. If supplied, \code{prompt} is ignored (see below).}
 
-\item{prompt}{If \code{png_param} is not specified, \code{prompt} is a logical variable that defines whether or not to pause function execution between plots and between centroids within plots to facilitate interpretation.}
+\item{prompt}{If \code{png_param} is not specified, \code{prompt} is a logical variable that defines whether or not to pause function execution between plots and between containers within plots to facilitate interpretation.}
 }
 \value{
-The function returns, for each time step, a plot of the location-probability surface and acoustic centroids.
+The function returns, for each time step, a plot of the location-probability surface and acoustic containers.
 }
 \description{
-This function visually reconstructs the dynamics of an acoustic-centroid algorithm (i.e., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).
+This function visually reconstructs the dynamics of an acoustic-container algorithm (i.e., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).
 
 To implement the function, an \code{\link[flapper]{acdc_record-class}} object (\code{record}) from \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} that defines the outputs of the AC* algorithm is required. A \code{\link[sp]{SpatialPointsDataFrame}} that defines receiver locations and a matrix that defines the daily operational status of each receiver are also required.
 
-For each time step, the function plots the location-probability surface, the receiver(s) at which the individual was detected and the acoustic centroids, illustrating how the expansion, contraction and intersection of acoustic centroids capture the boundaries of an individual's location through time.
+For each time step, the function plots the location-probability surface, the receiver(s) at which the individual was detected and the acoustic containers, illustrating how the expansion, contraction and intersection of acoustic containers capture the boundaries of an individual's location through time.
 }
 \examples{
 #### Prepare example AC algorithm outputs with spatial files
@@ -103,21 +103,21 @@ grid <- raster::crop(grid, ext)
 grid <- raster::trim(grid)
 raster::plot(grid)
 
-## Define detection centroids/probability kernels
-# Define detection centroids
+## Define detection containers/probability kernels
+# Define detection containers
 moorings <- raster::crop(moorings, grid)
-dat_centroid <- acs_setup_centroids(xy = moorings,
+dat_container <- acs_setup_containers(xy = moorings,
                                     detection_range = 425,
                                     coastline = dat_coast,
                                     boundaries = ext,
                                     plot = TRUE,
                                     resolution = 10,
                                     verbose = TRUE)
-# Define detection centroid overlaps
-centroids_spdf      <- do.call(raster::bind, plyr::compact(dat_centroids))
-centroids_spdf@data <- dat_moorings
-dat_centroids_overlaps <-
-  get_detection_centroids_overlap(centroids = centroids_spdf,
+# Define detection container overlaps
+containers_spdf      <- do.call(raster::bind, plyr::compact(dat_containers))
+containers_spdf@data <- dat_moorings
+dat_containers_overlaps <-
+  get_detection_containers_overlap(containers = containers_spdf,
                                   services = NULL)
 # Define detection probability kernels
 calc_dpr <-
@@ -126,8 +126,8 @@ calc_dpr <-
   }
 dat_kernels <- acs_setup_detection_kernels(xy = moorings,
                                            services = NULL,
-                                           centroids = dat_centroids,
-                                           overlaps = dat_centroids_overlaps,
+                                           containers = dat_containers,
+                                           overlaps = dat_containers_overlaps,
                                            calc_detection_pr = calc_dpr,
                                            bathy = grid)
 
@@ -135,9 +135,9 @@ dat_kernels <- acs_setup_detection_kernels(xy = moorings,
 out_ac <- ac(acoustics = acc,
              step = 120,
              bathy = grid,
-             detection_centroids = dat_centroids,
+             detection_containers = dat_containers,
              detection_kernels = dat_kernels,
-             detection_kernels_overlap = dat_centroids_overlaps,
+             detection_kernels_overlap = dat_containers_overlaps,
              mobility = 200,
              save_record_spatial = NULL
              )

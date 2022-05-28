@@ -16,7 +16,7 @@ The `time' element is a dataframe that defines the times of sequential stages in
 The `args' element is a named list of user inputs that records the parameters used to generate the outputs.
 }
 \description{
-An S3 class that defines the object returned by an acoustic-centroid/depth-contour (AC/DC) algorithm (\code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}).
+An S3 class that defines the object returned by an acoustic-container/depth-contour (AC/DC) algorithm (\code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}).
 }
 \author{
 Edward Lavender

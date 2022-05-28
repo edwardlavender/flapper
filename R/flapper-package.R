@@ -68,9 +68,9 @@
 #' Some functions facilitate the calculation of detection statistics, including those related to sampling effort and to detections of individuals:
 #' \itemize{
 #'   \item \link{get_detection_pr} calculates detection probability given a model for detection probability with distance;
-#'   \item \link{get_detection_centroids} defines detection centroids (areas within the maximum detection range) around receivers;
-#'   \item \link{get_detection_centroids_overlap} identifies receivers with overlapping detection centroids in space and time;
-#'   \item \link{get_detection_centroids_envir} extracts environmental conditions from within receiver detection ranges, accounting for detection probability;
+#'   \item \link{get_detection_containers} defines detection containers (areas within the maximum detection range) around receivers;
+#'   \item \link{get_detection_containers_overlap} identifies receivers with overlapping detection containers in space and time;
+#'   \item \link{get_detection_containers_envir} extracts environmental conditions from within receiver detection ranges, accounting for detection probability;
 #'   \item \link{get_detection_area_sum} calculates the total area surveyed by receivers;
 #'   \item \link{get_detection_area_ts} defines a time series of the area surveyed by receivers;
 #'   \item \link{get_n_operational_ts} defines a time series of the number of operational units (e.g., individuals at liberty or active receivers);
@@ -121,12 +121,12 @@
 #'          \item \link{dc} implements the DC algorithm;
 #'          \item \link{dcq} implements the quick DC (DCQ) algorithm;
 #'          }
-#'      \item The acoustic-centroid* (AC*) algorithms
+#'      \item The acoustic-container* (AC*) algorithms
 #'      \itemize{
 #'         \item \link{acs_setup_mobility} examines the assumption of a constant `mobility' parameter;
-#'         \item \link{acs_setup_centroids} defines the detection centroids for the algorithm(s);
+#'         \item \link{acs_setup_containers} defines the detection containers for the algorithm(s);
 #'         \item \link{acs_setup_detection_kernels} defines detection probability kernels for the algorithm(s);
-#'         \item \link{ac} and \link{acdc} implement the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms, via \link{.acs_pl} and \link{.acs};
+#'         \item \link{ac} and \link{acdc} implement the acoustic-container (AC) and acoustic-container depth-contour (ACDC) algorithms, via \link{.acs_pl} and \link{.acs};
 #'          }
 #'      \item AC/DC processing
 #'      \itemize{
@@ -135,7 +135,7 @@
 #'         \item \link{acdc_access_dat} accesses stored dataframes in an \link{acdc_record-class} object object;
 #'         \item \link{acdc_access_timesteps} accesses the total number of time steps in an \link{acdc_record-class} object;
 #'         \item \link{acdc_access_maps} accesses stored maps in an \link{acdc_record-class} object;
-#'         \item \link{acdc_plot_trace} plots acoustic centroid dynamics;
+#'         \item \link{acdc_plot_trace} plots acoustic container dynamics;
 #'         \item \link{acdc_plot_record} plots the results of the algorithm(s);
 #'         \item \link{acdc_animate_record} creates html animations of the algorithm(s);
 #'         }

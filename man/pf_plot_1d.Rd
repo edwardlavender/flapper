@@ -34,7 +34,7 @@ pf_plot_1d(
 The function returns a plot of the observed and reconstructed depth time series, either for all paths at once (if \code{prompt = FALSE}) or each path separately (if \code{prompt = TRUE}).
 }
 \description{
-This function plots the observed depth time series and the depth time series associated with each path reconstructed by the depth-contour particle filtering (DCPF) or acoustic-centroid depth-contour particle filtering (ACDCPF) algorithm.
+This function plots the observed depth time series and the depth time series associated with each path reconstructed by the depth-contour particle filtering (DCPF) or acoustic-container depth-contour particle filtering (ACDCPF) algorithm.
 }
 \details{
 Observed and reconstructed depth time series can differ due to measurement error, which is controlled via the \code{calc_depth_error} function in the DC and ACDC algorithms (see \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}).

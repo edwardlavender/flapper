@@ -57,8 +57,8 @@ rownames(dat_moorings) <- dat_moorings$receiver_id
 dat_coast_fol <- readRDS(url("https://biogeo.ucdavis.edu/data/gadm3.6/Rsp/gadm36_GBR_0_sp.rds"))
 ## Open source bathymetry data
 # Define a buffered region around the receivers for which to obtain bathymetry data
-proj_wgs84  <- sp::CRS(SRS_string = "EPSG:4326")
-proj_utm    <- sp::CRS(SRS_string = "EPSG:32629")
+proj_wgs84   <- sp::CRS(SRS_string = "EPSG:4326")
+proj_utm     <- sp::CRS(SRS_string = "EPSG:32629")
 rxy_wgs84    <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 rxy_utm      <- sp::spTransform(rxy_wgs84, proj_utm)
 rxy_utm_buf  <- rgeos::gBuffer(rxy_utm, width = 1000)
@@ -70,7 +70,7 @@ bounds_wgs84 <- sp::spTransform(bounds_utm, proj_wgs84)
 # Use these coordinates to download manually Open source GEBCO bathymetry data from https://download.gebco.net
 # Data source: GEBCO Compilation Group (2019) GEBCO 2019 Grid (doi:10.5285/836f016a-33be-6ddc-e053-6c86abc0788e)
 # Data saved in /data_raw/
-dat_gebco_fol <- raster::raster("./data-raw/gebco_2020_n56.53355_s56.34059_w-5.786025_e-5.562533.tif")
+dat_gebco_fol <- raster::raster("gebco_2020_n56.53355_s56.34059_w-5.786025_e-5.562533.tif")
 
 #### Process spatial data
 # Crop coastline to boundaries
@@ -78,6 +78,7 @@ area <- raster::extent(bounds_wgs84)
 dat_coast_fol <- raster::crop(dat_coast_fol, area)
 # Use spatial data with UTM coordinates
 dat_coast <- sp::spTransform(dat_coast_fol, proj_utm)
+raster::crs(dat_gebco) <- proj_wgs84
 dat_gebco <- raster::projectRaster(dat_gebco_fol, crs = proj_utm)
 # Process bathymetry data to remove observations on land
 dat_gebco[dat_gebco[] >= 0] <- NA
@@ -150,6 +151,7 @@ prettyGraphics::pretty_map(add_rasters = list(x = surface),
 dat_dc <- dc(archival = depth,
              bathy = surface,
              calc_depth_error = function(...) matrix(c(-30, 30), nrow = 2),
+             normalise = TRUE,
              save_record_spatial = 0L,
              save_args = TRUE
              )
@@ -188,7 +190,7 @@ file.size(paste0(tempdir(), "/dat_dcpf_histories.rds"))/1e6
 
 #####################################
 #### dat_acdc_contours:
-# ... an example dataset of detection centroids required for ACDC algorithm
+# ... an example dataset of detection containers required for ACDC algorithm
 # ... useful for demonstrating the acdc algorithm
 
 ## Define data for setup_acdc()
@@ -204,9 +206,9 @@ xy_utm <-
   sp::SpatialPointsDataFrame(xy_utm,
                              dat_moorings[, "receiver_id", drop = FALSE])
 
-## Define a list of centroids with specified parameters
+## Define a list of containers with specified parameters
 # Use reduced 'quadsegs' param to minimise file size
-dat_centroids <- acs_setup_centroids(xy = xy_utm,
+dat_containers <- acs_setup_containers(xy = xy_utm,
                                      detection_range = 425,
                                      coastline = dat_coast,
                                      boundaries = raster::extent(dat_gebco),
@@ -214,8 +216,8 @@ dat_centroids <- acs_setup_centroids(xy = xy_utm,
                                      resolution = 5,
                                      verbose = TRUE)
 # Check size (Mb) of file prior to inclusion in package
-saveRDS(dat_centroids, paste0(tempdir(), "/dat_centroids.rds"))
-file.size(paste0(tempdir(), "/dat_centroids.rds"))/1e6
+saveRDS(dat_containers, paste0(tempdir(), "/dat_containers.rds"))
+file.size(paste0(tempdir(), "/dat_containers.rds"))/1e6
 
 
 #####################################
@@ -248,9 +250,10 @@ par(pp)
 dat_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_centroids = dat_centroids,
+                 detection_containers = dat_containers,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+                 normalise = TRUE,
                  save_record_spatial = 1:3,
                  progress = 3L,
                  verbose = TRUE,
@@ -268,8 +271,8 @@ file.size(paste0(tempdir(), "/dat_acdc.rds"))/1e6
 #####################################
 #### Global flapper options
 
-flapper_run_parallel <- FALSE # TRUE
-flapper_run_slow     <- FALSE # TRUE
+flapper_run_parallel <- TRUE # TRUE
+flapper_run_slow     <- TRUE # TRUE
 
 
 #####################################
@@ -287,7 +290,7 @@ usethis::use_data(dat_archival, overwrite = TRUE)
 usethis::use_data(dat_coast, overwrite = TRUE)
 usethis::use_data(dat_gebco, overwrite = TRUE)
 # function example data
-usethis::use_data(dat_centroids, overwrite = TRUE)
+usethis::use_data(dat_containers, overwrite = TRUE)
 usethis::use_data(dat_dc, overwrite = TRUE)
 usethis::use_data(dat_acdc, overwrite = TRUE)
 usethis::use_data(dat_dcpf_histories, overwrite = TRUE)

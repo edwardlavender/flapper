@@ -67,7 +67,7 @@
 #'   \item{receiver_depth}{The depth of the receiver at which the individual was detected (see \code{\link{dat_moorings}}).}
 #' }
 #'
-#' @details Time stamps are expressed to the nearest two minutes. `Duplicate' detections (of the same individual at the same receiver in the same time step) are excluded. This supports the implementation of the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms (see \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}).
+#' @details Time stamps are expressed to the nearest two minutes. `Duplicate' detections (of the same individual at the same receiver in the same time step) are excluded. This supports the implementation of the acoustic-container (AC) and acoustic-container depth-contour (ACDC) algorithms (see \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}).
 #'
 #' @source Data were collected by, and belong to, Marine Scotland Science and NatureScot. Data were processed by Edward Lavender. If you wish to use these data, please contact Marine Scotland Science and NatureScot for further information.
 #'
@@ -154,13 +154,13 @@
 
 #####################################
 #####################################
-#### dat_centroids
+#### dat_containers
 
-#' @title Example detection centroids from \code{\link[flapper]{acs_setup_centroids}}
-#' @description A list of detection centroids created by \code{\link[flapper]{acs_setup_centroids}}. This is included principally to streamline function examples.
+#' @title Example detection containers from \code{\link[flapper]{acs_setup_containers}}
+#' @description A list of detection containers created by \code{\link[flapper]{acs_setup_containers}}. This is included principally to streamline function examples.
 #'
-#' @format A list with 57 elements, one for each receiver from 1:max(\code{\link[flapper]{dat_moorings}$receiver_id}). Each element contains a SpatialPolygonsDataFrame with the detection centroid for that receiver, under a detection range of 425 m and within the boundaries defined by \code{\link[flapper]{dat_coast}} and \code{\link[flapper]{dat_gebco}}.
-"dat_centroids"
+#' @format A list with 57 elements, one for each receiver from 1:max(\code{\link[flapper]{dat_moorings}$receiver_id}). Each element contains a SpatialPolygonsDataFrame with the detection container for that receiver, under a detection range of 425 m and within the boundaries defined by \code{\link[flapper]{dat_coast}} and \code{\link[flapper]{dat_gebco}}.
+"dat_containers"
 
 
 #####################################

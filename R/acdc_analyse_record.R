@@ -101,12 +101,12 @@ acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"),
 ######################################
 #### acdc_plot_trace()
 
-#' @title Plot AC* centroid dynamics
-#' @description This function visually reconstructs the dynamics of an acoustic-centroid algorithm (i.e., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).
+#' @title Plot AC* container dynamics
+#' @description This function visually reconstructs the dynamics of an acoustic-container algorithm (i.e., \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}).
 #'
 #' To implement the function, an \code{\link[flapper]{acdc_record-class}} object (\code{record}) from \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} that defines the outputs of the AC* algorithm is required. A \code{\link[sp]{SpatialPointsDataFrame}} that defines receiver locations and a matrix that defines the daily operational status of each receiver are also required.
 #'
-#' For each time step, the function plots the location-probability surface, the receiver(s) at which the individual was detected and the acoustic centroids, illustrating how the expansion, contraction and intersection of acoustic centroids capture the boundaries of an individual's location through time.
+#' For each time step, the function plots the location-probability surface, the receiver(s) at which the individual was detected and the acoustic containers, illustrating how the expansion, contraction and intersection of acoustic containers capture the boundaries of an individual's location through time.
 #'
 #' @param record A \code{\link[flapper]{acdc_record-class}} object from \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}}.
 #' @param plot An integer vector that defines the time steps for which to make plots. If \code{plot = NULL}, the function will make a plot for all time steps for which the necessary information is available in \code{record}.
@@ -114,15 +114,15 @@ acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"),
 #' @param moorings_matrix A matrix that defines, for each day of the study (rows) and each receiver (columns), receivers' operational status (see \code{\link[flapper]{make_matrix_receivers}}).
 #' @param add_raster A named list of arguments, passed to \code{\link[prettyGraphics]{add_sp_raster}}, to plot the location-probability surface.
 #' @param add_receiver_1,add_receiver_2,add_receiver_3,add_receiver_n Named lists of arguments, passed to \code{\link[graphics]{points}}, to customise the appearance of receivers. \code{add_receiver_1} controls the appearance of the `current' receiver (at which the individual was last or has just been detected); \code{add_receiver_2} controls the appearance of the receiver at which the individual was next detected; \code{add_receiver_3} controls the appearance of the third receiver at which the individual was detected; and \code{add_receiver_n} controls the appearance of all remaining active receivers.
-#' @param add_centroid_ap,add_centroid_an,add_centroid_b,add_centroid_c Named lists of arguments that control the appearance of acoustic centroids. (\code{centroid_ap} defines the boundaries of the individual's location from the perspective of its previous location; \code{centroid_an} defines the boundaries of the individual's location at the moment of detection from the perspective of the receiver that recorded the detection; \code{centroid_b} defines the boundaries of the individual's location from the perspective of the receiver at which the individual was next detected; and \code{centroid_c} defines the boundaries of the individual's location integrated across all of these perspectives; see \code{\link[flapper]{acdc_record-class}}.) \code{add_centroid_ap,add_centroid_an} and \code{add_centroid_b} are passed to \code{\link[raster]{lines,SpatialPolygons-method}} and \code{add_centroid_c} is passed to \code{\link[raster]{plot}}.
+#' @param add_container_ap,add_container_an,add_container_b,add_container_c Named lists of arguments that control the appearance of acoustic containers. (\code{container_ap} defines the boundaries of the individual's location from the perspective of its previous location; \code{container_an} defines the boundaries of the individual's location at the moment of detection from the perspective of the receiver that recorded the detection; \code{container_b} defines the boundaries of the individual's location from the perspective of the receiver at which the individual was next detected; and \code{container_c} defines the boundaries of the individual's location integrated across all of these perspectives; see \code{\link[flapper]{acdc_record-class}}.) \code{add_container_ap,add_container_an} and \code{add_container_b} are passed to \code{\link[raster]{lines,SpatialPolygons-method}} and \code{add_container_c} is passed to \code{\link[raster]{plot}}.
 #' @param add_coastline A named list of arguments, passed to \code{\link[raster]{plot}}, to add coastline to each plot.
-#' @param add_main A named list of arguments, passed to \code{\link[graphics]{mtext}}, to customise the appearance of the plot title. Default plot titles are structured as follows: `Map for t = cumulative time step (detection time step [intermediate time step] time stamp'. When the intermediate time step is one, the individual is detected. At subsequent intermediate time steps, acoustic centroids expand and contract.
+#' @param add_main A named list of arguments, passed to \code{\link[graphics]{mtext}}, to customise the appearance of the plot title. Default plot titles are structured as follows: `Map for t = cumulative time step (detection time step [intermediate time step] time stamp'. When the intermediate time step is one, the individual is detected. At subsequent intermediate time steps, acoustic containers expand and contract.
 #' @param ... Additional plot customisation options passed to \code{\link[prettyGraphics]{pretty_map}}.
 #' @param par_param A named list of arguments, passed to \code{\link[graphics]{par}}, to set the plotting window.
 #' @param png_param (optional) A named list of arguments, passed to \code{\link[grDevices]{png}}, to save plots to file. If supplied, the plot for each time step is saved separately. The `filename' argument should be the directory in which plots are saved. Plots are then saved as "1.png", "2.png" and so on. If supplied, \code{prompt} is ignored (see below).
-#' @param prompt If \code{png_param} is not specified, \code{prompt} is a logical variable that defines whether or not to pause function execution between plots and between centroids within plots to facilitate interpretation.
+#' @param prompt If \code{png_param} is not specified, \code{prompt} is a logical variable that defines whether or not to pause function execution between plots and between containers within plots to facilitate interpretation.
 #'
-#' @return The function returns, for each time step, a plot of the location-probability surface and acoustic centroids.
+#' @return The function returns, for each time step, a plot of the location-probability surface and acoustic containers.
 #'
 #' @examples
 #' #### Prepare example AC algorithm outputs with spatial files
@@ -164,21 +164,21 @@ acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"),
 #' grid <- raster::trim(grid)
 #' raster::plot(grid)
 #'
-#' ## Define detection centroids/probability kernels
-#' # Define detection centroids
+#' ## Define detection containers/probability kernels
+#' # Define detection containers
 #' moorings <- raster::crop(moorings, grid)
-#' dat_centroid <- acs_setup_centroids(xy = moorings,
+#' dat_container <- acs_setup_containers(xy = moorings,
 #'                                     detection_range = 425,
 #'                                     coastline = dat_coast,
 #'                                     boundaries = ext,
 #'                                     plot = TRUE,
 #'                                     resolution = 10,
 #'                                     verbose = TRUE)
-#' # Define detection centroid overlaps
-#' centroids_spdf      <- do.call(raster::bind, plyr::compact(dat_centroids))
-#' centroids_spdf@data <- dat_moorings
-#' dat_centroids_overlaps <-
-#'   get_detection_centroids_overlap(centroids = centroids_spdf,
+#' # Define detection container overlaps
+#' containers_spdf      <- do.call(raster::bind, plyr::compact(dat_containers))
+#' containers_spdf@data <- dat_moorings
+#' dat_containers_overlaps <-
+#'   get_detection_containers_overlap(containers = containers_spdf,
 #'                                   services = NULL)
 #' # Define detection probability kernels
 #' calc_dpr <-
@@ -187,8 +187,8 @@ acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"),
 #'   }
 #' dat_kernels <- acs_setup_detection_kernels(xy = moorings,
 #'                                            services = NULL,
-#'                                            centroids = dat_centroids,
-#'                                            overlaps = dat_centroids_overlaps,
+#'                                            containers = dat_containers,
+#'                                            overlaps = dat_containers_overlaps,
 #'                                            calc_detection_pr = calc_dpr,
 #'                                            bathy = grid)
 #'
@@ -196,9 +196,9 @@ acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"),
 #' out_ac <- ac(acoustics = acc,
 #'              step = 120,
 #'              bathy = grid,
-#'              detection_centroids = dat_centroids,
+#'              detection_containers = dat_containers,
 #'              detection_kernels = dat_kernels,
-#'              detection_kernels_overlap = dat_centroids_overlaps,
+#'              detection_kernels_overlap = dat_containers_overlaps,
 #'              mobility = 200,
 #'              save_record_spatial = NULL
 #'              )
@@ -248,10 +248,10 @@ acdc_plot_trace <- function(record,
                             add_receiver_2 = list(pch = 4, lwd = 2, col = "darkorange"),
                             add_receiver_3 = list(pch = 4, lwd = 1, col = "darkred"),
                             add_receiver_n = list(pch = 4, lwd = 2),
-                            add_centroid_ap = list(col = "darkgreen"),
-                            add_centroid_an = list(col = "darkgreen"),
-                            add_centroid_b = list(col = "darkorange"),
-                            add_centroid_c = list(col = scales::alpha("forestgreen", 0.5), density = 20),
+                            add_container_ap = list(col = "darkgreen"),
+                            add_container_an = list(col = "darkgreen"),
+                            add_container_b = list(col = "darkorange"),
+                            add_container_c = list(col = scales::alpha("forestgreen", 0.5), density = 20),
                             add_coastline = list(),
                             add_main = list(),...,
                             par_param = list(),
@@ -396,40 +396,40 @@ acdc_plot_trace <- function(record,
     }
     do.call(graphics::mtext, add_main)
 
-    #### Add centroids
-    ## Add centroid (Ap)
-    if(!is.null(spatial_for_t$centroid_ap)){
-      cat_to_console("...Add centroid (An)...", show = prompt)
-      add_centroid_ap$x <- spatial_for_t$centroid_ap
-      add_centroid_ap$x <- raster::crop(add_centroid_ap$x, ext)
-      do.call(raster::lines, add_centroid_ap)
+    #### Add containers
+    ## Add container (Ap)
+    if(!is.null(spatial_for_t$container_ap)){
+      cat_to_console("...Add container (An)...", show = prompt)
+      add_container_ap$x <- spatial_for_t$container_ap
+      add_container_ap$x <- raster::crop(add_container_ap$x, ext)
+      do.call(raster::lines, add_container_ap)
       continue(prompt)
     }
 
-    ## Add centroid (An)
-    if(!is.null(spatial_for_t$centroid_an)){
-      cat_to_console("...Add centroid (An)...", show = prompt)
-      add_centroid_an$x <- spatial_for_t$centroid_an
-      add_centroid_an$x <- raster::crop(add_centroid_an$x, ext)
-      do.call(raster::lines, add_centroid_an)
+    ## Add container (An)
+    if(!is.null(spatial_for_t$container_an)){
+      cat_to_console("...Add container (An)...", show = prompt)
+      add_container_an$x <- spatial_for_t$container_an
+      add_container_an$x <- raster::crop(add_container_an$x, ext)
+      do.call(raster::lines, add_container_an)
       continue(prompt)
     }
 
-    ## Add centroid (B)
-    if(!is.null(spatial_for_t$centroid_b)){
-      cat_to_console("...Add centroid (B)...", show = prompt)
-      add_centroid_b$x <- spatial_for_t$centroid_b
-      add_centroid_b$x <- raster::crop(add_centroid_b$x, ext)
-      do.call(raster::lines, add_centroid_b)
+    ## Add container (B)
+    if(!is.null(spatial_for_t$container_b)){
+      cat_to_console("...Add container (B)...", show = prompt)
+      add_container_b$x <- spatial_for_t$container_b
+      add_container_b$x <- raster::crop(add_container_b$x, ext)
+      do.call(raster::lines, add_container_b)
       continue(prompt)
     }
 
-    ## Add centroid (C)
-    cat_to_console("...Add centroid (C)...", show = prompt)
-    add_centroid_c$x <- spatial_for_t$centroid_c
-    add_centroid_c$x <- raster::crop(add_centroid_c$x, ext)
-    add_centroid_c$add <- TRUE
-    do.call(raster::plot, add_centroid_c)
+    ## Add container (C)
+    cat_to_console("...Add container (C)...", show = prompt)
+    add_container_c$x <- spatial_for_t$container_c
+    add_container_c$x <- raster::crop(add_container_c$x, ext)
+    add_container_c$add <- TRUE
+    do.call(raster::plot, add_container_c)
     continue(prompt)
 
     ## Add back coastline at end if necessary (for tidiness)
@@ -454,14 +454,14 @@ acdc_plot_trace <- function(record,
 #### acdc_plot_record()
 
 #' @title Plot time-specific maps from the AC/DC algorithm(s)
-#' @description This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, an \code{\link[flapper]{acdc_record-class}} list from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids (if applicable) can be added and customised and the finalised plots can be returned or saved to file.
+#' @description This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, an \code{\link[flapper]{acdc_record-class}} list from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic containers (if applicable) can be added and customised and the finalised plots can be returned or saved to file.
 #' @param record An \code{\link[flapper]{acdc_record-class}} object.
 #' @param type A character that defines the plotted surface(s): \code{"map_cumulative"} plots the cumulative surface and \code{"map_timestep"} plots time step-specific surfaces.
 #' @param plot An integer vector that defines the time steps for which to make plots. If \code{plot = NULL}, the function will make a plot for all time steps for which the necessary information is available in \code{record}.
 #' @param add_coastline (optional) A named list of arguments, passed to \code{\link[raster]{plot}}, to add a polygon (i.e., of the coastline), to the plot. If provided, this must contain an `x' element that contains the coastline as a spatial object (e.g., a SpatialPolygonsDataFrame: see \code{\link[flapper]{dat_coast}} for an example).
 #' @param add_receivers (optional) A named list of arguments, passed to \code{\link[graphics]{points}}, to add points (i.e., receivers) to the plot. If provided, this must contain an `x' element that is a SpatialPoints object that specifies receiver locations (in the same coordinate reference system as other spatial data).
 #' @param add_raster (optional) A named list of arguments, passed to \code{\link[fields]{image.plot}}, to plot the RasterLayer of possible locations that is extracted from \code{record}.
-#' @param add_centroids (optional) For outputs from the AC* algorithms (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), \code{centroids} is a named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic centroid to the plot.
+#' @param add_containers (optional) For outputs from the AC* algorithms (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), \code{containers} is a named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic container to the plot.
 #' @param add_additional (optional) A stand-alone function, to be executed after the background plot has been made and any specified spatial layers have been added to this, to customise the result (see Examples).
 #' @param crop_spatial A logical variable that defines whether or not to crop spatial data to lie within the axis limits.
 #' @param xlim,ylim,fix_zlim,pretty_axis_args Axis control arguments. \code{xlim} and \code{ylim} control the axis limits, following the rules of the \code{lim} argument in \code{\link[prettyGraphics]{pretty_axis}}. \code{fix_zlim} is a logical input that defines whether or not to fix z axis limits across all plots (to facilitate comparisons), or a vector of two numbers that define a custom range for the z axis which is fixed across all plots. \code{fix_zlim = FALSE} produces plots in which the z axis is allowed to vary flexibly between time units. Other axis options supported by \code{\link[prettyGraphics]{pretty_axis}} are implemented by passing a named list of arguments to this function via \code{pretty_axis_args}.
@@ -494,11 +494,11 @@ acdc_plot_trace <- function(record,
 #' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
 #' rsp <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 #' rsp <- sp::spTransform(rsp, proj_utm)
-#' ## Plot with receiver locations and coastline, customise the centroids and the raster
+#' ## Plot with receiver locations and coastline, customise the containers and the raster
 #' acdc_plot_record(record = dat_acdc,
 #'                  add_coastline = list(x = dat_coast, col = "darkgreen"),
 #'                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-#'                  add_centroids = list(col = "red"),
+#'                  add_containers = list(col = "red"),
 #'                  add_raster = list(col = rev(topo.colors(100)))
 #'                  )
 #'
@@ -508,7 +508,7 @@ acdc_plot_trace <- function(record,
 #' acdc_plot_record(record = dat_acdc,
 #'                  add_coastline = list(x = dat_coast, col = "darkgreen"),
 #'                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-#'                  add_centroids = list(col = "red"),
+#'                  add_containers = list(col = "red"),
 #'                  add_raster = list(smallplot= c(0.85, 0.9, 0.25, 0.75)),
 #'                  crop_spatial = TRUE,
 #'                  pretty_axis_args = list(side = 1:4,
@@ -531,7 +531,7 @@ acdc_plot_trace <- function(record,
 #'                  par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)),
 #'                  add_coastline = list(x = dat_coast, col = "darkgreen"),
 #'                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-#'                  add_centroids = list(col = "red"),
+#'                  add_containers = list(col = "red"),
 #'                  add_raster = list(),
 #'                  crop_spatial = TRUE,
 #'                  xlim = raster::extent(dat_coast)[1:2],
@@ -569,7 +569,7 @@ acdc_plot_record <- function(record,
                              add_coastline = NULL,
                              add_receivers = NULL,
                              add_raster = list(col = rev(grDevices::terrain.colors(255))),
-                             add_centroids = list(),
+                             add_containers = list(),
                              add_additional = NULL,
                              crop_spatial = FALSE,
                              xlim = NULL, ylim = NULL, fix_zlim = FALSE,
@@ -607,7 +607,7 @@ acdc_plot_record <- function(record,
       check_class(input = add_receivers$x, to_class = "SpatialPoints", type = "stop")
     }
     if(!is.null(add_raster)) check_named_list(input = add_raster)
-    if(!is.null(add_centroids)) check_named_list(input = add_centroids)
+    if(!is.null(add_containers)) check_named_list(input = add_containers)
     ## Check plotting window param
     check_named_list(input = par_param, ignore_empty = TRUE)
     ## Check png_param, if provided
@@ -646,10 +646,10 @@ acdc_plot_record <- function(record,
   if(check) {
     if(length(acdc_plot) <= 0) stop("No plotting data available for selected plot(s).")
     if(any(length(plot) > length(acdc_plot))) stop("'plot' exceeds the number of available plots.")
-    if(!is.null(add_centroids)){
-      if(!rlang::has_name(acdc_plot[[1]], "centroid")){
-        add_centroids <- NULL
-        message("add_centroids = NULL implemented: 'record' does not contain centroids.")
+    if(!is.null(add_containers)){
+      if(!rlang::has_name(acdc_plot[[1]], "container")){
+        add_containers <- NULL
+        message("add_containers = NULL implemented: 'record' does not contain containers.")
       }
     }
   }
@@ -758,12 +758,12 @@ acdc_plot_record <- function(record,
       add_raster$add <- TRUE
       do.call(fields::image.plot, add_raster)
     }
-    # Add acoustic centroid
-    if(!is.null(add_centroids)) {
-      add_centroids$x   <- map_info$centroid
-      if(crop_spatial) add_centroids$x <- raster::crop(add_centroids$x, ext)
-      add_centroids$add <- TRUE
-      do.call(raster::plot, add_centroids)
+    # Add acoustic container
+    if(!is.null(add_containers)) {
+      add_containers$x   <- map_info$container
+      if(crop_spatial) add_containers$x <- raster::crop(add_containers$x, ext)
+      add_containers$add <- TRUE
+      do.call(raster::plot, add_containers)
     }
     # Add the coastline (note that the coastline has already been cropped, if necessary)
     if(!is.null(add_coastline)) {

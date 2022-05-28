@@ -52,7 +52,7 @@ pf_setup_movement_pr <- function(distance,...) {
 #' out_ac <- ac(acoustics = acc,
 #'              step = 120,
 #'              bathy = dat_gebco,
-#'              detection_centroids = dat_centroids,
+#'              detection_containers = dat_containers,
 #'              mobility = 250,
 #'              write_record_spatial_for_pf = list(filename = root))
 #' # List the files for pf()

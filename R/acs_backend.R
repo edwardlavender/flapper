@@ -3,19 +3,19 @@
 #### .acs()
 
 #' @title Back-end implementation of the AC and ACDC algorithms
-#' @description This function is the back-end of the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms.
-#' @param acoustics A dataframe that contains passive acoustic telemetry detection time series for a specific individual (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named `receiver_id' (that must match that inputted to \code{\link[flapper]{acs_setup_centroids}}); an integer vector of detection indices, named `index'; a POSIXct vector of time stamps when detections were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'.
+#' @description This function is the back-end of the acoustic-container (AC) and acoustic-container depth-contour (ACDC) algorithms.
+#' @param acoustics A dataframe that contains passive acoustic telemetry detection time series for a specific individual (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: an integer vector of receiver IDs, named `receiver_id' (that must match that inputted to \code{\link[flapper]{acs_setup_containers}}); an integer vector of detection indices, named `index'; a POSIXct vector of time stamps when detections were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'.
 #' @param archival For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series for the same individual (see \code{\link[flapper]{dat_archival}} for an example). This should contain the following columns: a numeric vector of observed depths, named `depth'; a POSIXct vector of time stamps when observations were made, named `timestamp'; and a numeric vector of those time stamps, named `timestamp_num'. Depths should be recorded in the same units and with the same sign as the bathymetry data (see \code{bathy}). Absolute depths (m) are suggested. Unlike the detection time series, archival time stamps are assumed to have occurred at regular intervals.
 #' @param step A number that defines the time step length (s) between consecutive detections. If \code{archival} is supplied, this is the resolution of the archival data (e.g., 120 s).
 #' @param round_ts A logical input that defines whether or not to round the \code{acoustics} and/or \code{archival} time series to the nearest \code{step/60} minutes. This step is necessary to ensure appropriate alignment between the two time series given the assumption of a constant \code{mobility} parameter (see below). For implementations via \code{\link[flapper]{.acs_pl}}, this step is implemented in \code{\link[flapper]{.acs_pl}}.
 #' @param plot_ts A logical input that defines whether or not to the plot movement series before the algorithm is initiated.
-#' @param bathy A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC* algorithm) across the area within which the individual could have moved. For the ACDC algorithm, this must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acs_setup_centroids}}).
+#' @param bathy A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC* algorithm) across the area within which the individual could have moved. For the ACDC algorithm, this must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acs_setup_containers}}).
 #' @param map (optional) A blank \code{\link[raster]{raster}}, with the same properties (i.e., dimensions, resolution, extent and coordinate reference system) as the area/bathymetry raster (see \code{bathy}), but in which all values are 0. If \code{NULL}, this is computed internally, but supplying a pre-defined raster can be more computationally efficient if the function is applied iteratively (e.g., over different time windows).
 #' @param detection_kernels A named list of detection probability kernels, from \code{\link[flapper]{acs_setup_detection_kernels}} and created using consistent parameters as specified for other \code{acs_setup_*} functions and here (i.e., see the \code{overlaps}, \code{calc_detection_pr} and \code{map} arguments in \code{\link[flapper]{acs_setup_detection_kernels}}).
-#' @param detection_kernels_overlap (optional) A named list (the `list_by_receiver' element from \code{\link[flapper]{get_detection_centroids_overlap}}), that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers. If \code{detection_kernels_overlap} and \code{detection_time_window} (below) are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids; if unsupplied, receiver detection probability kernels are assumed not to overlap.
-#' @param detection_time_window (optional) A number that defines the maximum duration (s) between consecutive detections at different receivers such that they can be said to have occurred at `effectively the same time'. This indicates that the same transmission was detected by multiple receivers. If \code{detection_kernels_overlap} (above) and \code{detection_time_window} are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection centroids, by up-weighting overlapping areas between receivers that detected the transmission and down-weighting overlapping areas between receivers that did not detect the transmission (see Details in \code{\link[flapper]{acs_setup_detection_kernels}}). Note that the timing of detections is affected by \code{step} (see Details).
-#' @param detection_centroids A list of detection centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.
-#' @param mobility A number that defines the distance (m) that an individual could move in the time steps between acoustic detections (see also \code{\link[flapper]{acs_setup_centroids}}).
+#' @param detection_kernels_overlap (optional) A named list (the `list_by_receiver' element from \code{\link[flapper]{get_detection_containers_overlap}}), that defines, for each receiver, for each day over its deployment period, whether or not its detection container overlapped with those of other receivers. If \code{detection_kernels_overlap} and \code{detection_time_window} (below) are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection containers; if unsupplied, receiver detection probability kernels are assumed not to overlap.
+#' @param detection_time_window (optional) A number that defines the maximum duration (s) between consecutive detections at different receivers such that they can be said to have occurred at `effectively the same time'. This indicates that the same transmission was detected by multiple receivers. If \code{detection_kernels_overlap} (above) and \code{detection_time_window} are supplied, the implementation of detection probability kernels when a detection is made accounts for overlaps in receivers' detection containers, by up-weighting overlapping areas between receivers that detected the transmission and down-weighting overlapping areas between receivers that did not detect the transmission (see Details in \code{\link[flapper]{acs_setup_detection_kernels}}). Note that the timing of detections is affected by \code{step} (see Details).
+#' @param detection_containers A list of detection containers, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_containers}}.
+#' @param mobility A number that defines the distance (m) that an individual could move in the time steps between acoustic detections (see also \code{\link[flapper]{acs_setup_containers}}).
 #' @param calc_depth_error In the ACDC algorithm, \code{calc_depth_error} is function that returns the depth errors around a vector of depths. The function should accept vector of depths (from \code{archival$depth}) and return a matrix, with one row for each (lower and upper) error and one one column for each depth (if the error varies with depth). For each depth, the two numbers are added to the observed depth to define the range of depths on the bathymetry raster (\code{bathy}) that the individual could plausibly have occupied at any time. Since the depth errors are added to the individual's depth, the first number should be negative (i.e., the individual could have been shallower that observed) and the second positive (i.e., the individual could have been deeper than observed). The appropriate form for \code{calc_depth_error} depends on the species (pelagic versus demersal/benthic species), the measurement error for the depth observations in \code{archival} and bathymetry (\code{bathy}) data, as well as the tidal range (m) across the area (over the duration of observations). For example, for a pelagic species, the constant function \code{calc_depth_error = function(...) matrix(c(-2.5, Inf)} implies that the individual could have occupied bathymetric cells that are deeper than the observed depth + (-2.5) m and shallower than Inf m (i.e. the individual could have been in any location in which the depth was deeper than the shallow depth limit for the individual). In contrast, for a benthic species, the constant function \code{calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)} implies that the individual could have occupied bathymetric cells whose depth lies within the interval defined by the observed depth + (-2.5) and + (+2.5) m.
 #' @param normalise A logical variable that defines whether or not to normalise the map of possible locations at each time step so that they sum to one.
 #' @param chunk An integer that defines the chunk ID (from \code{\link[flapper]{.acs_pl}}).
@@ -30,7 +30,7 @@
 #'
 #' @return The function returns an \code{\link[flapper]{acdc_record-class}} object with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific information on the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by \code{save_record_spatial}). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{save_args = TRUE}, otherwise the `args' element is \code{NULL}).
 #'
-#' @seealso The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call \code{\link[flapper]{.acs_pl}} which in turn calls this function. \code{\link[flapper]{acs_setup_centroids}} defines the detection centroids required by this function.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_trace}}, \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results.
+#' @seealso The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call \code{\link[flapper]{.acs_pl}} which in turn calls this function. \code{\link[flapper]{acs_setup_containers}} defines the detection containers required by this function.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_trace}}, \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results.
 #'
 #' @examples
 #' #### Step (1) Prepare study site grid
@@ -40,7 +40,7 @@
 #' gebco <- raster::resample(dat_gebco, blank)
 #'
 #' #### Step (2) Implement setup_acdc_*() steps
-#' # ... Define detection centroids required for algorithm(s) (see acs_setup_centroids())
+#' # ... Define detection containers required for algorithm(s) (see acs_setup_containers())
 #'
 #' #### Step (3) Prepare movement time series for algorithm(s)
 #' # Add required columns to dataframes:
@@ -71,7 +71,7 @@
 #' #### Example (1) Implement AC algorithm with default arguments
 #' out_acdc_1 <- flapper:::.acs(acoustics = acc,
 #'                              bathy = gebco,
-#'                              detection_centroids = dat_centroids,
+#'                              detection_containers = dat_containers,
 #'                              mobility = 200
 #'                              )
 #'
@@ -79,14 +79,14 @@
 #' out_acdc_2 <- flapper:::.acs(acoustics = acc,
 #'                              archival = arc,
 #'                              bathy = gebco,
-#'                              detection_centroids = dat_centroids,
+#'                              detection_containers = dat_containers,
 #'                              mobility = 200,
 #'                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
 #'                              )
 #'
 #' #### Example (3) Implement AC or ACDC algorithm with detection probability kernels
 #'
-#' ## (A) Get detection centroid overlaps
+#' ## (A) Get detection container overlaps
 #' # Define receiver locations as a SpatialPointsDataFrame object with a UTM CRS
 #' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
 #' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
@@ -98,16 +98,16 @@
 #'                                                       "receiver_start_date",
 #'                                                       "receiver_end_date")])
 #' # Get detection overlap(s) as a SpatialPolygonsDataFrame
-#' centroids <- get_detection_centroids(xy = sp::SpatialPoints(xy),
+#' containers <- get_detection_containers(xy = sp::SpatialPoints(xy),
 #'                                      detection_range = 425,
 #'                                      coastline = dat_coast,
 #'                                      byid = TRUE)
-#' centroids_df <- dat_moorings[, c("receiver_id",
+#' containers_df <- dat_moorings[, c("receiver_id",
 #'                                  "receiver_start_date",
 #'                                  "receiver_end_date")]
-#' row.names(centroids_df) <- names(centroids)
-#' centroids <- sp::SpatialPolygonsDataFrame(centroids, centroids_df)
-#' overlaps <- get_detection_centroids_overlap(centroids =  centroids)
+#' row.names(containers_df) <- names(containers)
+#' containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
+#' overlaps <- get_detection_containers_overlap(containers =  containers)
 #'
 #' ## (B) Define detection probability function based on distance and detection_range
 #' calc_dpr <-
@@ -117,7 +117,7 @@
 #'
 #' ## (C) Get detection kernels (a slow step)
 #' kernels <- acs_setup_detection_kernels(xy = xy,
-#'                                        centroids = dat_centroids,
+#'                                        containers = dat_containers,
 #'                                        overlaps = overlaps,
 #'                                        calc_detection_pr = calc_dpr,
 #'                                        bathy = gebco)
@@ -125,7 +125,7 @@
 #' out_acdc_3 <- flapper:::.acs(acoustics = acc,
 #'                              archival = arc,
 #'                              bathy = gebco,
-#'                              detection_centroids = dat_centroids,
+#'                              detection_containers = dat_containers,
 #'                              detection_kernels = kernels,
 #'                              detection_kernels_overlap = overlaps$list_by_receiver,
 #'                              detection_time_window = 10,
@@ -138,14 +138,14 @@
 #' out_acdc_4a <- flapper:::.acs(acoustics = acc,
 #'                               archival = arc,
 #'                               bathy = gebco,
-#'                               detection_centroids = dat_centroids,
+#'                               detection_containers = dat_containers,
 #'                               mobility = 200,
 #'                               calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
 #'                               )
 #' out_acdc_4b <- flapper:::.acs(acoustics = acc,
 #'                               archival = arc,
 #'                               bathy = gebco,
-#'                               detection_centroids = dat_centroids,
+#'                               detection_containers = dat_containers,
 #'                               normalise = TRUE,
 #'                               mobility = 200,
 #'                               calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
@@ -154,7 +154,7 @@
 #' out_acdc_4c <- flapper:::.acs(acoustics = acc,
 #'                               archival = arc,
 #'                               bathy = gebco,
-#'                               detection_centroids = dat_centroids,
+#'                               detection_containers = dat_containers,
 #'                               detection_kernels = kernels,
 #'                               mobility = 200,
 #'                               calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
@@ -162,7 +162,7 @@
 #' out_acdc_4d <- flapper:::.acs(acoustics = acc,
 #'                               archival = arc,
 #'                               bathy = gebco,
-#'                                detection_centroids = dat_centroids,
+#'                                detection_containers = dat_containers,
 #'                               detection_kernels = kernels, normalise = TRUE,
 #'                               mobility = 200,
 #'                               calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
@@ -179,7 +179,7 @@
 #' out_acdc_5 <- flapper:::.acs(acoustics = acc,
 #'                              archival = arc,
 #'                              bathy = gebco,
-#'                              detection_centroids = dat_centroids,
+#'                              detection_containers = dat_containers,
 #'                              mobility = 200,
 #'                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
 #'                              verbose = TRUE,
@@ -195,7 +195,7 @@
 #' out_acdc_6 <- flapper:::.acs(acoustics = acc,
 #'                              archival = arc,
 #'                              bathy = gebco,
-#'                              detection_centroids = dat_centroids,
+#'                              detection_containers = dat_containers,
 #'                              mobility = 200,
 #'                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
 #'                              save_record_spatial = NULL,
@@ -216,7 +216,7 @@
     plot_ts = TRUE,
     bathy,
     map = NULL,
-    detection_centroids,
+    detection_containers,
     detection_kernels = NULL, detection_kernels_overlap = NULL, detection_time_window = 5,
     mobility,
     calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
@@ -250,7 +250,7 @@
                        plot_ts = plot_ts,
                        bathy = bathy,
                        map = map,
-                       detection_centroids = detection_centroids,
+                       detection_containers = detection_containers,
                        detection_kernels = detection_kernels,
                        detection_kernels_overlap = detection_kernels_overlap,
                        detection_time_window = detection_time_window,
@@ -320,8 +320,8 @@
           stop("'step' does not equal difftime(archival$timestamp[2], archival$timestamp[1], units = 's'.)")
         }
       }
-      # Check detection centroids have been supplied as a list
-      check_class(input = detection_centroids, to_class = "list", type = "stop")
+      # Check detection containers have been supplied as a list
+      check_class(input = detection_containers, to_class = "list", type = "stop")
       # Focus on the subset of data for which we have both acoustic and archival detections
       if(!is.null(archival)){
         nrw_acc_pre <- nrow(acoustics)
@@ -578,94 +578,94 @@
 
 
         ######################################
-        #### Implement centroid expansion and contraction
+        #### Implement container expansion and contraction
 
-        #### At the moment of detection, get the detection centroids
+        #### At the moment of detection, get the detection containers
         if(timestep_archival == 1){
 
-          ## Previous centroid (perspective Ap)
+          ## Previous container (perspective Ap)
           # If the current detection is at a new receiver (compared to the previous time step),
-          # ... get the (expanded) detection centroid from the previous time step
-          centroid_ap <- NULL
+          # ... get the (expanded) detection container from the previous time step
+          container_ap <- NULL
           if(index > 1){
             if(receiver_0_id != receiver_1_id)
-              centroid_ap <- rgeos::gBuffer(centroid_c, width = mobility, quadsegs = 1000)
+              container_ap <- rgeos::gBuffer(container_c, width = mobility, quadsegs = 1000)
           }
 
-          ## Detection centroid (perspective A or An)
-          # Get the detection centroid around the current receiver
-          centroid_an <- detection_centroids[[receiver_1_id]]
+          ## Detection container (perspective A or An)
+          # Get the detection container around the current receiver
+          container_an <- detection_containers[[receiver_1_id]]
 
-          ## Next centroid (perspective B)
+          ## Next container (perspective B)
           # If the individual was next detected at a different receiver,
-          # ... we also need the (expanded) centroid around that receiver
+          # ... we also need the (expanded) container around that receiver
           if(receiver_1_id != receiver_2_id){
-            centroid_b <- detection_centroids[[receiver_2_id]]
-            centroid_b <- rgeos::gBuffer(centroid_b, width = mobility * (lpos - 1), quadsegs = 1000)
-          } else centroid_b <- NULL
+            container_b <- detection_containers[[receiver_2_id]]
+            container_b <- rgeos::gBuffer(container_b, width = mobility * (lpos - 1), quadsegs = 1000)
+          } else container_b <- NULL
 
-          ## Individual's centroid (perspective C)
+          ## Individual's container (perspective C)
           # (i.e., the boundaries of the individuals location, given perspectives A, Ap and B)
-          centroid_c <- get_intersection(list(centroid_an, centroid_ap, centroid_b))
+          container_c <- get_intersection(list(container_an, container_ap, container_b))
 
           #### For subsequent time steps in-between detections
         } else {
 
           #### Dynamics (1): If the current and next receiver are identical
-          # .... we simply expand/contract the centroid around this receiver
+          # .... we simply expand/contract the container around this receiver
           if(receiver_1_id == receiver_2_id){
 
-            ## Define blank centroids
-            centroid_an <- centroid_ap <- centroid_b <- NULL
+            ## Define blank containers
+            container_an <- container_ap <- container_b <- NULL
 
             ## Option 1: as the time step increases until halfway through acoustic detections:
-            # ... increase the size of the centroid by the value of mobility (m) at each time step
+            # ... increase the size of the container by the value of mobility (m) at each time step
             # Note the use of ceiling: if lpos is odd, then this takes us to the middle timestep_archival;
             # ... if lpos is even, then there are two middle timestep_archivals, and this takes us to the first one.
             if(timestep_archival <= ceiling(lpos/2)){
-              cat_to_cf(paste0("... ... ... Acoustic centroid is expanding..."))
-              centroid_c <- rgeos::gBuffer(centroid_c, width = mobility, quadsegs = 1000)
+              cat_to_cf(paste0("... ... ... Acoustic container is expanding..."))
+              container_c <- rgeos::gBuffer(container_c, width = mobility, quadsegs = 1000)
 
               ## Option 2: as the time step increases, from beyond halfway through acoustic detections,
-              # ... to time of the next acoustic detection, we decrease the centroid size
+              # ... to time of the next acoustic detection, we decrease the container size
             } else if(timestep_archival > ceiling(lpos/2)){
 
-              ## Retain or shrink the centroid as appropriate
+              ## Retain or shrink the container as appropriate
               ## For sequences with an even number of steps, the first post-middle value the stays the same
               # For example, if lpos = 4, then
-              # ... centroid 1 = (say) 800 m (at detection)
-              # ... centroid 2 =       1000 m
-              # ... centroid 3 =       1000 m [first post-middle value - constant]
-              # ... centroid 4 =       800 m (at next detection)
-              # In this scenario, we don't need to change centroid.
+              # ... container 1 = (say) 800 m (at detection)
+              # ... container 2 =       1000 m
+              # ... container 3 =       1000 m [first post-middle value - constant]
+              # ... container 4 =       800 m (at next detection)
+              # In this scenario, we don't need to change container.
               ## For sequences with an odd number of steps, the fist post-middle value starts to  shrink
               # For example, if lpos = 5,  then
-              # ... centroid 1 = 800 m
-              # ... centroid 2 = 1000 m
-              # ... centroid 3 = 1200 m
-              # ... centroid 4 = 1000 m [first post-middle value - shrinks]
-              # ... centroid 5 = 800 m
+              # ... container 1 = 800 m
+              # ... container 2 = 1000 m
+              # ... container 3 = 1200 m
+              # ... container 4 = 1000 m [first post-middle value - shrinks]
+              # ... container 5 = 800 m
               if(timestep_archival == (lpos/2 + 1)){
-                cat_to_cf(paste0("... ... ... Acoustic centroid is constant ..."))
+                cat_to_cf(paste0("... ... ... Acoustic container is constant ..."))
               } else {
-                cat_to_cf(paste0("... ... ... Acoustic centroid is shrinking ..."))
-                centroid_c <- rgeos::gBuffer(centroid_c, width = -mobility, quadsegs = 1000)
+                cat_to_cf(paste0("... ... ... Acoustic container is shrinking ..."))
+                container_c <- rgeos::gBuffer(container_c, width = -mobility, quadsegs = 1000)
               }
             }
 
             #### Dynamics (2): If the two receivers are different
-            # ... we keep expanding the current centroid
-            # ... and contract the centroid of the other receiver
+            # ... we keep expanding the current container
+            # ... and contract the container of the other receiver
             # ... note that a high 'quadsegs' here is required to ensure correct calculations.
           } else {
-            # Blank centroid_an
-            centroid_an <- NULL
-            # Expand existing centroid
-            centroid_ap <- rgeos::gBuffer(centroid_c, width = mobility, quadsegs = 1000)
-            # Contract centroid around receiver_id_2
-            centroid_b <- rgeos::gBuffer(centroid_b, width = -mobility, quadsegs = 1000)
-            # Get the intersection between the expanding centroid for receiver_1_id and the contracting centroid for receiver_2_id
-            centroid_c <- rgeos::gIntersection(centroid_ap, centroid_b)
+            # Blank container_an
+            container_an <- NULL
+            # Expand existing container
+            container_ap <- rgeos::gBuffer(container_c, width = mobility, quadsegs = 1000)
+            # Contract container around receiver_id_2
+            container_b <- rgeos::gBuffer(container_b, width = -mobility, quadsegs = 1000)
+            # Get the intersection between the expanding container for receiver_1_id and the contracting container for receiver_2_id
+            container_c <- rgeos::gIntersection(container_ap, container_b)
           }
         }
 
@@ -693,7 +693,7 @@
             if(!is.null(detection_time_window) & !is.null(detection_kernels_overlap)){
 
               ## Identify the full set of receivers whose deployments overlapped in space/time with receiver_1_id
-              # ... from 'detection_kernels_overlap$list_by_receiver' list, derived from get_detection_centroids_overlap().
+              # ... from 'detection_kernels_overlap$list_by_receiver' list, derived from get_detection_containers_overlap().
               # ... This is a list, with one element for each receiver.
               # ... Each element is a time series dataframe, with columns for the time and each receiver, that defines
               # ... whether or not the each receiver was active over that receivers deployment period.
@@ -742,7 +742,7 @@
             }
 
             #### At other time steps (timestep_archival != 1 ) (in between detections),
-            # ... we simply upweight areas away from receivers relative to those within detection centroids
+            # ... we simply upweight areas away from receivers relative to those within detection containers
             # ... by using a single inverse detection probability surface calculated across all receivers
           } else {
 
@@ -758,7 +758,7 @@
 
         #### Define uniform probabilities across study site, if detection kernels unsupplied
         # Defined as 'kernel' at the start of the function.
-        # Areas beyond the current centroid are masked below.
+        # Areas beyond the current container are masked below.
 
 
         ######################################
@@ -766,7 +766,7 @@
 
         #### AC algorithm implementation only depends on detection probability kernels
         if(is.null(archival)){
-          map_timestep <- raster::mask(kernel, centroid_c)
+          map_timestep <- raster::mask(kernel, container_c)
           if(is.null(detection_kernels)) map_timestep <- raster::mask(map_timestep, bathy)
 
           #### ACDC algorithm implementation also incorporates depth
@@ -774,7 +774,7 @@
 
           # Identify the area of the bathymetry raster which is contained within the
           # ... allowed polygon. This step can be slow.
-          bathy_sbt <- raster::mask(bathy, centroid_c)
+          bathy_sbt <- raster::mask(bathy, container_c)
           if(is.null(detection_kernels)) bathy_sbt <- raster::mask(bathy_sbt, bathy)
 
           # Identify possible position of individual at this time step based on depth ± depth_error m:
@@ -794,10 +794,10 @@
         # ... (e.g. for illustrative plots and/or error checking):
         if(is.null(save_record_spatial) | timestep_cumulative %in% save_record_spatial){
           # Create a list, plot options (po), which contains relevant spatial information:
-          po <- list(centroid_ap    = centroid_ap,
-                     centroid_an     = centroid_an,
-                     centroid_b     = centroid_b,
-                     centroid_c     = centroid_c,
+          po <- list(container_ap    = container_ap,
+                     container_an     = container_an,
+                     container_b     = container_b,
+                     container_c     = container_c,
                      kernel         = kernel,
                      map_timestep   = map_timestep,
                      map_cumulative = map_cumulative)

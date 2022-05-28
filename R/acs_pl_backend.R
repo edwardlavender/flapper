@@ -3,16 +3,16 @@
 #### .acs_pl()
 
 #' @title Intermediate wrapper for \code{\link[flapper]{.acs}} that supports parallelisation
-#' @description This function implements the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms. This is called via a front-end function (i.e. \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}). It checks and processes inputs and implements the selected algorithm via calls to \code{\link[flapper]{.acs}}. Outputs are returned in a named list.
+#' @description This function implements the acoustic-container (AC) and acoustic-container depth-contour (ACDC) algorithms. This is called via a front-end function (i.e. \code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}). It checks and processes inputs and implements the selected algorithm via calls to \code{\link[flapper]{.acs}}. Outputs are returned in a named list.
 #'
 #' @param acoustics A dataframe, or a list of dataframes, that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. Each dataframe should contain the following columns: an integer vector of receiver IDs, named `receiver_id'; an integer vector of detection indices, named `index'; and a POSIXct vector of time stamps when detections were made, named `timestamp'. If a list of dataframes is supplied, dataframes must be refer to the detections of a single individual and be ordered by time (e.g., in hourly chunks). In addition, sequential list elements must be linked by identical receiver pairs (i.e., the final receiver at which the individual was detected for any given chunk must be the same as the receiver at which the individual was next detected at the start of the next chunk) because it is only in this specific scenario that information does not need to be shared across time steps (see \code{split}). The algorithm will be implemented on each dataframe, termed `chunk', either in sequence or parallel. Any empty or \code{NULL} elements will be removed automatically.
 #' @param archival For the ACDC algorithm, \code{archival} is a dataframe that contains depth time series (see \code{\link[flapper]{.acs}}).
 #' @param step A number that defines the time step length (s) between consecutive detections (see \code{\link[flapper]{.acs}}).
 #' @param plot_ts A logical input that defines whether or not to plot movement time series (see \code{\link[flapper]{.acs}}).
 #' @param bathy A \code{\link[raster]{raster}} that defines the area (for the AC algorithm) or bathymetry (for the ACDC algorithm) across the area within which the individual could have moved (see \code{\link[flapper]{.acs}}).
-#' @param detection_centroids A list of detection centroids (see \code{\link[flapper]{.acs}}).
+#' @param detection_containers A list of detection containers (see \code{\link[flapper]{.acs}}).
 #' @param detection_kernels A named list of detection probability kernels (see \code{\link[flapper]{.acs}}).
-#' @param detection_kernels_overlap A named list of detection probability kernel overlaps, directly from \code{\link[flapper]{get_detection_centroids_overlap}}. This must contain an element named `list_by_receiver' with the data for each receiver.
+#' @param detection_kernels_overlap A named list of detection probability kernel overlaps, directly from \code{\link[flapper]{get_detection_containers_overlap}}. This must contain an element named `list_by_receiver' with the data for each receiver.
 #' @param detection_time_window A number that defines the detection time window (see \code{\link[flapper]{.acs}})
 #' @param mobility The mobility parameter (see \code{\link[flapper]{.acs}}).
 #' @param calc_depth_error The depth error function (see \code{\link[flapper]{.acs}}).
@@ -27,7 +27,7 @@
 #'
 #' @return The function returns an \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
 #'
-#' @seealso The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call this function, which in turn calls \code{\link[flapper]{.acs}}. \code{\link[flapper]{acs_setup_centroids}} defines the detection centroids required by this function. \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_trace}}, \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results.
+#' @seealso The front-end functions \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} call this function, which in turn calls \code{\link[flapper]{.acs}}. \code{\link[flapper]{acs_setup_containers}} defines the detection containers required by this function. \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. For calls via \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}, \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_trace}}, \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results.
 #'
 #' @examples
 #' # For examples, see ?ac and ?acdc which call this function directly.
@@ -42,7 +42,7 @@
   step = 120,
   plot_ts = TRUE,
   bathy,
-  detection_centroids,
+  detection_containers,
   detection_kernels = NULL, detection_kernels_overlap = NULL, detection_time_window = 5,
   mobility,
   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
@@ -153,8 +153,8 @@
       stop("Archival observations do not span the time range of acoustic observations.", call. = FALSE)
     }
   }
-  # Check detection centroids have been supplied as a list
-  check_class(input = detection_centroids, to_class = "list", type = "stop")
+  # Check detection containers have been supplied as a list
+  check_class(input = detection_containers, to_class = "list", type = "stop")
   out$time <- rbind(out$time, data.frame(event = "initial_checks_passed", time = Sys.time()))
   # Check detection_kernels_overlap
   if(!is.null(detection_kernels_overlap)) {
@@ -520,7 +520,7 @@
                  round_ts = FALSE,
                  bathy = bathy,
                  map = map,
-                 detection_centroids = detection_centroids,
+                 detection_containers = detection_containers,
                  detection_kernels = detection_kernels,
                  detection_kernels_overlap = detection_kernels_overlap,
                  detection_time_window = detection_time_window,
@@ -551,7 +551,7 @@
                    step = step,
                    bathy = bathy,
                    map = map,
-                   detection_centroids = detection_centroids,
+                   detection_containers = detection_containers,
                    detection_kernels = detection_kernels,
                    detection_kernels_overlap = detection_kernels_overlap,
                    detection_time_window = detection_time_window,

@@ -14,7 +14,7 @@ get_detection_area_sum(
 )
 }
 \arguments{
-\item{xy, detection_range, coastline, plot, ...}{Arguments required to calculate and visualise detection centroids via \code{\link[flapper]{get_detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{detection_range}), barriers to detection (\code{coastline}), and whether or not to plot the centroids (\code{plot}).}
+\item{xy, detection_range, coastline, plot, ...}{Arguments required to calculate and visualise detection containers via \code{\link[flapper]{get_detection_containers}}; namely, receiver locations (\code{xy}), the detection range (\code{detection_range}), barriers to detection (\code{coastline}), and whether or not to plot the containers (\code{plot}).}
 
 \item{scale}{A number that scales the total area (m). The default (\code{1/(1000^2)}) converts the units of \eqn{m^2} to \eqn{km^2}.}
 }
@@ -22,7 +22,7 @@ get_detection_area_sum(
 The function returns a number that represents the total area surveyed by receivers (by default in \eqn{km^2}) and, if \code{plot = TRUE}, a plot of the area with receivers and their detection ranges.
 }
 \description{
-This function calculates the total area sampled by receivers, under the assumption of a constant detection range. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The \code{\link[flapper]{get_detection_centroids}} is used to calculate the detection centroids around receivers, given a specified detection range (m) and any barriers to detection, such as coastline, and then the total area covered by receivers is calculated, accounting for overlapping centroids.
+This function calculates the total area sampled by receivers, under the assumption of a constant detection range. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The \code{\link[flapper]{get_detection_containers}} is used to calculate the detection containers around receivers, given a specified detection range (m) and any barriers to detection, such as coastline, and then the total area covered by receivers is calculated, accounting for overlapping containers.
 }
 \details{
 This is a simple metric of the overall receiver sampling effort. This may be a poor metric if the assumption of a single detection range across all receivers is substantially incorrect or if there are substantial changes in the receiver array over the course of a study.
@@ -53,7 +53,7 @@ get_detection_area_sum(xy, coastline = dat_coast, plot = FALSE)
 
 }
 \seealso{
-\code{\link[flapper]{get_detection_centroids}} defines detection centroids, across which the detection area is calculated. \code{\link[flapper]{get_detection_area_ts}} calculates the area sampled by receivers through time.
+\code{\link[flapper]{get_detection_containers}} defines detection containers, across which the detection area is calculated. \code{\link[flapper]{get_detection_area_ts}} calculates the area sampled by receivers through time.
 }
 \author{
 Edward Lavender

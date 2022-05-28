@@ -36,7 +36,7 @@ pf_plot_3d(
 The function maps the trajectories of reconstructed paths across the bathymetry surface in three-dimensions, returning a single map if \code{prompt = FALSE} or one map for each path if \code{prompt = TRUE}. The function also invisibly returns the plot object, if \code{prompt = TRUE}, or a list of plot objects, if \code{prompt = FALSE} (with one element for each path), to facilitate further modification.
 }
 \description{
-This function is a simple wrapper for \code{\link[prettyGraphics]{pretty_scape_3d}} that maps the paths reconstructed by the depth-contour or acoustic-centroid depth-contour particle filtering algorithms (DCPF and ACDCPF) over a surface in three dimensions.
+This function is a simple wrapper for \code{\link[prettyGraphics]{pretty_scape_3d}} that maps the paths reconstructed by the depth-contour or acoustic-container depth-contour particle filtering algorithms (DCPF and ACDCPF) over a surface in three dimensions.
 }
 \details{
 This function requires the \code{\link[plotly]{plotly}} package.

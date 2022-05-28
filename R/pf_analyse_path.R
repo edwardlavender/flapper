@@ -4,7 +4,7 @@
 
 #' @title Calculate the log-likelihood of movement paths from a PF algorithm
 #' @importFrom rlang .data
-#' @description This function calculates the total log-likelihood of each movement path reconstructed by a particle filtering (PF) algorithm, including the acoustic-centroid (AC), depth-contour (DC) or acoustic-centroid depth-contour (ACDC) algorithms.
+#' @description This function calculates the total log-likelihood of each movement path reconstructed by a particle filtering (PF) algorithm, including the acoustic-container (AC), depth-contour (DC) or acoustic-container depth-contour (ACDC) algorithms.
 #' @param paths A dataframe containing movement paths from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the probability associated with each cell along each path (`cell_pr').
 #'
 #' @details For each path, at each time step the probability associated with the sampled location depends on (a) the `intrinsic' probability associated with each cell (assigned by the AC, DC or ACDC algorithm) and (b) a user-defined movement model that is driven by the distance between the sampled locations for the individual at the previous and current time steps (and other user-defined parameters). This function simply sums the logarithms of these probabilities for each path as a measure of their relative likelihood, given the movement model.
@@ -38,7 +38,7 @@ pf_loglik <- function(paths){
 #### pf_plot_1d()
 
 #' @title Plot one-dimensional depth time series from a PF algorithm
-#' @description This function plots the observed depth time series and the depth time series associated with each path reconstructed by the depth-contour particle filtering (DCPF) or acoustic-centroid depth-contour particle filtering (ACDCPF) algorithm.
+#' @description This function plots the observed depth time series and the depth time series associated with each path reconstructed by the depth-contour particle filtering (DCPF) or acoustic-container depth-contour particle filtering (ACDCPF) algorithm.
 #' @param paths A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id’), timesteps (`timestep') and the depth associated with each cell along each path (`cell_z').
 #' @param archival A dataframe of depth (m) observations named `depth', as used by \code{\link[flapper]{dc}} and \code{\link[flapper]{acdc}}.
 #' @param scale A number that vertically scales the depth time series for the observations and the reconstructed path(s). By default, absolute values for depth are assumed and negated for ease of visualisation.
@@ -172,7 +172,7 @@ pf_plot_2d <- function(paths,
 #### pf_plot_3d()
 
 #' @title Map three-dimensional paths from a PF algorithm
-#' @description This function is a simple wrapper for \code{\link[prettyGraphics]{pretty_scape_3d}} that maps the paths reconstructed by the depth-contour or acoustic-centroid depth-contour particle filtering algorithms (DCPF and ACDCPF) over a surface in three dimensions.
+#' @description This function is a simple wrapper for \code{\link[prettyGraphics]{pretty_scape_3d}} that maps the paths reconstructed by the depth-contour or acoustic-container depth-contour particle filtering algorithms (DCPF and ACDCPF) over a surface in three dimensions.
 #' @param paths A dataframe containing reconstructed movement path(s) from \code{\link[flapper]{pf}} via \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the x, y and z coordinates that define the trajectory of each path (`cell_x', `cell_y' and `cell_z').
 #' @param bathy A \code{\link[raster]{raster}} of the bathymetry surface over which movement was reconstructed.
 #' @param add_paths A named list, passed to \code{\link[plotly]{add_paths}}, to customise the appearance of the paths.

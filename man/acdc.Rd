@@ -2,14 +2,14 @@
 % Please edit documentation in R/acdc.R
 \name{acdc}
 \alias{acdc}
-\title{The acoustic-centroid depth-contour (ACDC) algorithm}
+\title{The acoustic-container depth-contour (ACDC) algorithm}
 \usage{
 acdc(
   acoustics,
   archival,
   plot_ts = TRUE,
   bathy,
-  detection_centroids,
+  detection_containers,
   detection_kernels = NULL,
   detection_kernels_overlap = NULL,
   detection_time_window = 5,
@@ -34,9 +34,9 @@ acdc(
 
 \item{plot_ts}{A logical input that defines whether or not to the plot detection and depth time series before the algorithm is initiated. This provides a useful visualisation of the extent to which they overlap.}
 
-\item{bathy}{A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acs_setup_centroids}}).}
+\item{bathy}{A \code{\link[raster]{raster}} that defines the bathymetry across the area within which the individual could have moved. This must be recorded in the same units and with the same sign as the depth observations (see \code{archival}). The coordinate reference system should be the Universal Transverse Mercator system, with distances in metres (see also \code{\link[flapper]{acs_setup_containers}}).}
 
-\item{detection_centroids}{A list of detection centroids, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_centroids}}.}
+\item{detection_containers}{A list of detection containers, with one element for each number from \code{1:max(acoustics$receiver_id)}, from \code{\link[flapper]{acs_setup_containers}}.}
 
 \item{detection_kernels}{A named list of detection probability kernels (see \code{\link[flapper]{ac}}).}
 
@@ -70,16 +70,16 @@ acdc(
 The function returns an \code{\link[flapper]{acdc_archive-class}} object. If a connection to write files has also been specified, an overall log (acdc_log.txt) as well as chunk-specific logs from calls to \code{\link[flapper]{.acs}}, if applicable, are written to file.
 }
 \description{
-This function implements the acoustic-centroid depth-contour (ACDC) algorithm. This is an extension of the AC algorithm implemented by \code{\link[flapper]{ac}} that that integrates acoustic detections and depth observations to infer where tagged animals could have spent more or less time over the period of observations. To implement the function, a dataframe (or list) of passive acoustic telemetry detections is required (\code{acoustics}), alongside a dataframe of depth observations (\code{archival}). At each time step, the algorithm integrates information from past and future acoustic detections in the form of acoustic centroids and information from depth observations in the form of depth contours to determine the possible locations of an individual in an area (see Details). As for the AC algorithm (\code{\link[flapper]{ac}}), the function can be implemented step-wise or chunk-wise and the outputs can be processed via \code{\link[flapper]{acdc_simplify}}.
+This function implements the acoustic-container depth-contour (ACDC) algorithm. This is an extension of the AC algorithm implemented by \code{\link[flapper]{ac}} that that integrates acoustic detections and depth observations to infer where tagged animals could have spent more or less time over the period of observations. To implement the function, a dataframe (or list) of passive acoustic telemetry detections is required (\code{acoustics}), alongside a dataframe of depth observations (\code{archival}). At each time step, the algorithm integrates information from past and future acoustic detections in the form of acoustic containers and information from depth observations in the form of depth contours to determine the possible locations of an individual in an area (see Details). As for the AC algorithm (\code{\link[flapper]{ac}}), the function can be implemented step-wise or chunk-wise and the outputs can be processed via \code{\link[flapper]{acdc_simplify}}.
 }
 \details{
-The acoustic-centroid depth-contour (ACDC) algorithm is an approach which integrates acoustic detections and depth observations to infer the possible locations of tagged animals within an area over some time interval. The locational information provided by acoustic detections is represented by acoustic centroids, which are areas around receivers that define where an individual could have been at each time point given the spatiotemporal pattern of detections at receivers, a model of detection probability and a movement parameter (see \code{\link[flapper]{ac}}). The locational information provided by depth observations is represented by depth contours, which are areas that define where an individual could have been at each time point given its depth and the local bathymetry (see \code{\link[flapper]{dc}}).
+The acoustic-container depth-contour (ACDC) algorithm is an approach which integrates acoustic detections and depth observations to infer the possible locations of tagged animals within an area over some time interval. The locational information provided by acoustic detections is represented by acoustic containers, which are areas around receivers that define where an individual could have been at each time point given the spatiotemporal pattern of detections at receivers, a model of detection probability and a movement parameter (see \code{\link[flapper]{ac}}). The locational information provided by depth observations is represented by depth contours, which are areas that define where an individual could have been at each time point given its depth and the local bathymetry (see \code{\link[flapper]{dc}}).
 
 In outline, the crux of the approach is the recognition that acoustic detections typically occur irregularly, while archival observations occur at regular intervals. Each detection anchors our knowledge of the location of an individual around a particular receiver (assuming that all detections are true detections). As time passes between acoustic detections, our uncertainty about the geographical location of an individual expands around the receiver at which it was detected before shrinking towards the receiver at which it was next detected. (This is the AC algorithm.) During this time, regular depth observations restrict the number of possible locations in which the individual could have been located at each time step, assuming that the bathymetric landscape is non-homogeneous. This is true both for pelagic species, which must be in an area where the depth is at least as deep as the observed depth, and for benthic/demersal species, which must be in an area relatively close in depth to the observed depth. (This is the DC algorithm.) In reality, the timing of acoustic and archival detections may not align perfectly between two detections; this is currently resolved by rounding the acoustic time series to the resolution of depth observations (see also \code{\link[flapper]{ac}}). In this way, the ACDC algorithm moves over acoustic and archival time steps, summing the positions in which individuals could have been located based on these two sources of data, to generate a map of that shows where the individual could have spent more or less (or no) time over the time interval under consideration.
 }
 \examples{
 #### Step (1) Implement setup_acdc_*() steps
-# ... Define detection centroids required for ACDC algorithm (see setup_acdc_centroids())
+# ... Define detection containers required for ACDC algorithm (see setup_acdc_containers())
 
 #### Step (2) Prepare movement time series for algorithm
 # Focus on an example individual
@@ -107,7 +107,7 @@ arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
 out_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_centroids = dat_centroids,
+                 detection_containers = dat_containers,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
                  )
@@ -121,7 +121,7 @@ summary(out_acdc)
 out_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_centroids = dat_centroids,
+                 detection_containers = dat_containers,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                  con = tempdir()
@@ -136,7 +136,7 @@ file.remove(paste0(tempdir(), "/acdc_log.txt"))
 out_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_centroids = dat_centroids,
+                 detection_containers = dat_containers,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                  save_record_spatial = NULL
@@ -149,7 +149,7 @@ out_acdc <- acdc(acoustics = acc,
 out_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_centroids = dat_centroids,
+                 detection_containers = dat_containers,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                  con = tempdir(),
@@ -181,7 +181,7 @@ lapply(out_acdc$ts_by_chunk,
 out_acdc <- acdc(acoustics = acc,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_centroids = dat_centroids,
+                 detection_containers = dat_containers,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                  con = tempdir(),
@@ -198,7 +198,7 @@ acc_ls <- split(acc, acc$chunk)
 out_acdc <- acdc(acoustics = acc_ls,
                  archival = arc,
                  bathy = dat_gebco,
-                 detection_centroids = dat_centroids,
+                 detection_containers = dat_containers,
                  mobility = 200,
                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                  con = tempdir(),
@@ -217,7 +217,7 @@ if(cluster){
   parallel::clusterExport(cl = cl, varlist = c("acdc",
                                                "dat_archival",
                                                "dat_gebco",
-                                               "dat_centroids"
+                                               "dat_containers"
                                                 ))
 } else cl <- NULL
 # Implement algorithm for each individual
@@ -235,7 +235,7 @@ acdc_out_by_id <-
     acdc_out <- acdc(acoustics = acc,
                      archival = dat_archival,
                      bathy = dat_gebco,
-                     detection_centroids = dat_centroids,
+                     detection_containers = dat_containers,
                      mobility = 200,
                      calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
                      save_record_spatial = 1:10L,
@@ -263,7 +263,7 @@ summary(acdc_out_by_id)
 
 }
 \seealso{
-This function calls \code{\link[flapper]{.acs_pl}} and \code{\link[flapper]{.acs}} to implement the ACDC algorithm. The AC component can be implemented via  \code{\link[flapper]{ac}} and the DC component via \code{\link[flapper]{dc}}. \code{\link[flapper]{acs_setup_centroids}} defines the detection centroids required by this function.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_trace}}, \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results. Particle filtering can be used to reconstruct movement paths.
+This function calls \code{\link[flapper]{.acs_pl}} and \code{\link[flapper]{.acs}} to implement the ACDC algorithm. The AC component can be implemented via  \code{\link[flapper]{ac}} and the DC component via \code{\link[flapper]{dc}}. \code{\link[flapper]{acs_setup_containers}} defines the detection containers required by this function.  \code{\link[flapper]{acs_setup_mobility}} is used to examine the assumption of the constant `mobility' parameter. \code{\link[flapper]{acs_setup_detection_kernels}} produces detection probability kernels for incorporation into the function. \code{\link[flapper]{acdc_simplify}} simplifies the outputs and \code{\link[flapper]{acdc_plot_trace}}, \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} visualise the results. Particle filtering can be used to reconstruct movement paths.
 }
 \author{
 Edward Lavender

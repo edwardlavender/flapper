@@ -84,10 +84,10 @@ space use from discrete detections at receivers, especially:
     mean-position algorithm to estimate centres of activity (COAs) from
     discrete detections at receivers, given a detection matrix and the
     locations of receivers.
-  - **`ac()`.** The function implements the acoustic-centroid (AC)
+  - **`ac()`.** The function implements the acoustic-container (AC)
     algorithm to examine patterns of space use. This is a new approach
     which utilises the information provided by acoustic detections in
-    the form of acoustic centroids to infer where animals could have
+    the form of acoustic containers to infer where animals could have
     spent more or less time over the period of observations. Key
     innovations of this approach include the natural incorporation of
     barriers to movement (such as coastline), detection probability and
@@ -98,7 +98,7 @@ space use from discrete detections at receivers, especially:
     surface to determine the extent to which different parts of an area
     might have (or have not) been used, or effectively represent
     occupied depths, over time.
-  - **`acdc()`.** This function implements the ‘acoustic-centroid
+  - **`acdc()`.** This function implements the ‘acoustic-container
     depth-contour’ (ACDC) algorithm to examine patterns of space use.
     This integrates the locational information provided by acoustic
     detections and concurrent depth observations to infer where tagged
@@ -298,11 +298,11 @@ of individuals:
 
   - `get_detection_pr()` calculates detection probability given a model
     for detection probability with distance;
-  - `get_detection_centroids()` defines detection centroids (areas
+  - `get_detection_containers()` defines detection containers (areas
     within the maximum detection range) around receivers;
-  - `get_detection_centroids_overlap` identifies receivers with
-    overlapping detection centroids in space and time;
-  - `get_detection_centroids_envir()` extracts environmental conditions
+  - `get_detection_containers_overlap` identifies receivers with
+    overlapping detection containers in space and time;
+  - `get_detection_containers_envir()` extracts environmental conditions
     from within receiver detection ranges, accounting for detection
     probability;
   - `get_detection_area_sum()` calculates the total area surveyed by
@@ -377,7 +377,7 @@ Alongside the COA algorithm, this package introduces the
 the inferring patterns of space use.
 
 <img src="vignettes/readme_flapper_family_implementation.png"/> *The
-\`flapper’ family of algorithms. The acoustic-centroid depth-contour
+\`flapper’ family of algorithms. The acoustic-container depth-contour
 (ACDC) branch utilises acoustic and/or archival data to map the possible
 locations of an animal through time. The particle filtering (PF) branch
 refines these maps via the implementation of a particle simulation and
@@ -403,17 +403,17 @@ a modified version of this algorithm for quicker run times.
 The [`flapper`](https://edwardlavender.github.io/flapper/)
 family-equivalent of the COA algorithm is the acoustic-contour (AC)
 algorithm. This approach represents the information from acoustic
-detections in the form of acoustic centroids, which contract and expand
+detections in the form of acoustic containers, which contract and expand
 in line with the distribution of uncertainty in the individual’s
 location when it is detected and in the gaps between detections. The
-acoustic-centroid depth-contour (ACDC) algorithm combines the AC and DC
+acoustic-container depth-contour (ACDC) algorithm combines the AC and DC
 algorithms, using PAT data to inform the area within which depth
 contours are most likely to be found. These algorithms are implemented
 with the `acdc*()` family of functions:
 
   - `acs_setup_mobility()` examines the assumption of a constant
     ‘mobility’ parameter;
-  - `acs_setup_centroids()` defines the detection centroids for the
+  - `acs_setup_containers()` defines the detection containers for the
     algorithm(s);
   - `acs_setup_detection_kernels()` defines detection probability
     kernels for the algorithm(s);
@@ -434,7 +434,7 @@ using several key functions:
       - `acdc_access_timesteps()` accesses the total number of time
         steps;
       - `acdc_access_maps()` accesses stored maps;
-  - `acdc_plot_trace()` plots acoustic centroid dynamics;
+  - `acdc_plot_trace()` plots acoustic container dynamics;
   - `acdc_plot_record()` plots the results of the algorithm(s);
   - `acdc_animate_record()` creates html animations of algorithm(s);
 

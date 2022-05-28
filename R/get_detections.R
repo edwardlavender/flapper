@@ -83,20 +83,20 @@ get_detection_pr <- function(distance = 1:1000,
 
 ######################################
 ######################################
-#### get_detection_centroids()
+#### get_detection_containers()
 
-#' @title Define detection centroids around receivers
-#' @description This function defines the areas surveyed by receivers (termed `detection centroids') as a spatial object, based on an estimate of the detection range (m) and any barriers to detection. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The function defines a spatial buffer around each receiver according to the estimated detection range, cuts out any barriers to detection, such as the coastline, and returns a SpatialPolygons object that defines the combined detection centroid across all receivers or receiver-specific detection centroids.
+#' @title Define detection containers around receivers
+#' @description This function defines the areas surveyed by receivers (termed `detection containers') as a spatial object, based on an estimate of the detection range (m) and any barriers to detection. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The function defines a spatial buffer around each receiver according to the estimated detection range, cuts out any barriers to detection, such as the coastline, and returns a SpatialPolygons object that defines the combined detection container across all receivers or receiver-specific detection containers.
 #'
 #' @param xy A \code{\link[sp]{SpatialPoints-class}} or \code{\link[sp]{SpatialPointsDataFrame-class}} object that defines receiver locations. The coordinate reference system should be the Universe Transverse Mercator coordinate reference system.
 #' @param detection_range A number that defines the detection range (m) of receivers.
-#' @param resolution A number that defines the number of linear segments used to approximate the detection centroid (see the \code{quadsegs} argument in \code{\link[rgeos]{gBuffer}}).
+#' @param resolution A number that defines the number of linear segments used to approximate the detection container (see the \code{quadsegs} argument in \code{\link[rgeos]{gBuffer}}).
 #' @param boundaries An \code{\link[raster]{extent}} object (on an object from which this can be extracted) that defines the boundaries of the study area.
 #' @param coastline (optional) A \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines barriers (such as the coastline) that block receivers from surveying areas within their detection range.
-#' @param plot A logical input that defines whether or not to plot receivers, their centroids, and the buffer (if specified).
+#' @param plot A logical input that defines whether or not to plot receivers, their containers, and the buffer (if specified).
 #' @param ... Additional arguments passed to \code{\link[rgeos]{gBuffer}}, such as \code{byid}.
 #'
-#' @return The function returns a \code{\link[sp]{SpatialPolygons-class}} object of the detection centroids around receivers that represents the area they survey under the assumption of a constant detection range, accounting for any barriers to detection. By default, this will contain a single feature, which is suitable for the calculation of the total area surveyed by receivers (see \code{\link[flapper]{get_detection_area_sum}}) because it accounts for the overlap in the detection ranges of receivers. However, if \code{byid = TRUE} is passed via \code{...} to \code{\link[rgeos]{gBuffer}}, the returned object will have a feature for each pair of coordinates in \code{xy} (i.e., receiver). This is less appropriate for calculating the area surveyed by receivers, since areas surveyed by multiple receivers will be over-counted, but it is suitable when the centroids for particular receivers are required (e.g., to extract environmental conditions within a specific receiver's detection range) (see \code{\link[flapper]{get_detection_centroids_envir}}).
+#' @return The function returns a \code{\link[sp]{SpatialPolygons-class}} object of the detection containers around receivers that represents the area they survey under the assumption of a constant detection range, accounting for any barriers to detection. By default, this will contain a single feature, which is suitable for the calculation of the total area surveyed by receivers (see \code{\link[flapper]{get_detection_area_sum}}) because it accounts for the overlap in the detection ranges of receivers. However, if \code{byid = TRUE} is passed via \code{...} to \code{\link[rgeos]{gBuffer}}, the returned object will have a feature for each pair of coordinates in \code{xy} (i.e., receiver). This is less appropriate for calculating the area surveyed by receivers, since areas surveyed by multiple receivers will be over-counted, but it is suitable when the containers for particular receivers are required (e.g., to extract environmental conditions within a specific receiver's detection range) (see \code{\link[flapper]{get_detection_containers_envir}}).
 #'
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
@@ -106,32 +106,32 @@ get_detection_pr <- function(distance = 1:1000,
 #'                         proj_wgs84)
 #' xy <- sp::spTransform(xy, proj_utm)
 #'
-#' #### Example (1): Get the simplest centroids around receivers
-#' get_detection_centroids(xy)
+#' #### Example (1): Get the simplest containers around receivers
+#' get_detection_containers(xy)
 #'
 #' #### Example (2): Account for barriers in the study area
-#' get_detection_centroids(xy, coastline = dat_coast)
+#' get_detection_containers(xy, coastline = dat_coast)
 #'
 #' #### Example (3): Adjust the detection range
-#' get_detection_centroids(xy, detection_range = 400, coastline = dat_coast)
-#' get_detection_centroids(xy, detection_range = 500, coastline = dat_coast)
+#' get_detection_containers(xy, detection_range = 400, coastline = dat_coast)
+#' get_detection_containers(xy, detection_range = 500, coastline = dat_coast)
 #'
 #' #### Example (4): Suppress the plot
-#' get_detection_centroids(xy, coastline = dat_coast, plot = FALSE)
+#' get_detection_containers(xy, coastline = dat_coast, plot = FALSE)
 #'
 #' #### Example (5): Output characteristics are controlled via byid
 #' # A SpatialPolygons object with one feature is the implicit output
-#' sp_1 <- get_detection_centroids(xy, coastline = dat_coast, byid = FALSE)
+#' sp_1 <- get_detection_containers(xy, coastline = dat_coast, byid = FALSE)
 #' sp_1
 #' # A SpatialPolygons object with one feature for each element in xy
 #' # ... can be returned via byid = TRUE
-#' sp_2 <- get_detection_centroids(xy, coastline = dat_coast, byid = TRUE)
+#' sp_2 <- get_detection_containers(xy, coastline = dat_coast, byid = TRUE)
 #' sp_2
 #' # The total area of the former will be smaller, since areas covered
 #' # ... by multiple receivers are merged
 #' rgeos::gArea(sp_1); rgeos::gArea(sp_2)
 #' # But it can be more convenient to use the latter format in some cases
-#' # ... because it is easy to isolate specific centroids:
+#' # ... because it is easy to isolate specific containers:
 #' raster::plot(dat_coast)
 #' raster::plot(sp_1[1], add = TRUE, col = "red")  # single feature
 #' raster::plot(sp_2[1], add = TRUE, col = "blue") # isolate specific features
@@ -139,7 +139,7 @@ get_detection_pr <- function(distance = 1:1000,
 #' @author Edward Lavender
 #' @export
 
-get_detection_centroids <- function(xy,
+get_detection_containers <- function(xy,
                                     detection_range = 425,
                                     resolution = 1000,
                                     boundaries = NULL, coastline = NULL,
@@ -189,25 +189,25 @@ get_detection_centroids <- function(xy,
 
 ########################################
 ########################################
-#### get_detection_centroids_overlap()
+#### get_detection_containers_overlap()
 
-#' @title Get detection centroid overlaps
+#' @title Get detection container overlaps
 #' @importFrom lubridate `%within%`
-#' @description This functions identifies receivers with overlapping detection centroids in space and time.
+#' @description This functions identifies receivers with overlapping detection containers in space and time.
 #'
-#' @param centroids A \code{\link[sp]{SpatialPolygonsDataFrame}} that defines detection centroids (see \code{\link[flapper]{get_detection_centroids}}). The \code{data} slot must include a dataframe with the following columns: an unique, integer identifier for each receiver (`receiver_id') and receiver deployment \code{\link[base]{Dates}} (`receiver_start_date' and `receiver_end_date').
+#' @param containers A \code{\link[sp]{SpatialPolygonsDataFrame}} that defines detection containers (see \code{\link[flapper]{get_detection_containers}}). The \code{data} slot must include a dataframe with the following columns: an unique, integer identifier for each receiver (`receiver_id') and receiver deployment \code{\link[base]{Dates}} (`receiver_start_date' and `receiver_end_date').
 #' @param services (optional) A dataframe that defines receiver IDs and servicing \code{\link[base]{Dates}} (times during the deployment period of a receiver when it was not active due to servicing). If provided, this must contain the following columns: an integer identifier for serviced receivers (named ‘receiver_id’) and two columns that define the time of the service(s) (‘service_start_date’ and ‘service_end_date’) (see \code{\link[flapper]{make_matrix_receivers}}).
 #'
 #' @details This function requires the \code{\link[tidyr]{tidyr-package}} (specifically \code{\link[tidyr]{pivot_longer}}).
 #'
 #' @return The function returns a list with two elements:
 #' \itemize{
-#'   \item \strong{overlap_by_receiver} is list, with one element for all integers from \code{1:max(centroids$receiver_id)}. Any elements that do not correspond to receivers contain a NULL element. List elements that correspond to receivers contain a dataframe that defines, for each day over the deployment period (defined in `timestamp') of that receiver (defined in `receiver_id'), whether (1) or not (0) that receiver overlapped in space with every other receiver (defined in the remaining columns by their receiver IDs).
-#'   \item \strong{overlap_by_date} is a named list, with one element for each date from the start until the end of the study (\code{min(centroids$receiver_start_date):max(centroids$receiver_end_date)}), that records an integer vector of all receivers with overlapping centroids on that date. In this vector, each receiver overlaps with at least one other receiver (but not every receiver will necessarily overlap with every other receiver).
+#'   \item \strong{overlap_by_receiver} is list, with one element for all integers from \code{1:max(containers$receiver_id)}. Any elements that do not correspond to receivers contain a NULL element. List elements that correspond to receivers contain a dataframe that defines, for each day over the deployment period (defined in `timestamp') of that receiver (defined in `receiver_id'), whether (1) or not (0) that receiver overlapped in space with every other receiver (defined in the remaining columns by their receiver IDs).
+#'   \item \strong{overlap_by_date} is a named list, with one element for each date from the start until the end of the study (\code{min(containers$receiver_start_date):max(containers$receiver_end_date)}), that records an integer vector of all receivers with overlapping containers on that date. In this vector, each receiver overlaps with at least one other receiver (but not every receiver will necessarily overlap with every other receiver).
 #' }
 #'
 #' @examples
-#' #### Define receiver centroids
+#' #### Define receiver containers
 #' ## Define receiver locations as a SpatialPoints object with a UTM CRS
 #' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
 #' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
@@ -215,16 +215,16 @@ get_detection_centroids <- function(xy,
 #' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
 #'                         proj_wgs84)
 #' xy <- sp::spTransform(xy, proj_utm)
-#' ## Get receiver-specific detection centroids
-#' # ... via get_detection_centroids with byid = TRUE
-#' centroids <- get_detection_centroids(xy, byid = TRUE)
-#' ## Link detection centroids with receiver IDs and deployment dates
+#' ## Get receiver-specific detection containers
+#' # ... via get_detection_containers with byid = TRUE
+#' containers <- get_detection_containers(xy, byid = TRUE)
+#' ## Link detection containers with receiver IDs and deployment dates
 #' # ... in a SpatialPointsDataFrame, as required for this function.
-#' centroids_df <- dat_moorings[, c("receiver_id",
+#' containers_df <- dat_moorings[, c("receiver_id",
 #'                                  "receiver_start_date",
 #'                                  "receiver_end_date")]
-#' row.names(centroids_df) <- names(centroids)
-#' centroids <- sp::SpatialPolygonsDataFrame(centroids, centroids_df)
+#' row.names(containers_df) <- names(containers)
+#' containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
 #'
 #' ## Simulate some receiver 'servicing' dates for demonstration purposes
 #' set.seed(1)
@@ -246,12 +246,12 @@ get_detection_centroids <- function(xy,
 #' rownames(services) <- NULL
 #' if(nrow(services) == 0) services <- NULL
 #'
-#' #### Example (1): Implement function using centroids alone
-#' overlaps_1 <- get_detection_centroids_overlap(centroids = centroids)
+#' #### Example (1): Implement function using containers alone
+#' overlaps_1 <- get_detection_containers_overlap(containers = containers)
 #' summary(overlaps_1)
 #'
 #' #### Example (2): Account for servicing dates
-#' overlaps_2 <- get_detection_centroids_overlap(centroids = centroids,
+#' overlaps_2 <- get_detection_containers_overlap(containers = containers,
 #'                                               services = services)
 #' # Examine the first few simulated servicing events
 #' services[1:3, ]
@@ -269,20 +269,20 @@ get_detection_centroids <- function(xy,
 #' overlaps_2$list_by_receiver[[r_id]][overlaps_2$list_by_receiver[[r_id]]$timestamp %in%
 #'                                       services$service_start_date[services$receiver_id == r_id], ]
 #'
-#' @seealso \code{\link[flapper]{get_detection_centroids}} creates detection centroids.
+#' @seealso \code{\link[flapper]{get_detection_containers}} creates detection containers.
 #' @author Edward Lavender
 #' @export
 
 
-get_detection_centroids_overlap <- function(centroids, services = NULL){
+get_detection_containers_overlap <- function(containers, services = NULL){
 
   #### Checks
   ## packages
   if(!requireNamespace("tidyr", quietly = TRUE)) stop("Please install 'tidyr': this function requires the tidyr::pivot_longer() routine.")
-  ## centroids
-  if(!inherits(centroids, "SpatialPolygonsDataFrame")) stop("'centroids' must be a SpatialPolygonsDataFrame.")
+  ## containers
+  if(!inherits(containers, "SpatialPolygonsDataFrame")) stop("'containers' must be a SpatialPolygonsDataFrame.")
   ## moorings
-  moorings <- data.frame(centroids)
+  moorings <- data.frame(containers)
   check_names(input = moorings, req = c("receiver_id", "receiver_start_date", "receiver_end_date"),
               extract_names = colnames, type = all)
   if(is.numeric(moorings$receiver_id)) moorings$receiver_id <- as.integer(moorings$receiver_id)
@@ -317,16 +317,16 @@ get_detection_centroids_overlap <- function(centroids, services = NULL){
                                          as_POSIXct = NULL)
 
   #### Define a list, with one dataframe element per receiver, that defines, for each time step, the overlapping receivers (0, 1)
-  # Loop over each centroid...
-  centroids_ls <- lapply(1:length(centroids), function(i) centroids[i, ])
-  list_by_receiver <- pbapply::pblapply(centroids_ls, function(centroid) {
+  # Loop over each container...
+  containers_ls <- lapply(1:length(containers), function(i) containers[i, ])
+  list_by_receiver <- pbapply::pblapply(containers_ls, function(container) {
 
-    #### Collect centroid and receiver status information
-    # centroid <- centroids_ls[[2]]
+    #### Collect container and receiver status information
+    # container <- containers_ls[[2]]
     # Copy receiver activity status matrix
     info <- rs_active_mat
     # Focus on receiver's deployment window
-    info <- info[as.Date(rownames(info)) %within% lubridate::interval(centroid$receiver_start_date, centroid$receiver_end_date), , drop = FALSE]
+    info <- info[as.Date(rownames(info)) %within% lubridate::interval(container$receiver_start_date, container$receiver_end_date), , drop = FALSE]
 
     #### Convert receiver 'active' index (0, 1) to 'overlapping' index
     # ... A) Check for overlapping receivers
@@ -336,8 +336,8 @@ get_detection_centroids_overlap <- function(centroids, services = NULL){
     # ... C) If there are no overlapping receivers, the whole matrix just gets forced to 0
 
     ## (A) Get an index of the receivers that intersected with the current receiver (in space)
-    centroids_sbt <- centroids[!(centroids$receiver_id %in% centroid$receiver_id), ]
-    int_1 <- rgeos::gIntersects(centroid, centroids_sbt, byid = TRUE)
+    containers_sbt <- containers[!(containers$receiver_id %in% container$receiver_id), ]
+    int_1 <- rgeos::gIntersects(container, containers_sbt, byid = TRUE)
 
     ## (B) If there are any overlapping receivers,
     if(any(int_1)){
@@ -349,7 +349,7 @@ get_detection_centroids_overlap <- function(centroids, services = NULL){
       # ... some of which may have been active on that date
       # ... Note the implementation of this step before the step below, when all rows for the receiver
       # ... of interest are (inadvertently) set to 0.
-      info[which(info[, as.character(centroid$receiver_id)] == 0), ] <- 0
+      info[which(info[, as.character(container$receiver_id)] == 0), ] <- 0
 
       ## Process 'overlap' for overlapping/non-overlapping receivers
       # For overlapping receivers, we'll leave these as defined in the activity matrix
@@ -357,11 +357,11 @@ get_detection_centroids_overlap <- function(centroids, services = NULL){
       # ... if not active, e.g., due to a servicing event for that receiver, then they can't overlap).
       # ... For the non-overlapping receivers, we'll force '0' for the overlap (even if they were active).
       # Get receiver IDs
-      centroids_that_overlapped <- data.frame(centroids_sbt[which(int_1), ])
+      containers_that_overlapped <- data.frame(containers_sbt[which(int_1), ])
       # For all non-overlapping receivers, set '0' for overlap
       # ... Note that this will include the receiver of interest
       # ... But that doesn't matter because we'll drop that column anyway
-      info[, !(colnames(info) %in% centroids_that_overlapped$receiver_id)] <- 0
+      info[, !(colnames(info) %in% containers_that_overlapped$receiver_id)] <- 0
 
       ## (C) If there aren't any spatially overlapping receivers, then the whole matrix just takes on 0
     } else  info[] <- 0
@@ -370,14 +370,14 @@ get_detection_centroids_overlap <- function(centroids, services = NULL){
     rnms <- rownames(info)
     info <- data.frame(info)
     colnames(info) <- colnames(rs_active_mat)
-    info[, as.character(centroid$receiver_id)] <- NULL
+    info[, as.character(container$receiver_id)] <- NULL
     cnms <- colnames(info)
     info$timestamp <- as.Date(rnms)
-    info$receiver_id <- centroid$receiver_id
+    info$receiver_id <- container$receiver_id
     info <- info[, c("timestamp", "receiver_id", cnms)]
     return(info)
   })
-  names(list_by_receiver) <- as.character(centroids$receiver_id)
+  names(list_by_receiver) <- as.character(containers$receiver_id)
 
   #### On each date, get the vector of overlapping receivers
   # Note that not every receiver in this list will necessarily overlap with every other receiver though.
@@ -415,16 +415,16 @@ get_detection_centroids_overlap <- function(centroids, services = NULL){
 #### get_detection_area_sum()
 
 #' @title Calculate the total area sampled by acoustic receivers
-#' @description This function calculates the total area sampled by receivers, under the assumption of a constant detection range. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The \code{\link[flapper]{get_detection_centroids}} is used to calculate the detection centroids around receivers, given a specified detection range (m) and any barriers to detection, such as coastline, and then the total area covered by receivers is calculated, accounting for overlapping centroids.
+#' @description This function calculates the total area sampled by receivers, under the assumption of a constant detection range. To implement the function, receiver locations must be supplied as a SpatialPoints or SpatialPointsDataFrame object with the Universe Transverse Mercator coordinate reference system. The \code{\link[flapper]{get_detection_containers}} is used to calculate the detection containers around receivers, given a specified detection range (m) and any barriers to detection, such as coastline, and then the total area covered by receivers is calculated, accounting for overlapping containers.
 #'
-#' @param xy,detection_range,coastline,plot,... Arguments required to calculate and visualise detection centroids via \code{\link[flapper]{get_detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{detection_range}), barriers to detection (\code{coastline}), and whether or not to plot the centroids (\code{plot}).
+#' @param xy,detection_range,coastline,plot,... Arguments required to calculate and visualise detection containers via \code{\link[flapper]{get_detection_containers}}; namely, receiver locations (\code{xy}), the detection range (\code{detection_range}), barriers to detection (\code{coastline}), and whether or not to plot the containers (\code{plot}).
 #' @param scale A number that scales the total area (m). The default (\code{1/(1000^2)}) converts the units of \eqn{m^2} to \eqn{km^2}.
 #'
 #' @details This is a simple metric of the overall receiver sampling effort. This may be a poor metric if the assumption of a single detection range across all receivers is substantially incorrect or if there are substantial changes in the receiver array over the course of a study.
 #'
 #' @return The function returns a number that represents the total area surveyed by receivers (by default in \eqn{km^2}) and, if \code{plot = TRUE}, a plot of the area with receivers and their detection ranges.
 #'
-#' @seealso \code{\link[flapper]{get_detection_centroids}} defines detection centroids, across which the detection area is calculated. \code{\link[flapper]{get_detection_area_ts}} calculates the area sampled by receivers through time.
+#' @seealso \code{\link[flapper]{get_detection_containers}} defines detection containers, across which the detection area is calculated. \code{\link[flapper]{get_detection_area_ts}} calculates the area sampled by receivers through time.
 #'
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
@@ -464,8 +464,8 @@ get_detection_area_sum <- function(xy,
   # If xy is empty, return area = 0
   if(length(xy) == 0) return(0)
 
-  #### Define detection centroids
-  xy_buf <- get_detection_centroids(xy = xy,
+  #### Define detection containers
+  xy_buf <- get_detection_containers(xy = xy,
                                     detection_range = detection_range,
                                     coastline = coastline,
                                     plot = plot,...)
@@ -806,12 +806,12 @@ get_id_rec_overlap <- function(ids,
 
 ######################################
 ######################################
-#### get_detection_centroids_envir()
+#### get_detection_containers_envir()
 
 #' @title Sample environmental conditions around receivers
-#' @description This function is used to sample environmental conditions from within the detection centroids of receivers. To implement the function, a SpatialPoints object that defines receiver locations (\code{xy}) must be provided, along with the detection range (\code{detection_range}) of receivers. This information is used to define detection centroids, via \code{\link[flapper]{get_detection_centroids}}. Within each receiver's centroid, all values of an environmental variable, or a random sample of values, are extracted from a user-defined \code{\link[raster]{raster}} (\code{envir}). Under random sampling, values can be sampled according to a detection probability function (\code{sample_probs}). The function returns a list of dataframes, one for each receiver, that include the sampled values.
+#' @description This function is used to sample environmental conditions from within the detection containers of receivers. To implement the function, a SpatialPoints object that defines receiver locations (\code{xy}) must be provided, along with the detection range (\code{detection_range}) of receivers. This information is used to define detection containers, via \code{\link[flapper]{get_detection_containers}}. Within each receiver's container, all values of an environmental variable, or a random sample of values, are extracted from a user-defined \code{\link[raster]{raster}} (\code{envir}). Under random sampling, values can be sampled according to a detection probability function (\code{sample_probs}). The function returns a list of dataframes, one for each receiver, that include the sampled values.
 
-#' @param xy,detection_range,coastline,plot,... Arguments required to calculate and visualise detection centroids via \code{\link[flapper]{get_detection_centroids}}; namely, receiver locations (\code{xy}), the detection range (\code{detection_range}), barriers to detection (\code{coastline}) and whether or not to plot the centroids (\code{plot}). Additional arguments can be passed via \code{...} but note that \code{byid} is necessarily \code{TRUE} and should not be provided.
+#' @param xy,detection_range,coastline,plot,... Arguments required to calculate and visualise detection containers via \code{\link[flapper]{get_detection_containers}}; namely, receiver locations (\code{xy}), the detection range (\code{detection_range}), barriers to detection (\code{coastline}) and whether or not to plot the containers (\code{plot}). Additional arguments can be passed via \code{...} but note that \code{byid} is necessarily \code{TRUE} and should not be provided.
 #' @param envir A \code{\link[raster]{raster}} that defines the values of an environmental variable across the study area. The coordinate reference system should be the Universal Transverse Mercator system.
 #' @param sample_size (optional) An integer that defines the number of samples of the environmental variable to draw from the area around each receiver (see the `size' argument of \code{\link[base]{sample}}). If this is provided, \code{sample_size} samples are taken from this area; otherwise, all values are extracted.
 #' @param sample_replace (optional) If \code{sample_size} is specified, \code{sample_replace} is a logical input that defines whether to implement sampling with (\code{sample_replace = TRUE}, the default) or without (\code{sample_replace = FALSE}) replacement (see the `replace' argument of \code{\link[base]{sample}}).
@@ -829,37 +829,37 @@ get_id_rec_overlap <- function(ids,
 #'                         proj_wgs84)
 #' xy <- sp::spTransform(xy, proj_utm)
 #'
-#' #### Example (1): Extract all depth values within each receiver's centroid
-#' depths_by_centroid <-
-#'   get_detection_centroids_envir(xy = xy,
+#' #### Example (1): Extract all depth values within each receiver's container
+#' depths_by_container <-
+#'   get_detection_containers_envir(xy = xy,
 #'                                 detection_range = 425,
 #'                                 coastline = dat_coast,
 #'                                 envir = dat_gebco
 #'                                 )
 #' # The function returns a list of dataframes, one for each receiver
 #' # ... with the cell IDs and the value of the environmental variable
-#' utils::str(depths_by_centroid)
+#' utils::str(depths_by_container)
 #' # Collapse the list and compare conditions across receivers
-#' depths_by_centroid <-
-#'   lapply(1:length(depths_by_centroid), function(i){
-#'     d <- depths_by_centroid[[i]]
+#' depths_by_container <-
+#'   lapply(1:length(depths_by_container), function(i){
+#'     d <- depths_by_container[[i]]
 #'     d$receiver_id <- dat_moorings$receiver_id[i]
 #'     return(d)
 #'   })
-#' depths_by_centroid <- dplyr::bind_rows(depths_by_centroid)
-#' prettyGraphics::pretty_boxplot(depths_by_centroid$receiver_id,
-#'                                depths_by_centroid$envir)
+#' depths_by_container <- dplyr::bind_rows(depths_by_container)
+#' prettyGraphics::pretty_boxplot(depths_by_container$receiver_id,
+#'                                depths_by_container$envir)
 #'
 #' #### Example (2): Extract a random sample of values
 #' # (We'll keep the values small for speed)
-#' depths_by_centroid <-
-#'   get_detection_centroids_envir(xy = xy,
+#' depths_by_container <-
+#'   get_detection_containers_envir(xy = xy,
 #'                                 detection_range = 425,
 #'                                 coastline = dat_coast,
 #'                                 envir = dat_gebco,
 #'                                 sample_size = 2
 #'                                 )
-#' utils::str(depths_by_centroid)
+#' utils::str(depths_by_container)
 #'
 #' #### Example (3) Extract a random sample of values with weighted probabilities
 #' # Define detection probability function based only on distance
@@ -873,8 +873,8 @@ get_id_rec_overlap <- function(ids,
 #'     return(dpr)
 #'   }
 #' # Implement sampling with replacement according to detection probability
-#' depths_by_centroid <-
-#'   get_detection_centroids_envir(xy = xy,
+#' depths_by_container <-
+#'   get_detection_containers_envir(xy = xy,
 #'                                 detection_range = 425,
 #'                                 coastline = dat_coast,
 #'                                 envir = dat_gebco,
@@ -885,11 +885,11 @@ get_id_rec_overlap <- function(ids,
 #' # ... as well as 'dist' and 'prob' that define the distance of that cell
 #' # ... from the location in xy and the corresponding detection probability
 #' # ... at that distance respectively
-#' utils::str(depths_by_centroid)
+#' utils::str(depths_by_container)
 #'
 #' #### Example (4) Sampling without replacement via sample_replace = FALSE
-#' depths_by_centroid <-
-#'   get_detection_centroids_envir(xy = xy,
+#' depths_by_container <-
+#'   get_detection_containers_envir(xy = xy,
 #'                                 detection_range = 425,
 #'                                 coastline = dat_coast,
 #'                                 envir = dat_gebco,
@@ -897,11 +897,11 @@ get_id_rec_overlap <- function(ids,
 #'                                 sample_probs = calc_detection_pr,
 #'                                 sample_replace = FALSE
 #'                                 )
-#' utils::str(depths_by_centroid)
+#' utils::str(depths_by_container)
 #'
 #' #### Example (5) Parallelise the algorithm via cl and varlist arguments
-#' depths_by_centroid <-
-#'   get_detection_centroids_envir(xy = xy,
+#' depths_by_container <-
+#'   get_detection_containers_envir(xy = xy,
 #'                                 detection_range = 425,
 #'                                 coastline = dat_coast,
 #'                                 envir = dat_gebco,
@@ -911,13 +911,13 @@ get_id_rec_overlap <- function(ids,
 #'                                 cl = parallel::makeCluster(2L),
 #'                                 varlist = c("dat_gebco","calc_detection_pr")
 #'                                 )
-#' utils::str(depths_by_centroid)
+#' utils::str(depths_by_container)
 #'
 #' @author Edward Lavender
 #' @export
 #'
 
-get_detection_centroids_envir <- function(xy,
+get_detection_containers_envir <- function(xy,
                                           detection_range,
                                           coastline,
                                           plot = FALSE,
@@ -932,7 +932,7 @@ get_detection_centroids_envir <- function(xy,
   #### Checks
   t_onset <- Sys.time()
   cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
-  cat_to_console(paste0("flapper::get_detection_centroids_envir() called (@ ", t_onset, ")..."))
+  cat_to_console(paste0("flapper::get_detection_containers_envir() called (@ ", t_onset, ")..."))
   cat_to_console("... Implementing function checks...")
   if(is.null(sample_size)){
     if(!is.null(sample_probs)) message("sample_size = NULL: input to 'sample_probs' ignored.")
@@ -940,9 +940,9 @@ get_detection_centroids_envir <- function(xy,
   }
   check...("byid",...)
 
-  #### Define detection centroids
-  cat_to_console("... Defining detection centroid(s)...")
-  xy_buf <- get_detection_centroids(xy = xy,
+  #### Define detection containers
+  cat_to_console("... Defining detection container(s)...")
+  xy_buf <- get_detection_containers(xy = xy,
                                     detection_range = detection_range,
                                     coastline = coastline,
                                     plot = plot,
@@ -952,11 +952,11 @@ get_detection_centroids_envir <- function(xy,
   #### Extract conditions
   cat_to_console("... Extracting environmental conditions from detection area(s)...")
   ls_envir <-
-    cl_lapply(xy_buf_ls, cl = cl, varlist = varlist, fun = function(centroid){
+    cl_lapply(xy_buf_ls, cl = cl, varlist = varlist, fun = function(container){
 
       ## Extract conditions
       # Create list of conditions sampled by each receiver
-      envir_sampled <- raster::extract(envir, centroid, cellnumbers = TRUE)
+      envir_sampled <- raster::extract(envir, container, cellnumbers = TRUE)
       envir_sampled <- envir_sampled[[1]]
       dat <- data.frame(envir_sampled)
       colnames(dat) <- c("cell", "envir")
@@ -964,7 +964,7 @@ get_detection_centroids_envir <- function(xy,
       ## Define distances
       if(!is.null(sample_probs)){
         rdist <- raster::distanceFromPoints(envir, xy)
-        dist_sampled <- raster::extract(rdist, centroid, cellnumbers = TRUE)
+        dist_sampled <- raster::extract(rdist, container, cellnumbers = TRUE)
         dist_sampled <- dist_sampled[[1]]
         dist_sampled <- data.frame(dist_sampled)
         colnames(dist_sampled) <- c("cell", "dist")
@@ -1261,13 +1261,13 @@ get_detection_clumps <-
 #### get_detection_overlaps()
 
 #' @title Get `overlapping' detections
-#' @description This function isolates detections that occurred at `effectively the same time' at different receivers with overlapping or non-overlapping detection centroids. To implement the function, a dataframe of acoustic detections for a specific individual (\code{acoustics}) is required. Within this dataframe, the function isolates any detections that occurred within a user-specified time interval (\code{clock_drift}) at different receivers. If a list of the receivers with overlapping detection centroids in space and time is supplied (\code{overlaps}), the function also flags the subset of these detections that occurred at receivers with overlapping or non-overlapping detection centroids. This information is important for identifying potential false detections and the implementation of the AC* algorithm(s) (see Details). The function returns this information via summary message(s) along with a dataframe of the overlapping detections.
+#' @description This function isolates detections that occurred at `effectively the same time' at different receivers with overlapping or non-overlapping detection containers. To implement the function, a dataframe of acoustic detections for a specific individual (\code{acoustics}) is required. Within this dataframe, the function isolates any detections that occurred within a user-specified time interval (\code{clock_drift}) at different receivers. If a list of the receivers with overlapping detection containers in space and time is supplied (\code{overlaps}), the function also flags the subset of these detections that occurred at receivers with overlapping or non-overlapping detection containers. This information is important for identifying potential false detections and the implementation of the AC* algorithm(s) (see Details). The function returns this information via summary message(s) along with a dataframe of the overlapping detections.
 #'
 #' @param acoustics A dataframe of passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example) for a single individual. This must contain an integer vector of receiver IDs, named `receiver_id' and a POSIXct vector of time stamps when detections were made, named `timestamp'.
-#' @param overlaps (optional) A named list, from \code{\link[flapper]{get_detection_centroids_overlap}}, that defines, for each receiver, for each day over its deployment period, whether or not its detection centroid overlapped with those of other receivers.
+#' @param overlaps (optional) A named list, from \code{\link[flapper]{get_detection_containers_overlap}}, that defines, for each receiver, for each day over its deployment period, whether or not its detection container overlapped with those of other receivers.
 #' @param clock_drift A number that defines the time (s) between sequential detections at which they are considered to have occurred at `effectively the same time'.
 #'
-#' @details Detections at different receivers that occur at effectively the same time have important implications for inferences of animal movement patterns, especially via the AC* algorithm(s) in \code{\link[flapper]{flapper}} (e.g. \code{\link[flapper]{acdc}}). Within the AC* algorithm(s), when an individual is detected at the same time at two different receivers, detection probability kernels dictate that these receivers must have overlapping detection centroids. If the detection centroids do not overlap, this suggests that either (a) receiver clocks are not well-aligned; (b) the definition of `effectively the same time' is be overly large (such that the individual could move from within the detection centroid of one receiver into the detection centroid of another); (c) detection centroids are too small and detection probability is higher than realised; and/or (d) one or more of the detections are false. The most likely cause may be guided by knowledge of the array design, detection probability and false detection algorithms. For example, if it is plausible that detection centroids are too small, repeating the implementation of this function with larger centroids may indicate whether or not this is likely to have been the case: if so, all detections that occurred at effectively the same time at receivers with non-overlapping detection centroids should be captured by the large centroids (though this does not rule out other explanations). The purpose of this function is to flag any such detections so that they can be investigated and addressed prior to the implementation of the AC* algorithm(s).
+#' @details Detections at different receivers that occur at effectively the same time have important implications for inferences of animal movement patterns, especially via the AC* algorithm(s) in \code{\link[flapper]{flapper}} (e.g. \code{\link[flapper]{acdc}}). Within the AC* algorithm(s), when an individual is detected at the same time at two different receivers, detection probability kernels dictate that these receivers must have overlapping detection containers. If the detection containers do not overlap, this suggests that either (a) receiver clocks are not well-aligned; (b) the definition of `effectively the same time' is be overly large (such that the individual could move from within the detection container of one receiver into the detection container of another); (c) detection containers are too small and detection probability is higher than realised; and/or (d) one or more of the detections are false. The most likely cause may be guided by knowledge of the array design, detection probability and false detection algorithms. For example, if it is plausible that detection containers are too small, repeating the implementation of this function with larger containers may indicate whether or not this is likely to have been the case: if so, all detections that occurred at effectively the same time at receivers with non-overlapping detection containers should be captured by the large containers (though this does not rule out other explanations). The purpose of this function is to flag any such detections so that they can be investigated and addressed prior to the implementation of the AC* algorithm(s).
 #'
 #' @return The function returns a message that defines the number of detections at different receivers that occurred at effectively the same time (within \code{clock_drift}) and, if \code{overlaps} is supplied, the subset of these that occurred at non-overlapping receivers. A dataframe is also invisibly returned that records the details of overlapping detections. This includes the following columns:
 #' \itemize{
@@ -1276,7 +1276,7 @@ get_detection_clumps <-
 #'    \item \code{timestamp_2}, a POSIXct vector of the time stamps at which immediately subsequent detections were made;
 #'    \item \code{receiver_id_2}, an integer identifier of the receivers at which the immediately subsequent detections were made;
 #'    \item \code{diff_time}, a numeric vector that defines the time (s) between consecutive detections (\code{timestamp_1} and \code{timestamp_2});
-#'    \item \code{detection_in_overlapping_centroid}, a binary vector that defines whether (1) or not (0) the detection centroids of \code{receiver_id_1} and \code{receiver_id_2} overlapped at the time of the detection (this is only included if \code{overlaps} is provided);
+#'    \item \code{detection_in_overlapping_container}, a binary vector that defines whether (1) or not (0) the detection containers of \code{receiver_id_1} and \code{receiver_id_2} overlapped at the time of the detection (this is only included if \code{overlaps} is provided);
 #' }
 #'
 #' @examples
@@ -1285,10 +1285,10 @@ get_detection_clumps <-
 #' dat <- get_detection_overlaps(acoustics = dat_acoustics_25)
 #' utils::head(dat)
 #'
-#' #### Example (2): Implement function, including information on detection centroids
+#' #### Example (2): Implement function, including information on detection containers
 #'
-#' ## Get detection centroid overlaps to include in function
-#' ## (see ?flapper::get_detection_centroid_overlaps)
+#' ## Get detection container overlaps to include in function
+#' ## (see ?flapper::get_detection_container_overlaps)
 #' # Define receiver locations
 #' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
 #' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
@@ -1296,34 +1296,34 @@ get_detection_clumps <-
 #' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
 #'                         proj_wgs84)
 #' xy <- sp::spTransform(xy, proj_utm)
-#' # Get receiver-specific detection centroids
-#' centroids <- get_detection_centroids(xy, byid = TRUE)
-#' centroids_df <- dat_moorings[, c("receiver_id",
+#' # Get receiver-specific detection containers
+#' containers <- get_detection_containers(xy, byid = TRUE)
+#' containers_df <- dat_moorings[, c("receiver_id",
 #'                                  "receiver_start_date",
 #'                                  "receiver_end_date")]
-#' row.names(centroids_df) <- names(centroids)
-#' centroids <- sp::SpatialPolygonsDataFrame(centroids, centroids_df)
-#' # Define detection centroid overlaps
-#' overlaps <- get_detection_centroids_overlap(centroids = centroids)
+#' row.names(containers_df) <- names(containers)
+#' containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
+#' # Define detection container overlaps
+#' overlaps <- get_detection_containers_overlap(containers = containers)
 #'
-#' ## Implement function with detection centroid overlaps included
+#' ## Implement function with detection container overlaps included
 #' dat <- get_detection_overlaps(acoustics = dat_acoustics_25, overlaps = overlaps)
 #' utils::head(dat)
 #'
 #' #### Implement function across all individuals
 #' # For some individuals, there are simultaneous detections at receivers with
-#' # ... non overlapping detection centroids, suggesting these are probably too small.
+#' # ... non overlapping detection containers, suggesting these are probably too small.
 #' dat_by_id <-
 #'   lapply(split(dat_acoustics, dat_acoustics$individual_id),
 #'          function(acc_for_id){
 #'            print(paste("individual_id", acc_for_id$individual_id[1], "-------"))
 #'            get_detection_overlaps(acoustics = acc_for_id, overlaps = overlaps)
 #'          })
-#' ## Test this hypothesis by re-implementing approach with larger centroids
-#' # Re-define centroids and receiver overlap
-#' centroids <- get_detection_centroids(xy, detection_range = 750, byid = TRUE)
-#' centroids <- sp::SpatialPolygonsDataFrame(centroids, centroids_df)
-#' overlaps <- get_detection_centroids_overlap(centroids = centroids)
+#' ## Test this hypothesis by re-implementing approach with larger containers
+#' # Re-define containers and receiver overlap
+#' containers <- get_detection_containers(xy, detection_range = 750, byid = TRUE)
+#' containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
+#' overlaps <- get_detection_containers_overlap(containers = containers)
 #' # Re-implement algorithm
 #' dat_by_id <-
 #'   lapply(split(dat_acoustics, dat_acoustics$individual_id),
@@ -1332,7 +1332,7 @@ get_detection_clumps <-
 #'            get_detection_overlaps(acoustics = acc_for_id, overlaps = overlaps)
 #'          })
 #' # There are now no observations within clock_drift at receivers with
-#' # ... non-overlapping centroids.
+#' # ... non-overlapping containers.
 #'
 #' @author Edward Lavender
 #' @export
@@ -1372,7 +1372,7 @@ get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5){
   n <- nrow(acoustics)
   message(n, " observation(s) identified at another receiver within ", clock_drift, " secs.")
 
-  #### Examine which of these occurred at receivers with overlapping detection centroids
+  #### Examine which of these occurred at receivers with overlapping detection containers
   # For each receiver, for each date, we will identify whether detections within the clock drift
   # ... occurred at a spatially overlapping receiver.
   if(n > 0 & !is.null(overlaps)) {
@@ -1381,7 +1381,7 @@ get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5){
     # Define a column to distinguish detection dates
     acoustics$timestamp_date <- as.Date(acoustics$timestamp_1)
     # Define blank column to store whether or not detections occurred at an overlapping receiver
-    acoustics$detection_in_overlapping_centroid <- 0
+    acoustics$detection_in_overlapping_container <- 0
     # Update acoustics with information on whether or not detections occurred at an overlapping receiver
     acc_by_receiver <-
       # For each receiver...
@@ -1401,7 +1401,7 @@ get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5){
             # For each detection...
             for(i in 1:nrow(acc_by_receiver_on_date)){
               # Work out whether or not that detection occurred at an overlapping receiver
-              acc_by_receiver_on_date$detection_in_overlapping_centroid[i] <-
+              acc_by_receiver_on_date$detection_in_overlapping_container[i] <-
                 overlap_for_receiver_on_date[, acc_by_receiver_on_date$receiver_id_2_char[i]] == 1
             }
             return(acc_by_receiver_on_date)
@@ -1413,8 +1413,8 @@ get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5){
     acoustics$timestamp_date <- NULL
 
     #### Determine the number of detections at non-overlapping receivers
-    n_at_non_overlapping_receivers <- length(which(acoustics$detection_in_overlapping_centroid == 0))
-    message("Of these, there are ", n_at_non_overlapping_receivers, " observation(s) within ", clock_drift, " secs that are not in overlapping centroids.")
+    n_at_non_overlapping_receivers <- length(which(acoustics$detection_in_overlapping_container == 0))
+    message("Of these, there are ", n_at_non_overlapping_receivers, " observation(s) within ", clock_drift, " secs that are not in overlapping containers.")
     # Examine the receiver combinations at which simultaneous detections at non-overlapping receivers occurred:
     if(n_at_non_overlapping_receivers > 0){
       acoustics$key <- paste0(acoustics$receiver_id_1, "-", acoustics$receiver_id_2)

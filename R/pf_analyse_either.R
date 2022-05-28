@@ -634,7 +634,7 @@ pf_kud_2 <- function(xpf,
       return(ud)
     })
     ud_by_path <- raster::stack(ud_by_path)
-    ud <- raster::calc(ud_by_path, mean)
+    ud <- raster::calc(ud_by_path, mean, na.rm = TRUE)
   }
 
   #### Renormalise KUDs

@@ -28,7 +28,7 @@ dat_acoustics
 A dataset containing a sample of processed flapper skate (\emph{Dipturus intermedius}) detection time series. Data are arranged by \code{individual_id}, \code{timestamp} and then \code{receiver_id} (see below).
 }
 \details{
-Time stamps are expressed to the nearest two minutes. `Duplicate' detections (of the same individual at the same receiver in the same time step) are excluded. This supports the implementation of the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms (see \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}).
+Time stamps are expressed to the nearest two minutes. `Duplicate' detections (of the same individual at the same receiver in the same time step) are excluded. This supports the implementation of the acoustic-container (AC) and acoustic-container depth-contour (ACDC) algorithms (see \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}).
 }
 \references{
 Data collection and processing is described in Lavender (in prep). Fine-scale habitat use of the Critically Endangered flapper skate (\emph{Dipturus intermedius}). [Doctoral dissertation, University of St Andrews].

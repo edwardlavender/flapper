@@ -3,7 +3,7 @@
 #### acdc_record-class
 
 #' @title "acdc_record" class
-#' @description An S3 class that defines the object returned by an acoustic-centroid/depth-contour (AC/DC) algorithm (\code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}), after simplification via \code{\link[flapper]{acdc_simplify}} or directly from internal routines.
+#' @description An S3 class that defines the object returned by an acoustic-container/depth-contour (AC/DC) algorithm (\code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}), after simplification via \code{\link[flapper]{acdc_simplify}} or directly from internal routines.
 
 #' @return \subsection{A named list}{An "acdc_record" class object is a named list with the following elements: `map', `record', `time', `args', `chunks' and `simplify'. The main output element is the `map' RasterLayer that shows where the individual could have spent more or less time over the duration of the movement time series. The `record' element records time-specific maps of the possible locations of the individual, and can be used to plot maps of specific time points or to produce animations (for the time steps specified by the \code{save_record_spatial} argument). The `time' element is a dataframe that defines the times of sequential stages in the algorithm's progression, providing a record of computation time. The `args' element is a named list of user inputs that record the parameters used to generate the outputs (if \code{save_args = TRUE}, otherwise the `args' element is \code{NULL}). The `chunks' element is a list with chunk-specific information that is generated if the algorithm is implemented chunk-wise and then simplified via \code{\link[flapper]{acdc_simplify}} with the \code{keep_chunks = TRUE} argument. The \code{simplify} element is a logical value that defines whether or not the object was created from \code{\link[flapper]{ac}}/\code{\link[flapper]{dc}}/\code{\link[flapper]{acdc}} and \code{\link[flapper]{acdc_simplify}} or an internal routine. Below, more detail about the `map' and `record' elements is provided.}
 #'
@@ -41,12 +41,12 @@
 #'   \item `map_timestep' is a RasterLayer of all the positions that the individual could have occupied at that time step, given the algorithm;
 #'   \item `map_cumulative' is a RasterLayer of the cumulative of the number of times when the movement data were compatible with the individual being in that cell, under the specified algorithm, from all previous time steps up to the current time step (i.e., the sum of `map_timestep' across all time steps from the first time step to the current time step) (unless \code{normalise = TRUE} in which case the interpretation differs);
 #' }
-#' For the AC* algorithms, this list also includes information on the acoustic centroids and location probability:
+#' For the AC* algorithms, this list also includes information on the acoustic containers and location probability:
 #' \itemize{
-#'   \item `centroid_ap` is \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location from the perspective of its previous location;
-#'   \item `centroid_an' is a \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location from the perspective of the receiver that records a detection at the moment of detection (i.e., the detection centroid);
-#'   \item `centroid_b` is \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location from (A) the perspective of
-#'   \item `centroid_c` is a \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location at a given time step, accounting for the information provided by previous, current and future locations;
+#'   \item `container_ap` is \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location from the perspective of its previous location;
+#'   \item `container_an' is a \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location from the perspective of the receiver that records a detection at the moment of detection (i.e., the detection container);
+#'   \item `container_b` is \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location from (A) the perspective of
+#'   \item `container_c` is a \code{\link[sp]{SpatialPolygonsDataFrame}} that defines the boundaries of the individual's location at a given time step, accounting for the information provided by previous, current and future locations;
 #'   \item `kernel` is a \code{\link[raster]{raster}} that defines location probability across the grid, accounting for the receiver(s) at which an individual was detected and the receiver(s) at which an individual was not detected and receiver arrangement;
 #' }
 #'
@@ -65,7 +65,7 @@ NULL
 #### acdc_archive-class
 
 #' @title "acdc-archive" class
-#' @description An S3 class that defines the object returned by an acoustic-centroid/depth-contour (AC/DC) algorithm (\code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}).
+#' @description An S3 class that defines the object returned by an acoustic-container/depth-contour (AC/DC) algorithm (\code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}).
 #'
 #' @return An \code{\link[flapper]{acdc_archive-class}} object is a named list that contains the output of a call to \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}}. This contains the following elements: `archive', `ts_by_chunk', `time' and `args'.
 #'

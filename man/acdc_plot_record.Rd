@@ -11,7 +11,7 @@ acdc_plot_record(
   add_coastline = NULL,
   add_receivers = NULL,
   add_raster = list(col = rev(grDevices::terrain.colors(255))),
-  add_centroids = list(),
+  add_containers = list(),
   add_additional = NULL,
   crop_spatial = FALSE,
   xlim = NULL,
@@ -42,7 +42,7 @@ acdc_plot_record(
 
 \item{add_raster}{(optional) A named list of arguments, passed to \code{\link[fields]{image.plot}}, to plot the RasterLayer of possible locations that is extracted from \code{record}.}
 
-\item{add_centroids}{(optional) For outputs from the AC* algorithms (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), \code{centroids} is a named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic centroid to the plot.}
+\item{add_containers}{(optional) For outputs from the AC* algorithms (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), \code{containers} is a named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic container to the plot.}
 
 \item{add_additional}{(optional) A stand-alone function, to be executed after the background plot has been made and any specified spatial layers have been added to this, to customise the result (see Examples).}
 
@@ -66,7 +66,7 @@ acdc_plot_record(
 The function plots the results of the AC* algorithm(s) at specified time steps, with one plot per time step. Plots are saved to file if \code{png_param} is supplied.
 }
 \description{
-This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, an \code{\link[flapper]{acdc_record-class}} list from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic centroids (if applicable) can be added and customised and the finalised plots can be returned or saved to file.
+This function is used to plot time-specific maps from the AC/DC algorithm(s). To implement the function, an \code{\link[flapper]{acdc_record-class}} list from \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} plus \code{\link[flapper]{acdc_simplify}} must be supplied, from which the results can be extracted and plotted for specified time steps. For each time step, the function extracts the necessary information; sets up a blank background plot using \code{\link[raster]{plot}} and \code{\link[prettyGraphics]{pretty_axis}} and then adds requested spatial layers to this plot. Depending on user-inputs, this will usually show a cumulative map of where the individual could have spent more or less time, summed from the start of the algorithm to each time point. Coastline, receivers and acoustic containers (if applicable) can be added and customised and the finalised plots can be returned or saved to file.
 }
 \examples{
 #### Step (1): Implement AC/DC algorithm(s)
@@ -89,11 +89,11 @@ proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
 proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
 rsp <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 rsp <- sp::spTransform(rsp, proj_utm)
-## Plot with receiver locations and coastline, customise the centroids and the raster
+## Plot with receiver locations and coastline, customise the containers and the raster
 acdc_plot_record(record = dat_acdc,
                  add_coastline = list(x = dat_coast, col = "darkgreen"),
                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-                 add_centroids = list(col = "red"),
+                 add_containers = list(col = "red"),
                  add_raster = list(col = rev(topo.colors(100)))
                  )
 
@@ -103,7 +103,7 @@ acdc_plot_record(record = dat_acdc,
 acdc_plot_record(record = dat_acdc,
                  add_coastline = list(x = dat_coast, col = "darkgreen"),
                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-                 add_centroids = list(col = "red"),
+                 add_containers = list(col = "red"),
                  add_raster = list(smallplot= c(0.85, 0.9, 0.25, 0.75)),
                  crop_spatial = TRUE,
                  pretty_axis_args = list(side = 1:4,
@@ -126,7 +126,7 @@ acdc_plot_record(record = dat_acdc,
                  par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)),
                  add_coastline = list(x = dat_coast, col = "darkgreen"),
                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-                 add_centroids = list(col = "red"),
+                 add_containers = list(col = "red"),
                  add_raster = list(),
                  crop_spatial = TRUE,
                  xlim = raster::extent(dat_coast)[1:2],

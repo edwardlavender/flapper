@@ -17,7 +17,7 @@ acs_setup_mobility(
 \arguments{
 \item{depth}{A vector of depth observations, whose units match the \code{mobility} parameter, to be incorporated into the ACDC algorithm. (Note that the ACDC algorithm may drop depth observations internally depending on their alignment with the acoustic time series and so, ideally, pre-processed time series should be passed to \code{depth} to ensure inferences correspond directly to the time series modelled by \code{\link[flapper]{acdc}}.) Depth observations should be regularly spaced in time (i.e., represent a time series for a single individual, without gaps).}
 
-\item{mobility}{A number, in the same units as \code{depth}, that defines the maximum horizontal distance that an individual could move in the time period between archival observations (see \code{\link[flapper]{acs_setup_centroids}}).}
+\item{mobility}{A number, in the same units as \code{depth}, that defines the maximum horizontal distance that an individual could move in the time period between archival observations (see \code{\link[flapper]{acs_setup_containers}}).}
 
 \item{plot}{A logical variable that defines whether or not to plot the distribution of horizontal distances that the individual could travel, given its depth time series and \code{mobility}, as a histogram.}
 
@@ -31,7 +31,7 @@ acs_setup_mobility(
 The function returns a numeric vector of distances and, if \code{plot = TRUE}, a histogram of those distances.
 }
 \description{
-In the simplest and fastest (and only) version of the acoustic-centroid (AC) and acoustic-centroid depth-contour (ACDC) algorithms currently implemented by \code{\link[flapper]{flapper}}, the rate at which acoustic centroids expand and contract depends on a single `mobility' parameter that describes how the uncertainty in an individual's location changes through time according to the passive acoustic telemetry data. These changes essentially reflect the maximum horizontal distance that an individual can move in the regularised time steps between sequential detections. However, in some situations, a fixed parameter for horizontal movement may not be well supported. For instance, in cases with archival data (the ACDC algorithm), animals changes dramatically in depth and for which changes in depth are likely to curtail the extent of horizontal movement*. Thus, this function investigates the extent to which the horizontal distance an animal could travel changes through time if the mobility parameter is instead conceptualised as the diagonal distance between sequential depth observations.
+In the simplest and fastest (and only) version of the acoustic-container (AC) and acoustic-container depth-contour (ACDC) algorithms currently implemented by \code{\link[flapper]{flapper}}, the rate at which acoustic containers expand and contract depends on a single `mobility' parameter that describes how the uncertainty in an individual's location changes through time according to the passive acoustic telemetry data. These changes essentially reflect the maximum horizontal distance that an individual can move in the regularised time steps between sequential detections. However, in some situations, a fixed parameter for horizontal movement may not be well supported. For instance, in cases with archival data (the ACDC algorithm), animals changes dramatically in depth and for which changes in depth are likely to curtail the extent of horizontal movement*. Thus, this function investigates the extent to which the horizontal distance an animal could travel changes through time if the mobility parameter is instead conceptualised as the diagonal distance between sequential depth observations.
 }
 \details{
 The function uses a Pythagorean approximation to estimate the \eqn{distance} that an individual could travel in each time step (\eqn{t}), given the maximum horizontal distance that the individual could move (\eqn{mobility}) and sequential changes in \eqn{depth}, according to the equation:
@@ -40,7 +40,7 @@ The function uses a Pythagorean approximation to estimate the \eqn{distance} tha
 
 where \eqn{depth_{t + 1}} for the final (\eqn{n^{th}}) observation is defined as \eqn{depth_{t = n}} and thus \eqn{distance_{t = n} = mobility}.
 
-*If the horizontal distances that an individual could travel are not very variable, then the benefits of a single mobility parameter are likely to outweigh the costs. On the other hand, substantial variation in the horizontal distances that an individual could travel may suggest that a constant mobility parameter is inappropriate; in this situation, the correct centroids could be computed on-the-fly within the ACDC algorithm, but this is not currently implemented. However, the particle filtering algorithms can account for this by the incorporation of movement models within/between acoustic centroids.
+*If the horizontal distances that an individual could travel are not very variable, then the benefits of a single mobility parameter are likely to outweigh the costs. On the other hand, substantial variation in the horizontal distances that an individual could travel may suggest that a constant mobility parameter is inappropriate; in this situation, the correct containers could be computed on-the-fly within the ACDC algorithm, but this is not currently implemented. However, the particle filtering algorithms can account for this by the incorporation of movement models within/between acoustic containers.
 }
 \examples{
 #### Example (1) Explore mobility for single individual
@@ -77,11 +77,11 @@ graphics::par(pp)
 # ... is reasonable without further information (e.g., models of the underlying
 # ... behavioural state of the animal). However, it is still likely to be
 # ... beneficial to include a movement model to join locations within/
-# ... between acoustic centroids for some applications via particle filtering.
+# ... between acoustic containers for some applications via particle filtering.
 
 }
 \seealso{
-\code{\link[flapper]{acs_setup_mobility}}, \code{\link[flapper]{acs_setup_centroids}} and \code{\link[flapper]{acs_setup_detection_kernels}} are used to set up the AC and ACDC algorithms as implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}.
+\code{\link[flapper]{acs_setup_mobility}}, \code{\link[flapper]{acs_setup_containers}} and \code{\link[flapper]{acs_setup_detection_kernels}} are used to set up the AC and ACDC algorithms as implemented by \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}.
 }
 \author{
 Edward Lavender

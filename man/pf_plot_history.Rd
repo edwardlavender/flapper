@@ -33,7 +33,7 @@ pf_plot_history(
 The function returns a plot, for each time step, of all the possible locations of the individual, with sampled locations overlaid.
 }
 \description{
-This function plots the spatiotemporal particle histories from a particle filtering (PF) algorithm (the acoustic-centroid PF, the depth-contour PF or the acoustic-centroid depth-contour PF). This produces, for each time step, a map of the individual's possible locations (from the AC, DC or ACDC algorithm), with sampled locations (derived via the particle filtering routine) overlaid.
+This function plots the spatiotemporal particle histories from a particle filtering (PF) algorithm (the acoustic-container PF, the depth-contour PF or the acoustic-container depth-contour PF). This produces, for each time step, a map of the individual's possible locations (from the AC, DC or ACDC algorithm), with sampled locations (derived via the particle filtering routine) overlaid.
 }
 \examples{
 #### Implement pf() algorithm
