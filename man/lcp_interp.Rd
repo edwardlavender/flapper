@@ -37,7 +37,7 @@ This function is a wrapper for \code{\link[flapper]{lcp_over_surface}} designed 
 \details{
 If \code{calc_distances = TRUE}, distances are calculated with movement from the previous location to the `current' location (see Value).
 
-A useful application of this function in \code{\link[flapper]{flapper}} is the post-hoc evaluation of particle filtering movement algorithms (see \code{\link[flapper]{pf}}). These can be implemented using movement models based on Euclidean or shortest distances. Since the former is typically much faster, a useful starting point is to implement the chosen algorithm using Euclidean distances and then, for the sample of paths reconstructed by the algorithm, use \code{\link[flapper]{lcp_interp}} to examine the similarity between Euclidean and shortest distances and the effects of updated distance values on movement probabilities. If a Euclidean distances implementation of an algorithm is acceptable (i.e., minimum swimming distances are not too large under the movement model), shortest distances from \code{\link[flapper]{lcp_interp}} can be used to adjust the movement probabilities to more realistic values. Alternatively,a shortest distances implementation of the movement path algorithm may be necessary.
+A useful application of this function in \code{\link[flapper]{flapper}} is the post-hoc evaluation of particle filtering movement algorithms (see \code{\link[flapper]{pf}}). These can be implemented using movement models based on Euclidean or shortest distances. Since the former is typically much faster, a useful starting point is to implement the chosen algorithm using Euclidean distances and then, for the sample of paths reconstructed by the algorithm, use \code{\link[flapper]{lcp_interp}} to examine the similarity between Euclidean and shortest distances and the effects of updated distance values on movement probabilities. If a Euclidean distances implementation of an algorithm is acceptable (i.e., minimum swimming distances are not too large under the movement model), shortest distances from \code{\link[flapper]{lcp_interp}} can be used to adjust the movement probabilities to more realistic values. Alternatively, a shortest distances implementation of the movement path algorithm may be necessary.
 
 This function can also be useful for visualising movement paths (e.g., via \code{\link[flapper]{pf_plot_3d}}).
 }
@@ -82,53 +82,6 @@ utils::head(paths_interp_3$dist_lcp)
 # ... additional 'dist' column for the distances between sequential locations
 # ... along each shortest path (i.e., time step)
 utils::head(paths_interp_3$path_lcp)
-
-#### Example (4): Using lcp_interp() for post-hoc evaluation and adjustment
-# ... of movement model outputs for the DCPF algorithm
-
-## Examine whether shortest distances for path derived using
-# ... planar Euclidean distances are within reasonable limits given the
-# ... movement model:
-# First, add shortest distances to the dataframe
-paths_1$key <- paste0(paths_1$path_id, "-", paste0(paths_1$timestep))
-paths_interp_3$dist_lcp$key <-
-  paste0(paths_interp_3$dist_lcp$path_id, "-",
-         paths_interp_3$dist_lcp$timestep)
-paths_1$dist <-
-  paths_interp_3$dist_lcp$dist[match(paths_1$key, paths_interp_3$dist_lcp$key)]
-# Examine shortest distances with respect to movement model used to implement DCPF
-prettyGraphics::pretty_plot(dat_dcpf_histories$args$calc_movement_pr(1:1000), type = "l")
-graphics::rug(paths_1$dist, col = "red", pos = 0, lwd = 2)
-# In this case, every step in this path has non zero probability, suggesting
-# ... the Euclidean approach worked reasonably well (there aren't 'impossible'
-# ... movements when we account for the bathymetry).
-
-## Post-hoc adjustment of movement probabilities based on shortest distances
-# Given the Euclidean approach has generated a reasonable path, we can adjust
-# ... the probabilities associated with sequential steps so that they are based,
-# ... more realistically, on shortest distances:
-paths_1$cell_pr_2 <- dat_dcpf_histories$args$calc_movement_pr(paths_1$dist)
-prettyGraphics::pretty_plot(paths_1$cell_pr, paths_1$cell_pr_2)
-graphics::abline(0, 1, lty = 3)
-# In this case, probabilities are mostly similar
-
-## Alternatively, we could re-implement the algorithm using shortest distances
-# Re-implement algorithm
-dcpf_args               <- dat_dcpf_histories$args
-dcpf_args$calc_distance <- "lcp"
-dcpf_args$n             <- 100
-dcpf_history            <- do.call(pf, dcpf_args)
-paths                   <- pf_simplify(dcpf_history)
-# Interpolate paths
-paths_interp_4 <- lcp_interp(paths, surface)
-# Show the probabilities reported by the DCPF algorithm are the same as those
-# ... derived by post-hoc calculation of probabilities from shortest paths
-# ... interpolated from reported results, although the origin is not included:
-utils::head(
-  cbind(dcpf_args$calc_movement_pr(paths_interp_4$dist_lcp$dist),
-        paths$cell_pr)
-)
-
 
 }
 \author{
