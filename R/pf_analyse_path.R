@@ -2,16 +2,16 @@
 ########################################
 #### pf_loglik()
 
-#' @title Calculate the log-likelihood of movement paths from a PF algorithm
+#' @title Calculate the log-probability of movement paths from a PF algorithm
 #' @importFrom rlang .data
-#' @description This function calculates the total log-likelihood of each movement path reconstructed by a particle filtering (PF) algorithm, including the acoustic-container (AC), depth-contour (DC) or acoustic-container depth-contour (ACDC) algorithms.
+#' @description This function calculates the total log-probability of each movement path reconstructed by a particle filtering (PF) algorithm, including the acoustic-container (AC), depth-contour (DC) or acoustic-container depth-contour (ACDC) algorithms.
 #' @param paths A dataframe containing movement paths from \code{\link[flapper]{pf}} plus \code{\link[flapper]{pf_simplify}} (see \code{\link[flapper]{pf_path-class}}). At a minimum, this should contain a unique identifier for each path (named `path_id') and the probability associated with each cell along each path (`cell_pr').
 #'
 #' @details For each path, at each time step the probability associated with the sampled location depends on (a) the `intrinsic' probability associated with each cell (assigned by the AC, DC or ACDC algorithm) and (b) a user-defined movement model that is driven by the distance between the sampled locations for the individual at the previous and current time steps (and other user-defined parameters). This function simply sums the logarithms of these probabilities for each path as a measure of their relative likelihood, given the movement model.
 #' @examples
 #' # An example with the DCPF paths dataset included in flapper
 #' pf_loglik(dat_dcpf_paths)
-#' @return The function returns a dataframe with the log likelihood (`loglik') of each path (`path_id'). Rows are ordered by log-likelihood and a `delta' column is provided with the differences in log-likelihood between the most likely path and every other path.
+#' @return The function returns a dataframe with the log likelihood (`loglik') of each path (`path_id'). Rows are ordered by log-probability and a `delta' column is provided with the differences in log-probability between the most likely path and every other path.
 #' @author Edward Lavender
 #' @export
 #'
@@ -68,7 +68,7 @@ pf_loglik <- function(paths){
 #' }
 #'
 #' @return The function returns a plot of the observed and reconstructed depth time series, either for all paths at once (if \code{prompt = FALSE}) or each path separately (if \code{prompt = TRUE}).
-#' @seealso \code{\link[flapper]{pf}} implements the pf algorithm. \code{\link[flapper]{pf_plot_history}} visualises particle histories, \code{\link[flapper]{pf_plot_map}} creates an overall `probability of use' map from particle histories and \code{\link[flapper]{pf_simplify}} processes the outputs into a dataframe of movement paths. \code{\link[flapper]{pf_plot_1d}}, \code{\link[flapper]{pf_plot_2d}} and \code{\link[flapper]{pf_plot_3d}} provide plotting routines for paths. \code{\link[flapper]{pf_loglik}} calculates the log-likelihood of each path.
+#' @seealso \code{\link[flapper]{pf}} implements the pf algorithm. \code{\link[flapper]{pf_plot_history}} visualises particle histories, \code{\link[flapper]{pf_plot_map}} creates an overall `probability of use' map from particle histories and \code{\link[flapper]{pf_simplify}} processes the outputs into a dataframe of movement paths. \code{\link[flapper]{pf_plot_1d}}, \code{\link[flapper]{pf_plot_2d}} and \code{\link[flapper]{pf_plot_3d}} provide plotting routines for paths. \code{\link[flapper]{pf_loglik}} calculates the log-probability of each path.
 #' @author Edward Lavender
 #' @export
 
@@ -143,7 +143,7 @@ pf_plot_1d <- function(paths,
 #'   graphics::par(pp)
 #' }
 #'
-#' @seealso \code{\link[flapper]{pf}} implements the pf algorithm. \code{\link[flapper]{pf_plot_history}} visualises particle histories, \code{\link[flapper]{pf_plot_map}} creates an overall `probability of use' map from particle histories and \code{\link[flapper]{pf_simplify}} processes these into a dataframe of movement paths. \code{\link[flapper]{pf_plot_1d}}, \code{\link[flapper]{pf_plot_2d}} and \code{\link[flapper]{pf_plot_3d}} provide plotting routines for paths. For mapping, it can be useful to interpolate shortest (least-cost) paths between sequential locations via \code{\link[flapper]{lcp_interp}}. \code{\link[flapper]{pf_loglik}} calculates the log-likelihood of each path.
+#' @seealso \code{\link[flapper]{pf}} implements the pf algorithm. \code{\link[flapper]{pf_plot_history}} visualises particle histories, \code{\link[flapper]{pf_plot_map}} creates an overall `probability of use' map from particle histories and \code{\link[flapper]{pf_simplify}} processes these into a dataframe of movement paths. \code{\link[flapper]{pf_plot_1d}}, \code{\link[flapper]{pf_plot_2d}} and \code{\link[flapper]{pf_plot_3d}} provide plotting routines for paths. For mapping, it can be useful to interpolate shortest (least-cost) paths between sequential locations via \code{\link[flapper]{lcp_interp}}. \code{\link[flapper]{pf_loglik}} calculates the log-probability of each path.
 #' @author Edward Lavender
 #' @export
 #'
@@ -214,7 +214,7 @@ pf_plot_2d <- function(paths,
 #'
 #' @details This function requires the \code{\link[plotly]{plotly}} package.
 #'
-#' @seealso \code{\link[flapper]{pf}} implements the pf algorithm. \code{\link[flapper]{pf_plot_history}} visualises particle histories, \code{\link[flapper]{pf_plot_map}} creates an overall `probability of use' map from particle histories and \code{\link[flapper]{pf_simplify}} processes these into a dataframe of movement paths. \code{\link[flapper]{pf_plot_1d}}, \code{\link[flapper]{pf_plot_2d}} and \code{\link[flapper]{pf_plot_3d}} provide plotting routines for paths. For mapping, it can be useful to interpolate shortest (least-cost) paths between sequential locations via \code{\link[flapper]{lcp_interp}}. \code{\link[flapper]{pf_loglik}} calculates the log-likelihood of each path.
+#' @seealso \code{\link[flapper]{pf}} implements the pf algorithm. \code{\link[flapper]{pf_plot_history}} visualises particle histories, \code{\link[flapper]{pf_plot_map}} creates an overall `probability of use' map from particle histories and \code{\link[flapper]{pf_simplify}} processes these into a dataframe of movement paths. \code{\link[flapper]{pf_plot_1d}}, \code{\link[flapper]{pf_plot_2d}} and \code{\link[flapper]{pf_plot_3d}} provide plotting routines for paths. For mapping, it can be useful to interpolate shortest (least-cost) paths between sequential locations via \code{\link[flapper]{lcp_interp}}. \code{\link[flapper]{pf_loglik}} calculates the log-probability of each path.
 #'
 #' @author Edward Lavender
 #' @export

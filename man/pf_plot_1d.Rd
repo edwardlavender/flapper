@@ -62,7 +62,7 @@ if(interactive()){
 
 }
 \seealso{
-\code{\link[flapper]{pf}} implements the pf algorithm. \code{\link[flapper]{pf_plot_history}} visualises particle histories, \code{\link[flapper]{pf_plot_map}} creates an overall `probability of use' map from particle histories and \code{\link[flapper]{pf_simplify}} processes the outputs into a dataframe of movement paths. \code{\link[flapper]{pf_plot_1d}}, \code{\link[flapper]{pf_plot_2d}} and \code{\link[flapper]{pf_plot_3d}} provide plotting routines for paths. \code{\link[flapper]{pf_loglik}} calculates the log-likelihood of each path.
+\code{\link[flapper]{pf}} implements the pf algorithm. \code{\link[flapper]{pf_plot_history}} visualises particle histories, \code{\link[flapper]{pf_plot_map}} creates an overall `probability of use' map from particle histories and \code{\link[flapper]{pf_simplify}} processes the outputs into a dataframe of movement paths. \code{\link[flapper]{pf_plot_1d}}, \code{\link[flapper]{pf_plot_2d}} and \code{\link[flapper]{pf_plot_3d}} provide plotting routines for paths. \code{\link[flapper]{pf_loglik}} calculates the log-probability of each path.
 }
 \author{
 Edward Lavender
