@@ -80,8 +80,7 @@ summary(dc_summary)
 ## Examine time-specific maps via acdc_plot_record()
 acdc_plot_record(dc_summary)
 ## Examine overall map via a raster* plotting function
-# Each cell shows the number of time steps when the bathymetry data
-# ... in each cell matches the archival data
+# Each cell shows expected proportion of time steps spent in each cell
 prettyGraphics::pretty_map(add_rasters = list(x = dc_summary$map),
                            add_polys = list(x = dat_coast))
 # Convert counts on map to percentages
