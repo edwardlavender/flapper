@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">flapper</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -188,11 +188,11 @@
     <pre class="examples"><div class='input'><span class='co'>#### Example (1) Construct matrix from detected individuals using detection time series</span>
 <span class='va'>dat_acoustics</span><span class='op'>$</span><span class='va'>receiver_id</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>dat_acoustics</span><span class='op'>$</span><span class='va'>receiver_id</span><span class='op'>)</span>
 <span class='va'>mat_by_id</span> <span class='op'>&lt;-</span> <span class='fu'>make_matrix_detections</span><span class='op'>(</span><span class='va'>dat_acoustics</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::make_matrix_detections() called (@ 2022-05-28 18:13:58)... 
+</div><div class='output co'>#&gt; flapper::make_matrix_detections() called (@ 2022-06-17 10:06:38)... 
 #&gt; ... Checking user inputs... 
 #&gt; ... Defining time bins given 'delta_t'... 
 #&gt; ... Making detection matrix... 
-#&gt; ... flapper::make_matrix_detections() call completed (@ 2022-05-28 18:13:58) after ~0 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>mat_by_id</span><span class='op'>)</span>
+#&gt; ... flapper::make_matrix_detections() call completed (@ 2022-06-17 10:06:38) after ~0 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>mat_by_id</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    Length Class Mode   
 #&gt; 25 206505 table numeric
 #&gt; 28 206505 table numeric
@@ -208,11 +208,11 @@
 <span class='va'>mat_by_id</span> <span class='op'>&lt;-</span> <span class='fu'>make_matrix_detections</span><span class='op'>(</span><span class='va'>dat_acoustics</span>,
                                     moorings <span class='op'>=</span> <span class='va'>dat_moorings</span>,
                                     set_outside <span class='op'>=</span> <span class='cn'>NA</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::make_matrix_detections() called (@ 2022-05-28 18:13:58)... 
+</div><div class='output co'>#&gt; flapper::make_matrix_detections() called (@ 2022-06-17 10:06:38)... 
 #&gt; ... Checking user inputs... </div><div class='output co'>#&gt; <span class='warning'>Warning: Argument 'acoustics$tag_start_date' coerced to class 'POSIXct' from class(es): 'Date'.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Argument 'acoustics$tag_end_date' coerced to class 'POSIXct' from class(es): 'Date'.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Argument 'moorings$receiver_start_date' coerced to class 'POSIXct' from class(es): 'Date'.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Argument 'moorings$receiver_end_date' coerced to class 'POSIXct' from class(es): 'Date'.</span></div><div class='output co'>#&gt; ... Defining time bins given 'delta_t'... 
 #&gt; ... Making receiver matrix... 
 #&gt; ... Making detection matrix... 
-#&gt; ... flapper::make_matrix_detections() call completed (@ 2022-05-28 18:13:58) after ~0 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>mat_by_id</span><span class='op'>)</span>
+#&gt; ... flapper::make_matrix_detections() call completed (@ 2022-06-17 10:06:38) after ~0 minutes. </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>mat_by_id</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    Length Class Mode   
 #&gt; 25 211800 table numeric
 #&gt; 28 211800 table numeric

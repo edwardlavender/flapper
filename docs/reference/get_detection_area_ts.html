@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">flapper</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -178,10 +178,10 @@
 
 <span class='co'>#### Example (1): Implement function with default arguments</span>
 <span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'>get_detection_area_ts</span><span class='op'>(</span><span class='va'>xy</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2022-05-28 18:10:14)... 
+</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2022-06-17 10:03:01)... 
 #&gt; ... Implementing function checks... 
 #&gt; ... Implementing algorithm... 
-#&gt; ... Visualising time series </div><div class='img'><img src='get_detection_area_ts-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::get_detection_area_ts() call completed (@ 2022-05-28 18:10:22) after ~0.14 minutes. </div><div class='input'>
+#&gt; ... Visualising time series </div><div class='img'><img src='get_detection_area_ts-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::get_detection_area_ts() call completed (@ 2022-06-17 10:03:09) after ~0.15 minutes. </div><div class='input'>
 <span class='co'>#### Example (2): Adjust detection range, include coastline and use parallel processing</span>
 <span class='co'># For areas with complex coastline, this will reduce the speed of the algorithm</span>
 <span class='co'># So we will also supply a cluster to improve the computation time.</span>
@@ -193,17 +193,17 @@
                                varlist <span class='op'>=</span> <span class='st'>"dat_coast"</span>
                                <span class='op'>)</span>
 <span class='op'>}</span>
-</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2022-05-28 18:10:22)... 
+</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2022-06-17 10:03:09)... 
 #&gt; ... Implementing function checks... 
 #&gt; ... Implementing algorithm... 
-#&gt; ... Visualising time series </div><div class='img'><img src='get_detection_area_ts-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::get_detection_area_ts() call completed (@ 2022-05-28 18:10:49) after ~0.44 minutes. </div><div class='input'>
+#&gt; ... Visualising time series </div><div class='img'><img src='get_detection_area_ts-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::get_detection_area_ts() call completed (@ 2022-06-17 10:03:36) after ~0.45 minutes. </div><div class='input'>
 <span class='co'>#### Example (3) Hide or customise the plot</span>
 <span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'>get_detection_area_ts</span><span class='op'>(</span><span class='va'>xy</span>, plot <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2022-05-28 18:10:49)... 
+</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2022-06-17 10:03:36)... 
 #&gt; ... Implementing function checks... 
 #&gt; ... Implementing algorithm... 
 #&gt; ... Visualising time series 
-#&gt; ... flapper::get_detection_area_ts() call completed (@ 2022-05-28 18:10:58) after ~0.16 minutes. </div><div class='input'><span class='va'>dat</span> <span class='op'>&lt;-</span>
+#&gt; ... flapper::get_detection_area_ts() call completed (@ 2022-06-17 10:03:46) after ~0.17 minutes. </div><div class='input'><span class='va'>dat</span> <span class='op'>&lt;-</span>
   <span class='fu'>get_detection_area_ts</span><span class='op'>(</span><span class='va'>xy</span>,
                         pretty_axis_args <span class='op'>=</span>
                           <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
@@ -213,10 +213,10 @@
                        xlab <span class='op'>=</span> <span class='st'>"Time (month-year)"</span>,
                        ylab <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/expression.html'>expression</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"Area ("</span>, <span class='va'>m</span><span class='op'>^</span><span class='fl'>2</span>, <span class='st'>")"</span><span class='op'>)</span><span class='op'>)</span>,
                        type <span class='op'>=</span> <span class='st'>"l"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2022-05-28 18:10:58)... 
+</div><div class='output co'>#&gt; flapper::get_detection_area_ts() called (@ 2022-06-17 10:03:46)... 
 #&gt; ... Implementing function checks... 
 #&gt; ... Implementing algorithm... 
-#&gt; ... Visualising time series </div><div class='output co'>#&gt; <span class='message'>Argument 'side' not supplied to pretty_axis_args (nor 'axis_ls'); defaulting to side = 1:2.</span></div><div class='img'><img src='get_detection_area_ts-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::get_detection_area_ts() call completed (@ 2022-05-28 18:11:08) after ~0.17 minutes. </div><div class='input'>
+#&gt; ... Visualising time series </div><div class='output co'>#&gt; <span class='message'>Argument 'side' not supplied to pretty_axis_args (nor 'axis_ls'); defaulting to side = 1:2.</span></div><div class='img'><img src='get_detection_area_ts-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... flapper::get_detection_area_ts() call completed (@ 2022-06-17 10:03:56) after ~0.16 minutes. </div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

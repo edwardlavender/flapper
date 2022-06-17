@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">flapper</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -200,11 +200,11 @@
                                                  delta_t <span class='op'>=</span> <span class='st'>"days"</span>,
                                                  start <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>min</a></span><span class='op'>(</span><span class='va'>dat_ids</span><span class='op'>$</span><span class='va'>tag_start_date</span><span class='op'>)</span>,
                                                  end <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='va'>dat_ids</span><span class='op'>$</span><span class='va'>tag_end_date</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::make_matrix_detections() called (@ 2022-05-28 18:06:32)... 
+</div><div class='output co'>#&gt; flapper::make_matrix_detections() called (@ 2022-06-17 09:59:27)... 
 #&gt; ... Checking user inputs... 
 #&gt; ... Defining time bins given 'delta_t'... 
 #&gt; ... Making detection matrix... 
-#&gt; ... flapper::make_matrix_detections() call completed (@ 2022-05-28 18:06:32) after ~0 minutes. </div><div class='input'>
+#&gt; ... flapper::make_matrix_detections() call completed (@ 2022-06-17 09:59:27) after ~0 minutes. </div><div class='input'>
 <span class='co'>## (4) Define receiver coordinates with UTM projection</span>
 <span class='va'>proj_wgs84</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span>SRS_string <span class='op'>=</span> <span class='st'>"EPSG:4326"</span><span class='op'>)</span>
 <span class='va'>proj_utm</span>   <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span>SRS_string <span class='op'>=</span> <span class='st'>"EPSG:32629"</span><span class='op'>)</span>

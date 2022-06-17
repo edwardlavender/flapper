@@ -74,7 +74,7 @@ For each time step, the function plots the probability surface, the receiver(s) 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">flapper</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -266,12 +266,12 @@ For each time step, the function plots the probability surface, the receiver(s) 
                                     plot <span class='op'>=</span> <span class='cn'>TRUE</span>,
                                     resolution <span class='op'>=</span> <span class='fl'>10</span>,
                                     verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::acs_setup_detection_containers() called (@ 2022-05-28 18:05:15)... 
+</div><div class='output co'>#&gt; flapper::acs_setup_detection_containers() called (@ 2022-06-17 09:58:10)... 
 #&gt; ... Checking user inputs... 
 #&gt; ... Plotting background map of area... </div><div class='img'><img src='acdc_plot_trace-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; ... Making containers... 
 #&gt; ... Plotting containers on map... 
 #&gt; ... Processing containers... 
-#&gt; ... flapper::acs_setup_detection_containers() call completed (@ 2022-05-28 18:05:16) after ~0.01 minutes. </div><div class='input'><span class='co'># Define detection container overlaps</span>
+#&gt; ... flapper::acs_setup_detection_containers() call completed (@ 2022-06-17 09:58:11) after ~0.01 minutes. </div><div class='input'><span class='co'># Define detection container overlaps</span>
 <span class='va'>containers_spdf</span>      <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/do.call.html'>do.call</a></span><span class='op'>(</span><span class='fu'>raster</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/raster/man/bind.html'>bind</a></span>, <span class='fu'>plyr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/plyr/man/compact.html'>compact</a></span><span class='op'>(</span><span class='va'>dat_containers</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>containers_spdf</span><span class='op'>@</span><span class='va'>data</span> <span class='op'>&lt;-</span> <span class='va'>dat_moorings</span>
 <span class='va'>dat_containers_overlaps</span> <span class='op'>&lt;-</span>
@@ -288,7 +288,7 @@ For each time step, the function plots the probability surface, the receiver(s) 
                                            overlaps <span class='op'>=</span> <span class='va'>dat_containers_overlaps</span>,
                                            calc_detection_pr <span class='op'>=</span> <span class='va'>calc_dpr</span>,
                                            bathy <span class='op'>=</span> <span class='va'>grid</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::acs_setup_detection_kernels() called (@ 2022-05-28 18:05:17)... 
+</div><div class='output co'>#&gt; flapper::acs_setup_detection_kernels() called (@ 2022-06-17 09:58:12)... 
 #&gt; ... Setting up function... 
 #&gt; ... Getting receiver-specific kernels (for detection)... 
 #&gt; 
@@ -482,7 +482,7 @@ For each time step, the function plots the probability surface, the receiver(s) 
 #&gt; ... ... ... ... Extract detection probability kernels for active receivers... 
 #&gt; ... ... ... ... Combining detection kernels to calculate the background detection probability surfaces (this is a slow step)... 
 #&gt; ... Process detection probability kernels ... 
-#&gt; ... flapper::acs_setup_detection_kernels() call completed (@ 2022-05-28 18:05:28) after ~0.2 minutes. </div><div class='input'>
+#&gt; ... flapper::acs_setup_detection_kernels() call completed (@ 2022-06-17 09:58:23) after ~0.19 minutes. </div><div class='input'>
 <span class='co'>## Implement AC algorithm</span>
 <span class='va'>out_ac</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ac.html'>ac</a></span><span class='op'>(</span>acoustics <span class='op'>=</span> <span class='va'>acc</span>,
              step <span class='op'>=</span> <span class='fl'>120</span>,
@@ -493,11 +493,11 @@ For each time step, the function plots the probability surface, the receiver(s) 
              mobility <span class='op'>=</span> <span class='fl'>200</span>,
              save_record_spatial <span class='op'>=</span> <span class='cn'>NULL</span>
              <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>flapper::ac() called (@ 2022-05-28 18:05:28)...</span></div><div class='output co'>#&gt; flapper::.acs_pl() called (@ 2022-05-28 18:05:28)... 
+</div><div class='output co'>#&gt; <span class='message'>flapper::ac() called (@ 2022-06-17 09:58:23)...</span></div><div class='output co'>#&gt; flapper::.acs_pl() called (@ 2022-06-17 09:58:23)... 
 #&gt; ... Checking user inputs... 
 #&gt; ... Processing movement time series... 
 #&gt; ... Plotting movement time series (for each chunk)... </div><div class='output co'>#&gt; ... Calling .acs() to implement ACDC algorithm on one chunk... 
-#&gt; flapper::.acs() called (@ 2022-05-28 18:05:28)... 
+#&gt; flapper::.acs() called (@ 2022-06-17 09:58:23)... 
 #&gt;   |                                                                              |                                                                      |   0%... Initiating algorithm: moving over acoustic and internal ('archival') time steps... 
 #&gt; ... On acoustic time step ('timestep_detection') 1. 
 #&gt; ... ... On internal time step ('timestep_archival') 1. 
@@ -556,8 +556,8 @@ For each time step, the function plots the probability surface, the receiver(s) 
 #&gt; ... ... On internal time step ('timestep_archival') 1. 
 #&gt;   |                                                                              |======================================================================| 100%
 #&gt; ... Movement over acoustic and internal ('archival') time steps has been completed. 
-#&gt; ... flapper::.acs() call completed (@ 2022-05-28 18:05:30) after ~0.03 minutes. 
-#&gt; ... flapper::.acs_pl() call completed (@ 2022-05-28 18:05:30) after ~0.03 minutes. </div><div class='output co'>#&gt; <span class='message'>flapper::ac() finished (@ 2022-05-28 18:05:30)...</span></div><div class='img'><img src='acdc_plot_trace-3.png' alt='' width='700' height='433' /></div><div class='input'>
+#&gt; ... flapper::.acs() call completed (@ 2022-06-17 09:58:25) after ~0.03 minutes. 
+#&gt; ... flapper::.acs_pl() call completed (@ 2022-06-17 09:58:25) after ~0.03 minutes. </div><div class='output co'>#&gt; <span class='message'>flapper::ac() finished (@ 2022-06-17 09:58:25)...</span></div><div class='img'><img src='acdc_plot_trace-3.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## Simplify outputs</span>
 <span class='va'>record</span> <span class='op'>&lt;-</span> <span class='fu'><a href='acdc_simplify.html'>acdc_simplify</a></span><span class='op'>(</span><span class='va'>out_ac</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>acdc_simplify() implemented for type = 'acs'.</span></div><div class='input'>

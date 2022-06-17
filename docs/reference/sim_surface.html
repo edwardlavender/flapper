@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">flapper</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -175,7 +175,7 @@
 #&gt; crs        : +proj=longlat +datum=WGS84 +no_defs 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0.003074374, 0.99993  (min, max)
+#&gt; values     : 0.0001218545, 0.999881  (min, max)
 #&gt; </div><div class='input'><span class='fu'>sim_surface</span><span class='op'>(</span><span class='va'>dat_gebco</span>,
             sim_values <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='va'>n</span>, <span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>prettyGraphics::pretty_map() CRS taken as: '+proj=longlat +datum=WGS84 +no_defs'.</span></div><div class='img'><img src='sim_surface-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; class      : RasterLayer 
@@ -185,7 +185,7 @@
 #&gt; crs        : +proj=longlat +datum=WGS84 +no_defs 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : -3.392097, 3.403319  (min, max)
+#&gt; values     : -3.256974, 3.35769  (min, max)
 #&gt; </div><div class='input'>
 <span class='co'>#### Example (2): Simulate values differently across different areas</span>
 <span class='co'># .. by defining the number of areas into which to split the raster</span>
@@ -201,7 +201,7 @@
 #&gt; crs        : +proj=longlat +datum=WGS84 +no_defs 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 0.0006700254, 10.9997  (min, max)
+#&gt; values     : 0.0003569499, 10.99139  (min, max)
 #&gt; </div><div class='input'>
 <span class='co'>#### Example (3): Include a spatial mask</span>
 <span class='fu'>sim_surface</span><span class='op'>(</span><span class='va'>dat_gebco</span>,
@@ -216,7 +216,7 @@
 #&gt; crs        : +proj=longlat +datum=WGS84 +no_defs 
 #&gt; source     : memory
 #&gt; names      : layer 
-#&gt; values     : 9.000707, 10.99942  (min, max)
+#&gt; values     : 9.000728, 10.99993  (min, max)
 #&gt; </div><div class='input'>
 </div></pre>
   </div>

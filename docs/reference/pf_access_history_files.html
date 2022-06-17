@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">flapper</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -169,13 +169,13 @@
 <span class='co'># Define a directory in which to save files from PF</span>
 <span class='va'>root</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"/pf/"</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.create</a></span><span class='op'>(</span><span class='va'>root</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: '/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf' already exists</span></div><div class='input'><span class='co'># Implement the PF algorithm with write_history specified</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: '/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmppNipsA/pf' already exists</span></div><div class='input'><span class='co'># Implement the PF algorithm with write_history specified</span>
 <span class='co'># ... For speed, we will implement the algorithm using pre-defined data</span>
 <span class='va'>pf_args</span> <span class='op'>&lt;-</span> <span class='va'>dat_dcpf_histories</span><span class='op'>$</span><span class='va'>args</span>
 <span class='va'>pf_args</span><span class='op'>$</span><span class='va'>calc_distance_euclid_fast</span> <span class='op'>&lt;-</span> <span class='cn'>TRUE</span>
 <span class='va'>pf_args</span><span class='op'>$</span><span class='va'>write_history</span>             <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>file <span class='op'>=</span> <span class='va'>root</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/do.call.html'>do.call</a></span><span class='op'>(</span><span class='va'>pf</span>, <span class='va'>pf_args</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; flapper::pf() called (@ 2022-05-28 18:14:07)... 
+</div><div class='output co'>#&gt; flapper::pf() called (@ 2022-06-17 10:06:45)... 
 #&gt; ... Setting up function... 
 #&gt; ... Determining the set of possible starting locations (t = 1)... 
 #&gt; ... Implementing algorithm iteratively over time steps... 
@@ -232,7 +232,7 @@
 #&gt; ... ... ... For each particle, getting the possible positions for the next time step... 
 #&gt; ... ... Time = 18... 
 #&gt; ... ... ... Selecting candidate starting positions for the current time step... 
-#&gt; ... flapper::pf() call completed (@ 2022-05-28 18:14:07) after ~0.01 minutes. </div><div class='output co'>#&gt; $history
+#&gt; ... flapper::pf() call completed (@ 2022-06-17 10:06:46) after ~0.01 minutes. </div><div class='output co'>#&gt; $history
 #&gt; $history[[1]]
 #&gt;    id_current   pr_current timestep
 #&gt; 1        3243 2.425569e-04        1
@@ -705,7 +705,7 @@
 #&gt;                  pr[distance &gt; 200] &lt;- 0
 #&gt;                  return(pr)
 #&gt;                }
-#&gt; &lt;bytecode: 0x7fea3cf8dfe8&gt;
+#&gt; &lt;bytecode: 0x7fb84c291820&gt;
 #&gt; 
 #&gt; $args$calc_movement_pr_from_origin
 #&gt; function(distance,...) {
@@ -713,7 +713,7 @@
 #&gt;                  pr[distance &gt; 200] &lt;- 0
 #&gt;                  return(pr)
 #&gt;                }
-#&gt; &lt;bytecode: 0x7fea9b422428&gt;
+#&gt; &lt;bytecode: 0x7fb84c28dac0&gt;
 #&gt; 
 #&gt; $args$mobility
 #&gt; [1] 200
@@ -735,7 +735,7 @@
 #&gt; 
 #&gt; $args$write_history
 #&gt; $args$write_history$file
-#&gt; [1] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf/"
+#&gt; [1] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmppNipsA/pf/"
 #&gt; 
 #&gt; 
 #&gt; $args$cl
@@ -768,12 +768,12 @@
 #&gt; [1] "list"       "pf_archive"</div><div class='input'><span class='co'># List the files</span>
 <span class='va'>files</span> <span class='op'>&lt;-</span> <span class='fu'>pf_access_history_files</span><span class='op'>(</span><span class='va'>root</span><span class='op'>)</span>
 <span class='fu'>utils</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>files</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf//pf_1.rds"
-#&gt; [2] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf//pf_2.rds"
-#&gt; [3] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf//pf_3.rds"
-#&gt; [4] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf//pf_4.rds"
-#&gt; [5] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf//pf_5.rds"
-#&gt; [6] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//Rtmpwmdj7E/pf//pf_6.rds"</div><div class='input'>
+</div><div class='output co'>#&gt; [1] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmppNipsA/pf//pf_1.rds"
+#&gt; [2] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmppNipsA/pf//pf_2.rds"
+#&gt; [3] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmppNipsA/pf//pf_3.rds"
+#&gt; [4] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmppNipsA/pf//pf_4.rds"
+#&gt; [5] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmppNipsA/pf//pf_5.rds"
+#&gt; [6] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmppNipsA/pf//pf_6.rds"</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
