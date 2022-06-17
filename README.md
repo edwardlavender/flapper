@@ -5,9 +5,9 @@
 including the reconstruction of fine-scale movement paths and emergent
 patterns of space use. <https://edwardlavender.github.io/flapper/>**
 
-[![Project Status: WIP – Initial development is in progress, but there
-has not yet been a stable, usable release suitable for the
-public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/flapper)](https://cran.r-project.org/package=flapper)
 
 [`flapper`](https://edwardlavender.github.io/flapper/) is an `R` package
