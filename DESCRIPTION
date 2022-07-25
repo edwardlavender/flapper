@@ -21,10 +21,10 @@ Suggests:
     rbenchmark,
     rmarkdown, knitr
 Remotes: 
-    github::edwardlavender/prettyGraphics/, 
-    github::edwardlavender/Tools4ETS/,
-    github::adamlilith/fasterRaster/,
-    url::https://gitlab.oceantrack.org/GreatLakes/glatos/-/archive/master/glatos-master.zip/
+    github::edwardlavender/prettyGraphics, 
+    github::edwardlavender/Tools4ETS,
+    github::adamlilith/fasterRaster,
+    url::https://gitlab.oceantrack.org/GreatLakes/glatos/-/archive/master/glatos-master.zip
 Depends: R (>= 4.0)
 License: GPL-3
 URL: https://github.com/edwardlavender/flapper/, https://edwardlavender.github.io/flapper/
