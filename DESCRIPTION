@@ -12,14 +12,25 @@ Imports:
     prettyGraphics, fields,
     Tools4ETS
 Suggests:
-    plyr, tidyr, stringr, 
-    fasterRaster, sf, sfheaders,
-    glatos, spatialEco,
-    plotly, animation, scales, viridis,
-    circular, 
-    httr, jsonlite,
+    plyr,
+    tidyr,
+    stringr,
+    fasterRaster,
+    sf,
+    sfheaders,
+    glatos,
+    spatialEco,
+    plotly,
+    animation,
+    scales,
+    viridis,
+    circular,
+    httr,
+    jsonlite,
     rbenchmark,
-    rmarkdown, knitr
+    rmarkdown,
+    knitr,
+    testthat (>= 3.0.0)
 Remotes: 
     github::edwardlavender/prettyGraphics, 
     github::edwardlavender/Tools4ETS,
@@ -33,3 +44,4 @@ Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
+Config/testthat/edition: 3
