@@ -1144,7 +1144,7 @@ get_detection_days <- function(acoustics,
 #' eg <-
 #'   data.frame(
 #'     timestamp =
-#'       as.Date(
+#'       as.POSIXct(
 #'         c("2016-01-01", # one week of continuous detections
 #'           "2016-01-02",
 #'           "2016-01-03",
