@@ -2,34 +2,46 @@
 % Please edit documentation in R/dists.R
 \name{dist_btw_points_3d}
 \alias{dist_btw_points_3d}
-\title{Calculate the Euclidean distance between points in three-dimensional space.}
+\title{Calculate the Euclidean distance(s) between points in three-dimensional space.}
 \usage{
 dist_btw_points_3d(x1, x2, y1, y2, z1, z2)
 }
 \arguments{
-\item{x1}{A number that defines the x-coordinate of the first point.}
+\item{x1}{A numeric vector that defines the x-coordinate(s) of the origin (for each point pair).}
 
-\item{x2}{A number that defines the x-coordinate of the second point.}
+\item{x2}{A numeric vector that defines the x-coordinate(s) of the destination (for each point pair).}
 
-\item{y1}{A number that defines the y-coordinate of the first point.}
+\item{y1}{A numeric vector that defines the y-coordinate(s) of the origin (for each point pair).}
 
-\item{y2}{A number that defines the y-coordinate of the second point.}
+\item{y2}{A numeric vector that defines the y-coordinate(s) of the destination (for each point pair).}
 
-\item{z1}{A number that defines the z-coordinate of the first point.}
+\item{z1}{A numeric vector that defines the z-coordinate(s) of the origin (for each point pair).}
 
-\item{z2}{A number that defines the z-coordinate of the second point.}
+\item{z2}{A numeric vector that defines the z-coordinate(s) of the destination (for each point pair).}
 }
 \value{
-A number that is equal to the Euclidean distance between points in three-dimensional space.
+The function returns a numeric vector that is equal to the Euclidean distance(s) between each pair of points in three-dimensional space.
 }
 \description{
-This function returns the Euclidean distance between points in three-dimensional space.
+This function calculates the Euclidean distance(s) between points in three-dimensional space.
 }
 \details{
-The distance between two points in three dimensional space is given by Pythagoras' Theorem: \eqn{\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2}}.
+The distance between any two points in three dimensional space is given by Pythagoras' Theorem: \eqn{\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2}}.
+
+This function does not currently support non-planar coordinates.
 }
 \examples{
+#### Example (1): A single pair of points
 dist_btw_points_3d(1, 2, 1, 2, 1, 2)
+sqrt((2 - 1)^2 + (2 - 1)^2 + (2 - 1)^2)
+
+#### Example (2): Multiple pairs of points (e.g., an animal movement path)
+xy <- data.frame(x = c(1, 2, 3, 4),
+                 y = c(1, 2, 3, 4),
+                 z = c(1, 2, 3, 4))
+dist_btw_points_3d(xy$x, dplyr::lead(xy$x),
+                   xy$y, dplyr::lead(xy$y),
+                   xy$z, dplyr::lead(xy$z))
 }
 \author{
 Edward Lavender

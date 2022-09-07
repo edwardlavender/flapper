@@ -19,6 +19,8 @@ This function calculates the total distance of a path, whose horizontal coordina
 }
 \details{
 The total distance of a path over a three-dimensional surface is equal to the sum of the pairwise distances between each point (\eqn{i}) and its successor (\eqn{i + 1}) according to the equation: \deqn{\Sigma_{i = 1}^n \sqrt{(x_{i+1} - x_i)^2 + (y_{i + 1} - y_i)^2 + (z_{i + 1} - z_i)^2)}} where \eqn{x}, \eqn{y} and \eqn{z} are the x, y and z coordinates of each point in three-dimensional space and \eqn{n} is the total number of points minus 1. Pairwise distances are calculated via \code{\link[flapper]{dist_btw_points_3d}}. Note that for realistic distances, some interpolation (e.g., via least-cost paths) between points may be required to generate localisations at sufficiently high resolution to effectively capture the shape of the landscape.
+
+This function does not currently support non-planar coordinates (\code{path} or \code{surface}).
 }
 \examples{
 #### Simulate a hypothetical landscape

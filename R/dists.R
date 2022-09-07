@@ -134,25 +134,35 @@ dist_btw_clicks <- function(calc_distance = raster::pointDistance,..., add_paths
 ######################################
 #### dist_btw_points_3d()
 
-#' @title Calculate the Euclidean distance between points in three-dimensional space.
-#' @description This function returns the Euclidean distance between points in three-dimensional space.
-#' @param x1 A number that defines the x-coordinate of the first point.
-#' @param x2 A number that defines the x-coordinate of the second point.
-#' @param y1 A number that defines the y-coordinate of the first point.
-#' @param y2 A number that defines the y-coordinate of the second point.
-#' @param z1 A number that defines the z-coordinate of the first point.
-#' @param z2 A number that defines the z-coordinate of the second point.
-#' @details The distance between two points in three dimensional space is given by Pythagoras' Theorem: \eqn{\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2}}.
-#' @return A number that is equal to the Euclidean distance between points in three-dimensional space.
+#' @title Calculate the Euclidean distance(s) between points in three-dimensional space.
+#' @description This function calculates the Euclidean distance(s) between points in three-dimensional space.
+#' @param x1 A numeric vector that defines the x-coordinate(s) of the origin (for each point pair).
+#' @param x2 A numeric vector that defines the x-coordinate(s) of the destination (for each point pair).
+#' @param y1 A numeric vector that defines the y-coordinate(s) of the origin (for each point pair).
+#' @param y2 A numeric vector that defines the y-coordinate(s) of the destination (for each point pair).
+#' @param z1 A numeric vector that defines the z-coordinate(s) of the origin (for each point pair).
+#' @param z2 A numeric vector that defines the z-coordinate(s) of the destination (for each point pair).
+#' @details The distance between any two points in three dimensional space is given by Pythagoras' Theorem: \eqn{\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2}}.
+#' @details This function does not currently support non-planar coordinates.
+#' @return The function returns a numeric vector that is equal to the Euclidean distance(s) between each pair of points in three-dimensional space.
 #' @examples
+#' #### Example (1): A single pair of points
 #' dist_btw_points_3d(1, 2, 1, 2, 1, 2)
+#' sqrt((2 - 1)^2 + (2 - 1)^2 + (2 - 1)^2)
+#'
+#' #### Example (2): Multiple pairs of points (e.g., an animal movement path)
+#' xy <- data.frame(x = c(1, 2, 3, 4),
+#'                  y = c(1, 2, 3, 4),
+#'                  z = c(1, 2, 3, 4))
+#' dist_btw_points_3d(xy$x, dplyr::lead(xy$x),
+#'                    xy$y, dplyr::lead(xy$y),
+#'                    xy$z, dplyr::lead(xy$z))
 #' @author Edward Lavender
 #' @export
 #'
 
 dist_btw_points_3d <- function(x1, x2, y1, y2, z1, z2){
-  td_dist <- sqrt((x2 - x1)^2 + (y2 - y1)^2 + (z2 - z1)^2)
-  return(td_dist)
+  sqrt((x2 - x1)^2 + (y2 - y1)^2 + (z2 - z1)^2)
 }
 
 
@@ -165,6 +175,7 @@ dist_btw_points_3d <- function(x1, x2, y1, y2, z1, z2){
 #' @param path A matrix or dataframe of horizontal coordinates (x, y) or a \code{\link[sp]{SpatialLines}} object which defines the path over a surface. The coordinate reference system (projection) of \code{path} should be the same as that for the \code{surface}.
 #' @param surface A \code{\link[raster]{raster}} over which the movement that generated the path occurred. The coordinate reference system (projection) of \code{path} should be the same as that for the \code{surface} and the values of the \code{surface} should also be expressed in the same units (e.g., metres).
 #' @details The total distance of a path over a three-dimensional surface is equal to the sum of the pairwise distances between each point (\eqn{i}) and its successor (\eqn{i + 1}) according to the equation: \deqn{\Sigma_{i = 1}^n \sqrt{(x_{i+1} - x_i)^2 + (y_{i + 1} - y_i)^2 + (z_{i + 1} - z_i)^2)}} where \eqn{x}, \eqn{y} and \eqn{z} are the x, y and z coordinates of each point in three-dimensional space and \eqn{n} is the total number of points minus 1. Pairwise distances are calculated via \code{\link[flapper]{dist_btw_points_3d}}. Note that for realistic distances, some interpolation (e.g., via least-cost paths) between points may be required to generate localisations at sufficiently high resolution to effectively capture the shape of the landscape.
+#' @details This function does not currently support non-planar coordinates (\code{path} or \code{surface}).
 #' @return The function returns a number equal to the total distance along the path.
 #' @examples
 #' #### Simulate a hypothetical landscape
@@ -219,7 +230,16 @@ dist_btw_points_3d <- function(x1, x2, y1, y2, z1, z2){
 dist_over_surface <- function(path, surface){
   # extract the coordinates from the path, if necessary
   check_class(input = path, to_class = c("matrix", "data.frame", "SpatialLines"), type = "stop")
-  if(inherits(path, "SpatialLines")) xy <- raster::geom(path)[, c("x", "y")] else xy <- path
+  if(!is.na(raster::crs(surface))){
+    message("The CRS of 'surface' is not NA. Note that this function only supports planar surfaces.")
+  }
+  if(inherits(path, "SpatialLines")) {
+    if(!identical(raster::crs(surface), raster::crs(path))){
+      warning("The CRS of 'surface' and 'path' are not identical.",
+              immediate. = TRUE, call. = FALSE)
+    }
+    xy <- raster::geom(path)[, c("x", "y")]
+  } else xy <- path
   # calculate the number of coordinate pairs:
   n  <- nrow(xy)
   # extract the value of the surface for these coordinates:
