@@ -192,8 +192,9 @@ check_names <- function(arg = deparse(substitute(input)), input, req, extract_na
   input_names <- extract_names(input)
   if(!type(req %in% input_names)){
     req_names_missing <- req[which(!(req %in% input_names))]
-    msg <- paste0("Argument ", arg, " does not contain ", deparse(substitute(type)), " required names. The following name(s) are missing:",
-                  paste0("'", req_names_missing, collapse = ", "),
+    msg <- paste0("Argument '", arg, "' does not contain ", deparse(substitute(type)),
+                  " required names. One or more of the following name(s) are missing: ",
+                  paste0("'", req_names_missing, collapse = "', "),
                   "'.")
     stop(msg, call. = FALSE)
   }
