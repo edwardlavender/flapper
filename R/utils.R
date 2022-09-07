@@ -67,7 +67,7 @@ check... <- function(not_allowed,...){
     trouble <- names(l)[names(l) %in% not_allowed]
     msg <- paste0("Additional arguments (", paste(trouble, collapse = ", "),
                   ") have been passed to the function via ... which are implemented internally or need to be supplied via other function arguments. Implement these options via appropriate function arguments, if possible, or do not supply them.")
-    stop(msg)
+    stop(msg, call. = FALSE)
   }
 }
 
@@ -99,11 +99,13 @@ check_value <- function(arg = deparse(substitute(input)), input, supp, warn = TR
     if(is.character(input)) input <- paste0("'", input, "'")
     if(warn){
       if(is.character(default)) default <- paste0("'", default, "'")
-      warning(paste0("Argument '", arg, "' = ", input, " is not supported; defaulting to ", arg, " = ", default, ".\n"))
+      warning(paste0("Argument '", arg, "' = ", input, " is not supported; defaulting to ", arg, " = ", default, ".\n"),
+              immediate. = TRUE, call. = FALSE)
       input <- default
     } else{
       if(is.character(supp)) supp <- paste0("'", supp, "'")
-      stop(paste0("Argument '", arg, "' = ", input, " is not supported. Supported option(s): ", paste0(supp, collapse = ", "), "."))
+      stop(paste0("Argument '", arg, "' = ", input, " is not supported. Supported option(s): ", paste0(supp, collapse = ", "), "."),
+           call. = FALSE)
     }
   }
   # Return input
@@ -153,11 +155,11 @@ check_class <-
                         paste0(to_class, collapse =  "', '"),
                         "', not class(es) '",
                         paste(class(input), collapse = "', '"), "'.")
-          stop(msg)
+          stop(msg, call. = FALSE)
           # Or print a warning and use coerce_input() to convert the object to the desired class.
         } else if(type == "warning"){
           msg <- paste0("Argument '", arg, "' coerced to class '", to_class, "' from class(es): '", paste(class(input), collapse = "', '"), "'.")
-          warning(msg)
+          warning(msg, immediate. = TRUE, call. = FALSE)
           input <- coerce_input(input)
         }
       }
@@ -193,7 +195,7 @@ check_names <- function(arg = deparse(substitute(input)), input, req, extract_na
     msg <- paste0("Argument ", arg, " does not contain ", deparse(substitute(type)), " required names. The following name(s) are missing:",
                   paste0("'", req_names_missing, collapse = ", "),
                   "'.")
-    stop(msg)
+    stop(msg, call. = FALSE)
   }
 }
 
@@ -217,7 +219,7 @@ check_tz <-
     if(inherits(input, "Date") | inherits(input, "POSIXct")){
       if(lubridate::tz(input) == ""){
         msg <- paste0("Argument '", arg, "' time zone currently ''; tz forced to UTC.")
-        warning(msg)
+        warning(msg, immediate. = TRUE, call. = FALSE)
         lubridate::tz(input) <- "UTC"
       }
     }
@@ -241,12 +243,12 @@ check_tz <-
 #' @keywords internal
 
 check_named_list <- function(arg = deparse(substitute(input)), input, ignore_empty = TRUE){
-  if(!any("list" %in% class(input))) stop(paste0("Argument '", arg, "' must be of class list."))
+  if(!any("list" %in% class(input))) stop(paste0("Argument '", arg, "' must be of class list."), call. = FALSE)
   list_is_empty <- (length(input) == 0)
   if(!list_is_empty | !ignore_empty){
     if(is.null(names(input)) | any(names(input) %in% "")){
       msg <- paste0("Argument '", arg, "' must be a named list.")
-      stop(msg)
+      stop(msg, call. = FALSE)
     }
   }
   return(input)
