@@ -23,66 +23,96 @@
 #' @title Compute Euclidean distances between receivers
 #' @description This function computes Euclidean distances (km) between all combinations of receivers.
 #'
-#' @param moorings A dataframe which defines each unique receiver deployment. This should contain the columns: `receiver_id', a unique identifier of each receiver, `receiver_lat', the latitude of that receiver in decimal degrees; and `receiver_long', the longitude of that receiver in decimal degrees (see \code{\link[flapper]{dat_moorings}}).
-#' @param f (optional) A function which is used to process distances before these are returned. For example, it may be useful to round distances to nearest km with \code{f = function(x) round(x, digits = 0)}.
+#' @param moorings A dataframe that defines each unique receiver deployment. This should contain the columns: `receiver_id', a unique identifier of each receiver; `receiver_long' or `receiver_easting', the longitude or easting of that receiver; and `receiver_lat' or `receiver_northing', the latitude or northing that receiver (see \code{\link[flapper]{dat_moorings}}).
+#' @param f (optional) A function to process distances. For example, round distances to the nearest km with \code{f = function(x) round(x, digits = 0)} or simply \code{round}.
+#' @param return A character that defines the class of the returned object (\code{"data.frame"} or \code{"matrix"}).
 #'
-#' @return The function returns a dataframe with columns `r1', `r2' and `dist'. These define the IDs of each combination of receivers and the associated distance between them, in km. Note that the dataframe contains duplicate combinations of receivers (e.g., both r1 = 1 and r2 = 2 and r1 = 2 and r2 = 1).
+#' @details Distances are calculated via \code{\link[raster]{pointDistance}}. If \code{moorings} contains `receiver_long' and `receiver_lat', \code{\link[raster]{pointDistance}} is implemented with \code{lonlat = TRUE} and distances are in km; otherwise \code{lonlat = FALSE} and distances are in map units over 1000 (i.e., km if map units are metres).
+#'
+#' To calculate distances between specific receiver pairs, call \code{\link[raster]{pointDistance}} directly.
+#'
+#' @return The function returns a dataframe, with columns `r1', `r2' and `dist', or a matrix. Dataframe columns define the IDs of each combination of receivers and the associated distance between them, in km (or map units/1000). Note that the dataframe contains duplicate combinations of receivers (e.g., both r1 = 1 and r2 = 2 and r1 = 2 and r2 = 1). Alternatively, matrix rows and columns define receiver IDs and cell values give distances between each combination.
 #'
 #' @examples
-#' #### Example (1): Compute distances between all combinations of receivers in km
-#' # Define dataframe with required columns
+#' #### Example (1): Implementation using lat/long coordinates
 #' dat <- data.frame(receiver_id = dat_moorings$receiver_id,
-#'                   receiver_lat = dat_moorings$receiver_lat,
-#'                   receiver_long = dat_moorings$receiver_long)
+#'                   receiver_long = dat_moorings$receiver_long,
+#'                   receiver_lat = dat_moorings$receiver_lat
+#'                   )
 #' # Compute distances
 #' dist_btw_receivers_km <- dist_btw_receivers(dat)
 #' head(dist_btw_receivers_km)
 #'
-#' #### Example (2): Post-process distances via the f argument
-# round distances
+#' #### Example (2): Implementation using planar coordinates
+#' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
+#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
+#' xy         <- sp::SpatialPoints(dat[, c("receiver_long", "receiver_lat")],
+#'                                 proj_wgs84)
+#' xy         <- sp::spTransform(xy, proj_utm)
+#' xy         <- sp::coordinates(xy)
+#' dat <- data.frame(receiver_id = dat_moorings$receiver_id,
+#'                   receiver_easting = xy[, 1],
+#'                   receiver_northing = xy[, 2])
+#' head(dist_btw_receivers(dat))
+#'
+#' #### Example (3): Post-process distances via the f argument
 #' dist_btw_receivers_km_round <- dist_btw_receivers(dat, f = round)
 #' head(dist_btw_receivers_km_round)
 #' # convert distances to m
 #' dist_btw_receivers_m <- dist_btw_receivers(dat, f = function(x) x*1000)
 #' head(dist_btw_receivers_m)
 #'
+#' #### Example (4) Return distances in a matrix
+#' # Get distances
+#' dist_btw_receivers(dat, return = "matrix")
+#' # Compare sample to dataframe
+#' dist_btw_receivers(dat)[1:5, ]
+#' dist_btw_receivers(dat, return = "matrix")[1:5, 1:5]
+#'
 #' @author Edward Lavender
 #' @export
 #'
 
 dist_btw_receivers <-
-  function(moorings,
-           f = NULL){
+  function(moorings, f = NULL, return = c("data.frame", "matrix")){
 
     #### Checks
-    stopifnot(all(c("receiver_id", "receiver_long", "receiver_lat") %in% colnames(moorings)))
-
-    #### Define all combinations of receivers
-    dists <- expand.grid(r1 = moorings$receiver_id, r2 = moorings$receiver_id)
-
-    #### Define lat and long
-    dists$lat1 <- moorings$receiver_lat[match(dists$r1, moorings$receiver_id)]
-    dists$long1 <- moorings$receiver_long[match(dists$r1, moorings$receiver_id)]
-    dists$lat2 <- moorings$receiver_lat[match(dists$r2, moorings$receiver_id)]
-    dists$long2 <- moorings$receiver_long[match(dists$r2, moorings$receiver_id)]
-
-    #### Compute the distances between each receiver combination in km
-    dists$dist <- NA
-    for(i in 1:nrow(dists)){
-      # calculate distances
-      dists$dist[i] <- geosphere::distGeo(c(dists$long1[i], dists$lat1[i]), c(dists$long2[i], dists$lat2[i]))
-      # convert output from m to km
-      dists$dist[i] <- dists$dist[i]/1000
+    return <- match.arg(return)
+    check_names(input = moorings, req = "receiver_id", extract_names = colnames, type = all)
+    check_names(input = moorings, req = c("receiver_long", "receiver_easting"), extract_names = colnames, type = any)
+    check_names(input = moorings, req = c("receiver_lat", "receiver_northing"), extract_names = colnames)
+    if(any(c("receiver_long", "receiver_lat") %in% colnames(moorings))){
+      check_names(input = moorings, req = c("receiver_long", "receiver_lat"), extract_names = colnames, type = all)
+    } else if(any(c("receiver_easting", "receiver_northing") %in% colnames(moorings))){
+      check_names(input = moorings, req = c("receiver_easting", "receiver_northing"), extract_names = colnames, type = all)
     }
 
-    #### Process dataframe
-    if(!is.null(f)){
-      dists$dist <- f(dists$dist)
+    #### Define x and y coordinates
+    if("receiver_long" %in% colnames(moorings)) {
+      lonlat <- TRUE
+      moorings$x <- moorings$receiver_long
+      moorings$y <- moorings$receiver_lat
+    }  else {
+      lonlat <- FALSE
+      moorings$x <- moorings$receiver_easting
+      moorings$y <- moorings$receiver_northing
     }
-    dists <- dists[, c("r1", "r2", "dist")]
 
-    #### Return dataframe
-    return(dists)
+    #### Compute the distances between each receiver combination in km (or map units/1000)
+    dists <- moorings[, c("x", "y")]
+    out   <- raster::pointDistance(dists[, c("x", "y")], allpairs = TRUE, lonlat = lonlat)
+    rownames(out) <- colnames(out) <- moorings$receiver_id
+    out <- out/1000
+    if(!is.null(f)) out <- f(out)
+    out[upper.tri(out)] <- t(out)[upper.tri(out)]
+    if(return == "data.frame"){
+      out <- data.frame(r1 = moorings$receiver_id[row(out)],
+                        r2 = moorings$receiver_id[col(out)],
+                        dist = as.vector(out))
+    }
+
+    #### Return outputs
+    return(out)
 
 }
 
