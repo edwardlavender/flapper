@@ -22,6 +22,74 @@ test_that(".planedist2 returns correct answers", {
 ########################################
 #### dist_btw_receivers()
 
+test_that("dist_btw_receivers() fails without required columns.", {
+  # Test error with missing names
+  expect_error(dist_btw_receivers(data.frame(receiver_id = integer(),
+                                             receiver_long = numeric())))
+  # Test error with mismatched names
+  expect_error(dist_btw_receivers(data.frame(receiver_id = integer(),
+                                             receiver_long = numeric(),
+                                             receiver_northing = numeric())))
+})
+
+
+test_that("dist_btw_receivers() returns correct distances.", {
+
+  #### Test distance calculations with a planar landscape/coordinates
+  # Define planar landscape with known properties
+  proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+  r <- raster::raster(nrows = 3, ncols = 3,
+                      crs = proj_utm,
+                      resolution = c(5, 5),
+                      ext = raster::extent(0, 15, 0, 15))
+  r[] <- 1:raster::ncell(r)
+  # Define receivers
+  rxy <- raster::coordinates(r)
+  rxy <- rxy[c(1, 8, 9), ]
+  raster::plot(r)
+  points(rxy)
+  # Check distances
+  answer <- raster::pointDistance(rxy, allpairs = TRUE, lonlat = FALSE) %>% as.vector()
+  expect_equal(
+    answer,
+    dist_btw_receivers(data.frame(receiver_id = seq_len(nrow(rxy)),
+                                  receiver_easting = rxy[, 1],
+                                  receiver_northing = rxy[, 2]),
+                       f = function(x) x*1000)$dist
+  )
+
+  #### Test distance calculations with a lonlat landscape/coordinates
+  # Define lon/lat landscape with known properties
+  proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
+  r <- raster::projectRaster(dat_gebco, crs = proj_wgs84)
+  r[] <- 1:raster::ncell(r)
+  # Define receivers
+  rxy <- raster::coordinates(r)
+  rxy <- rxy[sample(seq_len(nrow(rxy)), 5), ]
+  raster::plot(r)
+  points(rxy)
+  # Check distances
+  answer <- raster::pointDistance(rxy, allpairs = TRUE, lonlat = TRUE)
+  answer[upper.tri(answer)] <- t(answer)[upper.tri(answer)]
+  answer <- as.vector(answer)
+  expect_equal(
+    answer,
+    dist_btw_receivers(data.frame(receiver_id = seq_len(nrow(rxy)),
+                                  receiver_long = rxy[, 1],
+                                  receiver_lat = rxy[, 2]),
+                       f = function(x) x*1000)$dist
+  )
+
+  #### Test distance calculations with return = "matrix"
+  expect_equal(
+    answer,
+    dist_btw_receivers(data.frame(receiver_id = seq_len(nrow(rxy)),
+                                  receiver_long = rxy[, 1],
+                                  receiver_lat = rxy[, 2]),
+                       f = function(x) x*1000,
+                       return = "matrix") %>% as.vector()
+  )
+})
 
 
 ########################################
