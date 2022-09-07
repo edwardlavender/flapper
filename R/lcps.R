@@ -947,7 +947,7 @@ lcp_over_surface <-
     #### Mask raster
     if(!is.null(mask)){
       cat_to_console("... Masking raster...")
-      surface <- mask_io(x = surface, mask = mask, mask_inside = mask_inside, updatevalue = Inf)
+      surface <- mask_io(x = surface, mask = mask, mask_inside = mask_inside)
     }
 
     #### Visualise surface
