@@ -8,7 +8,7 @@ get_detection_days(
   acoustics,
   individual_id = NULL,
   receiver_id = NULL,
-  type = 1L,
+  type = c(1L, 2L),
   match_to = NULL,
   ...
 )
@@ -16,39 +16,47 @@ get_detection_days(
 \arguments{
 \item{acoustics}{A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). This should contain the following columns: a vector of individual IDs, named `individual_id'; a vector of receiver IDs, named `receiver_id'; and a POSIXct vector of time stamps when detections were made, named `timestamp'.}
 
-\item{individual_id}{(optional) A vector of individuals for which to calculate detection days.}
+\item{individual_id}{(optional) A vector of individuals for which to calculate detection days. Values not in \code{acoustics} are dropped with a \link{warning}.}
 
-\item{receiver_id}{(optional) A vector of receivers for which to calculate detection days.}
+\item{receiver_id}{(optional) A vector of receivers for which to calculate detection days. Values not in \code{acoustics} are dropped with a \link{warning}.}
 
 \item{type}{If both \code{individual_id} and \code{receiver_id} are specified, then \code{type} is an integer that defines whether or not to calculate detection days for (a) each individual/receiver pair (\code{type = 1L}) or (b) all combinations of individuals/receivers.}
 
 \item{match_to}{(optional) A dataframe against which to match detection days. This must contain the `individual_id' and `receiver_id' column, as in \code{acoustics}. If supplied, an integer vector of detection days for individual/receiver combinations, matched against the individuals/receivers in \code{match_to}, is returned (see also Value).}
 
-\item{...}{Additional arguments passed to \code{\link[pbapply]{pblapply}}.}
+\item{...}{Additional arguments (depreciated).}
 }
 \value{
-The function returns a dataframe with the detection days for all, or specified, combinations of individuals and receivers. Note that if \code{acoustics} only contains individuals/receivers that made detections, then this will only contain individuals/receivers for/at which detections were made. Alternatively, if \code{match_to} is supplied, a vector of detection days, matched against each individual/receiver observation in that dataframe, is returned.
+If \code{match_to} is un-supplied, the function returns a dataframe with the detection days for individual/receiver pairs in \code{acoustics} or specific pairs/all possible pairs of specified individuals and receivers. Individual(s) and receiver(s) (if specified via \code{individual_id} and \code{receiver_id}) not in \code{acoustics} are dropped with \link{warning}(s). If \code{match_to} is supplied, a vector of detection days, matched against each individual/receiver observation in that dataframe, is returned.
 }
 \description{
-The function calculates the total number of days (termed `detection days') during which individuals were detected at passive acoustic telemetry receivers. To implement the function, a dataframe with passive acoustic telemetry detections of individuals at receivers must be supplied. Detection days can be calculated for all combinations of individuals/receivers in this dataframe, for all combinations of specified individuals and receivers, or for specific individual/receiver pairs. The function returns a dataframe of detection days for these individual/receiver combinations or a vector of detection days that is matched against another dataframe.
+The function calculates the total number of days (termed `detection days') during which individuals were detected at passive acoustic telemetry receivers. To implement the function, a dataframe with passive acoustic telemetry detections of individuals at receivers must be supplied. Detection days can be calculated for individuals/receivers in this dataframe, for specific individual/receiver pairs or all combinations of specified individuals and receivers. The function returns a dataframe of detection days for these individual/receiver combinations or a vector of detection days that is matched against another dataframe.
+}
+\details{
+To calculate detection days for all individuals in \code{acoustics} across all receivers (rather than by each receiver), simply use \code{\link[dplyr]{dplyr}} (see Examples).
+
+This function does not currently support other time steps (e.g., detection hours).
 }
 \examples{
 #### Example (1): Detection days between all combinations
 # ... of detected individuals and receivers with detections
 dat <- get_detection_days(dat_acoustics)
+utils::head(dat)
 
-#### Example (2) Detection days between all combinations of specified
+#### Example (2) Detection days between specified individual/receiver pairs
+dat <- get_detection_days(dat_acoustics,
+                          individual_id = c(25, 28),
+                          receiver_id = c(3, 24),
+                          type = 1L)
+utils::head(dat)
+
+#### Example (3) Detection days between all combinations of specified
 #... individuals/receivers
 dat <- get_detection_days(dat_acoustics,
-                          individual_id = 25,
-                          receiver_id = c(25, 21),
+                          individual_id = c(25, 28),
+                          receiver_id = c(3, 24),
                           type = 2L)
-
-#### Example (3) Detection days between specified individual/receiver pairs
-dat <- get_detection_days(dat_acoustics,
-                          individual_id = c(25, 26),
-                          receiver_id = c(25, 21),
-                          type = 1L)
+utils::head(dat)
 
 #### Example (4) Match detection days to another dataframe
 dat_acoustics$detection_days <- get_detection_days(dat_acoustics,
@@ -56,6 +64,14 @@ dat_acoustics$detection_days <- get_detection_days(dat_acoustics,
                                                    type = 1L)
 
 utils::head(dat_acoustics)
+
+#### Example (5): Detection days for all individuals across all individuals
+# Simply use dplyr:
+require(dplyr)
+dat_acoustics \%>\%
+  mutate(date = as.Date(timestamp)) \%>\%
+  group_by(individual_id) \%>\%
+  summarise(detection_days = length(unique(date)))
 
 }
 \seealso{
