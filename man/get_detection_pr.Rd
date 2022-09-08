@@ -9,7 +9,7 @@ get_detection_pr(
   beta_0 = 2.5,
   beta_1 = -0.01,
   inv_link = stats::plogis,
-  output = 3L,
+  output = c(1L, 2L, 3L),
   ...
 )
 }
@@ -18,7 +18,7 @@ get_detection_pr(
 
 \item{beta_0, beta_1}{Single numbers that define the model coefficients (i.e., the intercept and gradient on the scale of the link function).}
 
-\item{inv_link}{A function that defines the inverse link function.The default function is the logistic (inverse logit) function.}
+\item{inv_link}{A function that defines the inverse link function. The default function is the logistic (inverse logit) function.}
 
 \item{output}{An integer (\code{1L}, \code{2L} or \code{3L}) that defines the output type. \code{1L} returns a plot of detection probability against distance; \code{2L} returns a numeric vector of detection probabilities; and \code{3L} returns both of the above.}
 
