@@ -5,7 +5,7 @@
 #' @title Estimate individual swimming speeds from acoustic and archival data
 #' @description These functions are designed to provide `ballpark' estimates of individual swimming speeds from (a) acoustic detections at passive acoustic telemetry receivers (\code{\link[flapper]{get_mvt_mobility_from_acoustics}}) and archival (depth) time series (\code{\link[flapper]{get_mvt_mobility_from_archival}}).
 #'
-#' @param data A dataframe of animal movement time series used to estimate swimming speeds. For \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, \code{data} should contain passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). This must contain a vector of receiver IDs, named `receiver_id', and a POSIXct vector of time stamps when detections were made, named `timestamp'. For \code{\link[flapper]{get_mvt_mobility_from_archival}}, \code{data} is a dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This must contain a numeric vector of observed depths (m), named `depth', and a POSIXct vector of regular time stamps when observations were made, named `timestamp'. In either case, an additional column can be included to distinguish time series for different individuals (see \code{fct}).
+#' @param data A dataframe of animal movement time series used to estimate swimming speeds. For \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, \code{data} should contain passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). This must contain a vector of receiver IDs, named `receiver_id', and a POSIXct vector of time stamps when detections were made, named `timestamp'. For \code{\link[flapper]{get_mvt_mobility_from_archival}}, \code{data} is a dataframe that contains depth time series (see \code{\link[flapper]{dat_archival}} for an example). This must contain a numeric vector of observed depths (m), named `depth', and a POSIXct (or Date) vector of regular time stamps when observations were made, named `timestamp'. In either case, an additional column can be included to distinguish time series for different individuals (see \code{fct}).
 #' @param fct (optional) A character variable that defines the name of a column in \code{data} that distinguishes levels of a grouping variable (e.g., individuals).
 #' @param moorings In \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, \code{moorings} is \code{\link[sp]{SpatialPointsDataFrame}} that defines receiver locations (in the Universe Transverse Mercator coordinate reference system) and receiver IDs (in a column named `receiver_id').
 #' @param detection_range In \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, \code{detection_range} is a number that defines the detection range (m) of receivers.
@@ -13,12 +13,13 @@
 #' @param bathy In \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, if \code{calc_distance = "lcp"}, \code{bathy} is \code{\link[raster]{raster}} that defines the surface over which individual(s) moved. \code{bathy} must be planar (i.e., Universal Transverse Mercator projection) with units of metres in x, y and z directions (m). The surface's resolution is taken to define the distance between horizontally and vertically connected cells and must be the same in both x and y directions. Any cells with NA values (e.g., due to missing data) are treated as `impossible' to move though by the algorithm (see \code{\link[flapper]{lcp_over_surface}}).
 #' @param transmission_interval (optional) In \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, \code{transmission_interval} is the (maximum) time delay between sequential acoustic transmissions.
 #' @param step (optional) In \code{\link[flapper]{get_mvt_mobility_from_acoustics}}, \code{step} is a number that defines the time (s) interval over which to represent speeds. By default, speeds are calculated in m/s. If \code{step} is supplied, speeds are also calculated in m/step s, which can be easier to interpret. For \code{\link[flapper]{get_mvt_mobility_from_archival}}, `step' is set automatically as the duration (s) between sequential depth observations, which is assumed to remain constant through time.
+#' @param step_check For \code{\link[flapper]{get_mvt_mobility_from_archival}}, \code{step_check} is a logical variable that defines whether or not to check that the steps in \code{data} are regular (see \code{step}).
 #'
 #' @details
 #'
 #' \subsection{Acoustic estimates}{Speed estimates from passive acoustic telemetry time series are derived from examination of detection patterns via \code{\link[flapper]{get_mvt_mobility_from_acoustics}}. For each \code{fct} group (e.g., individual), the function identifies sequential detections, which exceeded the maximum transmission interval, at receivers with non-overlapping detection containers (areas within the detection range of each receiver). Assuming that all detections are true, these can only result from movement between receivers. For these movements, transition distances are calculated as Euclidean distances, via \code{\link[raster]{pointDistance}}, or shortest swimming distances, assuming movement over a surface, via \code{\link[flapper]{lcp_over_surface}}. Given that detections can arise from movement anywhere within the detection range of a receiver, three distances are calculated: an average distance, from receiver to receiver; a lower-bound distance, between the closest edges of receiver detection containers (i.e., the average distance minus two times the detection range); and an upper-bound distance from the furthest edges of receiver detection ranges (i.e., the average distance plus two times the detection range). These estimates assume a uniform detection ranges over space. For each transition, distances are converted into an average, lower and upper speed (m/s) estimate (termed `speed_avg_ms`, `speed_min_ms` and `speed_max_ms` respectively). If \code{step} is supplied, speeds are also expressed per step. On many occasions, individuals will take indirect routes between receivers, resulting in inappropriately low speed estimates. However, if receivers are sufficiently close together such that individuals sometimes effectively transition directly between receivers, the faster speed estimates derived via this method may be quite informative about actual swimming speeds.}
 #'
-#' \subsection{Archival estimates}{Speed estimates from \code{archival} time series are derived from examination of changes in depth through time (vertical activity) via \code{\link[flapper]{get_mvt_mobility_from_archival}}. For each individual, speed is calculated from the vertical distances (m) between sequential, regular depth (m) observations over time (s). Speeds are also expressed per step, where `step' is the duration (s) between sequential observations.}
+#' \subsection{Archival estimates}{Speed estimates from \code{archival} time series are derived from examination of changes in depth through time (vertical activity) via \code{\link[flapper]{get_mvt_mobility_from_archival}}. For each individual, speed is calculated from the vertical distances (m) between sequential, regular depth (m) observations over time (s). Speeds are also expressed per step, where `step' is the duration (s) between sequential observations. The assumption of regular steps may be relaxed in the future.}
 #'
 #' @return Both functions print a statistical summary of the speed estimates to the console and return a dataframe with observations and the corresponding speed estimates invisibly.
 #'
@@ -37,7 +38,7 @@
 #' \itemize{
 #'   \item \code{dist} is the distance (m) between sequential depth observations;
 #'   \item \code{speed_ms} is the speed (m/s) of vertical movement between sequential depth observations;
-#'   \item \code{speed_m_per_step} is the speed of vertical movement between sequential depth observations in units of m per step, where `step' is the duration (s) between sequential depth observations;
+#'   \item \code{speed_mstep} is the speed of vertical movement between sequential depth observations in units of m per step, where `step' is the duration (s) between sequential depth observations (this is identical to \code{dist} and only added for consistency with \code{\link[flapper]{get_mvt_mobility_from_acoustics}});
 #' }
 #'
 #' @examples
@@ -263,8 +264,15 @@ get_mvt_mobility_from_acoustics <- function(data,
 #' @rdname get_mvt_mobility
 #' @export
 
-get_mvt_mobility_from_archival <- function(data, fct = NULL){
+get_mvt_mobility_from_archival <- function(data, fct = NULL, step_check = TRUE){
   check_names(input = data, req = c("timestamp", "depth", fct), type = all)
+  if(any(data$depth < 0)){
+    warning("data$depth contains negative values: using abs(data$depth).",
+            immediate. = TRUE, call. = FALSE)
+    data$depth <- abs(data$depth)
+  }
+  check_class(input = data$timestamp, to_class = c("Date", "POSIXct"), type = "stop")
+  data$index <- 1:nrow(data)
   if(!is.null(fct)) data$fct <- data[, fct] else data$fct <- 1L
   id_n_obs <-
     data %>%
@@ -272,12 +280,27 @@ get_mvt_mobility_from_archival <- function(data, fct = NULL){
     dplyr::summarise(n = dplyr::n(), .groups = "drop_last")
   if(any(id_n_obs$n <= 2)){
     id_to_drop <- id_n_obs$fct[which(id_n_obs$n <= 2)]
-    warning(paste0("Too few observations for the following individual(s) for analysis: ", paste0("'", id_to_drop, collapse = "', "), "'."))
+    if(!is.null(fct)){
+      warning(paste0("Too few observations for the following individual(s) for analysis: ", paste0("'", id_to_drop, collapse = "', "), "'."),
+              immediate. = TRUE, call. = FALSE)
+    }
     data <- data %>% dplyr::filter(.data$fct != id_to_drop)
-    if(nrow(data) <= 2) stop("Insufficient data data remaining for analysis.")
+    if(nrow(data) <= 2) stop("Insufficient data available for analysis (n <= 2).", call. = FALSE)
   }
   data_1 <- data %>% dplyr::filter(fct == unique(data$fct)[1])
   step   <- as.numeric(difftime(data_1$timestamp[2], data_1$timestamp[1]), units = "secs")
+  if(step_check){
+    data <-
+      data %>%
+      dplyr::group_by(.data$fct) %>%
+      dplyr::mutate(gap = Tools4ETS::serial_difference(.data$timestamp, units = "secs"))
+    gaps  <- unique(data$gap)[!is.na(unique(data$gap))]
+    lgaps <- length(gaps)
+    print(gaps)
+    if(lgaps != 1L)
+      stop("'data' should comprise regular time steps.", call. = FALSE)
+    data$gap <- NULL
+    }
   data <-
     data %>%
     dplyr::group_by(.data$fct) %>%
@@ -286,7 +309,9 @@ get_mvt_mobility_from_archival <- function(data, fct = NULL){
                   speed_mstep = .data$dist) %>%
     dplyr::ungroup() %>%
     dplyr::filter(!is.na(.data$dist)) %>%
-    dplyr::select(-.data$fct)
+    dplyr::arrange(.data$index) %>%
+    dplyr::select(-.data$fct, -.data$index) %>%
+    as.data.frame()
   message("Mobility estimates from n = ", nrow(data), " observation(s).")
   cat("--------------------------------------\n")
   cat("Estimates (m/s)-----------------------\n")
