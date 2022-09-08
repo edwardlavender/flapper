@@ -1,10 +1,22 @@
+# flapper 1.0.1 (in progress)
+
+* **Function fixes**
+    * Fix and refine calculations in `get_detection_days()`
+    * Fixes to functions after dependencies update, including: 
+        - `get_detection_clumps()` 
+        - `lcp_over_surface()`
+
+* **Function improvements**
+    * Update `get_mvt_mobility_from_archival()` with `step_check` argument to check for regular time series
+    * Update `dist_btw_receivers()` to handle lon/lat and planar coordinates and return dataframes or matrices
+    * Update `check_*()` functions with internal improvements
+
+* **Function tests**
+    * Set up testing with `testthat`;
+
 # flapper 1.0.0
 
-* Update `get_mvt_mobility_from_archival()` with `step_check` argument to check for regular time series;
-* Improve `dist_btw_receivers()` to handle lon/lat and planar coordinates and return dataframes or matrices;
-* Fixes to `get_detection_clumps()` and `lcp_over_surface()` after dependencies update;
-* Set up testing with `testthat`;
-* Internal improvments to `check_*()` functions; 
+* The first release of `flapper`
 
 # flapper 0.0.9000
 
