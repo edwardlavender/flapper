@@ -24,9 +24,9 @@ test_that("get_detection_pr() performs properly.", {
   x  <- 1:100
   b0 <- 3
   b1 <- -0.5
-  f <- gtools::inv.logit
+  f <- stats::plogis
   # Check calculations are correct (output = 3L)
-  p1 <- gtools::inv.logit(b0 + b1 * x)
+  p1 <- f(b0 + b1 * x)
   p2 <- get_detection_pr(distance = x, beta_0 = b0, beta_1 = b1, inv_link = f)
   expect_true(all(all_equal_vec(p1, p2)))
   # Check calculations are correct (output = 2L)

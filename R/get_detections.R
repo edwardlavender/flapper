@@ -53,10 +53,9 @@ get_detection_pr <- function(distance = 1:1000,
                              beta_0 = 2.5,
                              beta_1 = -0.01,
                              inv_link = stats::plogis,
-                             output = c(1L, 2L, 3L),...){
+                             output = 3L,...){
   #### Checks
   stopifnot(length(beta_0) == 1 & length(beta_1) == 1)
-  output <- output[1]
   output <- check_value(input = output, supp = 1:3, warn = TRUE, default = 3L)
 
   #### Calculate detection probabilities

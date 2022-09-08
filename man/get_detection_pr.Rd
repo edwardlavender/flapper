@@ -9,7 +9,7 @@ get_detection_pr(
   beta_0 = 2.5,
   beta_1 = -0.01,
   inv_link = stats::plogis,
-  output = c(1L, 2L, 3L),
+  output = 3L,
   ...
 )
 }
