@@ -8,6 +8,38 @@
 ########################################
 #### get_detection_pr()
 
+test_that("get_detection_pr() performs properly.", {
+  #### Check errors
+  # Coefficients should be length one
+  expect_error(get_detection_pr(beta_0 = 1:2))
+
+  #### Check warnings
+  # The output should be supported
+  expect_warning(get_detection_pr(output = 0))
+
+  #### Check calculations
+  # Define function to check calculated values are correct at every distance
+  all_equal_vec <- Vectorize(all.equal)
+  # Define example data
+  x  <- 1:100
+  b0 <- 3
+  b1 <- -0.5
+  f <- gtools::inv.logit
+  # Check calculations are correct (output = 3L)
+  p1 <- gtools::inv.logit(b0 + b1 * x)
+  p2 <- get_detection_pr(distance = x, beta_0 = b0, beta_1 = b1, inv_link = f)
+  expect_true(all(all_equal_vec(p1, p2)))
+  # Check calculations are correct (output = 2L)
+  p3 <- get_detection_pr(distance = x, beta_0 = b0, beta_1 = b1, inv_link = f, output = 2L)
+  all(all_equal_vec(p1, p3))
+
+  #### Check outputs
+  # Check only plot produced with output = 1L
+  expect_type(p2, "double")
+  expect_equal(names(attributes(p2)), c("X", "beta", "inv_link"))
+  expect_invisible(get_detection_pr(output = 1L))
+})
+
 
 ########################################
 ########################################
