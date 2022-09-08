@@ -264,3 +264,72 @@ test_that("get_detection_clumps() example calculations are correct.", {
 ########################################
 ########################################
 #### get_residents()
+
+test_that("get_residents works as expected.", {
+
+  #### Define example dataframe
+  acoustics <-
+    data.frame(timestamp = seq.POSIXt(
+      as.POSIXct("2016-01-01"),
+      as.POSIXct("2017-01-01"), "days"),
+      ID = "A",
+      random = "A")
+
+  #### Check errors
+  # Column names
+  expect_error(get_residents(data.frame(blah = numeric())))
+  # Only one value for resident_threshold_gap should be supplied
+  expect_error(get_residents(acoustics, resident_threshold_gap = c(10, 1)))
+  # 'resident_threshold_duration' should be a sorted, numeric vector.
+  expect_error(get_residents(acoustics, resident_threshold_duration = c(10, 1)))
+  # The number of resident_threshold_duration(s) and resident_label(s) should be the same.
+  expect_error(get_residents(acoustics, resident_threshold_duration = 1:4))
+
+  #### Check correct column names and labels
+  # Check column names
+  expect_true(all(colnames(get_residents(acoustics)) %in% c("time", "resident")))
+  expect_true(rlang::has_name(get_residents(acoustics, fct = "ID"), "ID"))
+  expect_true(rlang::has_name(get_residents(acoustics, keep = "random"), "random"))
+  # Check labels
+  get_residents(acoustics,
+                resident_labels = c("STR", "LTR"))$resident == "LTR"
+
+
+
+  #### Check calculations for example individual
+  res <- get_residents(acoustics)
+  expect_true(res$time == 366 & res$resident == "L")
+  res <- get_residents(acoustics[1:10, , drop = FALSE],
+                       resident_threshold_duration = 365,
+                       resident_labels = "resident")
+  expect_true(res$time == 9 & res$resident == "N")
+
+  #### Check calculations for multiple individuals
+  ## Define dataframes for non residents/short-term residents and long term residents
+  non <-
+    data.frame(
+      timestamp = as.POSIXct(c("2016-01-01", "2016-02-05")),
+      id = 1)
+  short <-
+    data.frame(
+      timestamp = seq.POSIXt(
+        as.POSIXct("2016-01-01"),
+        as.POSIXct("2016-05-01"), "hours"),
+      id = 2)
+  long <-
+    data.frame(
+      timestamp = seq.POSIXt(as.POSIXct("2016-01-01"),
+                             as.POSIXct("2018-01-01"),
+                             "weeks"),
+      id = 3)
+
+  ## Check calculations with default options
+  # Check residency categories
+  res <- get_residents(rbind(non, short, long), fct = "id")
+  expect_true(all(res$resident == c("N", "S", "L")))
+  # Check residency categories if individual need to be detected every day
+  # ... The individual that is detected weekly is now no longer resident
+  res <- get_residents(rbind(non, short, long), fct = "id",
+                       resident_threshold_gap = 1)
+  expect_true(all(res$resident == c("N", "S", "N")))
+})

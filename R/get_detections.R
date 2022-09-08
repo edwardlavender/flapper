@@ -1506,7 +1506,7 @@ get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5){
 #' prettyGraphics::pretty_plot(dat_acoustics$timestamp, dat_acoustics$individual_id)
 #'
 #' @seealso \code{\link[flapper]{get_detection_days}}, \code{\link[flapper]{get_detection_clumps}}
-#' @references Lavender, et al. (in review). Movement patterns of a Critically Endangered elasmobranch (\emph{Dipturus intermedius}) in a Marine Protected Area. Aquatic Conservation: Marine and Freshwater Ecosystems.
+#' @references Lavender, et al. (in 2021). Movement patterns of a Critically Endangered elasmobranch (\emph{Dipturus intermedius}) in a Marine Protected Area. Aquatic Conservation: Marine and Freshwater Ecosystems, 32(2), 348−365. https://doi.org/10.1002/aqc.3753
 #'
 #' @author Edward Lavender
 #' @export
@@ -1520,6 +1520,7 @@ get_residents <- function(acoustics,
                           keep = NULL){
   #### Checks
   check_names(input = acoustics, req = c("timestamp", fct), type = all)
+  stopifnot(length(resident_threshold_gap) == 1L)
   if(is.unsorted(resident_threshold_duration))
     stop("'resident_threshold_duration' should be a sorted, numeric vector.")
   if(length(resident_threshold_duration) != length(resident_labels))
