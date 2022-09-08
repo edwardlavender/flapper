@@ -26,7 +26,7 @@ For implementations with \code{summarise = FALSE}, the function returns a datafr
 For implementations with \code{summarise = TRUE}, the function returns a dataframe that defines the frequency distribution of the duration of detection clumps (i.e., the number of occasions when detection clumps lasted different lengths of time). This includes the following columns: (1) `n_interval', the duration of the clump, in units of \code{interval}; (2) `n_occasions', the number of occasions when detections clumped into windows of that duration; (3) `eg_occasions', the time stamp of an example clump of the specified duration; and, if \code{fct} is supplied, a column that distinguishes each individual.
 }
 \description{
-This function identifies unique, uninterrupted series of detections (`clumps') over a given time interval--for example, occasions when detections clumped into periods of one, two, three, ..., n days in duration without gaps longer than one day in length. A dataframe identifying each clump and the associated start time or the frequency distribution of the duration of clumps is returned.
+This function identifies unique, uninterrupted series of detections (`clumps') over a given time interval--for example, occasions when detections clumped into periods of one, two, three, ..., \eqn{n} days in duration without gaps longer than one day in length. A dataframe identifying each clump and the associated start time or the frequency distribution of the duration of clumps is returned.
 }
 \details{
 Detection clumps (and, more specifically, the frequency distribution of the duration of clump lengths) provide a means to assess residency within an array by determining how long individuals tended to spend around receivers.
@@ -35,10 +35,10 @@ Detection clumps (and, more specifically, the frequency distribution of the dura
 #### Define a hypothetical series of detections
 # with one occasion when the 'chunk length' is 1 day
 # ... two separate occasions when the chunk length is two days
-# ... ... (i.e., the individual was detected on two consecutive day
+# ... ... (i.e., the individual was detected on two consecutive days
 # ... .... on two different occasions)
 # ... one occasion when the chunk length is 5 days
-# ... one occasion when the chunk lenghth is 7 days
+# ... one occasion when the chunk length is 7 days
 eg <-
   data.frame(
     timestamp =
@@ -73,7 +73,6 @@ get_detection_clumps(eg, fct = "individual_id")
 #### Example (3): Change the time interval
 ## E.g. Use an hourly interval:
 # There are 17 unique clumps in this dataset, each comprising a single hour
-eg$timestamp <- as.POSIXct(eg$timestamp)
 get_detection_clumps(eg, interval = "hours")
 ## E.g. Use a monthly interval
 # There is a single 'three-month' clump of detections for this individual
