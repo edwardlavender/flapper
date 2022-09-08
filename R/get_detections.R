@@ -1160,7 +1160,7 @@ get_detection_days <- function(acoustics,
 
 #' @title Get detection clumps
 #' @importFrom rlang .data
-#' @description This function identifies unique, uninterrupted series of detections (`clumps') over a given time interval--for example, occasions when detections clumped into periods of one, two, three, ..., n days in duration without gaps longer than one day in length. A dataframe identifying each clump and the associated start time or the frequency distribution of the duration of clumps is returned.
+#' @description This function identifies unique, uninterrupted series of detections (`clumps') over a given time interval--for example, occasions when detections clumped into periods of one, two, three, ..., \eqn{n} days in duration without gaps longer than one day in length. A dataframe identifying each clump and the associated start time or the frequency distribution of the duration of clumps is returned.
 #' @param acoustics A dataframe that contains passive acoustic telemetry detection time series (see \code{\link[flapper]{dat_acoustics}} for an example). At a minimum, this should contain a POSIXct vector of time stamps when detections were made named `timestamp'.
 #' @param fct (optional) A character that defines the name of a column in \code{acoustics} that distinguishes acoustic time series for different individuals.
 #' @param interval A character that defines the time interval. This must be supported by \code{\link[lubridate]{round_date}}. The default is \code{"days"}, in which case the function identifies clumps in units of days, with detections within the same clump occurring within one day of each other.
@@ -1176,10 +1176,10 @@ get_detection_days <- function(acoustics,
 #' #### Define a hypothetical series of detections
 #' # with one occasion when the 'chunk length' is 1 day
 #' # ... two separate occasions when the chunk length is two days
-#' # ... ... (i.e., the individual was detected on two consecutive day
+#' # ... ... (i.e., the individual was detected on two consecutive days
 #' # ... .... on two different occasions)
 #' # ... one occasion when the chunk length is 5 days
-#' # ... one occasion when the chunk lenghth is 7 days
+#' # ... one occasion when the chunk length is 7 days
 #' eg <-
 #'   data.frame(
 #'     timestamp =
@@ -1214,7 +1214,6 @@ get_detection_days <- function(acoustics,
 #' #### Example (3): Change the time interval
 #' ## E.g. Use an hourly interval:
 #' # There are 17 unique clumps in this dataset, each comprising a single hour
-#' eg$timestamp <- as.POSIXct(eg$timestamp)
 #' get_detection_clumps(eg, interval = "hours")
 #' ## E.g. Use a monthly interval
 #' # There is a single 'three-month' clump of detections for this individual

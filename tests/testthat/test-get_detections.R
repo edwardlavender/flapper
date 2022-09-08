@@ -164,6 +164,97 @@ test_that("get_detection_days() calculations are correct.", {
 ########################################
 #### get_detection_clumps()
 
+test_that("get_detection_clumps() throws expected errors.", {
+  # Error for missing columns
+  expect_error(get_detection_clumps(data.frame(date = as.Date("2016-01-01"))))
+  expect_error(
+    get_detection_clumps(
+      data.frame(timestamp = as.POSIXct("2016-01-01"), ID = 1),
+      fct ="id")
+  )
+})
+
+test_that("get_detection_clumps() example calculations are correct.", {
+
+  #### Define a hypothetical series of detections
+  # ... following function examples.
+  eg <-
+    data.frame(
+      timestamp =
+        as.POSIXct(
+          c("2016-01-01", # one week of continuous detections
+            "2016-01-02",
+            "2016-01-03",
+            "2016-01-04",
+            "2016-01-05",
+            "2016-01-06",
+            "2016-01-07",
+            "2016-02-01", # one day with an isolated detection
+            "2016-02-03", # two days with detections
+            "2016-02-04",
+            "2016-02-15", # another two days with detections
+            "2016-02-16",
+            "2016-03-01", # five days of continuous detections
+            "2016-03-02",
+            "2016-03-03",
+            "2016-03-04",
+            "2016-03-05")))
+
+  #### Example (1): Implement function with default options
+  # Check colnames match description
+  expect_true(all(colnames(get_detection_clumps(eg)) %in%
+                    c("n_intervals", "n_occasions", "eg_occasions"))
+  )
+  # Check calculations
+  expect_true(
+    dplyr::all_equal(
+      get_detection_clumps(eg),
+      data.frame(n_intervals = as.integer(c(1, 2, 5, 7)),
+                 n_occasions = c(1, 2, 1, 1),
+                 eg_occasions = as.POSIXct(c("2016-02-01", "2016-02-03",
+                                             "2016-03-01", "2016-01-01")))
+    )
+  )
+
+  #### Example (2): Implement function for multiple individuals
+  eg$individual_id <- 1L
+  expect_true(rlang::has_name(get_detection_clumps(eg, fct = "individual_id"),
+                              "individual_id"))
+
+  #### Example (3): Change the time interval
+  ## E.g. Use an hourly interval:
+  eg$timestamp <- as.POSIXct(eg$timestamp)
+  expect_true(
+    dplyr::all_equal(
+      data.frame(n_intervals = 1L,
+                 n_occasions = 17,
+                 eg_occasions = as.POSIXct("2016-01-01")),
+      get_detection_clumps(eg, interval = "hours")
+    )
+  )
+  ## E.g. Use a monthly interval
+  get_detection_clumps(eg, interval = "months")
+  expect_true(
+    dplyr::all_equal(
+      data.frame(n_intervals = 1L,
+                 n_occasions = 17,
+                 eg_occasions = as.POSIXct("2016-01-01")),
+      get_detection_clumps(eg, interval = "hours")
+    )
+  )
+
+  #### Example (4): Identify the timing of each clump with summarise = FALSE
+  expect_true(
+    dplyr::all_equal(
+      get_detection_clumps(eg, summarise = FALSE),
+      data.frame(n_intervals = as.integer(c(7, 1, 2, 2, 5)),
+                 timestamp = as.POSIXct(c("2016-01-01", "2016-02-01",
+                                          "2016-02-03", "2016-02-15",
+                                          "2016-03-01")))
+    )
+  )
+})
+
 
 ########################################
 ########################################
