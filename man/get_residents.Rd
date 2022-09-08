@@ -48,7 +48,7 @@ prettyGraphics::pretty_plot(dat_acoustics$timestamp, dat_acoustics$individual_id
 
 }
 \references{
-Lavender, et al. (in 2021). Movement patterns of a Critically Endangered elasmobranch (\emph{Dipturus intermedius}) in a Marine Protected Area. Aquatic Conservation: Marine and Freshwater Ecosystems, 32(2), 348−365. https://doi.org/10.1002/aqc.3753
+Lavender, et al. (in 2021). Movement patterns of a Critically Endangered elasmobranch (\emph{Dipturus intermedius}) in a Marine Protected Area. Aquatic Conservation: Marine and Freshwater Ecosystems, 32(2), 348--365. https://doi.org/10.1002/aqc.3753
 }
 \seealso{
 \code{\link[flapper]{get_detection_days}}, \code{\link[flapper]{get_detection_clumps}}
