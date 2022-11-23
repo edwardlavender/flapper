@@ -1,7 +1,7 @@
 #' @title Get animal `home ranges'
-#' @description These functions extract `home range' estimates from \code{\link[raster]{raster}} objects that describe the intensity of movements within an area (from example from \code{\link[flapper]{pf_kud}}).
+#' @description These functions extract `home range' estimates from \code{SpatRaster} (or \code{\link[raster]{raster}}) objects that describe the intensity of movements within an area (from example from \code{\link[flapper]{pf_kud}}).
 #'
-#' @param x A \code{\link[raster]{raster}} of the utilisation distribution (UD).
+#' @param x A \code{SpatRaster} (or a \code{\link[raster]{raster}}) of the utilisation distribution (UD).
 #' @param prop For \code{\link[flapper]{get_hr_prop}}, \code{prop} is a number that defines the home range proportion.
 #' @param plot A logical variable that defines whether or not to plot the home range.
 #' @param add_raster,add_contour,... Plot customisation options. \code{add_raster} is a named list of arguments to customise the home range surface that is passed to \code{\link[prettyGraphics]{pretty_map}}. \code{...} are additional arguments passed to \code{\link[prettyGraphics]{pretty_map}}. \code{add_contour} is a named list of arguments passed to \code{\link[raster]{contour}} that is called afterwards.
@@ -58,11 +58,18 @@ NULL
 #' @export
 
 get_hr_prop <- function(x, prop = 0.5, plot = TRUE, add_raster = list(), add_contour = list(),...){
-  if(!requireNamespace("spatialEco", quietly = TRUE)) stop("This function requires the 'spatialEco' package.")
-  check_class(input = x, to_class = "RasterLayer", type = "stop")
+  if(!requireNamespace("spatialEco", quietly = TRUE))
+    stop("This function requires the 'spatialEco' package.", call. = FALSE)
+  check_class(input = x, to_class = c("SpatRaster", "RasterLayer"), type = "stop")
   if(length(prop) != 1L)
     stop("'prop' should be a single number (proportion).", call. = FALSE)
+  if (inherits(x, "RasterLayer")) {
+    if(!requireNamespace("terra", quietly = TRUE))
+      stop("This function requires the 'terra' package.", call. = FALSE)
+    x <- terra::rast(x)
+  }
   x <- spatialEco::raster.vol(x, p = prop, sample = FALSE)
+  if (inherits(x, "SpatRaster")) x <- raster::raster(x)
   if(plot) {
     if(!is.null(add_raster)) add_raster$x <- x
     prettyGraphics::pretty_map(add_rasters = add_raster,...)

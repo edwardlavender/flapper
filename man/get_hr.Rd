@@ -24,7 +24,7 @@ get_hr_home(x, plot = TRUE, add_raster = list(), add_contour = list(), ...)
 get_hr_full(x, plot = TRUE, add_raster = list(), add_contour = list(), ...)
 }
 \arguments{
-\item{x}{A \code{\link[raster]{raster}} of the utilisation distribution (UD).}
+\item{x}{A \code{SpatRaster} (or a \code{\link[raster]{raster}}) of the utilisation distribution (UD).}
 
 \item{prop}{For \code{\link[flapper]{get_hr_prop}}, \code{prop} is a number that defines the home range proportion.}
 
@@ -36,7 +36,7 @@ get_hr_full(x, plot = TRUE, add_raster = list(), add_contour = list(), ...)
 The functions return a \code{\link[raster]{raster}}. Cells with a value of one are inside the specified range boundaries; cells with a value of zero are beyond range boundaries.
 }
 \description{
-These functions extract `home range' estimates from \code{\link[raster]{raster}} objects that describe the intensity of movements within an area (from example from \code{\link[flapper]{pf_kud}}).
+These functions extract `home range' estimates from \code{SpatRaster} (or \code{\link[raster]{raster}}) objects that describe the intensity of movements within an area (from example from \code{\link[flapper]{pf_kud}}).
 }
 \details{
 Animal home ranges are widely quantified as `the smallest subregion that accounts for a specified proportion, \emph{p}, of [the animal's] total distribution' (Jennrich and Turner 1969, page 232). In line with this approach, \code{\link[flapper]{get_hr_prop}} extracts the region within a frequency distribution of space use (i.e., UD) that is enclosed by a specified proportion (\code{prop}) contour. Following the most widely used adopted conventions, three additional wrapper functions facilitate the extraction of core, home and full ranges:
