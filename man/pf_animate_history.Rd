@@ -12,9 +12,9 @@ pf_animate_history(
   html_title = "Demonstration of PF",
   html_description = "",
   navigator = FALSE,
-  ani_height = 800,
-  ani_width = 800,
-  ani_res = 1200,
+  ani_height = 1000,
+  ani_width = 1000,
+  ani_res = 150,
   interval = 0.1,
   verbose = FALSE,
   ...
