@@ -15,6 +15,7 @@ Suggests:
     plyr,
     tidyr,
     stringr,
+    terra,
     fasterRaster,
     sf,
     sfheaders,
@@ -43,5 +44,5 @@ BugReports: https://github.com/edwardlavender/flapper/issues/
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 Config/testthat/edition: 3
