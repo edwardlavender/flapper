@@ -36,7 +36,7 @@ The function returns a \code{\link[raster]{raster}} in which each cell represent
 This function calculates the least-cost distances from a point to all (or some) of the cells in a surrounding \code{\link[raster]{raster}} object, returning a \code{\link[raster]{raster}}. This is the least-cost distance equivalent of \code{\link[raster]{distanceFromPoints}}.
 }
 \details{
-This function implements routines provided via \code{\link[flapper]{flapper}} and the \code{\link[cppRouting]{cppRouting}} package to calculate least-cost distances. The main steps are:
+This function implements routines provided via \code{\link[flapper]{flapper}} and the \code{cppRouting} package to calculate least-cost distances. The main steps are:
 \enumerate{
   \item The calculation of distances between adjacent cells (i.e., \code{cost}, if not supplied, via \code{\link[flapper]{lcp_costs}});
   \item The construction of a graph that defines cell connections from the \code{origin} to surrounding cells on the \code{surface} as a network (via \code{\link[cppRouting]{makegraph}});
