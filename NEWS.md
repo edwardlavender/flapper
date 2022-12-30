@@ -1,4 +1,4 @@
-# flapper 1.0.1 (in progress)
+# flapper (development version)
 
 * **Function fixes**
     * Fix and refine calculations in `get_detection_days()`
