@@ -113,7 +113,7 @@ cl_lapply <- function(x, fun, ..., cl = NULL, varlist = NULL, use_chunks = FALSE
       # Get indices for chunk
       x_for_chunk <- x[index_for_chunk]
       # Loop over chunk in serial
-      y_for_chunk <- lapply(x_for_chunk, function(xi) return(fun(xi)))
+      y_for_chunk <- lapply(x_for_chunk, function(xi) return(fun(xi, ...)))
       return(y_for_chunk)
     })
     # Close cluster
@@ -123,7 +123,7 @@ cl_lapply <- function(x, fun, ..., cl = NULL, varlist = NULL, use_chunks = FALSE
   } else {
     # Loop over x elements in parallel
     cl_export(cl = cl, varlist = varlist)
-    y <- pbapply::pblapply(x, cl = cl, function(xi) return(fun(xi)))
+    y <- pbapply::pblapply(x, cl = cl, function(xi) return(fun(xi, ...)))
     cl_stop(cl = cl)
   }
   return(y)
