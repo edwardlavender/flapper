@@ -1,0 +1,93 @@
+---
+title: "`flapper`: practitioner FAQs"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: yes
+vignette: >
+  %\VignetteIndexEntry{`flapper`: practitioner FAQs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+This vignette addresses frequently asked questions (FAQs) for practitioners seeking to apply the `flapper` algorithms. For further details, consult Lavender _et al._ (in review). To submit a new question, go to https://github.com/edwardlavender/flapper/issues. 
+
+# Abbreviations
+
+* **AC**---acoustic-container (see `ac()`)
+* **ACPF**---coustic-container particle filtering (see `ac()` and `pf()`)
+* **ACDC**---acoustic-container depth-contour (see `acdc()`)
+* **ACDCPF**---acoustic-container depth-contour particle filtering (see `acdc()` and `pf()`)
+* **PF**--- particle filtering (see `pf()`)
+
+# Algorithm implementation
+
+## Can the algorithm efficiently incorporate receiver-specific detection ranges? Or detection ranges that vary as a function of depth or substrate?
+
+There is no theoretical obstacle to the incorporation of receiver-specific detection ranges or detection probability models that vary by receiver (or other environmental variables). In flapper, receiver-specific detection containers are passed as objects to the relevant algorithm function (i.e., `ac()`, `acdc()`). At the time of writing, the helper function used to create detection containers (`acs_setup_containers()`) assumes the detection range is constant across receivers, but custom detection containers could be created and passed to the algorithm similarly. The same goes for detection probability kernels. Since these objects are created in advance, custom inputs are efficiently incorporated. However, for larger and/or more complex containers/kernels, calculations may take longer.
+
+## How are simultaneous detections of the same transmission on different receivers handled?
+
+Assuming that the clocks of receivers are aligned, a simultaneous detection of an individual at multiple receivers implies that the individual must have been located within the intersection of those receivers' detection containers (at that moment in time), accounting for the set of possible previous and future locations. Within this region, the probability that the individual was in any given location depends on the detection probability model.
+
+## How much time must pass without detection before a tag could be anywhere in the study area?
+
+This depends on the algorithm, the size and shape of study area, the arrangement of receivers, the detection range and the movement capacity of the tagged animal. These factors affect both how quickly an animal can move away from an area and where it can go (i.e., the definition of 'anywhere'). Take a circular study area of radius 1000 m with a single receiver at the centre where an individual is both located and detected. If we take a maximum swimming speed of 1 ms-1 and assume this can be maintained indefinitely then, by time $(s)=distance (m)/speed (ms^{-1})$, the individual could be located anywhere in the area after a detection gap of 1000 s (about 17 minutes). This calculation provides an indication of the duration between detections beyond which the set of possible locations for the individual (and our uncertainty in its location) is greatest and is effectively encapsulated by the AC/ACDC algorithm (assuming a 'negligibly small' detection container). Allowing for locational uncertainty within a detection container, then the time by which the individual could reach the boundaries of the study area could be smaller (because the starting position could be further away from the receiver), though the area in which the individual could be located following the detection is also reduced by the detection container (and the shape of the detection probability kernel within that region). If you refine the AC-branch outputs using the ACPF or ACDCPF algorithm, the set of possible locations of the individual may expand less rapidly in the gaps between detections, depending on the probability of different rates of movement (as defined by the movement model), the presence of additional constraints (such as the locations of receivers that did not record detections, the depth at each time step or movement barriers) and the stochastic sampling process. At the time of writing, we recommend researchers consider the duration of detection gaps in relation to these criteria and avoid implementing the algorithms over 'long' detection gaps when information on the location of an individual is limited. Ultimately, however, the definition of 'long' depends not only on the aforementioned criteria but also a study's objectives. For example, in this study, we deliberately implement the algorithms over the complete detection time series for a one-month period for an example individual to test the hypothesis that the individual could have remained in the study area (a Marine Protected Area) over this time interval. For post-hoc evaluation of the influence of each time step on algorithm outputs, you can examine the shape of the probability distribution of the set of possible locations in which the individual could have been located through time.
+
+## The different flapper algorithms suggest different patterns of space use. How do I choose which algorithm to use?
+
+The choice of algorithm depends on data availability and study objectives. For reconstructing patterns of space use, the different algorithms suggest different patterns because they incorporate different information. Let's use Fig. 3 in Lavender _et al._ (in review) to illustrate this point and clarify algorithm choice. Recall that Fig. 3A shows a map reconstructed from the depth time series; Fig. 3B--C show maps reconstructed from acoustic detections; and Fig. 3D shows a map based on both datasets. If you only have depth time series, or you are interested in the extent to which a region (such as a Marine Protected Area) represents the depths used by an individual, the DC algorithm (Fig. 3A), is the appropriate choice. If you only have detection data at receivers, you have the choice of a number of existing methods, such as the mean-position algorithm (Fig. 3B), or our ACPF algorithm (Fig. 3C). As noted in Lavender _et al._, (in review), the relative utility of these methods may vary in different settings but in clustered receiver arrays the mean-position algorithm may perform poorly (Fig. 3B) and the ACPF algorithm (Fig. 3C) is the clear choice here. If you have both depth and detection time series, the ACDCPF algorithm is a refinement. Thus, for flapper skate, the ACDCPF algorithm is the best choice when it comes to reconstructing patterns of space use and Fig. 3D is the most-refined map of space use for the analysed individual. In summary, the best algorithm for reconstructing patterns of space use depends on the data you have available: if you only have depth time series, use the DC algorithm; if you only have acoustic time series, use the ACPF algorithm; if you have both depth and acoustic data, then use the ACDCPF algorithm, which can integrate both types of data.
+
+# Algorithm interpretation
+
+## What do the movement paths look like between receivers? Are they simply straight lines or least-cost paths?
+
+Recall that in the PF-branch algorithm, a large number of particles are sampled at each time step. Consequently, if the gaps between detections span a large number of time steps, a large number of possible paths may be reconstructed between receivers that are consistent with the data (based on the connections between sequentially sampled particles). This is one of the key innovations of our method because it provides 'a fuller exploration of possible movements than permitted under the assumption that individuals follow least-cost paths between detection containers'. The set of possible paths depends on the information that is available to constrain the location of the animal in the gaps between detections (i.e., the detection probability model and receiver positions, the movement model and additional constraints, such as depth observations and coastline). If there are few constraints on individual locations and the gaps between detections span multiple time steps, then different paths will 'wander' across the landscape, generating a relatively smooth surface that reflects our uncertainty in the possible location of the individual through time. If there are more constraints, the set of possible paths may be more tightly focussed and highlight several more-or-less likely 'routes' between receivers. Direct linear or least-cost transitions between detection containers are only likely to emerge if the time between detections is short (relative to the movement capacity), such that the individual could (or must have) moved directly from one to another during the detection gap.
+
+# Sensitivity
+
+## How sensitive are the algorithms to the mobility parameter?
+
+The mobility parameter controls how far an individual can move in any given time step. Intuitively, underestimation of mobility will lead to overly concentrated patterns of space use, while overestimation of mobility will lead to overly diffuse patterns of space use. However, these two outcomes are not necessarily equally plausible. Algorithm sensitivity also depends on additional constraints, such as array design.
+
+First, note that it can be quite hard to underestimate the mobility parameter. If you, for example, half mobility, the PF algorithm is unlikely to converge: during the simulation of individual movements, you are likely to reach a time step in which the set of locations in which the individual could be located at a subsequent time step (given previously sampled locations) does not overlap with the set of locations within which the individual must have been located (given the data), because mobility is too restricted (assuming you sample a sufficient number of particles). This situation is more likely to arise in studies in which constraints on an individual's location through time (e.g., detections or ancillary time series) successfully restrict the number of possible routes between sequential locations. If you attempt to repeat the case-study analyses in Lavender _et al._ (in review) (e.g., analysis A2) with a reduced mobility, you will run into exactly this issue. This provides good evidence that the mobility parameter is appropriate for the analysed data in this study.
+
+While it can be difficult to underestimate mobility, it is possible to overestimate it. The effects of doing so will be most apparent in the AC-branch algorithms and depend on constraints (such as array design). In a sparse array that records few detections, there is little information to constrain movement and an overestimated mobility parameter will produce more diffuse patterns of space use. However, the coupling of AC- and PF- branch algorithms can limit the influence of an overestimated mobility parameter because the latter incorporates a movement model in which longer-range movements, while permitted, can be made less likely. This is what the movement model for flapper skate does in Lavender _et al._ (in review).
+
+Finally, it is important to note that these considerations are not unique to our methods. The flapper algorithms simply make the influence of movement constraints explicit, but the interpretation of passive acoustic telemetry data in general (and particularly of patterns such as residency) depends on knowledge of movement constraints. This has point been emphasised by recent publications (Lavender _et al._, 2021).
+
+For practitioners seeking to apply our methods in new settings, we make the following recommendations:
+
+* **Study design phase**. If you are designing a study, plan to collect some information on individual movement speeds if possible. 
+* **Data analysis phase**. If you already have information on movement speeds, use it to inform the definition of the movement constraints. Otherwise, examine the literature and use the `get_mvt_mobility_*()` functions as a guide.
+* **Sensitivity analysis phase**. If movement constraints are uncertain, use simulation to explore the consequences of different choices for mobility and the movement model within reasonable bounds for your study system. While time consuming, you can also explore implementations of the algorithms using lower-bound estimates of mobility to test whether or not the algorithms fail to converge. Increase the movement capacity until convergence.
+
+# Algorithm optimisation
+
+## Under what set of tag/receiver/site conditions are the algorithms robust?
+
+The algorithms are always 'robust' in the sense that the reconstructed set of possible locations of an individual is a complete, mechanistic description of all inputted information about the location of the animal through time (i.e., all detections, all gaps between detections and all ancillary data, given the detection probability model, the movement model and other parameters). Consequently, unless the algorithm is misspecified (see below), the set of possible locations will include the 'true' movement path, even in sparse arrays with few detections. However, care is required in the interpretation of the 'set of possible locations of an individual through time': while this, by definition, will include the 'true' movement path, it is not guaranteed (nor even desirable) that the pattern of space use exhibited by the set of possible locations should match the pattern of space use exhibited by the 'true' path.
+
+While a correctly specified algorithm will reconstruct a set of possible locations that includes the 'true' path (assuming you sample a sufficiently large number of particles in the PF step), the algorithms are sensitive to misspecification like any other method. However, the consequences of mis specifying algorithm components, such as the detection range, detection kernels or movement parameters, vary. See 'Sensitivity' for further commentary.
+
+The 'usefulness' of the algorithms in different settings is a separate issue. If tags malfunction, receivers are sparse and or detection probability is limited, the flapper algorithms, like other methods, are of limited utility: the set of possible locations will simply span the 'permitted' area (mainly beyond receiver detection containers) with more-or-less uniform probability. The quality of the inputs unavoidably influences the utility of the outputs.
+
+These comments notwithstanding, as for other emerging movement modelling approaches in passive acoustic telemetry systems, more needs to be learnt about the utility of the flapper algorithms in different settings. As argued in the main text, an improved understanding of the relative utility of different methods in different settings will help to move the field forwards.
+
+## How does transmission interval affect the algorithm?
+
+The resolution of available data affects the temporal resolution of the analysis. The transmission interval of acoustic tags sets a sensible lower bound for this. In theory, a more frequent transmission interval makes it possible to resolve movement paths at a higher temporal resolution. However, in practice, the appropriate resolution of an analysis will depend upon whether or not more frequent transmissions are accompanied by more frequent detections, the resolution of other datasets (such as depth time series), analytical objectives and computational constraints. As for other methods, the optimisation of study design and algorithm parameters for improved inference is an avenue in which future research will be beneficial.
+
+# Algorithm validation
+
+## How can I assess the utility of the different algorithms without continuous, fine-scale positioning records (i.e., a 'known' track?)
+
+Recall that the flapper algorithms are designed to recapitulate the movement and detection processes that give rise to detections. This means that, by definition, reconstructed patterns of space use will contain the 'true' movement path (assuming they have been correctly specified: see 'Sensitivity'). As in Lavender _et al._ (in review), you can explore the correspondence between a 'known' and reconstructed movements under different conditions using simulation. In real-world settings, fine-scale positioning records collected during drift tests of detection probability can also be used for this purpose. The probability distribution of the set of possible locations through time provides a measure of our certainty in the location of an individual: a flat surface emerges when there are few constraints on an individual's possible location and reflects low certainty; a more concentrated surface emerges when the set of possible locations for an individual is more constrained and reflects higher certainty. However, even for more concentrated distributions, it is not guaranteed (nor even desirable) that the pattern of space use exhibited by the simulated locations will match the pattern of space use exhibited by the 'true' path (see 'Optimisation').
+
+# References
+
+Lavender, E. _et al._ (in review). A semi-stochastic modelling framework for passive acoustic telemetry. 
+
+Lavender, E. _et al._ (2021). Movement patterns of a Critically Endangered elasmobranch (_Dipturus intermedius_) in a Marine Protected Area. _Aquatic Conservation: Marine and Freshwater Ecosystems_, 32(2), 348–365. https://doi.org/10.1002/aqc.3753
