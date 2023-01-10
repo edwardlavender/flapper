@@ -13,6 +13,9 @@
 
 * **Function tests**
     * Set up testing with `testthat`;
+    
+* **Documentation**
+    * Add `flapper_algorithms_faqs` vignette
 
 # flapper 1.0.0
 
