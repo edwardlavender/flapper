@@ -1,8 +1,8 @@
 ---
-title: "Vignette: an introduction to the `flapper` package"
+title: "`flapper`: an overview"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{flapper}
+  %\VignetteIndexEntry{`flapper`: an overview}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
