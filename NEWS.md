@@ -2,16 +2,19 @@
 
 * **Datasets**
     * Rebuild (`RasterLayer`) datasets to fix `no slot of name "srs" for this object of class "RasterLayer"` warning for `dat_gebco` (and downstream errors)
-    * Replace non-ASCII characters in the `comment` attributes of Coordinate Reference System (CRS) objects to fix
-    warning for these during R CMD check (`Warning: found non-ASCII strings PROJCRS...`)
+    * Replace non-ASCII characters in the `comment` attributes of Coordinate Reference System (CRS) objects to fix the
+    warnings for these during R CMD check (`Warning: found non-ASCII strings PROJCRS...`)
+    * Set `flapper_run_slow` and `flapper_run_parallel` to `FALSE` on remote
 
 * **Function fixes**
+    * Fix re-sampling issue in `pf_simplify()`
     * Fix and refine calculations in `get_detection_days()`
     * Fixes to functions after dependencies update, including: 
         - `get_detection_clumps()` 
         - `lcp_over_surface()`
 
 * **Function improvements**
+    * Update `.acs_pl()` and `.acs()` internals to check for centroid overlap (to prevent unclear error messages)
     * Update `get_mvt_mobility_from_archival()` with `step_check` argument to check for regular time series
     * Update `dist_btw_receivers()` to handle lon/lat and planar coordinates and return dataframes or matrices
     * Update `check_*()` functions with internal improvements
