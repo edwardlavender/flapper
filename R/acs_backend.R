@@ -669,6 +669,12 @@
           }
         }
 
+        #### Check container validity
+        # Containers may fail to intersect if the detection range parameter is too small
+        if(is.null(container_c)){
+          stop("The container(s) for each receiver do not intersect.", call. = FALSE)
+        }
+
 
         ######################################
         #### Update map based on detection kernels

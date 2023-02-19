@@ -160,6 +160,30 @@
   if(!is.null(detection_kernels_overlap)) {
     if(!("list_by_receiver" %in% names(detection_kernels_overlap))) stop("'detection_kernels_overlap' must contain a 'list_by_receiver' element.")
     detection_kernels_overlap <- detection_kernels_overlap$list_by_receiver
+    # For the detections that occurred at the same point in time, check they occurred at receivers with overlapping centroids
+    # If not, this suggests detection centroids are too small
+    # We want to catch this issue early to prevent errors following centroid intersections later.
+    multiples <-
+      acoustics |>
+      dplyr::filter(.data$timestamp %in% .data$timestamp[duplicated(.data$timestamp)])
+    if(nrow(multiples) > 0L){
+      check_overlaps <-
+        sapply(split(multiples, multiples$timestamp), function(d){
+          issue <- FALSE
+          .overlaps <- detection_kernels_overlap[[d$receiver[1]]]
+          if(any(.overlaps[, colnames(.overlaps)[colnames(.overlaps) %in% d$receiver_id]] == 0L)) {
+            issue <- TRUE
+            warning(paste0("The individual was detected at multiple receivers ('",
+                           paste0(d$receiver_id, collapse = "', '"),
+                           "') at the same moment in time ('",
+                           d$timestamp[1],
+                           "') but not all detection radii overlap."),
+                    immediate. = TRUE, call. = FALSE)
+          }
+          issue
+        })
+      if(any(check_overlaps)) stop("Detection radii do not overlap.", call. = FALSE)
+    }
   }
   # Check depth error
   if(!is.null(archival)){
