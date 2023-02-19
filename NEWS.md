@@ -1,4 +1,9 @@
-# flapper (development version)
+# `flapper` (development version)
+
+* **Datasets**
+    * Rebuild (`RasterLayer`) datasets to fix `no slot of name "srs" for this object of class "RasterLayer"` warning for `dat_gebco` (and downstream errors)
+    * Replace non-ASCII characters in the `comment` attributes of Coordinate Reference System (CRS) objects to fix
+    warning for these during R CMD check (`Warning: found non-ASCII strings PROJCRS...`)
 
 * **Function fixes**
     * Fix and refine calculations in `get_detection_days()`
@@ -17,10 +22,10 @@
 * **Documentation**
     * Add `flapper_algorithms_faqs` vignette
 
-# flapper 1.0.0
+# `flapper` 1.0.0
 
 * The first release of `flapper`
 
-# flapper 0.0.9000
+# `flapper` 0.0.0.9000
 
 * The developmental version of `flapper`

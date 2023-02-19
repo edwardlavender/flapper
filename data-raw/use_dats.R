@@ -4,21 +4,42 @@
 
 #### This code:
 # 1) Adds example datasets (dats) to flapper R package.
-# setwd(paste0(getwd(), "/data-raw/"))
+
+
+#####################################
+#####################################
+#### Set up
+
+#### Wipe workspace
+rm(list = ls())
+try(pacman::p_unload("all"), silent = TRUE)
 
 #### Essential packages
 library(dplyr)
+
+#### Define helper functions
+## Define file paths
+here_data_raw <- function(...) here::here("data-raw", ...)
+## Drop non-non-ASCII characters in PROJ comments in spatial data
+# See here to check for non-ASCII: https://pages.cs.wisc.edu/~markm/ascii.html
+# See also issue here: https://github.com/r-spatial/sf/issues/1341
+drop_non_ascii <- function(x){
+    x |>
+    stringi::stri_trans_general("latin-ascii") |>
+    stringr::str_replace_all("°|º", "degrees")
+}
+
 
 #####################################
 #####################################
 #### Movement data
 
 #### Load data
-dat_ids       <- readRDS("dat_ids.rds")
-dat_moorings  <- readRDS("dat_moorings.rds")
-dat_acoustics <- readRDS("dat_acoustics.rds")
-dat_sentinel  <- readRDS("dat_sentinel.rds")
-dat_archival  <- readRDS("dat_archival.rds")
+dat_ids       <- readRDS(here_data_raw("dat_ids.rds"))
+dat_moorings  <- readRDS(here_data_raw("dat_moorings.rds"))
+dat_acoustics <- readRDS(here_data_raw("dat_acoustics.rds"))
+dat_sentinel  <- readRDS(here_data_raw("dat_sentinel.rds"))
+dat_archival  <- readRDS(here_data_raw("dat_archival.rds"))
 
 #### Processing
 ## dat_acoustics
@@ -58,7 +79,9 @@ dat_coast_fol <- readRDS(url("https://biogeo.ucdavis.edu/data/gadm3.6/Rsp/gadm36
 ## Open source bathymetry data
 # Define a buffered region around the receivers for which to obtain bathymetry data
 proj_wgs84   <- sp::CRS(SRS_string = "EPSG:4326")
+attr(proj_wgs84, "comment") <- drop_non_ascii(attr(proj_wgs84, "comment"))
 proj_utm     <- sp::CRS(SRS_string = "EPSG:32629")
+attr(proj_utm, "comment") <- drop_non_ascii(attr(proj_utm, "comment"))
 rxy_wgs84    <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 rxy_utm      <- sp::spTransform(rxy_wgs84, proj_utm)
 rxy_utm_buf  <- rgeos::gBuffer(rxy_utm, width = 1000)
@@ -70,7 +93,8 @@ bounds_wgs84 <- sp::spTransform(bounds_utm, proj_wgs84)
 # Use these coordinates to download manually Open source GEBCO bathymetry data from https://download.gebco.net
 # Data source: GEBCO Compilation Group (2019) GEBCO 2019 Grid (doi:10.5285/836f016a-33be-6ddc-e053-6c86abc0788e)
 # Data saved in /data_raw/
-dat_gebco_fol <- raster::raster("gebco_2020_n56.53355_s56.34059_w-5.786025_e-5.562533.tif")
+dat_gebco_fol <-
+  raster::raster(here_data_raw("gebco_2020_n56.53355_s56.34059_w-5.786025_e-5.562533.tif"))
 
 #### Process spatial data
 # Crop coastline to boundaries
@@ -78,8 +102,9 @@ area <- raster::extent(bounds_wgs84)
 dat_coast_fol <- raster::crop(dat_coast_fol, area)
 # Use spatial data with UTM coordinates
 dat_coast <- sp::spTransform(dat_coast_fol, proj_utm)
-raster::crs(dat_gebco) <- proj_wgs84
 dat_gebco <- raster::projectRaster(dat_gebco_fol, crs = proj_utm)
+# Check raster validity (no missing slots)
+str(dat_gebco)
 # Process bathymetry data to remove observations on land
 dat_gebco[dat_gebco[] >= 0] <- NA
 # Use absolute values
@@ -299,7 +324,7 @@ usethis::use_data(dat_dcpf_paths, overwrite = TRUE)
 usethis::use_data(flapper_run_parallel, overwrite = TRUE)
 usethis::use_data(flapper_run_slow, overwrite = TRUE)
 # check size of data directory
-sum(sapply(list.files("./data", full.names = TRUE), file.size))/1e6
+sum(sapply(list.files(here::here("data"), full.names = TRUE), file.size))/1e6
 
 
 #### End of code.
