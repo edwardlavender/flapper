@@ -453,9 +453,9 @@ pf_simplify <- function(archive,
   if(!is.null(max_n_particles)){
     history <- pbapply::pblapply(history, function(history_for_t){
       if(max_n_particles_sampler == "random"){
-        history_for_t <- history_for_t %>% dplyr::slice_sample(n = max_n_particles)
+        history_for_t <- history_for_t %>% dplyr::slice_sample(n = max_n_particles, replace = TRUE)
       } else if(max_n_particles_sampler == "weighted"){
-        history_for_t <- history_for_t %>% dplyr::slice_sample(n = max_n_particles, weight_by = .data$pr_current)
+        history_for_t <- history_for_t %>% dplyr::slice_sample(n = max_n_particles, weight_by = .data$pr_current, replace = TRUE)
       } else if(max_n_particles_sampler == "max"){
         history_for_t <- history_for_t %>% dplyr::arrange(.data$pr_current) %>% dplyr::slice(1:max_n_particles)
       }
@@ -929,16 +929,16 @@ pf_simplify <- function(archive,
           dplyr::group_by(.data$id_current.y) %>%
           dplyr::arrange(dplyr::desc(.data$pr_current))
         if(max_n_copies_sampler == "random"){
-          history_for_pair <- history_for_pair %>% dplyr::slice_sample(n = max_n_copies)
+          history_for_pair <- history_for_pair %>% dplyr::slice_sample(n = max_n_copies, replace = TRUE)
         } else if(max_n_copies_sampler == "weighted"){
-          history_for_pair <- history_for_pair %>% dplyr::slice_sample(n = max_n_copies, weight_by = .data$pr_current)
+          history_for_pair <- history_for_pair %>% dplyr::slice_sample(n = max_n_copies, weight_by = .data$pr_current, replace = TRUE)
         } else if(max_n_copies_sampler == "max"){
           history_for_pair <- history_for_pair %>% dplyr::slice(1:max_n_copies)
         }
       }
       if(!is.null(max_n_paths)){
         if(nrow(history_for_pair) > max_n_paths){
-          history_for_pair <- history_for_pair %>% dplyr::slice_sample(n = max_n_paths)
+          history_for_pair <- history_for_pair %>% dplyr::slice_sample(n = max_n_paths, replace = TRUE)
         }
       }
       history_for_pair[, paste0("id_", t+1)]  <- history_for_pair$id_current.y
