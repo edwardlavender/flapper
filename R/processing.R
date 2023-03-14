@@ -15,21 +15,29 @@
 #' @examples
 #' #### Define example data
 #' # In this example, we have two receivers, but one has been re-deployed:
-#' moorings <- data.frame(receiver = c(1, 1, 2),
-#'                        receiver_id = c(1, 2, 3),
-#'                        start_date = as.POSIXct(c("2016-01-01",
-#'                                                  "2016-01-02",
-#'                                                  "2016-01-01"), tz = "UTC"),
-#'                        end_date = as.POSIXct(c("2016-01-02",
-#'                                                "2016-01-03",
-#'                                                "2016-01-02"), tz = "UTC")
-#'                        )
+#' moorings <- data.frame(
+#'   receiver = c(1, 1, 2),
+#'   receiver_id = c(1, 2, 3),
+#'   start_date = as.POSIXct(c(
+#'     "2016-01-01",
+#'     "2016-01-02",
+#'     "2016-01-01"
+#'   ), tz = "UTC"),
+#'   end_date = as.POSIXct(c(
+#'     "2016-01-02",
+#'     "2016-01-03",
+#'     "2016-01-02"
+#'   ), tz = "UTC")
+#' )
 #' # Our observational dataframe contains receivers but not unique receiver IDs:
-#' acoustics <- data.frame(receiver = c(1, 1, 2),
-#'                        timestamp = as.POSIXct(c("2016-01-01 00:30:00",
-#'                                                  "2016-01-02 00:30:00",
-#'                                                  "2016-01-01 00:30:00"), tz = "UTC")
-#'                                               )
+#' acoustics <- data.frame(
+#'   receiver = c(1, 1, 2),
+#'   timestamp = as.POSIXct(c(
+#'     "2016-01-01 00:30:00",
+#'     "2016-01-02 00:30:00",
+#'     "2016-01-01 00:30:00"
+#'   ), tz = "UTC")
+#' )
 #'
 #' #### Example (1): Add unique receiver IDs to the observational dataframe
 #' # The first observation corresponds to receiver 1;
@@ -45,43 +53,41 @@
 #' @export
 
 process_receiver_id <-
-  function(acoustics, moorings){
-
+  function(acoustics, moorings) {
     #### Checks
     # Check that moorings and acoustics contain required columns
-    if(!all(c("receiver", "receiver_id", "start_date", "end_date") %in% colnames(moorings))) stop("moorings does not contain all required column names.")
-    if(!all(c("receiver", "timestamp") %in% colnames(acoustics))) stop("acoustics does not contain all required column names.")
+    if (!all(c("receiver", "receiver_id", "start_date", "end_date") %in% colnames(moorings))) stop("moorings does not contain all required column names.")
+    if (!all(c("receiver", "timestamp") %in% colnames(acoustics))) stop("acoustics does not contain all required column names.")
 
     #### If some receivers were deployed, we need to
     # ... account for the receiver code and the time of deployment when we add receiver IDs to the acoustics df.
-    if(any(duplicated(moorings$receiver))){
-
+    if (any(duplicated(moorings$receiver))) {
       #### Check acoustics/moorings dataframes contain required information in correct format
-      if(!inherits(acoustics$timestamp, "POSIXct")) stop("acoustics$timestamp must an POSIXct object")
-      if(lubridate::tz(acoustics$timestamp) == ""){
+      if (!inherits(acoustics$timestamp, "POSIXct")) stop("acoustics$timestamp must an POSIXct object")
+      if (lubridate::tz(acoustics$timestamp) == "") {
         warning("acoustics$timestamp lacking timezone (see lubridate::tz()). tz = 'UTC' forced.")
         lubridate::tz(acoustics$timestamp) <- "UTC"
       }
       tz <- lubridate::tz(acoustics$timestamp)
-      if(!inherits(moorings$start_date, "POSIXct")){
+      if (!inherits(moorings$start_date, "POSIXct")) {
         warning("moorings$start_date must be a POSIXct object; attempting to coerce moorings$start_date into a POSIXct object.")
         moorings$start_date <- lubridate::round_date(as.POSIXct(moorings$start_date, tz = tz), unit = "day")
         lubridate::tz(moorings$start_date) <- tz
       }
-      if(!inherits(moorings$end_date, "POSIXct")){
+      if (!inherits(moorings$end_date, "POSIXct")) {
         warning("moorings$end_date must be a POSIXct object; attempting to coerce moorings$end_date into a POSIXct object.")
         moorings$end_date <- lubridate::round_date(as.POSIXct(moorings$end_date, tz = tz), unit = "day")
         lubridate::tz(moorings$end_date) <- tz
       }
-      if(lubridate::tz(moorings$start_date) == ""){
+      if (lubridate::tz(moorings$start_date) == "") {
         warning("moorings$start_date lacking timezone (see lubridate::tz()). tz = lubridate::tz(acoustics$timestamp) forced.")
         lubridate::tz(moorings$start_date) <- tz
       }
-      if(lubridate::tz(moorings$end_date) == ""){
+      if (lubridate::tz(moorings$end_date) == "") {
         warning("moorings$timestamp lacking timezone (see lubridate::tz()). tz = lubridate::tz(acoustics$timestamp) forced.")
         lubridate::tz(moorings$end_date) <- tz
       }
-      if(class(moorings$receiver)[1] != class(acoustics$receiver)[1]){
+      if (class(moorings$receiver)[1] != class(acoustics$receiver)[1]) {
         warning("class(moorings$receiver)[1] != class(acoustics$receiver)[1]; both coerced to character vectors.")
         moorings$receiver <- as.character(moorings$receiver)
         acoustics$receiver <- as.character(acoustics$receiver)
@@ -92,7 +98,9 @@ process_receiver_id <-
       acoustics$end_date <- acoustics$timestamp
       acoustics <- data.table::data.table(acoustics)
       moorings <- data.table::data.table(moorings)
-      receiver <- NULL; start_date <- NULL; end_date <- NULL
+      receiver <- NULL
+      start_date <- NULL
+      end_date <- NULL
       data.table::setkey(moorings, receiver, start_date, end_date)
 
       #### Implement data.table::foverlaps()
@@ -101,15 +109,15 @@ process_receiver_id <-
       #### Define acoustics$receiver_id
       acoustics$receiver_id <- moorings$receiver_id[order$yid]
 
-    #### If there are no redeployed receivers, we can simply use match()
-    # ... to obtain the receiver IDs for the acoustics dataframe.
-    } else{
+      #### If there are no redeployed receivers, we can simply use match()
+      # ... to obtain the receiver IDs for the acoustics dataframe.
+    } else {
       acoustics$receiver_id <- moorings$receiver_id[match(acoustics$receiver, moorings$receiver)]
     }
 
     #### Return the receiver IDs
     lna <- length(which(is.na(acoustics$receiver_id)))
-    if(lna > 0) warning(paste("receiver IDs returned contain,", lna, "NAs (e.g. possibly due to incorrect start/end dates)."))
+    if (lna > 0) warning(paste("receiver IDs returned contain,", lna, "NAs (e.g. possibly due to incorrect start/end dates)."))
     return(acoustics$receiver_id)
   }
 
@@ -140,11 +148,11 @@ process_receiver_id <-
 #' pos_false <- (nrow(dat_acoustics_with_false_det) - 2):nrow(dat_acoustics_with_false_det)
 #' # Add an isolated detection accompanied by a detection at a nearby receiver
 #' dat_acoustics_with_false_det$timestamp[pos_false[1:2]] <-
-#'   dat_acoustics_with_false_det$timestamp[pos_false[1:2]] + 60*60*60
+#'   dat_acoustics_with_false_det$timestamp[pos_false[1:2]] + 60 * 60 * 60
 #' dat_acoustics_with_false_det$receiver_id[pos_false[2]] <- 33
 #' # Add an isolated detection not accompanied by a detection at a nearby receiver
 #' dat_acoustics_with_false_det$timestamp[pos_false[3]] <-
-#'   dat_acoustics_with_false_det$timestamp[pos_false[3]] + 60*60*60*2
+#'   dat_acoustics_with_false_det$timestamp[pos_false[3]] + 60 * 60 * 60 * 2
 #'
 #' #### Define necessary columns to compute false detections using glatos::false_detections()
 #' dat_acoustics_with_false_det$detection_timestamp_utc <-
@@ -154,10 +162,12 @@ process_receiver_id <-
 #' dat_acoustics_with_false_det$transmitter_id <-
 #'   substr(dat_acoustics_with_false_det$transmitter_id, 10, 13)
 #' dat_acoustics_with_false_det$receiver_sn <- dat_acoustics_with_false_det$receiver_id
-#' det <- dat_acoustics_with_false_det[, c("detection_timestamp_utc",
-#'                                         "transmitter_codespace",
-#'                                         "transmitter_id",
-#'                                         "receiver_sn")]
+#' det <- dat_acoustics_with_false_det[, c(
+#'   "detection_timestamp_utc",
+#'   "transmitter_codespace",
+#'   "transmitter_id",
+#'   "receiver_sn"
+#' )]
 #'
 #' #### Compute false detections
 #' # 3 false detections returned, as expected:
@@ -171,14 +181,14 @@ process_receiver_id <-
 #' # Implement spatial filter.
 #' # Note the function returns a vector, unlike glatos::false_detections():
 #' det$passed_filter_sf <- process_false_detections_sf(det,
-#'                                             tf = 3600,
-#'                                             sf = 0.5,
-#'                                             dist_btw_receivers = dist_btw_receivers_km)
+#'   tf = 3600,
+#'   sf = 0.5,
+#'   dist_btw_receivers = dist_btw_receivers_km
+#' )
 #' # Only the last observation failed the spatial filter, as expected:
 #' tail(det$passed_filter_sf)
 #' # Additional information is available from the attributes dataframe:
 #' tail(attr(det$passed_filter_sf, "details"))
-#'
 #'
 #' @author Edward Lavender
 #' @export
@@ -187,12 +197,10 @@ process_false_detections_sf <-
   function(det,
            tf,
            sf,
-           dist_btw_receivers
-  ){
-
+           dist_btw_receivers) {
     #### Initial checks
     # Check that there are at least some detections which failed glatos' false detection filter
-    if(!any(det$passed_filter == 0)){
+    if (!any(det$passed_filter == 0)) {
       warning("No detections failed glatos' false detection filter; det returned unchanged.")
       return(det)
     }
@@ -214,7 +222,9 @@ process_false_detections_sf <-
 
     #### Define blank dataframe
     dout <- data.frame(passed_filter = NA, n_wn_sf = NA, detection_timestamp_utc = as.POSIXct(NA), receiver_sn = NA, dist_btw_receivers = NA)
-    dout_ls <- lapply(pos_fail, function(i) return(dout))
+    dout_ls <- lapply(pos_fail, function(i) {
+      return(dout)
+    })
 
     #### Loop over all data pertaining to failed detections
     dout_ls <-
@@ -224,8 +234,7 @@ process_false_detections_sf <-
         min_lag_fail$transmitter_id,
         min_lag_fail$receiver_sn,
         dout_ls,
-        FUN = function(t1, t2, trans_id, rec_id, dout){
-
+        FUN = function(t1, t2, trans_id, rec_id, dout) {
           #### Testing
           # testing <- FALSE
           # if(testing){
@@ -241,21 +250,20 @@ process_false_detections_sf <-
           # ... all detections of a transmitted within the necessary time interval
           # ... i.e., include possible detections at other receivers.
           det_tmp <- det[det$transmitter_id == trans_id &
-                           det$detection_timestamp_utc >= t1 &
-                           det$detection_timestamp_utc <= t2, ]
+            det$detection_timestamp_utc >= t1 &
+            det$detection_timestamp_utc <= t2, ]
 
           #### If det_tmp only contains one detection (i.e., at the receiver in question)
           # ... then no detections were made at other receivers, so we'll return a 0
           # ... i.e., it still looks like this is a false detection.
-          if(nrow(det_tmp) == 1){
+          if (nrow(det_tmp) == 1) {
             dout$passed_filter <- 0
 
             #### If there are detections at multiple receivers,
             # ... then we'll extract the distances between the receiver with the worrying detection and
             # ... all of those other receivers. If the distance is below a user-defined threshold,
             # ... perhaps this isn't a false detection.
-          } else{
-
+          } else {
             #### Remove the detection receiver in question
             # Otherwise this will cause issues with the calculation of distances between receivers
             # ... and the identification of the smallest distances.
@@ -271,7 +279,7 @@ process_false_detections_sf <-
             #### If any of the distances are less than a threshold, this suggests they
             # ... may not be false after all. Hence, return a 1. Otherwise, return a 0
             # ... i.e., it still looks like a false detection.
-            if(any(det_tmp$dist <= sf)){
+            if (any(det_tmp$dist <= sf)) {
               # Define passed filter and the number of detections at other receivers within the necessary distance
               dout$passed_filter <- 1
               dout$n_wn_sf <- length(which(det_tmp$dist <= sf))
@@ -282,17 +290,15 @@ process_false_detections_sf <-
               dout$dist <- min(det_tmp$dist)
               dout$receiver_sn <- det_tmp$receiver_sn[pos_min_dist]
               dout$detection_timestamp_utc <- det_tmp$detection_timestamp_utc[pos_min_dist]
-
-            } else{
+            } else {
               dout$passed_filter <- 0
             }
-
           }
 
           # Return the updated dataframe
           return(dout)
-
-        }, SIMPLIFY = FALSE)
+        }, SIMPLIFY = FALSE
+      )
 
     #### Join the list into a single dataframe
     dout <- dplyr::bind_rows(dout_ls)
@@ -302,13 +308,13 @@ process_false_detections_sf <-
     n_false_detections_passed_spatial <- sum(dout$passed_filter)
     n_false_detections_failed_spatial <- nrow(dout) - sum(dout$passed_filter)
 
-    message(paste0("The spatial filter retained ",
-                   n_false_detections_failed_spatial,
-                   " detections, out of ", n_false_detections, " previously identified false detections ",
-                   " (", round(n_false_detections_failed_spatial/n_false_detections * 100, 2),
-                   " %) as 'true' false detections."
-    )
-    )
+    message(paste0(
+      "The spatial filter retained ",
+      n_false_detections_failed_spatial,
+      " detections, out of ", n_false_detections, " previously identified false detections ",
+      " (", round(n_false_detections_failed_spatial / n_false_detections * 100, 2),
+      " %) as 'true' false detections."
+    ))
 
     #### Return a vector of whether or not each
     # ... observation passed the spatial filter,
@@ -324,13 +330,14 @@ process_false_detections_sf <-
     det$receiver_sn_sf[pos_fail] <- dout$receiver_sn
     det$dist_sf[pos_fail] <- dout$dist
     det <- det[order(det$original_order), ]
-    attr(det$passed_filter_sf, "details") <- det[, c("passed_filter_sf",
-                                                     "n_wn_sf",
-                                                     "receiver_sn_sf",
-                                                     "detection_timestamp_utc_sf",
-                                                     "dist_sf")]
+    attr(det$passed_filter_sf, "details") <- det[, c(
+      "passed_filter_sf",
+      "n_wn_sf",
+      "receiver_sn_sf",
+      "detection_timestamp_utc_sf",
+      "dist_sf"
+    )]
     return(det$passed_filter_sf)
-
   }
 
 
@@ -363,14 +370,14 @@ process_false_detections_sf <-
 #' ## All data have previously passed false detection filters (see glatos::false_detections())
 #' dat_acoustics$passed_filter <- 1
 #' ## Times should be in POSIXct format
-#' dat_moorings$receiver_start_date <-  as.POSIXct(dat_moorings$receiver_start_date)
+#' dat_moorings$receiver_start_date <- as.POSIXct(dat_moorings$receiver_start_date)
 #' lubridate::tz(dat_moorings$receiver_start_date) <- "UTC"
-#' dat_moorings$receiver_end_date   <-  as.POSIXct(dat_moorings$receiver_end_date)
+#' dat_moorings$receiver_end_date <- as.POSIXct(dat_moorings$receiver_end_date)
 #' lubridate::tz(dat_moorings$receiver_end_date) <- "UTC"
 #' dat_ids$tag_start_date <- as.POSIXct(dat_ids$tag_start_date)
 #' lubridate::tz(dat_ids$tag_start_date) <- "UTC"
 #' ## tag_end_date column needed in dat_ids
-#' dat_ids$tag_end_date   <- as.POSIXct("2020-01-01", tz = "UTC")
+#' dat_ids$tag_end_date <- as.POSIXct("2020-01-01", tz = "UTC")
 #'
 #' #### Implement process_quality_check() on processed data as a final check for any issues
 #' process_quality_check(dat_acoustics, dat_moorings, dat_ids)
@@ -378,8 +385,8 @@ process_false_detections_sf <-
 #' #### Add erroneous data to acoustics for demonstrating process_quality_check()
 #' ## Define a convenience function to add erroneous data to
 #' # ... acoustics to demonstrate process_quality_check()
-#' add_erroneous_row <- function(acoustics, row = nrow(acoustics), col, val){
-#'   tmp_ls <- lapply(val, function(v){
+#' add_erroneous_row <- function(acoustics, row = nrow(acoustics), col, val) {
+#'   tmp_ls <- lapply(val, function(v) {
 #'     tmp <- acoustics[row, ]
 #'     tmp[1, col] <- v
 #'     return(tmp)
@@ -391,20 +398,24 @@ process_false_detections_sf <-
 #' ## Add erroneous receiver ids
 #' nrw <- nrow(dat_acoustics)
 #' acoustics_wth_errors <- add_erroneous_row(dat_acoustics,
-#'                                           row = nrw,
-#'                                           col = "receiver_id",
-#'                                           val = c(100, 200, 300))
+#'   row = nrw,
+#'   col = "receiver_id",
+#'   val = c(100, 200, 300)
+#' )
 #' ## Add erroneous time stamps (outside receiver/individual id deployment periods )
 #' acoustics_wth_errors <- add_erroneous_row(acoustics_wth_errors,
-#'                                          row = nrw,
-#'                                           col = "timestamp",
-#'                                           val = as.POSIXct(c("2019-01-01", "2019-03-01"),
-#'                                                            tz = "UTC"))
+#'   row = nrw,
+#'   col = "timestamp",
+#'   val = as.POSIXct(c("2019-01-01", "2019-03-01"),
+#'     tz = "UTC"
+#'   )
+#' )
 #' ## Add erroneous individual ids
 #' acoustics_wth_errors <- add_erroneous_row(acoustics_wth_errors,
-#'                                           row = nrw,
-#'                                           col = "individual_id",
-#'                                           val = c(100, 200, 300))
+#'   row = nrw,
+#'   col = "individual_id",
+#'   val = c(100, 200, 300)
+#' )
 #' ## Examine erroneous data:
 #' utils::tail(acoustics_wth_errors, 10)
 #'
@@ -417,60 +428,75 @@ process_false_detections_sf <-
 process_quality_check <-
   function(acoustics,
            moorings,
-           ids){
-
+           ids) {
     #### Checks
     ## acoustics colnames
-    check_names(arg = "acoustics", input = acoustics,
-                req = c("timestamp", "receiver_id", "individual_id"),
-                extract_names = colnames, type = all)
+    check_names(
+      arg = "acoustics", input = acoustics,
+      req = c("timestamp", "receiver_id", "individual_id"),
+      extract_names = colnames, type = all
+    )
     ## moorings colnames
-    check_names(arg = "moorings",
-                input = moorings,
-                req = c("receiver_id", "receiver_start_date", "receiver_end_date"),
-                extract_names = names, type = all)
+    check_names(
+      arg = "moorings",
+      input = moorings,
+      req = c("receiver_id", "receiver_start_date", "receiver_end_date"),
+      extract_names = names, type = all
+    )
     ## ids colnames
-    check_names(arg = "ids",
-                input = ids,
-                req = c("individual_id", "tag_start_date", "tag_end_date"),
-                extract_names = names, type = all)
+    check_names(
+      arg = "ids",
+      input = ids,
+      req = c("individual_id", "tag_start_date", "tag_end_date"),
+      extract_names = names, type = all
+    )
     ## format of times and timezones
     times_ls <-
-      mapply(list("acoustics$timestamp",
-                  "moorings$receiver_start_date", "moorings$receiver_end_date",
-                  "ids$tag_start_date", "ids$tag_end_date"),
-             list(acoustics$timestamp,
-                  moorings$receiver_start_date, moorings$receiver_end_date,
-                  ids$tag_start_date, ids$tag_end_date),
-             FUN = function(arg, elm){
-               out <- check_class(arg = arg,
-                                  input = elm,
-                                  if_class = NULL,
-                                  to_class = "POSIXct",
-                                  type = "warning",
-                                  coerce_input = function(x) as.POSIXct(x, tz = "UTC"))
-               out <- check_tz(arg, elm)
-               return(out)
-             }, SIMPLIFY = FALSE)
-    acoustics$timestamp          <- times_ls[[1]]
+      mapply(
+        list(
+          "acoustics$timestamp",
+          "moorings$receiver_start_date", "moorings$receiver_end_date",
+          "ids$tag_start_date", "ids$tag_end_date"
+        ),
+        list(
+          acoustics$timestamp,
+          moorings$receiver_start_date, moorings$receiver_end_date,
+          ids$tag_start_date, ids$tag_end_date
+        ),
+        FUN = function(arg, elm) {
+          out <- check_class(
+            arg = arg,
+            input = elm,
+            if_class = NULL,
+            to_class = "POSIXct",
+            type = "warning",
+            coerce_input = function(x) as.POSIXct(x, tz = "UTC")
+          )
+          out <- check_tz(arg, elm)
+          return(out)
+        }, SIMPLIFY = FALSE
+      )
+    acoustics$timestamp <- times_ls[[1]]
     moorings$receiver_start_date <- times_ls[[2]]
-    moorings$receiver_end_date   <- times_ls[[3]]
-    ids$tag_start_date           <- times_ls[[4]]
-    ids$tag_end_date             <- times_ls[[5]]
+    moorings$receiver_end_date <- times_ls[[3]]
+    ids$tag_start_date <- times_ls[[4]]
+    ids$tag_end_date <- times_ls[[5]]
 
     #### Receiver identity
     # All receivers should have been deployed in the study in question.
     runknown <- unique(acoustics$receiver_id)[!(unique(acoustics$receiver_id) %in% moorings$receiver_id)]
     lrunknown <- length(runknown)
-    if(lrunknown > 0){
+    if (lrunknown > 0) {
       pos <- which(acoustics$receiver_id %in% runknown)
       lpos <- length(pos)
-      warn <- paste0("Check 1 (receiver identity): failed. ",
-                     lrunknown, " receiver identities unknown (", paste(runknown, collapse = ", "), "), ",
-                     "corresponding to ", lpos, " observations in acoustics. \n")
+      warn <- paste0(
+        "Check 1 (receiver identity): failed. ",
+        lrunknown, " receiver identities unknown (", paste(runknown, collapse = ", "), "), ",
+        "corresponding to ", lpos, " observations in acoustics. \n"
+      )
       warning(warn, immediate. = TRUE)
       acoustics <- acoustics[-pos, ]
-    } else{
+    } else {
       message("Check 1 (receiver identity): passed. \n")
     }
 
@@ -479,18 +505,20 @@ process_quality_check <-
 
     #### Receiver operation window
     match_receiver <- match(acoustics$receiver_id, moorings$receiver_id)
-    acoustics$receiver_start_date  <- moorings$receiver_start_date[match_receiver]
-    acoustics$receiver_end_date    <- moorings$receiver_end_date[match_receiver]
-    acoustics$interval   <- lubridate::interval(acoustics$receiver_start_date, acoustics$receiver_end_date)
+    acoustics$receiver_start_date <- moorings$receiver_start_date[match_receiver]
+    acoustics$receiver_end_date <- moorings$receiver_end_date[match_receiver]
+    acoustics$interval <- lubridate::interval(acoustics$receiver_start_date, acoustics$receiver_end_date)
     acoustics$not_within <- !(acoustics$timestamp %within% acoustics$interval)
-    if(length(which(acoustics$not_within)) > 0){
-      pos  <- which(acoustics$not_within)
+    if (length(which(acoustics$not_within)) > 0) {
+      pos <- which(acoustics$not_within)
       lpos <- length(pos)
-      warn <- paste0("Check 3 (receiver deployment windows): failed. ",
-                     lpos, " observations in acoustics outside of receiver deployment windows. \n")
+      warn <- paste0(
+        "Check 3 (receiver deployment windows): failed. ",
+        lpos, " observations in acoustics outside of receiver deployment windows. \n"
+      )
       warning(warn, immediate. = TRUE)
       acoustics <- acoustics[-pos, ]
-    } else{
+    } else {
       message("Check 2 (receiver deployment windows): passed. \n")
     }
 
@@ -500,15 +528,17 @@ process_quality_check <-
     #### Tag identity
     tunknown <- unique(acoustics$individual_id)[!(unique(acoustics$individual_id) %in% ids$individual_id)]
     ltunknown <- length(tunknown)
-    if(ltunknown > 0){
+    if (ltunknown > 0) {
       pos <- which(acoustics$individual_id %in% tunknown)
       lpos <- length(pos)
-      warn <- paste0("Check 3 (tag identity): failed. ",
-                     ltunknown, " tag identities unknown (", paste(tunknown, collapse = ", "), "), ",
-                     "corresponding to ", lpos, " observations in acoustics. \n")
+      warn <- paste0(
+        "Check 3 (tag identity): failed. ",
+        ltunknown, " tag identities unknown (", paste(tunknown, collapse = ", "), "), ",
+        "corresponding to ", lpos, " observations in acoustics. \n"
+      )
       warning(warn, immediate. = TRUE)
       acoustics <- acoustics[-pos, ]
-    } else{
+    } else {
       message("Check 3 (tag identity): passed. \n")
     }
 
@@ -518,17 +548,19 @@ process_quality_check <-
     #### Tag operation window
     match_tag <- match(acoustics$individual_id, ids$individual_id)
     acoustics$tag_start_date <- ids$tag_start_date[match_tag]
-    acoustics$tag_end_date   <- ids$tag_end_date[match_tag]
-    acoustics$interval   <- lubridate::interval(acoustics$tag_start_date, acoustics$tag_end_date)
+    acoustics$tag_end_date <- ids$tag_end_date[match_tag]
+    acoustics$interval <- lubridate::interval(acoustics$tag_start_date, acoustics$tag_end_date)
     acoustics$not_within <- !(acoustics$timestamp %within% acoustics$interval)
-    if(length(which(acoustics$not_within)) > 0){
-      pos  <- which(acoustics$not_within)
+    if (length(which(acoustics$not_within)) > 0) {
+      pos <- which(acoustics$not_within)
       lpos <- length(pos)
-      warn <- paste0("Check 3 (tag deployment windows): failed. ",
-                     lpos, " observations in acoustics outside of tag deployment windows. \n")
+      warn <- paste0(
+        "Check 3 (tag deployment windows): failed. ",
+        lpos, " observations in acoustics outside of tag deployment windows. \n"
+      )
       warning(warn, immediate. = TRUE)
       acoustics <- acoustics[-pos, ]
-    } else{
+    } else {
       message("Check 4 (tag deployment windows): passed. \n")
     }
 
@@ -536,19 +568,18 @@ process_quality_check <-
     # Not currently implemented.
 
     #### False detections
-    if(!rlang::has_name(acoustics, "passed_filter")){
+    if (!rlang::has_name(acoustics, "passed_filter")) {
       warn <- "Check 5 (false detections): 'passed_filter' column not found in acoustics. See glatos::false_detections() to analyse false detections."
       warning(warn, immediate. = TRUE)
-    } else{
+    } else {
       lpos <- length(which(acoustics$passed_filter == 0))
-      if(lpos > 1){
+      if (lpos > 1) {
         warn <- paste0("There are ", lpos, " false detections in the acoustics$passed_filter column.")
         warning(warn, immediate. = TRUE)
-      } else{
+      } else {
         message("Check 5 (false detections) passed: acoustics$passed_filter does not contain false detections. \n")
       }
     }
-
   }
 
 
@@ -586,14 +617,13 @@ process_quality_check <-
 
 process_surface <- function(x,
                             fact = 2L,
-                            stat = list(mean = mean),...,
+                            stat = list(mean = mean), ...,
                             plot = TRUE,
                             cl = NULL, varlist = NULL,
-                            verbose = TRUE){
-
+                            verbose = TRUE) {
   # Set up function
   t_onset <- Sys.time()
-  cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+  cat_to_console <- function(..., show = verbose) if (show) cat(paste(..., "\n"))
   cat_to_console(paste0("flapper::process_surface() called (@ ", t_onset, ")..."))
   check_named_list(input = stat)
 
@@ -604,14 +634,14 @@ process_surface <- function(x,
   cat_to_console("... Aggregating raster...")
   cl_check(cl, varlist)
   cl_export(cl, varlist)
-  x_agg_by_stat <- pbapply::pblapply(stat, cl = cl, function(foo){
-    x_agg <- raster::aggregate(x, fact = fact, fun = foo,...)
+  x_agg_by_stat <- pbapply::pblapply(stat, cl = cl, function(foo) {
+    x_agg <- raster::aggregate(x, fact = fact, fun = foo, ...)
     return(x_agg)
   })
 
   # Re-sample aggregated rasters to original resolution
   cat_to_console("... Resampling aggregated raster(s) back onto the original resolution...")
-  x_agg_by_stat_rs <- pbapply::pblapply(x_agg_by_stat, cl = cl, function(x_agg){
+  x_agg_by_stat_rs <- pbapply::pblapply(x_agg_by_stat, cl = cl, function(x_agg) {
     x_agg_rs <- raster::resample(x_agg, x_blank, method = "ngb")
     return(x_agg_rs)
   })
@@ -619,36 +649,42 @@ process_surface <- function(x,
 
   # Get differences between original raster and aggregated (resampled) rasters for each statistic
   cat_to_console("... Computing differences between the original and aggregated raster(s)...")
-  x_agg_by_stat_rs_diff <- pbapply::pblapply(x_agg_by_stat_rs, function(x_agg_rs){
+  x_agg_by_stat_rs_diff <- pbapply::pblapply(x_agg_by_stat_rs, function(x_agg_rs) {
     x_agg_rs_diff <- x - x_agg_rs
     return(x_agg_rs_diff)
   })
 
   # Summarise differences
-  if(plot){
+  if (plot) {
     cat_to_console("... Summarising the differences between rasters across statistic(s)...")
     mins <- sapply(x_agg_by_stat_rs_diff, raster::cellStats, stat = "min")
     meds <- sapply(x_agg_by_stat_rs_diff, raster::cellStats, stat = "mean")
     maxs <- sapply(x_agg_by_stat_rs_diff, raster::cellStats, stat = "max")
     xp <- factor(names(stat), levels = names(stat))
     prettyGraphics::pretty_plot(xp, meds,
-                                ylim = range(c(mins, maxs)),
-                                type = "n", xlab= "Statistic", ylab = "Difference [x - x_agg]")
+      ylim = range(c(mins, maxs)),
+      type = "n", xlab = "Statistic", ylab = "Difference [x - x_agg]"
+    )
     prettyGraphics::add_error_bars(x = xp, fit = meds, lwr = mins, upr = maxs)
-    x_summary_stats <- data.frame(stat = names(stat),
-                                min = mins,
-                                median = meds,
-                                max = maxs)
-  } else x_summary_stats <- NULL
+    x_summary_stats <- data.frame(
+      stat = names(stat),
+      min = mins,
+      median = meds,
+      max = maxs
+    )
+  } else {
+    x_summary_stats <- NULL
+  }
 
 
   # Return outputs
-  out <- list(agg_by_stat = x_agg_by_stat,
-              agg_by_stat_rs_diff = x_agg_by_stat_rs_diff,
-              summary_stats = x_summary_stats)
+  out <- list(
+    agg_by_stat = x_agg_by_stat,
+    agg_by_stat_rs_diff = x_agg_by_stat_rs_diff,
+    summary_stats = x_summary_stats
+  )
   t_end <- Sys.time()
   duration <- difftime(t_end, t_onset, units = "mins")
   cat_to_console(paste0("... flapper::process_surface() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
   return(out)
-
 }

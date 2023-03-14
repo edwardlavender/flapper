@@ -20,41 +20,57 @@
 #' @examples
 #' #### Example (1): Use default options and example dataframes, which contain
 #' # ... all required columns:
-#' sentinel_counts <- assemble_sentinel_counts(sentinel = dat_sentinel,
-#'                                             moorings = dat_moorings)
-#' head(sentinel_counts); tail(sentinel_counts);
-#'
+#' sentinel_counts <- assemble_sentinel_counts(
+#'   sentinel = dat_sentinel,
+#'   moorings = dat_moorings
+#' )
+#' head(sentinel_counts)
+#' tail(sentinel_counts)
 #' #### Example (2): Adjust time window
-#' sentinel_counts <- assemble_sentinel_counts(sentinel = dat_sentinel,
-#'                                             moorings = dat_moorings,
-#'                                             breaks = "days")
-#' head(sentinel_counts); tail(sentinel_counts);
-#'
+#' sentinel_counts <- assemble_sentinel_counts(
+#'   sentinel = dat_sentinel,
+#'   moorings = dat_moorings,
+#'   breaks = "days"
+#' )
+#' head(sentinel_counts)
+#' tail(sentinel_counts)
 #' #### Example (2): Adjust maximum detection distance and supply dist_btw_receivers
-#' dist_btw_receivers_m <- dist_btw_receivers(dat_moorings[, c("receiver_id",
-#'                                                             "receiver_long",
-#'                                                             "receiver_lat")],
-#'                                            f = function(x) return(x*1000))
-#' sentinel_counts <- assemble_sentinel_counts(sentinel = dat_sentinel,
-#'                                             moorings = dat_moorings,
-#'                                             detection_range = 1500,
-#'                                             dist_btw_receivers = dist_btw_receivers_m)
-#' head(sentinel_counts); tail(sentinel_counts)
+#' dist_btw_receivers_m <- dist_btw_receivers(
+#'   dat_moorings[, c(
+#'     "receiver_id",
+#'     "receiver_long",
+#'     "receiver_lat"
+#'   )],
+#'   f = function(x) {
+#'     return(x * 1000)
+#'   }
+#' )
+#' sentinel_counts <- assemble_sentinel_counts(
+#'   sentinel = dat_sentinel,
+#'   moorings = dat_moorings,
+#'   detection_range = 1500,
+#'   dist_btw_receivers = dist_btw_receivers_m
+#' )
+#' head(sentinel_counts)
+#' tail(sentinel_counts)
 #'
 #' @author Edward Lavender
 #' @export
 
 assemble_sentinel_counts <-
   function(
-    sentinel,
-    moorings,
-    breaks = "hours",
-    as_POSIXct = function(x, tz = "UTC",...) fasttime::fastPOSIXct(x, tz = tz,...),
-    detection_range = 2000,
-    dist_btw_receivers = NULL){
-
+      sentinel,
+      moorings,
+      breaks = "hours",
+      as_POSIXct = function(x, tz = "UTC", ...) fasttime::fastPOSIXct(x, tz = tz, ...),
+      detection_range = 2000,
+      dist_btw_receivers = NULL) {
     #### Define global variables
-    timestamp_bin <- NULL; source_id <- NULL; sink_id <- NULL; n_trms <- NULL; n_dets <- NULL;
+    timestamp_bin <- NULL
+    source_id <- NULL
+    sink_id <- NULL
+    n_trms <- NULL
+    n_dets <- NULL
 
     #### Define time bins of user-specified size
     sentinel$timestamp_bin <- cut(sentinel$timestamp, breaks)
@@ -68,36 +84,37 @@ assemble_sentinel_counts <-
 
     #### Duplicate the dataframe for all source/sink pair combinations
     count <-
-      lapply(unique(moorings$receiver_id), function(id){
+      lapply(unique(moorings$receiver_id), function(id) {
         count$sink_id <- id
         return(count)
       })
     count <- do.call("rbind", count)
 
     #### Exclude sinks that were deployed at different time and could not have detected the transmission
-    match_sink    <- match(count$sink_id, moorings$receiver_id)
+    match_sink <- match(count$sink_id, moorings$receiver_id)
     match_source <- match(count$source_id, moorings$receiver_id)
     count$sink_start_date <- moorings$receiver_start_date[match_sink]
-    count$sink_end_date   <- moorings$receiver_end_date[match_sink]
-    count$sink_interval   <- lubridate::interval(count$sink_start_date, count$sink_end_date)
+    count$sink_end_date <- moorings$receiver_end_date[match_sink]
+    count$sink_interval <- lubridate::interval(count$sink_start_date, count$sink_end_date)
     count$within <- count$timestamp_bin %within% count$sink_interval
     count <- count[count$within, ]
 
     #### Exclude sinks that were too far away and could not have detected the transmission
     # Define matching indices for convenience
-    match_sink    <- match(count$sink_id, moorings$receiver_id)
+    match_sink <- match(count$sink_id, moorings$receiver_id)
     match_source <- match(count$source_id, moorings$receiver_id)
     # Add receiver location
-    count$sink_lat     <- moorings$receiver_lat[match_sink]
-    count$sink_long    <- moorings$receiver_long[match_sink]
-    count$source_lat  <- moorings$receiver_lat[match_source]
+    count$sink_lat <- moorings$receiver_lat[match_sink]
+    count$sink_long <- moorings$receiver_long[match_sink]
+    count$source_lat <- moorings$receiver_lat[match_source]
     count$source_long <- moorings$receiver_long[match_source]
     # Compute distances between all combinations of receivers, if not provided:
-    if(is.null(dist_btw_receivers)){
-      dist_btw_receivers <- dist_btw_receivers(moorings[, c("receiver_id",
-                                                            "receiver_long",
-                                                            "receiver_lat")]
-      )
+    if (is.null(dist_btw_receivers)) {
+      dist_btw_receivers <- dist_btw_receivers(moorings[, c(
+        "receiver_id",
+        "receiver_long",
+        "receiver_lat"
+      )])
       dist_btw_receivers$dist <- dist_btw_receivers$dist * 1000
     }
     # Add distances to dataframe
@@ -128,15 +145,19 @@ assemble_sentinel_counts <-
 
     #### Organise dataframe
     count <- count %>%
-      dplyr::select(timestamp_bin,
-                    source_id,
-                    sink_id,
-                    n_trms,
-                    n_dets,
-                    dist_btw_receivers) %>%
-      dplyr::arrange(source_id,
-                     timestamp_bin,
-                     sink_id)
+      dplyr::select(
+        timestamp_bin,
+        source_id,
+        sink_id,
+        n_trms,
+        n_dets,
+        dist_btw_receivers
+      ) %>%
+      dplyr::arrange(
+        source_id,
+        timestamp_bin,
+        sink_id
+      )
     count <- data.frame(count)
 
     #### Return dataframe

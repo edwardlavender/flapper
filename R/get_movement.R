@@ -44,18 +44,20 @@
 #' @examples
 #' #### Estimate mobility from acoustic data using Euclidean distances
 #' ## (A) Define receiver coordinates as SPDF in UTM CRS
-#' proj     <- sp::CRS(SRS_string = "EPSG:4326")
+#' proj <- sp::CRS(SRS_string = "EPSG:4326")
 #' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 #' moorings <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj)
 #' moorings <- sp::spTransform(moorings, proj_utm)
 #' moorings <- sp::SpatialPointsDataFrame(moorings, data.frame(receiver_id = dat_moorings$receiver_id))
 #' ## (B) Implement algorithm using Euclidean distances
-#' mob_1 <- get_mvt_mobility_from_acoustics(data = dat_acoustics,
-#'                                          fct = "individual_id",
-#'                                          moorings = moorings,
-#'                                          detection_range = 750,
-#'                                          transmission_interval = 120,
-#'                                          step = 120)
+#' mob_1 <- get_mvt_mobility_from_acoustics(
+#'   data = dat_acoustics,
+#'   fct = "individual_id",
+#'   moorings = moorings,
+#'   detection_range = 750,
+#'   transmission_interval = 120,
+#'   step = 120
+#' )
 #'
 #' #### Estimate mobility from acoustic data using LCP distances
 #' ## (A) Define receiver coordinates
@@ -65,14 +67,16 @@
 #' bathy <- raster::raster(ext = raster::extent(dat_gebco), resolution = 50)
 #' bathy <- raster::resample(dat_gebco, bathy, method = "bilinear")
 #' ## (C) Implement algorithm using LCP distances
-#' mob_2 <- get_mvt_mobility_from_acoustics(data = dat_acoustics,
-#'                                          fct = "individual_id",
-#'                                          moorings = moorings,
-#'                                          detection_range = 750,
-#'                                          calc_distance = "lcp",
-#'                                          bathy = bathy,
-#'                                          transmission_interval = 120,
-#'                                          step = 120)
+#' mob_2 <- get_mvt_mobility_from_acoustics(
+#'   data = dat_acoustics,
+#'   fct = "individual_id",
+#'   moorings = moorings,
+#'   detection_range = 750,
+#'   calc_distance = "lcp",
+#'   bathy = bathy,
+#'   transmission_interval = 120,
+#'   step = 120
+#' )
 #'
 #' #### Estimate mobility from archival data
 #' # Note the use of 'individual_id' for 'fct' here is only appropriate
@@ -95,23 +99,22 @@ get_mvt_mobility_from_acoustics <- function(data,
                                             calc_distance = c("euclid", "lcp"),
                                             bathy = NULL,
                                             transmission_interval,
-                                            step = NULL){
-
+                                            step = NULL) {
   #### Checks
   check_names(input = data, req = c("receiver_id", "timestamp", fct), type = all)
-  if(!is.null(fct)) data$fct <- data[, fct] else data$fct <- 1L
+  if (!is.null(fct)) data$fct <- data[, fct] else data$fct <- 1L
   moorings_data <- data.frame(moorings)
   check_names(input = moorings_data, req = "receiver_id", type = all)
-  if(!all(unique(data$receiver_id) %in% moorings_data$receiver_id)) stop("Not all unique data$receiver_id are in moorings$receiver_id.")
+  if (!all(unique(data$receiver_id) %in% moorings_data$receiver_id)) stop("Not all unique data$receiver_id are in moorings$receiver_id.")
   calc_distance <- match.arg(calc_distance)
-  if(calc_distance == "lcp" & is.null(bathy)) stop("'bathy' is required for calc_distance = 'lcp'.")
+  if (calc_distance == "lcp" & is.null(bathy)) stop("'bathy' is required for calc_distance = 'lcp'.")
   msg_no_suitable_data <- "No 'data' following filtering with which to estimate mobility."
 
   #### Add receiver coordinates to data
   coords <- sp::coordinates(moorings)
-  colnames(coords)   <- c("easting", "northing")
-  match_index        <- match(data$receiver_id, moorings$receiver_id)
-  data$easting  <- coords[match_index, "easting"]
+  colnames(coords) <- c("easting", "northing")
+  match_index <- match(data$receiver_id, moorings$receiver_id)
+  data$easting <- coords[match_index, "easting"]
   data$northing <- coords[match_index, "northing"]
 
   #### Define a dataframe of transitions between receivers
@@ -126,21 +129,23 @@ get_mvt_mobility_from_acoustics <- function(data,
     dplyr::select(.data$fct, .data$timestamp, .data$receiver_id, .data$easting, .data$northing) %>%
     dplyr::group_by(.data$fct) %>%
     dplyr::arrange(.data$timestamp) %>%
-    dplyr::mutate(r_1 = .data$receiver_id,
-                  r_2 = dplyr::lead(.data$receiver_id),
-                  r_key = paste0(.data$r_1, "-", .data$r_2),
-                  t_1 = .data$timestamp,
-                  t_2 = dplyr::lead(.data$timestamp),
-                  time = as.numeric(difftime(.data$t_2, .data$t_1, units = "s")),
-                  easting_1 = .data$easting,
-                  northing_1 = .data$northing,
-                  easting_2 = dplyr::lead(.data$easting),
-                  northing_2 = dplyr::lead(.data$northing)) %>%
+    dplyr::mutate(
+      r_1 = .data$receiver_id,
+      r_2 = dplyr::lead(.data$receiver_id),
+      r_key = paste0(.data$r_1, "-", .data$r_2),
+      t_1 = .data$timestamp,
+      t_2 = dplyr::lead(.data$timestamp),
+      time = as.numeric(difftime(.data$t_2, .data$t_1, units = "s")),
+      easting_1 = .data$easting,
+      northing_1 = .data$northing,
+      easting_2 = dplyr::lead(.data$easting),
+      northing_2 = dplyr::lead(.data$northing)
+    ) %>%
     dplyr::select(-c(.data$timestamp, .data$receiver_id, .data$easting, .data$northing)) %>%
     dplyr::filter(.data$r_1 != .data$r_2) %>%
     dplyr::filter(.data$time >= transmission_interval) %>%
     dplyr::filter(!is.na(.data$r_2))
-  if(nrow(transitions) == 0L){
+  if (nrow(transitions) == 0L) {
     message(msg_no_suitable_data)
     return(invisible())
   }
@@ -159,28 +164,32 @@ get_mvt_mobility_from_acoustics <- function(data,
   # ... Minus detection_range * 2 m from the distance between receivers to get a adjusted distance
   # ... Then drop any detections at receivers that are within each other's distance
   ## Define coordinates
-  origins      <- receiver_pairwise_dists[, c("easting_1", "northing_1")] %>% as.matrix()
+  origins <- receiver_pairwise_dists[, c("easting_1", "northing_1")] %>% as.matrix()
   destinations <- receiver_pairwise_dists[, c("easting_2", "northing_2")] %>% as.matrix()
   ## Get distances
-  if(calc_distance == "euclid"){
+  if (calc_distance == "euclid") {
     receiver_pairwise_dists$dist_avg <- raster::pointDistance(origins, destinations, lonlat = FALSE)
   } else {
-    receiver_pairwise_dists_lcps <- lcp_over_surface(origin = origins,
-                                                     destination = destinations,
-                                                     surface = bathy,
-                                                     goal = 3,
-                                                     combination = "pair",
-                                                     verbose = FALSE)
+    receiver_pairwise_dists_lcps <- lcp_over_surface(
+      origin = origins,
+      destination = destinations,
+      surface = bathy,
+      goal = 3,
+      combination = "pair",
+      verbose = FALSE
+    )
     receiver_pairwise_dists$dist_avg <- receiver_pairwise_dists_lcps$dist_lcp
   }
 
   ## Adjust distances and drop spatially overlapping receivers
   receiver_pairwise_dists <-
     receiver_pairwise_dists %>%
-    dplyr::mutate(dist_min = .data$dist_avg - detection_range * 2,
-                  dist_max = .data$dist_avg + detection_range * 2) %>%
+    dplyr::mutate(
+      dist_min = .data$dist_avg - detection_range * 2,
+      dist_max = .data$dist_avg + detection_range * 2
+    ) %>%
     dplyr::filter(.data$dist_min > 0)
-  if(nrow(receiver_pairwise_dists) == 0L){
+  if (nrow(receiver_pairwise_dists) == 0L) {
     message(msg_no_suitable_data)
     return(invisible())
   }
@@ -190,7 +199,7 @@ get_mvt_mobility_from_acoustics <- function(data,
   # ... (whose adjusted distance is more than 0 m!)
   transitions <-
     transitions %>% dplyr::filter(.data$r_key %in% receiver_pairwise_dists$r_key)
-  if(nrow(transitions) == 0L){
+  if (nrow(transitions) == 0L) {
     message(msg_no_suitable_data)
     return(invisible())
   }
@@ -202,16 +211,19 @@ get_mvt_mobility_from_acoustics <- function(data,
 
   #### Tidy transitions
   transitions <- transitions %>%
-    dplyr::rename(receiver_id_1 = .data$r_1,
-                  receiver_id_2 = .data$r_2,
-                  timestamp_1 = .data$t_1,
-                  timestamp_2 = .data$t_2) %>%
-    dplyr::select(.data$fct,
-                  .data$receiver_id_1, .data$receiver_id_2,
-                  .data$timestamp_1, .data$timestamp_2,
-                  .data$time, .data$dist_min, .data$dist_avg, .data$dist_max
-                  )
-  if(is.null(fct)){
+    dplyr::rename(
+      receiver_id_1 = .data$r_1,
+      receiver_id_2 = .data$r_2,
+      timestamp_1 = .data$t_1,
+      timestamp_2 = .data$t_2
+    ) %>%
+    dplyr::select(
+      .data$fct,
+      .data$receiver_id_1, .data$receiver_id_2,
+      .data$timestamp_1, .data$timestamp_2,
+      .data$time, .data$dist_min, .data$dist_avg, .data$dist_max
+    )
+  if (is.null(fct)) {
     transitions$fct <- NULL
   } else {
     cnms <- colnames(transitions)
@@ -222,33 +234,35 @@ get_mvt_mobility_from_acoustics <- function(data,
   #### Calculate speeds
   message("Mobility estimates from n = ", nrow(transitions), " observation(s).")
   ## Speeds (m/s)
-  transitions$speed_min_ms <- transitions$dist_min/transitions$time
-  transitions$speed_avg_ms <- transitions$dist_avg/transitions$time
-  transitions$speed_max_ms <- transitions$dist_max/transitions$time
+  transitions$speed_min_ms <- transitions$dist_min / transitions$time
+  transitions$speed_avg_ms <- transitions$dist_avg / transitions$time
+  transitions$speed_max_ms <- transitions$dist_max / transitions$time
   cat("--------------------------------------\n")
   cat("Estimates (m/s)-----------------------\n")
-  stats <- data.frame(variable = c("speed_min_ms", "speed_avg_ms", "speed_max_ms"),
-                      min = c(min(transitions$speed_min_ms), min(transitions$speed_avg_ms), min(transitions$speed_max_ms)),
-                      mean = c(mean(transitions$speed_min_ms), mean(transitions$speed_avg_ms), mean(transitions$speed_max_ms)),
-                      max = c(max(transitions$speed_min_ms), max(transitions$speed_avg_ms), max(transitions$speed_max_ms))
-                      )
-  stats$min  <- round(stats$min, 2)
+  stats <- data.frame(
+    variable = c("speed_min_ms", "speed_avg_ms", "speed_max_ms"),
+    min = c(min(transitions$speed_min_ms), min(transitions$speed_avg_ms), min(transitions$speed_max_ms)),
+    mean = c(mean(transitions$speed_min_ms), mean(transitions$speed_avg_ms), mean(transitions$speed_max_ms)),
+    max = c(max(transitions$speed_min_ms), max(transitions$speed_avg_ms), max(transitions$speed_max_ms))
+  )
+  stats$min <- round(stats$min, 2)
   stats$mean <- round(stats$mean, 2)
   stats$max <- round(stats$max, 2)
   print(stats)
   cat("--------------------------------------\n")
   ## Speeds (m per step)
-  if(!is.null(step)) {
+  if (!is.null(step)) {
     transitions$speed_min_mstep <- transitions$speed_min_ms * step
     transitions$speed_avg_mstep <- transitions$speed_avg_ms * step
     transitions$speed_max_mstep <- transitions$speed_max_ms * step
     cat("Estimates (m/step)--------------------\n")
-    stats <- data.frame(variable = c("speed_min_mstep", "speed_avg_mstep", "speed_max_mstep"),
-                        min = c(min(transitions$speed_min_mstep), min(transitions$speed_avg_mstep), min(transitions$speed_max_mstep)),
-                        mean = c(mean(transitions$speed_min_mstep), mean(transitions$speed_avg_mstep), mean(transitions$speed_max_mstep)),
-                        max = c(max(transitions$speed_min_mstep), max(transitions$speed_avg_mstep), max(transitions$speed_max_mstep))
-                        )
-    stats$min  <- round(stats$min, 2)
+    stats <- data.frame(
+      variable = c("speed_min_mstep", "speed_avg_mstep", "speed_max_mstep"),
+      min = c(min(transitions$speed_min_mstep), min(transitions$speed_avg_mstep), min(transitions$speed_max_mstep)),
+      mean = c(mean(transitions$speed_min_mstep), mean(transitions$speed_avg_mstep), mean(transitions$speed_max_mstep)),
+      max = c(max(transitions$speed_min_mstep), max(transitions$speed_avg_mstep), max(transitions$speed_max_mstep))
+    )
+    stats$min <- round(stats$min, 2)
     stats$mean <- round(stats$mean, 2)
     stats$max <- round(stats$max, 2)
     print(stats)
@@ -264,49 +278,54 @@ get_mvt_mobility_from_acoustics <- function(data,
 #' @rdname get_mvt_mobility
 #' @export
 
-get_mvt_mobility_from_archival <- function(data, fct = NULL, step_check = TRUE){
+get_mvt_mobility_from_archival <- function(data, fct = NULL, step_check = TRUE) {
   check_names(input = data, req = c("timestamp", "depth", fct), type = all)
-  if(any(data$depth < 0)){
+  if (any(data$depth < 0)) {
     warning("data$depth contains negative values: using abs(data$depth).",
-            immediate. = TRUE, call. = FALSE)
+      immediate. = TRUE, call. = FALSE
+    )
     data$depth <- abs(data$depth)
   }
   check_class(input = data$timestamp, to_class = c("Date", "POSIXct"), type = "stop")
   data$index <- 1:nrow(data)
-  if(!is.null(fct)) data$fct <- data[, fct] else data$fct <- 1L
+  if (!is.null(fct)) data$fct <- data[, fct] else data$fct <- 1L
   id_n_obs <-
     data %>%
     dplyr::group_by(.data$fct) %>%
     dplyr::summarise(n = dplyr::n(), .groups = "drop_last")
-  if(any(id_n_obs$n <= 2)){
+  if (any(id_n_obs$n <= 2)) {
     id_to_drop <- id_n_obs$fct[which(id_n_obs$n <= 2)]
-    if(!is.null(fct)){
+    if (!is.null(fct)) {
       warning(paste0("Too few observations for the following individual(s) for analysis: ", paste0("'", id_to_drop, collapse = "', "), "'."),
-              immediate. = TRUE, call. = FALSE)
+        immediate. = TRUE, call. = FALSE
+      )
     }
     data <- data %>% dplyr::filter(.data$fct != id_to_drop)
-    if(nrow(data) <= 2) stop("Insufficient data available for analysis (n <= 2).", call. = FALSE)
+    if (nrow(data) <= 2) stop("Insufficient data available for analysis (n <= 2).", call. = FALSE)
   }
   data_1 <- data %>% dplyr::filter(fct == unique(data$fct)[1])
-  step   <- as.numeric(difftime(data_1$timestamp[2], data_1$timestamp[1]), units = "secs")
-  if(step_check){
+  step <- as.numeric(difftime(data_1$timestamp[2], data_1$timestamp[1]), units = "secs")
+  if (step_check) {
     data <-
       data %>%
       dplyr::group_by(.data$fct) %>%
       dplyr::mutate(gap = Tools4ETS::serial_difference(.data$timestamp, units = "secs"))
-    gaps  <- unique(data$gap)[!is.na(unique(data$gap))]
+    gaps <- unique(data$gap)[!is.na(unique(data$gap))]
     lgaps <- length(gaps)
     print(gaps)
-    if(lgaps != 1L)
+    if (lgaps != 1L) {
       stop("'data' should comprise regular time steps.", call. = FALSE)
-    data$gap <- NULL
     }
+    data$gap <- NULL
+  }
   data <-
     data %>%
     dplyr::group_by(.data$fct) %>%
-    dplyr::mutate(dist = abs(Tools4ETS::serial_difference(.data$depth)),
-                  speed_ms = .data$dist/step,
-                  speed_mstep = .data$dist) %>%
+    dplyr::mutate(
+      dist = abs(Tools4ETS::serial_difference(.data$depth)),
+      speed_ms = .data$dist / step,
+      speed_mstep = .data$dist
+    ) %>%
     dplyr::ungroup() %>%
     dplyr::filter(!is.na(.data$dist)) %>%
     dplyr::arrange(.data$index) %>%
@@ -349,33 +368,41 @@ get_mvt_mobility_from_archival <- function(data, fct = NULL, step_check = TRUE){
 #'
 #' @examples
 #' #### Example (1): Assign 'resting' based on a simple depth threshold
-#' dat_archival$state_1 <- get_mvt_resting(archival = dat_archival,
-#'                                         fct = "individual_id",
-#'                                         th_depth = 0.25)
+#' dat_archival$state_1 <- get_mvt_resting(
+#'   archival = dat_archival,
+#'   fct = "individual_id",
+#'   th_depth = 0.25
+#' )
 #'
 #' #### Example (2): Assign 'resting' based on depth and time thresholds
 #' # ... Under the default settings, all of observations in the time threshold
 #' # ... must be below the depth threshold to qualify as 'resting'
-#' dat_archival$state_2 <- get_mvt_resting(archival = dat_archival,
-#'                                         fct = "individual_id",
-#'                                         th_depth = 0.25,
-#'                                         th_time = 30)
+#' dat_archival$state_2 <- get_mvt_resting(
+#'   archival = dat_archival,
+#'   fct = "individual_id",
+#'   th_depth = 0.25,
+#'   th_time = 30
+#' )
 #'
 #' #### Example (3): Dampen the effects of occasionally exceeding the depth threshold
 #' # ... by increasing the proportion of observations that are allowed to
 #' # ... exceed the depth threshold in a each time window
-#' dat_archival$state_3 <- get_mvt_resting(archival = dat_archival,
-#'                                         fct = "individual_id",
-#'                                         th_depth = 0.25,
-#'                                         th_time = 30,
-#'                                         discrete = 0.05)
+#' dat_archival$state_3 <- get_mvt_resting(
+#'   archival = dat_archival,
+#'   fct = "individual_id",
+#'   th_depth = 0.25,
+#'   th_time = 30,
+#'   discrete = 0.05
+#' )
 #'
 #' #### Example (4): Return average state scores via discrete = NULL
-#' dat_archival$state_4 <- get_mvt_resting(archival = dat_archival,
-#'                                         fct = "individual_id",
-#'                                         th_depth = 0.25,
-#'                                         th_time = 30,
-#'                                         discrete = NULL)
+#' dat_archival$state_4 <- get_mvt_resting(
+#'   archival = dat_archival,
+#'   fct = "individual_id",
+#'   th_depth = 0.25,
+#'   th_time = 30,
+#'   discrete = NULL
+#' )
 #'
 #' #### Compare the frequency distribution of states among methods
 #' # In the first example, a large number of 'resting' states are assigned
@@ -398,16 +425,19 @@ get_mvt_mobility_from_archival <- function(data, fct = NULL, step_check = TRUE){
 #' dat_archival_1 <- dat_archival[dat_archival$individual_id == 25, ]
 #' ## Define helper functions
 #' # Define helper function to plot blank depth time series
-#' plot_blank <- function(...){
-#'   prettyGraphics::pretty_plot(dat_archival_1$timestamp, dat_archival_1$depth*-1,
-#'                               pretty_axis_args = list(side = 3:2),
-#'                               type = "n",...)
+#' plot_blank <- function(...) {
+#'   prettyGraphics::pretty_plot(dat_archival_1$timestamp, dat_archival_1$depth * -1,
+#'     pretty_axis_args = list(side = 3:2),
+#'     type = "n", ...
+#'   )
 #' }
 #' # Define helper function to add depth time series, coloured by state, to the plot
-#' add_lines_for_state <- function(state,...){
-#'   prettyGraphics::add_lines(x = dat_archival_1$timestamp,
-#'                             y1 = dat_archival_1$depth*-1,
-#'                             y2 = dat_archival_1[, state],...)
+#' add_lines_for_state <- function(state, ...) {
+#'   prettyGraphics::add_lines(
+#'     x = dat_archival_1$timestamp,
+#'     y1 = dat_archival_1$depth * -1,
+#'     y2 = dat_archival_1[, state], ...
+#'   )
 #' }
 #' ## Make plots
 #' pp <- graphics::par(mfrow = c(2, 2))
@@ -432,21 +462,19 @@ get_mvt_resting <- function(archival,
                             fct = NULL,
                             th_depth = 0.25,
                             th_time = NULL,
-                            weights = mean, align = "center",...,
-                            discrete = 0
-                            ){
-
+                            weights = mean, align = "center", ...,
+                            discrete = 0) {
   #### Implement function checks
   check_names(input = archival, req = c("depth", fct))
-  if(!is.null(fct)){
+  if (!is.null(fct)) {
     check_class(input = fct, to_class = "character", coerce_input = as.character)
   }
-  if(!is.null(discrete)){
-    if(!(discrete >= 0 & discrete <= 1)) stop("'discrete' should be between 0 and 1 inclusive.")
+  if (!is.null(discrete)) {
+    if (!(discrete >= 0 & discrete <= 1)) stop("'discrete' should be between 0 and 1 inclusive.")
   }
 
   #### Define states based on depth only
-  if(is.null(fct)) archival$fct <- 1L else archival$fct <- archival[, fct]
+  if (is.null(fct)) archival$fct <- 1L else archival$fct <- archival[, fct]
   archival <-
     archival %>%
     dplyr::group_by(.data$fct) %>%
@@ -455,17 +483,18 @@ get_mvt_resting <- function(archival,
     dplyr::mutate(state_2 = .data$state_1)
 
   #### Average states over time interval
-  if(!is.null(th_time)){
+  if (!is.null(th_time)) {
     # Average states over time window via rollapply()
     archival <-
       archival %>%
       dplyr::mutate(state_2 = data.table::frollapply(.data$state_1,
-                                                     n = th_time,
-                                                     FUN = weights, align = align,...)) %>%
+        n = th_time,
+        FUN = weights, align = align, ...
+      )) %>%
       dplyr::mutate(state_2 = dplyr::if_else(is.na(.data$state_2), .data$state_1, .data$state_2))
 
     # Assign discrete states based on threshold proportion parameter
-    if(!is.null(discrete)){
+    if (!is.null(discrete)) {
       archival <- archival %>% dplyr::mutate(state_2 = dplyr::if_else(.data$state_2 <= discrete, 0, 1))
     }
   }

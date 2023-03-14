@@ -29,10 +29,10 @@ The function returns a warning produced by \code{\link[gdistance]{transition}} w
 # ... 'dat_gebco' raster. For speed, we will focus on a subset of the area.
 # ... Within this area, we need to regularise the resolution:
 boundaries <- raster::extent(707884.6, 709884.6, 6253404, 6255404)
-blank      <- raster::raster(boundaries, res = c(5, 5))
-r          <- raster::resample(dat_gebco, blank)
+blank <- raster::raster(boundaries, res = c(5, 5))
+r <- raster::resample(dat_gebco, blank)
 # Implement algorithm
-costs      <- lcp_costs(r)
+costs <- lcp_costs(r)
 # Examine outputs
 utils::str(costs)
 

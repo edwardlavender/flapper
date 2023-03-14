@@ -32,22 +32,25 @@
 #'
 #' #### Step (1) Simulate an array in an area
 #' # We will pack the area with receivers to generate lots of detections
-#' array_ls <- sim_array(boundaries = raster::extent(dat_coast),
-#'                       coastline = dat_coast,
-#'                       n_receivers = 1000,
-#'                       arrangement = "regular",
-#'                       seed = 1)
+#' array_ls <- sim_array(
+#'   boundaries = raster::extent(dat_coast),
+#'   coastline = dat_coast,
+#'   n_receivers = 1000,
+#'   arrangement = "regular",
+#'   seed = 1
+#' )
 #' raster::lines(dat_coast)
 #' array <- array_ls$array
 #'
 #' #### Step (2) Simulate a movement path in this area
 #' n <- 500
-#' path_ls <- sim_path_sa(n = n,
-#'                        sim_step = function(...) stats::rgamma(1, shape = 25, scale = 25),
-#'                        area = array$sea,
-#'                        seed = 1,
-#'                        plot = FALSE
-#'                        )
+#' path_ls <- sim_path_sa(
+#'   n = n,
+#'   sim_step = function(...) stats::rgamma(1, shape = 25, scale = 25),
+#'   area = array$sea,
+#'   seed = 1,
+#'   plot = FALSE
+#' )
 #' prettyGraphics::add_sp_path(path_ls$xy_mat, col = viridis::viridis(n), length = 0.02)
 #'
 #' #### Step (3) Simulate and aggregate detections over some delta_t interval
@@ -55,10 +58,12 @@
 #' # ... and determining whether or not the individual is detected in that interval
 #' # ... and then aggregating detections over some interval e.g., X mins
 #' # ... (In reality, we would need to consider this choice carefully).
-#' det_ls <- sim_detections(path = path_ls$xy_mat,
-#'                          xy = sp::coordinates(array$xy),
-#'                          calc_detection_pr = function(dist) ifelse(dist < 700, 1, 0),
-#'                          delta_t = 10)
+#' det_ls <- sim_detections(
+#'   path = path_ls$xy_mat,
+#'   xy = sp::coordinates(array$xy),
+#'   calc_detection_pr = function(dist) ifelse(dist < 700, 1, 0),
+#'   delta_t = 10
+#' )
 #'
 #' str(det_ls)
 #'
@@ -69,19 +74,23 @@
 #' path_true <- path_ls$xy_mat
 #' path_true <-
 #'   sp::SpatialPointsDataFrame(path_true,
-#'                              data = data.frame(ID = factor(rep(1, nrow(path_true)))),
-#'                              proj4string = raster::crs(dat_coast))
+#'     data = data.frame(ID = factor(rep(1, nrow(path_true)))),
+#'     proj4string = raster::crs(dat_coast)
+#'   )
 #' path_coa <- coas
 #' path_coa <-
 #'   sp::SpatialPointsDataFrame(path_coa,
-#'                              data = data.frame(ID = factor(rep(1, nrow(path_coa)))),
-#'                              proj4string = raster::crs(dat_coast))
+#'     data = data.frame(ID = factor(rep(1, nrow(path_coa)))),
+#'     proj4string = raster::crs(dat_coast)
+#'   )
 #'
 #' #### Example (1): Implement algorithm using default options
-#' eval_by_kud(path_sim = path_true,
-#'             path_est = path_coa,
-#'             grid = 60,
-#'             array = array)
+#' eval_by_kud(
+#'   path_sim = path_true,
+#'   path_est = path_coa,
+#'   grid = 60,
+#'   array = array
+#' )
 #'
 #' #### Example (2): Account for coastline via kud_around_coastline()
 #' # Define grid of habitat/non habitat
@@ -90,42 +99,53 @@
 #' r <- raster::mask(r, dat_coast, updatevalue = 1)
 #' habitat <- methods::as(r, "SpatialPixelsDataFrame")
 #' # Implement algorithm
-#' eval_by_kud(path_sim = path_true,
-#'             path_est = path_coa,
-#'             estimate_ud = kud_around_coastline,
-#'             grid = habitat,
-#'             array = array)
+#' eval_by_kud(
+#'   path_sim = path_true,
+#'   path_est = path_coa,
+#'   estimate_ud = kud_around_coastline,
+#'   grid = habitat,
+#'   array = array
+#' )
 #'
 #' #### Example (3): Plot customisation options
 #' # Use add_* lists to customise main plotting features
 #' # ... such as receivers and land (but also the movement paths etc.)
-#' eval_by_kud(path_sim = path_true,
-#'             path_est = path_coa,
-#'             estimate_ud = kud_around_coastline,
-#'             grid = habitat,
-#'             array = array,
-#'             add_receivers = list(pch = "."),
-#'             add_land = list(col = "darkgreen"))
+#' eval_by_kud(
+#'   path_sim = path_true,
+#'   path_est = path_coa,
+#'   estimate_ud = kud_around_coastline,
+#'   grid = habitat,
+#'   array = array,
+#'   add_receivers = list(pch = "."),
+#'   add_land = list(col = "darkgreen")
+#' )
 #' # Use 'process' to focus on contours of the home range of interest
-#' process <- function(r) { r[r > 95] <- NA; return(r) }
-#' eval_by_kud(path_sim = path_true,
-#'             path_est = path_coa,
-#'             estimate_ud = kud_around_coastline,
-#'             grid = habitat,
-#'             process = process,
-#'             array = array,
-#'             add_receivers = list(pch = "."),
-#'             add_land = list(col = "darkgreen"))
+#' process <- function(r) {
+#'   r[r > 95] <- NA
+#'   return(r)
+#' }
+#' eval_by_kud(
+#'   path_sim = path_true,
+#'   path_est = path_coa,
+#'   estimate_ud = kud_around_coastline,
+#'   grid = habitat,
+#'   process = process,
+#'   array = array,
+#'   add_receivers = list(pch = "."),
+#'   add_land = list(col = "darkgreen")
+#' )
 #' # Pass other arguments to via ... to pretty map
-#' eval_by_kud(path_sim = path_true,
-#'             path_est = path_coa,
-#'             estimate_ud = kud_around_coastline,
-#'             grid = habitat,
-#'             process = process,
-#'             array = array,
-#'             add_receivers = list(pch = "."),
-#'             add_land = list(col = "darkgreen"),
-#'             xlab = "x", ylab = "y")
+#' eval_by_kud(
+#'   path_sim = path_true,
+#'   path_est = path_coa,
+#'   estimate_ud = kud_around_coastline,
+#'   grid = habitat,
+#'   process = process,
+#'   array = array,
+#'   add_receivers = list(pch = "."),
+#'   add_land = list(col = "darkgreen"),
+#'   xlab = "x", ylab = "y"
+#' )
 #'
 #' #### Results
 #' # In this case, with a regularly spaced and dense array, the COA metric
@@ -151,84 +171,84 @@ eval_by_kud <-
            add_path_est = add_path_sim,
            add_vol_sim = list(), add_vol_est = list(),
            one_page = TRUE,
-           verbose = TRUE,...){
+           verbose = TRUE, ...) {
+    #### Get CRS
+    crs_area <- raster::crs(path_sim)
 
-  #### Get CRS
-  crs_area <- raster::crs(path_sim)
+    #### Estimate UDs and volumes
 
-  #### Estimate UDs and volumes
+    ## Estimate KUDs for path_sim
+    # derive the raw UD:
+    path_sim_ud <- estimate_ud(xy = path_sim, h = h, grid = grid, hlim = hlim, kern = kern, extent = extent, boundary = boundary)
+    if (inherits(path_sim_ud, "estUDm")) path_sim_ud <- path_sim_ud[[1]]
+    raster::crs(path_sim_ud) <- crs_area
+    # define the home range %:
+    path_sim_vol <- adehabitatHR::getvolumeUD(path_sim_ud, standardize = TRUE)
+    path_sim_vol <- raster::raster(path_sim_vol)
+    if (!is.null(process)) path_sim_vol <- process(path_sim_vol)
+    raster::crs(path_sim_vol) <- crs_area
 
-  ## Estimate KUDs for path_sim
-  # derive the raw UD:
-  path_sim_ud <- estimate_ud(xy = path_sim, h = h, grid = grid, hlim = hlim, kern = kern, extent = extent, boundary = boundary)
-  if(inherits(path_sim_ud, "estUDm")) path_sim_ud <- path_sim_ud[[1]]
-  raster::crs(path_sim_ud) <- crs_area
-  # define the home range %:
-  path_sim_vol <- adehabitatHR::getvolumeUD(path_sim_ud, standardize = TRUE)
-  path_sim_vol <- raster::raster(path_sim_vol)
-  if(!is.null(process)) path_sim_vol <- process(path_sim_vol)
-  raster::crs(path_sim_vol) <- crs_area
+    ## Estimate KUDs for path_est
+    path_est_ud <- adehabitatHR::kernelUD(xy = path_est, h = h, grid = grid, hlim = hlim, kern = kern, extent = extent, boundary = boundary)
+    if (inherits(path_est_ud, "estUDm")) path_est_ud <- path_est_ud[[1]]
+    raster::crs(path_est_ud) <- crs_area
+    # define the home range %:
+    path_est_vol <- adehabitatHR::getvolumeUD(path_est_ud, standardize = TRUE)
+    path_est_vol <- raster::raster(path_est_vol)
+    if (!is.null(process)) path_est_vol <- process(path_est_vol)
+    raster::crs(path_est_vol) <- crs_area
 
-  ## Estimate KUDs for path_est
-  path_est_ud <- adehabitatHR::kernelUD(xy = path_est, h = h, grid = grid, hlim = hlim, kern = kern, extent = extent, boundary = boundary)
-  if(inherits(path_est_ud, "estUDm")) path_est_ud <- path_est_ud[[1]]
-  raster::crs(path_est_ud) <- crs_area
-  # define the home range %:
-  path_est_vol <- adehabitatHR::getvolumeUD(path_est_ud, standardize = TRUE)
-  path_est_vol <- raster::raster(path_est_vol)
-  if(!is.null(process)) path_est_vol <- process(path_est_vol)
-  raster::crs(path_est_vol) <- crs_area
+    #### Set up plotting param
+    if (one_page) pp <- graphics::par(mfrow = prettyGraphics::par_mf(length(plot)))
+    if (!is.null(add_land)) add_land$x <- array$land
+    if (!is.null(add_sea)) add_sea$x <- array$sea
+    add_polys <- list(add_land, add_sea)
+    add_polys <- compact(add_polys)
+    if (length(add_polys) == 0L) add_polys <- NULL
+    if (!is.null(add_receivers)) add_receivers$x <- array$xy
 
-  #### Set up plotting param
-  if(one_page) pp <- graphics::par(mfrow = prettyGraphics::par_mf(length(plot)))
-  if(!is.null(add_land)) add_land$x <- array$land
-  if(!is.null(add_sea)) add_sea$x <- array$sea
-  add_polys <- list(add_land, add_sea)
-  add_polys <- compact(add_polys)
-  if(length(add_polys) == 0L) add_polys <- NULL
-  if(!is.null(add_receivers)) add_receivers$x <- array$xy
+    #### Plot 1: receiver array and true trajectory
+    if (1L %in% plot) {
+      add_path_sim$x <- path_sim
+      prettyGraphics::pretty_map(array$area,
+        add_polys = add_polys,
+        add_paths = add_path_sim,
+        add_points = add_receivers,
+        verbose = FALSE, ...
+      )
+    }
 
-  #### Plot 1: receiver array and true trajectory
-  if(1L %in% plot) {
+    #### Plot 2: receiver array and path_est (e.g., COAs)
+    if (2L %in% plot) {
+      add_path_est$x <- path_est
+      prettyGraphics::pretty_map(array$area,
+        add_polys = add_polys,
+        add_paths = add_path_est,
+        add_points = add_receivers,
+        verbose = FALSE, ...
+      )
+    }
 
-    add_path_sim$x <- path_sim
-    prettyGraphics::pretty_map(array$area,
-                               add_polys = add_polys,
-                               add_paths = add_path_sim,
-                               add_points = add_receivers,
-                               verbose = FALSE,...)
+    #### Plot 3: receiver array and KUD based on true trajectory
+    if (3L %in% plot) {
+      add_vol_sim$x <- path_sim_vol
+      prettyGraphics::pretty_map(array$area,
+        add_rasters = add_vol_sim,
+        add_polys = add_polys,
+        verbose = FALSE, ...
+      )
+    }
 
+    #### Plot 4: receiver array and KUD based on path_est (e.g., COAs)
+    if (4L %in% plot) {
+      add_vol_est$x <- path_est_vol
+      prettyGraphics::pretty_map(array$area,
+        add_rasters = add_vol_est,
+        add_polys = add_polys,
+        verbose = FALSE, ...
+      )
+    }
+
+    #### Close plotting window
+    graphics::par(pp)
   }
-
-  #### Plot 2: receiver array and path_est (e.g., COAs)
-  if(2L %in% plot) {
-    add_path_est$x <- path_est
-    prettyGraphics::pretty_map(array$area,
-                               add_polys = add_polys,
-                               add_paths = add_path_est,
-                               add_points = add_receivers,
-                               verbose = FALSE,...)
-  }
-
-  #### Plot 3: receiver array and KUD based on true trajectory
-  if(3L %in% plot) {
-    add_vol_sim$x <- path_sim_vol
-    prettyGraphics::pretty_map(array$area,
-                               add_rasters = add_vol_sim,
-                               add_polys = add_polys,
-                               verbose = FALSE,...)
-  }
-
-  #### Plot 4: receiver array and KUD based on path_est (e.g., COAs)
-  if(4L %in% plot) {
-    add_vol_est$x <- path_est_vol
-    prettyGraphics::pretty_map(array$area,
-                               add_rasters = add_vol_est,
-                               add_polys = add_polys,
-                               verbose = FALSE,...)
-  }
-
-  #### Close plotting window
-  graphics::par(pp)
-
-}

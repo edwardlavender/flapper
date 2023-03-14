@@ -24,8 +24,7 @@
 #' @author Edward Lavender
 #'
 #' @examples
-#' if(flapper_run_slow){
-#'
+#' if (flapper_run_slow) {
 #'   #### Background
 #'   # In this example, we explore, for a small time series
 #'   # ... of particles created via pf(), the speed of alternative
@@ -33,38 +32,41 @@
 #'   # ... and with sockets versus forking.
 #'
 #'   #### Implement pf() for example data using a large number of particles
-#'   pf_args   <- dat_dcpf_histories$args
+#'   pf_args <- dat_dcpf_histories$args
 #'   pf_args$n <- 200L
 #'   pf_args$calc_distance_euclid_fast <- TRUE
 #'   out_pf <- do.call(pf, pf_args)
 #'
 #'   #### Compare the speed of alternative parallelisation approaches
 #'   # ... for particle processing
-#'   if(requireNamespace("rbenchmark", quietly = TRUE)){
+#'   if (requireNamespace("rbenchmark", quietly = TRUE)) {
 #'     pb_op <- pbapply::pboptions(type = "none")
 #'     rbenchmark::benchmark(
 #'       baseline = pf_simplify(out_pf,
-#'                              cl = NULL,
-#'                              calc_distance = "lcp",
-#'                              verbose = FALSE),
+#'         cl = NULL,
+#'         calc_distance = "lcp",
+#'         verbose = FALSE
+#'       ),
 #'       fork = pf_simplify(out_pf,
-#'                          cl = 2L,
-#'                          calc_distance = "lcp",
-#'                          verbose = FALSE),
-#'       socket = pf_simplify(out_pf, calc_distance = "lcp",
-#'                            cl = parallel::makeCluster(2L),
-#'                            verbose = FALSE),
+#'         cl = 2L,
+#'         calc_distance = "lcp",
+#'         verbose = FALSE
+#'       ),
+#'       socket = pf_simplify(out_pf,
+#'         calc_distance = "lcp",
+#'         cl = parallel::makeCluster(2L),
+#'         verbose = FALSE
+#'       ),
 #'       replications = 1L
 #'     )
 #'     pbapply::pboptions(pb_op)
 #'   }
-#'
 #' }
 #'
 #' #### Note a difference in error handling between socket clusters and forking:
 #' \dontrun{
 #' # Implement pf() with a small number of particles
-#' pf_args   <- dat_dcpf_histories$args
+#' pf_args <- dat_dcpf_histories$args
 #' pf_args$n <- 10L
 #' pf_args$calc_distance_euclid_fast <- TRUE
 #' out_pf <- do.call(pf, pf_args)
@@ -73,19 +75,21 @@
 #' # ... (which is because we have implemented pf() using Euclidean sampling
 #' # ... with only 10 particles).
 #' pf_simplify(out_pf,
-#'             calc_distance = "lcp",
-#'             cl = parallel::makeCluster(2L))
+#'   calc_distance = "lcp",
+#'   cl = parallel::makeCluster(2L)
+#' )
 #' # With forking, we get an apparently less helpful error message:
 #' pf_simplify(out_pf,
-#'             calc_distance = "lcp",
-#'             cl = 2L)
+#'   calc_distance = "lcp",
+#'   cl = 2L
+#' )
 #' # This results from a difference in error handling
 #' # ... between parLapply() and mclapply(), as shown here:
-#' out <- pbapply::pblapply(1:10, cl = parallel::makeCluster(2L), function(i){
-#'   if(i== 5L) stop("error") else return(i)
+#' out <- pbapply::pblapply(1:10, cl = parallel::makeCluster(2L), function(i) {
+#'   if (i == 5L) stop("error") else return(i)
 #' })
-#' out <- pbapply::pblapply(1:10, cl = 2L, function(i){
-#'   if(i== 5L) stop("error") else return(i)
+#' out <- pbapply::pblapply(1:10, cl = 2L, function(i) {
+#'   if (i == 5L) stop("error") else return(i)
 #' })
 #' # In the example above, connected cells are being identified at each time step
 #' # ... based on previous cells. The function hits a point at which there are no

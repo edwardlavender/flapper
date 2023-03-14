@@ -32,8 +32,10 @@ pf_setup_optimisers()
 
 #### Example (2): Use GRASS for Euclidean distance calculations
 # Specification for GRASS-7.4.4 on MacOS
-pf_setup_optimisers(use_calc_distance_euclid_backend_grass = TRUE,
-                    use_grass_dir = "/Applications/GRASS-7.4.4.app/Contents/Resources")
+pf_setup_optimisers(
+  use_calc_distance_euclid_backend_grass = TRUE,
+  use_grass_dir = "/Applications/GRASS-7.4.4.app/Contents/Resources"
+)
 # This list should be passed to the 'optimisers' argument in pf().
 
 }

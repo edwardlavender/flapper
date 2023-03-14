@@ -43,63 +43,72 @@ This function is used to sample environmental conditions from within the detecti
 \examples{
 #### Define receiver locations as a SpatialPoints object with a UTM CRS
 proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-                        proj_wgs84)
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+xy <- sp::SpatialPoints(
+  dat_moorings[, c("receiver_long", "receiver_lat")],
+  proj_wgs84
+)
 xy <- sp::spTransform(xy, proj_utm)
 
 #### Example (1): Extract all depth values within each receiver's container
 depths_by_container <-
-  get_detection_containers_envir(xy = xy,
-                                detection_range = 425,
-                                coastline = dat_coast,
-                                envir = dat_gebco
-                                )
+  get_detection_containers_envir(
+    xy = xy,
+    detection_range = 425,
+    coastline = dat_coast,
+    envir = dat_gebco
+  )
 # The function returns a list of dataframes, one for each receiver
 # ... with the cell IDs and the value of the environmental variable
 utils::str(depths_by_container)
 # Collapse the list and compare conditions across receivers
 depths_by_container <-
-  lapply(1:length(depths_by_container), function(i){
+  lapply(1:length(depths_by_container), function(i) {
     d <- depths_by_container[[i]]
     d$receiver_id <- dat_moorings$receiver_id[i]
     return(d)
   })
 depths_by_container <- dplyr::bind_rows(depths_by_container)
-prettyGraphics::pretty_boxplot(depths_by_container$receiver_id,
-                               depths_by_container$envir)
+prettyGraphics::pretty_boxplot(
+  depths_by_container$receiver_id,
+  depths_by_container$envir
+)
 
 #### Example (2): Extract a random sample of values
 # (We'll keep the values small for speed)
 depths_by_container <-
-  get_detection_containers_envir(xy = xy,
-                                detection_range = 425,
-                                coastline = dat_coast,
-                                envir = dat_gebco,
-                                sample_size = 2
-                                )
+  get_detection_containers_envir(
+    xy = xy,
+    detection_range = 425,
+    coastline = dat_coast,
+    envir = dat_gebco,
+    sample_size = 2
+  )
 utils::str(depths_by_container)
 
 #### Example (3) Extract a random sample of values with weighted probabilities
 # Define detection probability function based only on distance
 calc_detection_pr <-
-  function(dist){
-    dpr <- get_detection_pr(distance = dist,
-                            beta_0 = 2.5,
-                            beta_1 = -0.01,
-                            inv_link = stats::plogis,
-                            output = 2L)
+  function(dist) {
+    dpr <- get_detection_pr(
+      distance = dist,
+      beta_0 = 2.5,
+      beta_1 = -0.01,
+      inv_link = stats::plogis,
+      output = 2L
+    )
     return(dpr)
   }
 # Implement sampling with replacement according to detection probability
 depths_by_container <-
-  get_detection_containers_envir(xy = xy,
-                                detection_range = 425,
-                                coastline = dat_coast,
-                                envir = dat_gebco,
-                                sample_size = 2,
-                                sample_probs = calc_detection_pr
-                                )
+  get_detection_containers_envir(
+    xy = xy,
+    detection_range = 425,
+    coastline = dat_coast,
+    envir = dat_gebco,
+    sample_size = 2,
+    sample_probs = calc_detection_pr
+  )
 # Each element of the outputted list includes the 'cell' and 'envir' column
 # ... as well as 'dist' and 'prob' that define the distance of that cell
 # ... from the location in xy and the corresponding detection probability
@@ -108,28 +117,30 @@ utils::str(depths_by_container)
 
 #### Example (4) Sampling without replacement via sample_replace = FALSE
 depths_by_container <-
-  get_detection_containers_envir(xy = xy,
-                                detection_range = 425,
-                                coastline = dat_coast,
-                                envir = dat_gebco,
-                                sample_size = 2,
-                                sample_probs = calc_detection_pr,
-                                sample_replace = FALSE
-                                )
+  get_detection_containers_envir(
+    xy = xy,
+    detection_range = 425,
+    coastline = dat_coast,
+    envir = dat_gebco,
+    sample_size = 2,
+    sample_probs = calc_detection_pr,
+    sample_replace = FALSE
+  )
 utils::str(depths_by_container)
 
 #### Example (5) Parallelise the algorithm via cl and varlist arguments
 depths_by_container <-
-  get_detection_containers_envir(xy = xy,
-                                detection_range = 425,
-                                coastline = dat_coast,
-                                envir = dat_gebco,
-                                sample_size = 2,
-                                sample_probs = calc_detection_pr,
-                                sample_replace = FALSE,
-                                cl = parallel::makeCluster(2L),
-                                varlist = c("dat_gebco","calc_detection_pr")
-                                )
+  get_detection_containers_envir(
+    xy = xy,
+    detection_range = 425,
+    coastline = dat_coast,
+    envir = dat_gebco,
+    sample_size = 2,
+    sample_probs = calc_detection_pr,
+    sample_replace = FALSE,
+    cl = parallel::makeCluster(2L),
+    varlist = c("dat_gebco", "calc_detection_pr")
+  )
 utils::str(depths_by_container)
 
 }

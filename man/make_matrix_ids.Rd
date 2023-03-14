@@ -33,7 +33,7 @@ This function creates a matrix that, for each time step (matrix row) in a sequen
 \examples{
 dat_ids$tag_end_date <- as.Date("2017-06-02")
 mat_hours <- make_matrix_ids(dat_ids, delta_t = "hours")
-mat_days  <- make_matrix_ids(dat_ids, delta_t = "days")
+mat_days <- make_matrix_ids(dat_ids, delta_t = "days")
 utils::str(mat_hours)
 utils::str(mat_days)
 }

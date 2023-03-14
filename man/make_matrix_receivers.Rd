@@ -38,18 +38,23 @@ This function creates a matrix that, for each time step (matrix row) in a sequen
 
 ## Define some example 'moorings' data
 # ... with receiver IDs and deployment times
-moorings <- data.frame(receiver_id = c(1, 2, 3, 4, 5),
-                       receiver_start_date = as.Date(c("2016-01-01",
-                                                       "2016-01-02",
-                                                       "2016-01-03",
-                                                       "2016-01-04",
-                                                       "2016-01-05")),
-                       receiver_end_date = as.Date(c("2016-01-06",
-                                                     "2016-01-07",
-                                                     "2016-01-08",
-                                                     "2016-01-09",
-                                                     "2016-01-09"))
-                       )
+moorings <- data.frame(
+  receiver_id = c(1, 2, 3, 4, 5),
+  receiver_start_date = as.Date(c(
+    "2016-01-01",
+    "2016-01-02",
+    "2016-01-03",
+    "2016-01-04",
+    "2016-01-05"
+  )),
+  receiver_end_date = as.Date(c(
+    "2016-01-06",
+    "2016-01-07",
+    "2016-01-08",
+    "2016-01-09",
+    "2016-01-09"
+  ))
+)
 
 ## Define some example 'servicing' data
 # ... with receiver IDs and servicing times
@@ -57,14 +62,19 @@ moorings <- data.frame(receiver_id = c(1, 2, 3, 4, 5),
 # ... ... from 2016-01-02--3 and 2016-01-04--5
 # ... and receiver 5 was serviced
 # ... ... on 2016-01-08.
-services <- data.frame(receiver_id = c(1, 1, 5),
-                       service_start_date = as.Date(c("2016-01-02",
-                                                      "2016-01-04",
-                                                      "2016-01-08")),
-                       service_end_date = as.Date(c("2016-01-03",
-                                                    "2016-01-05",
-                                                    "2016-01-08"))
-                       )
+services <- data.frame(
+  receiver_id = c(1, 1, 5),
+  service_start_date = as.Date(c(
+    "2016-01-02",
+    "2016-01-04",
+    "2016-01-08"
+  )),
+  service_end_date = as.Date(c(
+    "2016-01-03",
+    "2016-01-05",
+    "2016-01-08"
+  ))
+)
 
 ## Get daily receiver status (0, 1) matrix
 make_matrix_receivers(moorings, delta_t = "days", as_POSIXct = NULL)
@@ -75,7 +85,7 @@ make_matrix_receivers(moorings, services, delta_t = "days", as_POSIXct = NULL)
 
 #### Example (2): Illustration using actual data
 # ... for different time windows
-mat_days  <- make_matrix_receivers(dat_moorings, delta_t = "days", as_POSIXct = NULL)
+mat_days <- make_matrix_receivers(dat_moorings, delta_t = "days", as_POSIXct = NULL)
 mat_hours <- make_matrix_receivers(dat_moorings, delta_t = "hours")
 utils::str(mat_days)
 utils::str(mat_hours)

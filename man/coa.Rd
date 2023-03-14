@@ -42,7 +42,7 @@ To generate estimates of space use, COAs are usually taken as point estimates fr
 ## (1) Define the period over which to calculate COAs
 # ... by focusing on the time over which IDs were at liberty.
 dat_ids$tag_start_date <- as.POSIXct(dat_ids$tag_start_date)
-dat_ids$tag_end_date   <- as.POSIXct("2017-06-02")
+dat_ids$tag_end_date <- as.POSIXct("2017-06-02")
 
 ## (2) Define the receivers over which to calculate detections
 # ... Here we use factors to ensure that the order of receiver coordinates
@@ -50,7 +50,8 @@ dat_ids$tag_end_date   <- as.POSIXct("2017-06-02")
 # ... matches.
 dat_moorings$receiver_id <- factor(dat_moorings$receiver_id)
 dat_acoustics$receiver_id <- factor(dat_acoustics$receiver_id,
-                                    levels = levels(dat_moorings$receiver_id))
+  levels = levels(dat_moorings$receiver_id)
+)
 
 ## (3) Define the detection matrix
 # ... Here we simply create a detection matrix across all IDs and using
@@ -58,15 +59,18 @@ dat_acoustics$receiver_id <- factor(dat_acoustics$receiver_id,
 # ... to consider the time series for which to calculate
 # ... COAs and the appropriate delta t value(s) more carefully.
 detection_matrix_by_id <- make_matrix_detections(dat_acoustics,
-                                                 delta_t = "days",
-                                                 start = min(dat_ids$tag_start_date),
-                                                 end = max(dat_ids$tag_end_date))
+  delta_t = "days",
+  start = min(dat_ids$tag_start_date),
+  end = max(dat_ids$tag_end_date)
+)
 
 ## (4) Define receiver coordinates with UTM projection
 proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-                        proj_wgs84)
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+xy <- sp::SpatialPoints(
+  dat_moorings[, c("receiver_long", "receiver_lat")],
+  proj_wgs84
+)
 xy <- sp::spTransform(xy, proj_utm)
 xy <- sp::coordinates(xy)
 
@@ -80,10 +84,12 @@ utils::str(coa_dat)
 
 #### Example (3): Implement the algorithm on a cluster
 # This will only be faster for very large detection time series.
-if(flapper_run_parallel){
-  coa_mat <- coa(mat = detection_matrix_by_id[[1]],
-                 xy = xy,
-                 cl = parallel::makeCluster(2L))
+if (flapper_run_parallel) {
+  coa_mat <- coa(
+    mat = detection_matrix_by_id[[1]],
+    xy = xy,
+    cl = parallel::makeCluster(2L)
+  )
 }
 
 }

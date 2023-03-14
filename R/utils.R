@@ -28,7 +28,9 @@ NULL
 #' @keywords internal
 #'
 
-round_any <- function(x, accuracy, f = round){f(x/accuracy) * accuracy}
+round_any <- function(x, accuracy, f = round) {
+  f(x / accuracy) * accuracy
+}
 
 
 ######################################
@@ -61,12 +63,14 @@ compact <- function(l) l[which(!sapply(l, is.null))]
 #' @keywords internal
 #'
 
-check... <- function(not_allowed,...){
+check... <- function(not_allowed, ...) {
   l <- list(...)
-  if(any(names(l) %in% not_allowed)){
+  if (any(names(l) %in% not_allowed)) {
     trouble <- names(l)[names(l) %in% not_allowed]
-    msg <- paste0("Additional arguments (", paste(trouble, collapse = ", "),
-                  ") have been passed to the function via ... which are implemented internally or need to be supplied via other function arguments. Implement these options via appropriate function arguments, if possible, or do not supply them.")
+    msg <- paste0(
+      "Additional arguments (", paste(trouble, collapse = ", "),
+      ") have been passed to the function via ... which are implemented internally or need to be supplied via other function arguments. Implement these options via appropriate function arguments, if possible, or do not supply them."
+    )
     stop(msg, call. = FALSE)
   }
 }
@@ -92,20 +96,22 @@ check... <- function(not_allowed,...){
 #' @keywords internal
 #'
 
-check_value <- function(arg = deparse(substitute(input)), input, supp, warn = TRUE, default = supp[1]){
+check_value <- function(arg = deparse(substitute(input)), input, supp, warn = TRUE, default = supp[1]) {
   # If the input is not in a vector of supported arguments...
-  if(!(input %in% supp)){
+  if (!(input %in% supp)) {
     ## Provide a warning and revert to the default
-    if(is.character(input)) input <- paste0("'", input, "'")
-    if(warn){
-      if(is.character(default)) default <- paste0("'", default, "'")
+    if (is.character(input)) input <- paste0("'", input, "'")
+    if (warn) {
+      if (is.character(default)) default <- paste0("'", default, "'")
       warning(paste0("Argument '", arg, "' = ", input, " is not supported; defaulting to ", arg, " = ", default, ".\n"),
-              immediate. = TRUE, call. = FALSE)
+        immediate. = TRUE, call. = FALSE
+      )
       input <- default
-    } else{
-      if(is.character(supp)) supp <- paste0("'", supp, "'")
+    } else {
+      if (is.character(supp)) supp <- paste0("'", supp, "'")
       stop(paste0("Argument '", arg, "' = ", input, " is not supported. Supported option(s): ", paste0(supp, collapse = ", "), "."),
-           call. = FALSE)
+        call. = FALSE
+      )
     }
   }
   # Return input
@@ -133,31 +139,32 @@ check_value <- function(arg = deparse(substitute(input)), input, supp, warn = TR
 #'
 
 check_class <-
-  function(arg = deparse(substitute(input)), input, if_class = NULL, to_class, type = "stop", coerce_input){
-
+  function(arg = deparse(substitute(input)), input, if_class = NULL, to_class, type = "stop", coerce_input) {
     #### Define whether or not to proceed:
     # Only proceed if if_class is NULL or, if supplied, then only proceed if the class of the object
     # ... is of type(s) in if_class
     proceed <- FALSE
-    if(is.null(if_class)){
+    if (is.null(if_class)) {
       proceed <- TRUE
-    } else{
-      if(inherits(input, if_class)) proceed <- TRUE
+    } else {
+      if (inherits(input, if_class)) proceed <- TRUE
     }
 
     #### Check the class, if required
-    if(proceed){
+    if (proceed) {
       # If the object is not of the necessary class
-      if(!inherits(input, to_class)){
+      if (!inherits(input, to_class)) {
         # Either stop...
-        if(type == "stop"){
-          msg <- paste0("Argument '", arg, "' must be of class(es) '",
-                        paste0(to_class, collapse =  "', '"),
-                        "', not class(es) '",
-                        paste(class(input), collapse = "', '"), "'.")
+        if (type == "stop") {
+          msg <- paste0(
+            "Argument '", arg, "' must be of class(es) '",
+            paste0(to_class, collapse = "', '"),
+            "', not class(es) '",
+            paste(class(input), collapse = "', '"), "'."
+          )
           stop(msg, call. = FALSE)
           # Or print a warning and use coerce_input() to convert the object to the desired class.
-        } else if(type == "warning"){
+        } else if (type == "warning") {
           msg <- paste0("Argument '", arg, "' coerced to class '", to_class, "' from class(es): '", paste(class(input), collapse = "', '"), "'.")
           warning(msg, immediate. = TRUE, call. = FALSE)
           input <- coerce_input(input)
@@ -188,14 +195,16 @@ check_class <-
 #' @keywords internal
 #'
 
-check_names <- function(arg = deparse(substitute(input)), input, req, extract_names = names, type = any){
+check_names <- function(arg = deparse(substitute(input)), input, req, extract_names = names, type = any) {
   input_names <- extract_names(input)
-  if(!type(req %in% input_names)){
+  if (!type(req %in% input_names)) {
     req_names_missing <- req[which(!(req %in% input_names))]
-    msg <- paste0("Argument '", arg, "' does not contain ", deparse(substitute(type)),
-                  " required names. One or more of the following name(s) are missing: ",
-                  paste0("'", req_names_missing, collapse = "', "),
-                  "'.")
+    msg <- paste0(
+      "Argument '", arg, "' does not contain ", deparse(substitute(type)),
+      " required names. One or more of the following name(s) are missing: ",
+      paste0("'", req_names_missing, collapse = "', "),
+      "'."
+    )
     stop(msg, call. = FALSE)
   }
 }
@@ -216,9 +225,9 @@ check_names <- function(arg = deparse(substitute(input)), input, req, extract_na
 #' @keywords internal
 
 check_tz <-
-  function(arg = deparse(substitute(input)), input){
-    if(inherits(input, "Date") | inherits(input, "POSIXct")){
-      if(lubridate::tz(input) == ""){
+  function(arg = deparse(substitute(input)), input) {
+    if (inherits(input, "Date") | inherits(input, "POSIXct")) {
+      if (lubridate::tz(input) == "") {
         msg <- paste0("Argument '", arg, "' time zone currently ''; tz forced to UTC.")
         warning(msg, immediate. = TRUE, call. = FALSE)
         lubridate::tz(input) <- "UTC"
@@ -243,11 +252,11 @@ check_tz <-
 #' @author Edward Lavender
 #' @keywords internal
 
-check_named_list <- function(arg = deparse(substitute(input)), input, ignore_empty = TRUE){
-  if(!any("list" %in% class(input))) stop(paste0("Argument '", arg, "' must be of class list."), call. = FALSE)
+check_named_list <- function(arg = deparse(substitute(input)), input, ignore_empty = TRUE) {
+  if (!any("list" %in% class(input))) stop(paste0("Argument '", arg, "' must be of class list."), call. = FALSE)
   list_is_empty <- (length(input) == 0)
-  if(!list_is_empty | !ignore_empty){
-    if(is.null(names(input)) | any(names(input) %in% "")){
+  if (!list_is_empty | !ignore_empty) {
+    if (is.null(names(input)) | any(names(input) %in% "")) {
       msg <- paste0("Argument '", arg, "' must be a named list.")
       stop(msg, call. = FALSE)
     }
@@ -274,18 +283,16 @@ check_named_list <- function(arg = deparse(substitute(input)), input, ignore_emp
 
 check_dir <- function(arg = deparse(substitute(input)),
                       input,
-                      check_slash = FALSE){
-
+                      check_slash = FALSE) {
   #### Check the directory exists
-  if(!dir.exists(input)){
+  if (!dir.exists(input)) {
     stop(paste0("The directory inputted to the argument '", arg, "' ('", input, "') does not exist."), call. = FALSE)
   }
 
   #### Check the directory ends in a /
-  if(check_slash){
+  if (check_slash) {
     end_is_slash <- substr(input, nchar(input), nchar(input)) == "/"
-    if(!end_is_slash){
-
+    if (!end_is_slash) {
       message(paste0("'/' added to the directory inputted to the argument '", arg, "' ('", input, "')."))
       input <- paste0(input, "/")
     }
@@ -306,9 +313,11 @@ check_dir <- function(arg = deparse(substitute(input)),
 #' \dontrun{
 #' # The function can accept spatial objects
 #' check_crs(dat_gebco, dat_coast)
-#' check_crs(dat_gebco,
-#'           dat_coast,
-#'           raster::raster(matrix(1)))
+#' check_crs(
+#'   dat_gebco,
+#'   dat_coast,
+#'   raster::raster(matrix(1))
+#' )
 #'
 #' # The function can accept CRS objects
 #' check_crs(dat_gebco, sp::CRS(as.character(NA)))
@@ -325,34 +334,37 @@ check_dir <- function(arg = deparse(substitute(input)),
 ######################################
 #### check_crs()
 
-check_crs <- function(...){
+check_crs <- function(...) {
   # Extract dots
-  dots  <- list(...)
+  dots <- list(...)
   names(dots) <- as.character(match.call()[-1L])
   # Extract CRS (if necessary)
-  dots  <- lapply(dots, function(dot){
-    if(!is.null(dot)){
-      if(inherits(dot, "CRS")) return(dot)
-      else return(raster::crs(dot))
+  dots <- lapply(dots, function(dot) {
+    if (!is.null(dot)) {
+      if (inherits(dot, "CRS")) {
+        return(dot)
+      } else {
+        return(raster::crs(dot))
+      }
     }
   })
   dots <- compact(dots)
-  if(length(dots) > 1L){
+  if (length(dots) > 1L) {
     # Extract CRS for the first element (the 'baseline')
     crs_base <- dots[[1]]
     # Compare baseline CRS to each remaining CRS
-    lapply(2:length(dots), function(i){
-      crs_arg   <- dots[[i]]
-      crs_check   <- all.equal(crs_base, crs_arg)
-      if(!isTRUE(crs_check)){
+    lapply(2:length(dots), function(i) {
+      crs_arg <- dots[[i]]
+      crs_check <- all.equal(crs_base, crs_arg)
+      if (!isTRUE(crs_check)) {
         warning("The CRSs of '", names(dots)[1], "' and '", names(dots)[i], "' are not identical.",
-                immediate. = TRUE, call. = FALSE)
+          immediate. = TRUE, call. = FALSE
+        )
         message("  -- details: ", crs_check, ".")
-        message("  -- ",  names(dots)[1], " CRS: '", crs_base, "'.")
-        message("  -- ",  names(dots)[2], " CRS: '", crs_arg, "'.\n")
+        message("  -- ", names(dots)[1], " CRS: '", crs_base, "'.")
+        message("  -- ", names(dots)[2], " CRS: '", crs_arg, "'.\n")
       }
     })
   }
   return(invisible())
 }
-

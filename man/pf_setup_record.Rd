@@ -31,12 +31,14 @@ root <- paste0(tempdir(), "/ac/")
 dir.create(root)
 # Implement the AC algorithm for some example time series
 acc <- dat_acoustics[dat_acoustics$individual_id == 25, ][1:5, ]
-out_ac <- ac(acoustics = acc,
-             step = 120,
-             bathy = dat_gebco,
-             detection_containers = dat_containers,
-             mobility = 250,
-             write_record_spatial_for_pf = list(filename = root))
+out_ac <- ac(
+  acoustics = acc,
+  step = 120,
+  bathy = dat_gebco,
+  detection_containers = dat_containers,
+  mobility = 250,
+  write_record_spatial_for_pf = list(filename = root)
+)
 # List the files for pf()
 files <- pf_setup_record(root, type = "acs", pattern = "*.grd")
 utils::head(files)
@@ -48,9 +50,11 @@ root <- paste0(tempdir(), "/dc/")
 dir.create(root)
 # Implement the DC algorithm for some example time series
 depth <- dat_archival[dat_archival$individual_id == 25, ][1:5, ]
-out_dc <- dc(archival = depth,
-             bathy = dat_gebco,
-             write_record_spatial_for_pf = list(filename = root))
+out_dc <- dc(
+  archival = depth,
+  bathy = dat_gebco,
+  write_record_spatial_for_pf = list(filename = root)
+)
 # List the files for pf()
 files <- pf_setup_record(root, type = "dc", pattern = "*.grd")
 utils::head(files)

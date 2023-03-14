@@ -19,9 +19,11 @@ The first (`baseline') CRS is compared against that for every other input. \code
 \dontrun{
 # The function can accept spatial objects
 check_crs(dat_gebco, dat_coast)
-check_crs(dat_gebco,
-          dat_coast,
-          raster::raster(matrix(1)))
+check_crs(
+  dat_gebco,
+  dat_coast,
+  raster::raster(matrix(1))
+)
 
 # The function can accept CRS objects
 check_crs(dat_gebco, sp::CRS(as.character(NA)))

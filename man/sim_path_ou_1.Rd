@@ -74,11 +74,12 @@ path <- sim_path_ou_1(n = 1000, eps = 1, k = 500)
 
 #### Example (4): Customise the plot via add_paths, add_points and ...
 n <- 1000
-path <- sim_path_ou_1(n = n,
-                      add_points = list(pch = c(1, 4), lwd = 3),
-                      add_paths = list(col = viridis::magma(n)),
-                      pretty_axis_args = list(1:4)
-                      )
+path <- sim_path_ou_1(
+  n = n,
+  add_points = list(pch = c(1, 4), lwd = 3),
+  add_paths = list(col = viridis::magma(n)),
+  pretty_axis_args = list(1:4)
+)
 
 }
 \references{

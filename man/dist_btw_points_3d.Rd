@@ -36,12 +36,16 @@ dist_btw_points_3d(1, 2, 1, 2, 1, 2)
 sqrt((2 - 1)^2 + (2 - 1)^2 + (2 - 1)^2)
 
 #### Example (2): Multiple pairs of points (e.g., an animal movement path)
-xy <- data.frame(x = c(1, 2, 3, 4),
-                 y = c(1, 2, 3, 4),
-                 z = c(1, 2, 3, 4))
-dist_btw_points_3d(xy$x, dplyr::lead(xy$x),
-                   xy$y, dplyr::lead(xy$y),
-                   xy$z, dplyr::lead(xy$z))
+xy <- data.frame(
+  x = c(1, 2, 3, 4),
+  y = c(1, 2, 3, 4),
+  z = c(1, 2, 3, 4)
+)
+dist_btw_points_3d(
+  xy$x, dplyr::lead(xy$x),
+  xy$y, dplyr::lead(xy$y),
+  xy$z, dplyr::lead(xy$z)
+)
 }
 \author{
 Edward Lavender

@@ -113,18 +113,22 @@ grid <- methods::as(grid, "SpatialPixelsDataFrame")
 ## Implementation based on particles
 pp <- par(mfrow = c(1, 2), mar = c(3, 3, 3, 3))
 pf_kud_1(out_dcpf_particles_1,
-         bathy = bathy,
-         sample_size = 500,
-         estimate_ud = kud_around_coastline_fast, grid = grid)
+  bathy = bathy,
+  sample_size = 500,
+  estimate_ud = kud_around_coastline_fast, grid = grid
+)
 ## Implementation based on paths
-if(flapper_run_parallel){
+if (flapper_run_parallel) {
   pf_kud_1(out_dcpf_paths,
-           bathy = bathy,
-           sample_size = 500,
-           estimate_ud = kud_around_coastline_fast, grid = grid)
-  prettyGraphics::add_sp_path(x = out_dcpf_paths$cell_x,
-                              y = out_dcpf_paths$cell_y,
-                              length = 0.01)
+    bathy = bathy,
+    sample_size = 500,
+    estimate_ud = kud_around_coastline_fast, grid = grid
+  )
+  prettyGraphics::add_sp_path(
+    x = out_dcpf_paths$cell_x,
+    y = out_dcpf_paths$cell_y,
+    length = 0.01
+  )
 }
 par(pp)
 
@@ -132,35 +136,41 @@ par(pp)
 ## Implementation based on particles
 pp <- par(mfrow = c(1, 2), mar = c(3, 3, 3, 3))
 pf_kud_2(out_dcpf_particles_2,
-         bathy = bathy,
-         estimate_ud = kud_around_coastline, grid = grid)
+  bathy = bathy,
+  estimate_ud = kud_around_coastline, grid = grid
+)
 ## Implementation based on paths
 pf_kud_2(out_dcpf_paths,
-         bathy = bathy,
-         estimate_ud = kud_around_coastline, grid = grid)
-prettyGraphics::add_sp_path(x = out_dcpf_paths$cell_x, y = out_dcpf_paths$cell_y,
-                            length = 0.01)
+  bathy = bathy,
+  estimate_ud = kud_around_coastline, grid = grid
+)
+prettyGraphics::add_sp_path(
+  x = out_dcpf_paths$cell_x, y = out_dcpf_paths$cell_y,
+  length = 0.01
+)
 par(pp)
 
 #### Example (3): For improved speed with pf_kud_1(), use parallelisation
 ## Implementation based on particles
 pp <- par(mfrow = c(1, 2), mar = c(3, 3, 3, 3))
 pf_kud_1(out_dcpf_particles_1,
-         bathy = bathy,
-         sample_size = 500,
-         estimate_ud = flapper::kud_around_coastline_fast, grid = grid,
-         chunks = 2L,
-         cl = parallel::makeCluster(2L))
+  bathy = bathy,
+  sample_size = 500,
+  estimate_ud = flapper::kud_around_coastline_fast, grid = grid,
+  chunks = 2L,
+  cl = parallel::makeCluster(2L)
+)
 ## Implementation based on paths
-if(flapper_run_parallel){
+if (flapper_run_parallel) {
   cl <- parallel::makeCluster(2L)
   parallel::clusterEvalQ(cl = cl, library(raster))
   pf_kud_1(out_dcpf_paths,
-           bathy = bathy,
-           sample_size = 500,
-           estimate_ud = flapper::kud_around_coastline_fast, grid = grid,
-           chunks = 2L,
-           cl = cl)
+    bathy = bathy,
+    sample_size = 500,
+    estimate_ud = flapper::kud_around_coastline_fast, grid = grid,
+    chunks = 2L,
+    cl = cl
+  )
 }
 par(pp)
 
@@ -168,40 +178,50 @@ par(pp)
 ## Implementation based on particles
 pp <- par(mfrow = c(1, 2), mar = c(3, 3, 3, 3))
 pf_kud_2(out_dcpf_particles_2,
-         bathy = bathy,
-         sample_size = 50, # sample 50 particles overall
-         estimate_ud = kud_around_coastline, grid = grid)
+  bathy = bathy,
+  sample_size = 50, # sample 50 particles overall
+  estimate_ud = kud_around_coastline, grid = grid
+)
 ## Implementation based on paths
 pf_kud_2(out_dcpf_paths,
-         bathy = bathy,
-         sample_size = 50, # sample 50 particles per path
-         estimate_ud = kud_around_coastline, grid = grid)
+  bathy = bathy,
+  sample_size = 50, # sample 50 particles per path
+  estimate_ud = kud_around_coastline, grid = grid
+)
 par(pp)
 
 #### Example (5): Compare pf_kud_1() and pf_kud_2()
 pp <- par(mfrow = c(2, 2), mar = c(3, 3, 3, 3))
-kud_1a <- pf_kud_1(xpf = out_dcpf_particles_1,
-                   bathy = out_dcpf_particles$args$bathy,
-                   sample_size = out_dcpf_particles$args$n,
-                   estimate_ud = kud_around_coastline_fast, grid = grid,
-                   plot = TRUE)
+kud_1a <- pf_kud_1(
+  xpf = out_dcpf_particles_1,
+  bathy = out_dcpf_particles$args$bathy,
+  sample_size = out_dcpf_particles$args$n,
+  estimate_ud = kud_around_coastline_fast, grid = grid,
+  plot = TRUE
+)
 
-kud_1b <- pf_kud_1(xpf = out_dcpf_particles_1,
-                   bathy = out_dcpf_particles$args$bathy,
-                   sample_size = 500,
-                   estimate_ud = kud_around_coastline_fast, grid = grid,
-                   plot = TRUE)
+kud_1b <- pf_kud_1(
+  xpf = out_dcpf_particles_1,
+  bathy = out_dcpf_particles$args$bathy,
+  sample_size = 500,
+  estimate_ud = kud_around_coastline_fast, grid = grid,
+  plot = TRUE
+)
 
-kud_1c <- pf_kud_1(xpf = out_dcpf_particles_1,
-                   bathy = out_dcpf_particles$args$bathy,
-                   sample_size = 5000,
-                   estimate_ud = kud_around_coastline_fast, grid = grid,
-                   plot = TRUE)
+kud_1c <- pf_kud_1(
+  xpf = out_dcpf_particles_1,
+  bathy = out_dcpf_particles$args$bathy,
+  sample_size = 5000,
+  estimate_ud = kud_around_coastline_fast, grid = grid,
+  plot = TRUE
+)
 
-kud_1d <- pf_kud_2(xpf = out_dcpf_particles_2,
-                 bathy = out_dcpf_particles$args$bathy,
-                 estimate_ud = kud_around_coastline, grid = grid,
-                 plot = TRUE)
+kud_1d <- pf_kud_2(
+  xpf = out_dcpf_particles_2,
+  bathy = out_dcpf_particles$args$bathy,
+  estimate_ud = kud_around_coastline, grid = grid,
+  plot = TRUE
+)
 par(pp)
 
 }

@@ -58,40 +58,50 @@ The selection of the most appropriate time interval over which to calculate COAs
 \examples{
 #### Example (1): For a specified delta_t, use a specific method and implementation
 pp <- graphics::par(mfrow = c(2, 2))
-dat <- coa_setup_delta_t(acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
-                         delta_t = "6 hours",
-                         method = 1L,
-                         implementation = 1L,
-                         main = "1(1)")
+dat <- coa_setup_delta_t(
+  acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
+  delta_t = "6 hours",
+  method = 1L,
+  implementation = 1L,
+  main = "1(1)"
+)
 utils::str(dat)
-dat <- coa_setup_delta_t(acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
-                         delta_t = "6 hours",
-                         method = 1L,
-                         implementation = 2L,
-                         moorings = dat_moorings,
-                         main = "1(2)")
+dat <- coa_setup_delta_t(
+  acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
+  delta_t = "6 hours",
+  method = 1L,
+  implementation = 2L,
+  moorings = dat_moorings,
+  main = "1(2)"
+)
 utils::str(dat)
-dat <- coa_setup_delta_t(acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
-                         delta_t = "6 hours",
-                         method = 2L,
-                         implementation = 1L,
-                         main = "2(1)")
+dat <- coa_setup_delta_t(
+  acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
+  delta_t = "6 hours",
+  method = 2L,
+  implementation = 1L,
+  main = "2(1)"
+)
 utils::str(dat)
-dat <- coa_setup_delta_t(acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
-                         delta_t = "6 hours",
-                         method = 2L,
-                         implementation = 2L,
-                         moorings = dat_moorings,
-                         main = "2(2)")
+dat <- coa_setup_delta_t(
+  acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
+  delta_t = "6 hours",
+  method = 2L,
+  implementation = 2L,
+  moorings = dat_moorings,
+  main = "2(2)"
+)
 utils::str(dat)
 graphics::par(pp)
 
 #### Example (2) For a specified delta_t, use both methods
 pp <- graphics::par(mfrow = c(1, 2))
-dat <- coa_setup_delta_t(acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
-                         delta_t = "6 hours",
-                         method = 1:2L,
-                         implementation = 1L)
+dat <- coa_setup_delta_t(
+  acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
+  delta_t = "6 hours",
+  method = 1:2L,
+  implementation = 1L
+)
 graphics::par(pp)
 
 #### Example (3) Plot customisation options
@@ -99,25 +109,29 @@ graphics::par(pp)
 # ... or a list that affects each plot (see 'ylim' versus 'xlim' below).
 # ... other arguments can be passed to prettyGraphics::pretty_plot() via...
 pp <- graphics::par(mfrow = c(1, 2))
-dat <- coa_setup_delta_t(acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
-                         delta_t = "6 hours",
-                         xlim = list(c(0, 50), c(0, 450)), ylim = c(0, 100),
-                         method = 1:2L,
-                         implementation = 1L,
-                         main = list("A", "B"),
-                         col = "royalblue", lwd = 2)
+dat <- coa_setup_delta_t(
+  acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
+  delta_t = "6 hours",
+  xlim = list(c(0, 50), c(0, 450)), ylim = c(0, 100),
+  method = 1:2L,
+  implementation = 1L,
+  main = list("A", "B"),
+  col = "royalblue", lwd = 2
+)
 graphics::par(pp)
 
 #### Example (4) Compare multiple delta_t values
 pp <- graphics::par(mfrow = c(3, 2))
 delta_t_opts <- c("6 hours", "12 hours", "24 hours")
-lapply(delta_t_opts, function(delta_t){
-  coa_setup_delta_t(acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
-                    delta_t = delta_t,
-                    method = 1:2L,
-                    implementation = 2L,
-                    moorings = dat_moorings,
-                    main = delta_t, col = "royalblue")
+lapply(delta_t_opts, function(delta_t) {
+  coa_setup_delta_t(
+    acoustics = dat_acoustics[dat_acoustics$individual_id == 25, ],
+    delta_t = delta_t,
+    method = 1:2L,
+    implementation = 2L,
+    moorings = dat_moorings,
+    main = delta_t, col = "royalblue"
+  )
 })
 graphics::par(pp)
 

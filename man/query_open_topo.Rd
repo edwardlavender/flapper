@@ -47,10 +47,12 @@ dat_coast_wgs84 <- sp::spTransform(dat_coast, proj_wgs84)
 x <- dat_gebco_wgs84
 x <- matrix(c(-5.616532, 56.50279), ncol = 2)
 # Plot area
-prettyGraphics::pretty_map(add_rasters = list(x = dat_gebco_wgs84),
-                           add_polys = list(x = dat_coast_wgs84),
-                           add_points = list(x = x),
-                           verbose = FALSE)
+prettyGraphics::pretty_map(
+  add_rasters = list(x = dat_gebco_wgs84),
+  add_polys = list(x = dat_coast_wgs84),
+  add_points = list(x = x),
+  verbose = FALSE
+)
 # Check depth in area using available data
 raster::extract(dat_gebco_wgs84, x)
 # Query database
@@ -60,8 +62,10 @@ query_open_topo(x = x, db = "gebco2020")
 # Alternative databases, such as EMOD bathymetry
 query_open_topo(x = x, db = "emod2018", verbose = FALSE)
 # Set interpolation
-query_open_topo(x = x, db = "emod2018",
-                interpolation = "cubic", verbose = FALSE)
+query_open_topo(
+  x = x, db = "emod2018",
+  interpolation = "cubic", verbose = FALSE
+)
 
 #### Example (2): Queries with multiple coordinates
 # Define a random sample of coordinates
@@ -79,22 +83,28 @@ depth <- cbind(depth, raster::extract(dat_gebco_wgs84, x))
 # ... hence the restrictions on the resolution specified here.
 x <- raster::extent(dat_coast_wgs84)
 depth <- query_open_topo(x = x, nrows = 10, ncols = 10, db = "gebco2020")
-prettyGraphics::pretty_map(add_rasters = list(x = depth),
-                           add_polys = list(x = dat_coast_wgs84),
-                           verbose = FALSE)
+prettyGraphics::pretty_map(
+  add_rasters = list(x = depth),
+  add_polys = list(x = dat_coast_wgs84),
+  verbose = FALSE
+)
 
 #### Example (4): Queries from a masked raster
 # Focus on a small area
 ext <- raster::extent(c(-5.709508, -5.648977, 56.48656, 56.50267))
 x <- raster::crop(dat_gebco_wgs84, ext)
-prettyGraphics::pretty_map(add_rasters = list(x = x),
-                           add_polys = list(x = dat_coast_wgs84),
-                           verbose = FALSE)
+prettyGraphics::pretty_map(
+  add_rasters = list(x = x),
+  add_polys = list(x = dat_coast_wgs84),
+  verbose = FALSE
+)
 # Query database
 depth <- query_open_topo(x = x, db = "gebco2020")
-prettyGraphics::pretty_map(add_rasters = list(x = depth),
-                           add_polys = list(x = dat_coast_wgs84),
-                           verbose = FALSE)
+prettyGraphics::pretty_map(
+  add_rasters = list(x = depth),
+  add_polys = list(x = dat_coast_wgs84),
+  verbose = FALSE
+)
 }
 
 }

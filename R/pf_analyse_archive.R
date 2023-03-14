@@ -22,17 +22,20 @@
 #' #### Example (2): Plot customisation options, e.g.:
 #' # Customise bathy via add_bathy()
 #' pf_plot_history(dat_dcpf_histories,
-#'                 time_steps = 1,
-#'                 add_surface = list(col = c(grDevices::topo.colors(2))))
+#'   time_steps = 1,
+#'   add_surface = list(col = c(grDevices::topo.colors(2)))
+#' )
 #' # Customise particles via add_particles
 #' pf_plot_history(dat_dcpf_histories,
-#'                 time_steps = 1,
-#'                 add_particles = list(col = "red"))
+#'   time_steps = 1,
+#'   add_particles = list(col = "red")
+#' )
 #' # Pass other arguments to prettyGraphics::pretty_map() via ...
 #' pf_plot_history(dat_dcpf_histories,
-#'                 time_steps = 1,
-#'                 add_polys = list(x = dat_coast, col = "brown"),
-#'                 crop_spatial = TRUE)
+#'   time_steps = 1,
+#'   add_polys = list(x = dat_coast, col = "brown"),
+#'   crop_spatial = TRUE
+#' )
 #'
 #' #### Example (3): Plot multiple time steps
 #' pp <- graphics::par(mfrow = c(2, 2))
@@ -43,12 +46,16 @@
 #' dat_dcpf_histories_connected <-
 #'   pf_simplify(dat_dcpf_histories, return = "archive")
 #' pp <- graphics::par(mfcol = c(2, 4))
-#' pf_plot_history(dat_dcpf_histories, time_steps = 1:4,
-#'                 add_particles = list(pch = 21, bg = "black"),
-#'                 prompt  = FALSE)
-#' pf_plot_history(dat_dcpf_histories_connected, time_steps = 1:4,
-#'                 add_particles = list(pch = 21, bg = "black"),
-#'                 prompt = FALSE)
+#' pf_plot_history(dat_dcpf_histories,
+#'   time_steps = 1:4,
+#'   add_particles = list(pch = 21, bg = "black"),
+#'   prompt = FALSE
+#' )
+#' pf_plot_history(dat_dcpf_histories_connected,
+#'   time_steps = 1:4,
+#'   add_particles = list(pch = 21, bg = "black"),
+#'   prompt = FALSE
+#' )
 #' graphics::par(pp)
 #'
 #' @return The function returns a plot, for each time step, of all the possible locations of the individual, with sampled locations overlaid.
@@ -64,26 +71,27 @@ pf_plot_history <- function(archive,
                             add_surface = list(),
                             add_particles = list(pch = "."),
                             forwards = TRUE,
-                            prompt = TRUE,...){
-  if(!inherits(archive, "pf_archive")) stop("'archive' must be a 'pf_archive' class object.")
-  layers           <- archive$args$record
-  history          <- archive$history
-  time_steps       <- sort(time_steps)
-  if(!forwards) time_steps <- rev(time_steps)
-  lapply(time_steps, function(t){
+                            prompt = TRUE, ...) {
+  if (!inherits(archive, "pf_archive")) stop("'archive' must be a 'pf_archive' class object.")
+  layers <- archive$args$record
+  history <- archive$history
+  time_steps <- sort(time_steps)
+  if (!forwards) time_steps <- rev(time_steps)
+  lapply(time_steps, function(t) {
     title <- paste0("Time ", t)
     r <- layers[[t]]
-    if(inherits(r, "character")) r <- raster::raster(r)
+    if (inherits(r, "character")) r <- raster::raster(r)
     add_surface$x <- r
     xy_t <- raster::xyFromCell(r, history[[t]]$id_current)
     add_particles$x <- xy_t[, 1]
     add_particles$y <- xy_t[, 2]
     prettyGraphics::pretty_map(r,
-                               add_rasters = add_surface,
-                               add_points = add_particles,
-                               main = title,
-                               verbose = FALSE,...)
-    if(prompt * length(time_steps) > 1) readline(prompt = "Press [enter] to continue or [Esc] to exit...")
+      add_rasters = add_surface,
+      add_points = add_particles,
+      main = title,
+      verbose = FALSE, ...
+    )
+    if (prompt * length(time_steps) > 1) readline(prompt = "Press [enter] to continue or [Esc] to exit...")
   })
   return(invisible())
 }
@@ -111,23 +119,33 @@ pf_plot_history <- function(archive,
 #' @examples
 #' #### Example (1): Create a zoomed-in animation
 #' pf_animate_history(
-#'   expr_param = list(archive = dat_dcpf_histories,
-#'                     add_particles = list(cex = 2.5, pch = 21,
-#'                                          col = "black", bg = "black"),
-#'                     prompt = FALSE),
+#'   expr_param = list(
+#'     archive = dat_dcpf_histories,
+#'     add_particles = list(
+#'       cex = 2.5, pch = 21,
+#'       col = "black", bg = "black"
+#'     ),
+#'     prompt = FALSE
+#'   ),
 #'   dir = tempdir(),
-#'   interval = 0.25)
+#'   interval = 0.25
+#' )
 #'
 #' #### Example (2): Create a wider scale animation
 #' boundaries <- raster::extent(dat_coast)
 #' pf_animate_history(
-#'   expr_param = list(archive = dat_dcpf_histories,
-#'                     add_particles = list(cex = 0.5, pch = 21,
-#'                                           col = "black", bg = "black"),
-#'                     add_polys = list(x = dat_coast, col = "brown"),
-#'                     xlim = boundaries[1:2], ylim = boundaries[3:4],
-#'                     prompt = FALSE),
-#'   dir = tempdir())
+#'   expr_param = list(
+#'     archive = dat_dcpf_histories,
+#'     add_particles = list(
+#'       cex = 0.5, pch = 21,
+#'       col = "black", bg = "black"
+#'     ),
+#'     add_polys = list(x = dat_coast, col = "brown"),
+#'     xlim = boundaries[1:2], ylim = boundaries[3:4],
+#'     prompt = FALSE
+#'   ),
+#'   dir = tempdir()
+#' )
 #'
 #' @details This function requires the \code{\link[animation]{animation}} package.
 #' @author Edward Lavender
@@ -147,33 +165,35 @@ pf_animate_history <-
            ani_res = 150,
            interval = 0.1,
            verbose = FALSE,
-           ...){
+           ...) {
     #### Checks
     ## animation package
     if (!requireNamespace("animation", quietly = TRUE)) {
       stop("This function requires the 'animation' package. Please install it before continuing with install.packages('animation').")
     }
     #### Set directory
-    if(is.null(dir)) dir <- dirname(html_name)
+    if (is.null(dir)) dir <- dirname(html_name)
     wd <- getwd()
     check_dir(input = dir)
     setwd(dir)
     html_name <- basename(html_name)
     on.exit(setwd(wd), add = TRUE)
     #### Make plot
-    animation::saveHTML({
-      do.call(pf_plot_history, expr_param)
-    },
-    htmlfile = html_name,
-    img.name = image_name,
-    title = html_title,
-    description = html_description,
-    navigator = navigator,
-    ani.height = ani_height,
-    ani.width = ani_width,
-    ani.res = ani_res,
-    interval = interval,
-    verbose = verbose,...
+    animation::saveHTML(
+      {
+        do.call(pf_plot_history, expr_param)
+      },
+      htmlfile = html_name,
+      img.name = image_name,
+      title = html_title,
+      description = html_description,
+      navigator = navigator,
+      ani.height = ani_height,
+      ani.width = ani_width,
+      ani.res = ani_res,
+      interval = interval,
+      verbose = verbose,
+      ...
     )
     return(invisible())
   }

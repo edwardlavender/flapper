@@ -74,11 +74,13 @@ path <- sim_path_sa(n = 100)
 
 #### Example (3): Change the characteristics of the study area
 # .. and define the starting location of the individual
-sea  <- invert_poly(dat_coast)
-path <- sim_path_sa(n = 100,
-                    area = sea,
-                    p_1 = matrix(c(706529.1, 6262293), ncol = 2),
-                    add_area = list(x = sea, col = "skyblue"))
+sea <- invert_poly(dat_coast)
+path <- sim_path_sa(
+  n = 100,
+  area = sea,
+  p_1 = matrix(c(706529.1, 6262293), ncol = 2),
+  add_area = list(x = sea, col = "skyblue")
+)
 
 #### Example (4): Change the movement model(s) to use alternative distributions/parameters
 
@@ -93,22 +95,26 @@ prettyGraphics::pretty_hist(as.numeric(path$step_mat))
 
 ## Turning angles
 # E.g., Random walk: draw turning angle from von Mises distribution
-sim_angles_vmd <- function(...){
-  angle <- circular::rvonmises(n = 1,
-                               mu = circular::circular(0),
-                               kappa = 0,
-                               control.circular = list(units = "degrees"))
+sim_angles_vmd <- function(...) {
+  angle <- circular::rvonmises(
+    n = 1,
+    mu = circular::circular(0),
+    kappa = 0,
+    control.circular = list(units = "degrees")
+  )
   return(as.numeric(angle))
 }
 path <- sim_path_sa(n = 100, sim_angle = sim_angles_vmd)
 
 # E.g., Correlated random walk: draw turning angle from wrapped normal distribution
-sim_angles_rwn <- function(...){
-  angle <- circular::rwrappednormal(n = 1,
-                                    mu = circular::circular(0),
-                                    rho = 0.999,
-                                    sd = 0,
-                                    control.circular = list(units = "degrees"))
+sim_angles_rwn <- function(...) {
+  angle <- circular::rwrappednormal(
+    n = 1,
+    mu = circular::circular(0),
+    rho = 0.999,
+    sd = 0,
+    control.circular = list(units = "degrees")
+  )
   return(as.numeric(angle))
 }
 path <- sim_path_sa(n = 100, sim_angle = sim_angles_rwn)
@@ -119,16 +125,18 @@ path <- sim_path_sa(n = 100, sim_angle = sim_angles_rwn)
 # While the time step is less than the lag, the function needs to be
 # ... able to handle missing angles and return sensible values in these
 # ... cases e.g., via an 'is.null' structure:
-sim_angles_wrn_with_lag <- function(angle = NULL,...){
-  if(is.null(angle)) {
+sim_angles_wrn_with_lag <- function(angle = NULL, ...) {
+  if (is.null(angle)) {
     cat("\n... ... method (1) activated...\n") # useful check
     angle_out <- circular::circular(0)
-  } else{
-    angle_out <- circular::rwrappednormal(n = 1,
-                                          mu = circular::circular(angle, units = "degrees"),
-                                          rho = 0.9,
-                                          sd = 0.1,
-                                          control.circular = list(units = "degrees"))
+  } else {
+    angle_out <- circular::rwrappednormal(
+      n = 1,
+      mu = circular::circular(angle, units = "degrees"),
+      rho = 0.9,
+      sd = 0.1,
+      control.circular = list(units = "degrees")
+    )
   }
   return(as.numeric(angle_out))
 }

@@ -74,11 +74,11 @@ require(prettyGraphics)
 #### Define surface for examples
 # We will focus on a relatively small area for speed
 # The raster resolution should be equal in x and y directions
-bathy      <- flapper::dat_gebco
+bathy <- flapper::dat_gebco
 boundaries <- raster::extent(700652.2, 708401.2, 6262905, 6270179)
-blank      <- raster::raster(boundaries, res = c(5, 5))
-bathy      <- raster::resample(bathy, blank)
-bathy      <- mask_io(bathy, flapper::dat_coast, mask_inside = TRUE)
+blank <- raster::raster(boundaries, res = c(5, 5))
+bathy <- raster::resample(bathy, blank)
+bathy <- mask_io(bathy, flapper::dat_coast, mask_inside = TRUE)
 # raster::plot(bathy)
 # raster::lines(dat_coast)
 
@@ -87,16 +87,18 @@ coastline <- raster::crop(dat_coast, raster::extent(bathy))
 coastline <- sf::st_as_sf(coastline)
 
 #### Define graph for shortest-distance calculations
-bathy_costs <- lcp_costs(bathy)                                 # ~0.38 mins
+bathy_costs <- lcp_costs(bathy) # ~0.38 mins
 bathy_graph <- lcp_graph_surface(bathy, bathy_costs$dist_total) # ~0.26 mins
 
 #### Example (1): Distance-vector-based implementation
 
 ## Implement function
-out_1 <- lcp_comp(surface = bathy,
-                  distance = c(50, 100),
-                  graph = bathy_graph,
-                  barrier = coastline)
+out_1 <- lcp_comp(
+  surface = bathy,
+  distance = c(50, 100),
+  graph = bathy_graph,
+  barrier = coastline
+)
 
 ## Examine outputs
 # The function returns a dataframe
@@ -105,48 +107,56 @@ utils::str(out_1)
 ## Visualise sampled locations on map
 raster::plot(bathy)
 raster::lines(dat_coast)
-invisible(lapply(split(out_1, seq_len(nrow(out_1))), function(d){
-  arrows(x0 = d$cell_x0, y0 = d$cell_y0,
-         x1 = d$cell_x1, y1 = d$cell_y1, length = 0.01, lwd = 2)
+invisible(lapply(split(out_1, seq_len(nrow(out_1))), function(d) {
+  arrows(
+    x0 = d$cell_x0, y0 = d$cell_y0,
+    x1 = d$cell_x1, y1 = d$cell_y1, length = 0.01, lwd = 2
+  )
 }))
 
 ## Compare simulated, Euclidean and shortest distances
 pp <- graphics::par(mfrow = c(1, 2))
 pretty_plot(out_1$dist_sim, out_1$dist_euclid,
-            xlab = "Distance (simulated) [m]",
-            ylab = "Distance (Euclidean)[m]")
+  xlab = "Distance (simulated) [m]",
+  ylab = "Distance (Euclidean)[m]"
+)
 graphics::abline(0, 1)
 pretty_plot(out_1$dist_euclid, out_1$dist_lcp,
-            xlab = "Distance (Euclidean) [m]",
-            ylab = "Distance (shortest) [m]")
+  xlab = "Distance (Euclidean) [m]",
+  ylab = "Distance (shortest) [m]"
+)
 graphics::abline(0, 1)
 graphics::par(pp)
 
 #### Example (2): Distance-vector-based implementation in parallel
-out_2 <- lcp_comp(surface = bathy,
-                  distance = c(50, 100),
-                  graph = bathy_graph,
-                  barrier = coastline,
-                  cl = parallel::makeCluster(2L)
-                  )
+out_2 <- lcp_comp(
+  surface = bathy,
+  distance = c(50, 100),
+  graph = bathy_graph,
+  barrier = coastline,
+  cl = parallel::makeCluster(2L)
+)
 
 #### Example (3): Mobility-based implementation
 
 ## Implement function for mobility = 500
 mob <- 500
-out_3 <- lcp_comp(surface = bathy,
-                  mobility = mob,
-                  n = 1000,
-                  graph = bathy_graph,
-                  barrier = coastline
-                  )
+out_3 <- lcp_comp(
+  surface = bathy,
+  mobility = mob,
+  n = 1000,
+  graph = bathy_graph,
+  barrier = coastline
+)
 
 ## Visualise sampled locations on map
 raster::plot(bathy)
 raster::lines(dat_coast)
-invisible(lapply(split(out_3, seq_len(nrow(out_3))), function(d){
-  arrows(x0 = d$cell_x0, y0 = d$cell_y0,
-         x1 = d$cell_x1, y1 = d$cell_y1, length = 0.01, lwd = 0.5)
+invisible(lapply(split(out_3, seq_len(nrow(out_3))), function(d) {
+  arrows(
+    x0 = d$cell_x0, y0 = d$cell_y0,
+    x1 = d$cell_x1, y1 = d$cell_y1, length = 0.01, lwd = 0.5
+  )
 }))
 
 ## Compare Euclidean and shortest distances
@@ -158,40 +168,46 @@ pp <- graphics::par(mfrow = c(1, 2), oma = c(3, 3, 3, 3), mar = c(4, 4, 4, 4))
 # Results for paths that do not cross a barrier
 # ... Visualisation
 pretty_plot(out_3_barrier0$dist_euclid, out_3_barrier0$dist_lcp,
-            xlab = "Distance (Euclidean) [m]",
-            ylab = "Distance (shortest) [m]",
-            pch = ".")
+  xlab = "Distance (Euclidean) [m]",
+  ylab = "Distance (shortest) [m]",
+  pch = "."
+)
 graphics::abline(0, 1, col = "red")
 graphics::abline(h = mob, col = "royalblue", lty = 3)
 # ... Euclidean distance parameter at which mobility is exceeded
-limit0 <- min(out_3_barrier0$dist_euclid[out_3_barrier0$dist_lcp > mob]); limit0
+limit0 <- min(out_3_barrier0$dist_euclid[out_3_barrier0$dist_lcp > mob])
+limit0
 graphics::abline(v = limit0, col = "royalblue", lty = 3)
 # Results for paths that cross a barrier
 # ... Visualisation
 pretty_plot(out_3_barrier1$dist_euclid, out_3_barrier1$dist_lcp,
-           xlab = "Distance (Euclidean) [m]",
-           ylab = "Distance (shortest) [m]",
-           pch = ".")
+  xlab = "Distance (Euclidean) [m]",
+  ylab = "Distance (shortest) [m]",
+  pch = "."
+)
 graphics::abline(0, 1, col = "red")
 graphics::abline(h = mob, col = "royalblue", lty = 3)
 # ... Euclidean distance parameter at which mobility is exceeded
 limit1 <-
-  min(out_3_barrier1$dist_euclid[out_3_barrier1$dist_lcp > mob]); limit1
+  min(out_3_barrier1$dist_euclid[out_3_barrier1$dist_lcp > mob])
+limit1
 graphics::abline(v = limit1, col = "royalblue", lty = 3)
 graphics::par(pp)
 
 ## Plot the difference between Euclidean and shortest distances with distance
 pp <- graphics::par(mfrow = c(1, 2), oma = c(3, 3, 3, 3), mar = c(4, 4, 4, 4))
 pretty_plot(out_3_barrier0$dist_euclid,
-            out_3_barrier0$dist_lcp - out_3_barrier0$dist_euclid,
-            xlab = "Distance (Euclidean) [m]",
-            ylab = "Distance (shortest - Euclidean) [m]",
-            pch = ".")
+  out_3_barrier0$dist_lcp - out_3_barrier0$dist_euclid,
+  xlab = "Distance (Euclidean) [m]",
+  ylab = "Distance (shortest - Euclidean) [m]",
+  pch = "."
+)
 pretty_plot(out_3_barrier1$dist_euclid,
-            out_3_barrier1$dist_lcp - out_3_barrier1$dist_euclid,
-            xlab = "Distance (Euclidean) [m]",
-            ylab = "Distance (shortest - Euclidean) [m]",
-            pch = ".")
+  out_3_barrier1$dist_lcp - out_3_barrier1$dist_euclid,
+  xlab = "Distance (Euclidean) [m]",
+  ylab = "Distance (shortest - Euclidean) [m]",
+  pch = "."
+)
 graphics::par(pp)
 
 ## Approximate shortest distances using a model based on Euclidean distances
@@ -202,21 +218,25 @@ x <- seq(0, 500)
 nd <- data.frame(barrier = factor(0, levels = c(0, 1)), dist_euclid = x)
 ci <- list_CIs(predict(mod, nd, se.fit = TRUE))
 pretty_plot(out_3$dist_euclid, out_3$dist_lcp,
-                            col = c("grey", "darkred")[out_3$barrier],
-                            cex = c(0.1, 1.5)[out_3$barrier])
+  col = c("grey", "darkred")[out_3$barrier],
+  cex = c(0.1, 1.5)[out_3$barrier]
+)
 add_error_envelope(x, ci)
 nd$barrier <- factor(1, levels = c(0, 1))
 ci <- list_CIs(predict(mod, nd, se.fit = TRUE))
 add_error_envelope(x, ci,
-                   add_fit = list(col = "red"),
-                   add_ci = list(col = scales::alpha("red", 0.5),
-                                 border = FALSE))
+  add_fit = list(col = "red"),
+  add_ci = list(
+    col = scales::alpha("red", 0.5),
+    border = FALSE
+  )
+)
 # Define predictive model based on this analysis
-lcp_predict <- function(x, m, barrier){
+lcp_predict <- function(x, m, barrier) {
   stopifnot(length(m) == 2L)
   stopifnot(all(barrier \%in\% c(0, 1)))
   return(m[1] * x * (barrier == 0) + m[2] * x * (barrier == 1))
-  }
+}
 
 }
 \author{

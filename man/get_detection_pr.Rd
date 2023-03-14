@@ -48,11 +48,13 @@ det_pr <- get_detection_pr(beta_0 = 2.5, beta_1 = -0.006)
 det_pr <- get_detection_pr(beta_0 = 2.5, beta_1 = -0.006, inv_link = stats::pnorm)
 
 #### Example (3): Modify graphical properties
-det_pr <- get_detection_pr(beta_0 = 2.5,
-                           beta_1 = -0.006,
-                           type = "l",
-                           xlab = "Distance (m)",
-                           ylab = "Detection Probability")
+det_pr <- get_detection_pr(
+  beta_0 = 2.5,
+  beta_1 = -0.006,
+  type = "l",
+  xlab = "Distance (m)",
+  ylab = "Detection Probability"
+)
 
 #### Example (4): Modify return options
 # Only graph

@@ -16,9 +16,10 @@
 #'
 #' @examples
 #' #### Define POU map for examples
-#' out_dcpf_s   <- pf_simplify(dat_dcpf_histories,
-#'                             summarise_pr = TRUE,
-#'                             return = "archive")
+#' out_dcpf_s <- pf_simplify(dat_dcpf_histories,
+#'   summarise_pr = TRUE,
+#'   return = "archive"
+#' )
 #' out_dcpf_pou <- pf_plot_map(out_dcpf_s, dat_dcpf_histories$args$bathy)
 #'
 #' #### Example (1): Implement function using default options
@@ -28,23 +29,29 @@
 #' pf_kud(xpf = out_dcpf_pou, sample_size = 100, grid = 10)
 #'
 #' #### Example (3): Implement time trials
-#' if(interactive()){
+#' if (interactive()) {
 #'   # Implement time trials for specified numbers of cells
-#'   pf_kud(xpf = out_dcpf_pou,
-#'          sample_size = 100,
-#'          grid = 60,
-#'          trial_cells = list(10, 100, 1000, 10000))
+#'   pf_kud(
+#'     xpf = out_dcpf_pou,
+#'     sample_size = 100,
+#'     grid = 60,
+#'     trial_cells = list(10, 100, 1000, 10000)
+#'   )
 #'   # Implement time trials for specified grids
-#'   pf_kud(xpf = out_dcpf_pou,
-#'          sample_size = 100,
-#'          grid = 180,
-#'          trial_grids = list(60, 120, 180))
+#'   pf_kud(
+#'     xpf = out_dcpf_pou,
+#'     sample_size = 100,
+#'     grid = 180,
+#'     trial_grids = list(60, 120, 180)
+#'   )
 #'   # Implement time trials for specified numbers of cells and grids
-#'   pf_kud(xpf = out_dcpf_pou,
-#'          sample_size = 100,
-#'          grid = 10,
-#'          trial_cells = list(10, 100, 1000, 10000),
-#'          trial_grids = list(10, 30, 60))
+#'   pf_kud(
+#'     xpf = out_dcpf_pou,
+#'     sample_size = 100,
+#'     grid = 10,
+#'     trial_cells = list(10, 100, 1000, 10000),
+#'     trial_grids = list(10, 30, 60)
+#'   )
 #' }
 #'
 #' #### Example (4): Force alignment between POU scores and grids for speed
@@ -52,7 +59,7 @@
 #' out_dcpf_pou_agg <-
 #'   raster::aggregate(out_dcpf_pou, fact = 2)
 #' out_dcpf_pou_agg <-
-#'   out_dcpf_pou_agg/raster::cellStats(out_dcpf_pou_agg, "sum")
+#'   out_dcpf_pou_agg / raster::cellStats(out_dcpf_pou_agg, "sum")
 #' grid <- raster::res(out_dcpf_pou_agg)[1]
 #' pf_kud(out_dcpf_pou_agg, grid = grid)
 #' # Example with SpatialPixels grid
@@ -70,27 +77,27 @@ pf_kud <- function(xpf,
                    trial_grids = list(),
                    mask = NULL,
                    plot = TRUE,
-                   verbose = TRUE){
-
+                   verbose = TRUE) {
   #### Checks
-  cat_to_console <- function(..., show = verbose){
-    if(show) cat(paste(..., "\n"))
+  cat_to_console <- function(..., show = verbose) {
+    if (show) cat(paste(..., "\n"))
   }
   t_onset <- Sys.time()
   cat_to_console(paste0("flapper::pf_kud called (@ ", t_onset, ")..."))
   cat_to_console("... Setting up function...")
   crs_xpf <- crs_grid <- crs_mask <- NULL
   crs_xpf <- raster::crs(xpf)
-  if(!is.null(grid)) if(!inherits(grid, c("numeric", "integer"))) crs_grid <- raster::crs(grid)
-  if(!is.null(mask)) crs_mask <- raster::crs(mask)
+  if (!is.null(grid)) if (!inherits(grid, c("numeric", "integer"))) crs_grid <- raster::crs(grid)
+  if (!is.null(mask)) crs_mask <- raster::crs(mask)
   crs <- list(crs_xpf, crs_grid, crs_mask)
   crs <- compact(crs)
-  if(!length(unique(crs)) == 1L){
+  if (!length(unique(crs)) == 1L) {
     warning("The CRS(s) of spatial layer(s) ('xpf', 'grid' and 'mask', if applicable) are not identical.",
-            immediate. = TRUE, call. = FALSE)
+      immediate. = TRUE, call. = FALSE
+    )
   }
   crs_spp <- sapply(crs, function(x) !is.na(x))
-  if(any(crs_spp)){
+  if (any(crs_spp)) {
     crs <- crs[[which(crs_spp)[1]]]
   } else {
     crs <- sp::CRS(as.character(NA))
@@ -101,18 +108,20 @@ pf_kud <- function(xpf,
   #### Get POU scores
   cat_to_console("... Getting POU scores...")
   pou <- data.frame(cell = raster::Which(xpf > 0, cells = TRUE, na.rm = TRUE))
-  pou$score  <- raster::extract(xpf, pou$cell)
+  pou$score <- raster::extract(xpf, pou$cell)
   pou$cell_x <- raster::xFromCell(xpf, pou$cell)
   pou$cell_y <- raster::yFromCell(xpf, pou$cell)
   cat_to_console("... .... POU scores extracted for", nrow(pou), "locations...")
 
   #### Sample locations according to their probability
-  if(!is.null(sample_size)){
+  if (!is.null(sample_size)) {
     cat_to_console("... Sampling cells...")
     pou <-
       pou %>%
-      dplyr::slice_sample(n = nrow(pou) * sample_size,
-                          weight_by = pou$score, replace = TRUE) %>%
+      dplyr::slice_sample(
+        n = nrow(pou) * sample_size,
+        weight_by = pou$score, replace = TRUE
+      ) %>%
       data.frame()
     cat_to_console("... ... POU locations expanded to", nrow(pou), "locations...")
   }
@@ -122,49 +131,54 @@ pf_kud <- function(xpf,
   spdf <- sp::SpatialPointsDataFrame(
     pou[, c("cell_x", "cell_y")],
     data = data.frame(ID = factor(rep(1, nrow(pou)))),
-    proj4string = crs)
+    proj4string = crs
+  )
 
   #### Implement time trials
-  if((length(trial_cells) > 0L) | (length(trial_grids) > 0L)){
-
+  if ((length(trial_cells) > 0L) | (length(trial_grids) > 0L)) {
     #### Define default parameters
     cat_to_console("... Implementing time trials...")
-    if(length(trial_cells) == 0L) trial_cells <- c(10, 50, 100)
+    if (length(trial_cells) == 0L) trial_cells <- c(10, 50, 100)
     trial_cells <- unlist(trial_cells)
     trial_cells <- trial_cells[trial_cells > 5 & trial_cells <= nrow(pou)]
-    if(length(trial_grids) == 0L) trial_grids <- list(grid)
+    if (length(trial_grids) == 0L) trial_grids <- list(grid)
 
     #### Estimate times for UD fitting
-    trial_time <- lapply(trial_cells, function(trial_cell){
-      trial_time_by_grid <- sapply(trial_grids, function(trial_grid){
+    trial_time <- lapply(trial_cells, function(trial_cell) {
+      trial_time_by_grid <- sapply(trial_grids, function(trial_grid) {
         t1 <- Sys.time()
-        invisible(estimate_ud(xy = spdf[1:trial_cell, ], grid = trial_grid,...))
+        invisible(estimate_ud(xy = spdf[1:trial_cell, ], grid = trial_grid, ...))
         t2 <- Sys.time()
         return(as.numeric(difftime(t2, t1, units = "mins")))
       })
       return(trial_time_by_grid)
     }) %>% unlist()
     trial_time <-
-      expand.grid(cell = trial_cells,
-                  grid = 1:length(trial_grids)) %>%
+      expand.grid(
+        cell = trial_cells,
+        grid = 1:length(trial_grids)
+      ) %>%
       dplyr::arrange(.data$cell) %>%
       dplyr::mutate(time = trial_time) %>%
       data.frame()
     po <- graphics::par(no.readonly = TRUE)
     on.exit(graphics::par(po), add = TRUE)
     pp <- graphics::par(mfrow = prettyGraphics::par_mf(max(trial_time$grid)))
-    lapply(split(trial_time, trial_time$grid), function(tt){
+    lapply(split(trial_time, trial_time$grid), function(tt) {
       mod <- stats::lm(time ~ cell, data = tt)
       pred <- stats::predict(mod, newdata = data.frame(cell = nrow(pou)), se.fit = TRUE)
-      ci   <- prettyGraphics::list_CIs(pred)
-      if(is.na(pred$se.fit)){
+      ci <- prettyGraphics::list_CIs(pred)
+      if (is.na(pred$se.fit)) {
         title <- paste0("Grid (", tt$grid[1], "); Pred (", round(pred$fit, 2), " mins)")
       } else {
-        title <- paste0("Grid (", tt$grid[1], "); Pred (", round(pred$fit, 2),
-                        " [", round(ci$lowerCI, 2), "-", round(ci$upperCI, 2), "] mins)")
+        title <- paste0(
+          "Grid (", tt$grid[1], "); Pred (", round(pred$fit, 2),
+          " [", round(ci$lowerCI, 2), "-", round(ci$upperCI, 2), "] mins)"
+        )
       }
       prettyGraphics::pretty_predictions_1d(mod,
-                                            add_main = list(text = title))
+        add_main = list(text = title)
+      )
     })
     graphics::par(pp)
     readline("Press [Enter] to continue or [Esc] to quit...")
@@ -172,29 +186,32 @@ pf_kud <- function(xpf,
 
   #### Estimate UD
   cat_to_console("... Implementing KUD estimation based on", nrow(pou), "cells...")
-  ud <- estimate_ud(xy = spdf, grid = grid,...)
+  ud <- estimate_ud(xy = spdf, grid = grid, ...)
 
   #### Process KUD
   cat_to_console("... Processing KUD(s)...")
-  if(inherits(ud, "estUDm")) ud <- ud[[1]]
-  if(!inherits(ud, "RasterLayer")){
+  if (inherits(ud, "estUDm")) ud <- ud[[1]]
+  if (!inherits(ud, "RasterLayer")) {
     ud <- raster::raster(ud)
   }
   ud <- raster::resample(ud, xpf)
-  if(!is.null(mask)) ud <- raster::mask(ud, mask)
+  if (!is.null(mask)) ud <- raster::mask(ud, mask)
 
   #### Renormalise KUDs
-  ud <- ud/raster::cellStats(ud, "sum")
+  ud <- ud / raster::cellStats(ud, "sum")
 
   #### Visualise KUD
-  if(plot){
+  if (plot) {
     cat_to_console("... Plotting KUD...")
     ext <- raster::extent(xpf)
-    if(plot) prettyGraphics::pretty_map(add_rasters = list(x = ud),
-                                        xlim = ext[1:2], ylim = ext[3:4])
+    if (plot) {
+      prettyGraphics::pretty_map(
+        add_rasters = list(x = ud),
+        xlim = ext[1:2], ylim = ext[3:4]
+      )
+    }
   }
 
   #### Return KUD
   return(invisible(ud))
-
 }

@@ -43,7 +43,8 @@ eg <-
   data.frame(
     timestamp =
       as.POSIXct(
-        c("2016-01-01", # one week of continuous detections
+        c(
+          "2016-01-01", # one week of continuous detections
           "2016-01-02",
           "2016-01-03",
           "2016-01-04",
@@ -59,7 +60,10 @@ eg <-
           "2016-03-02",
           "2016-03-03",
           "2016-03-04",
-          "2016-03-05")))
+          "2016-03-05"
+        )
+      )
+  )
 
 #### Example (1): Implement function with default options
 # ... (for one individual, with a daily time interval)

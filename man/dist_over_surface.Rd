@@ -26,14 +26,18 @@ This function does not currently support non-planar coordinates (\code{path} or 
 #### Simulate a hypothetical landscape
 # Define a miniature, blank landscape with known dimensions
 proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
-r <- raster::raster(nrows = 3, ncols = 3,
-                    crs = proj_utm,
-                    resolution = c(5, 5),
-                    ext = raster::extent(0, 15, 0, 15))
+r <- raster::raster(
+  nrows = 3, ncols = 3,
+  crs = proj_utm,
+  resolution = c(5, 5),
+  ext = raster::extent(0, 15, 0, 15)
+)
 # Define a matrix of hypothetical values for the landscape
-mat <- matrix(c(5, 10, 3,
-                2, 1, 4,
-                5, 6, 6), ncol = 3, nrow = 3, byrow = TRUE)
+mat <- matrix(c(
+  5, 10, 3,
+  2, 1, 4,
+  5, 6, 6
+), ncol = 3, nrow = 3, byrow = TRUE)
 r[] <- mat
 # Visualise simulated landscape
 raster::plot(r)
@@ -43,7 +47,7 @@ raster::text(r)
 path_cells <- c(1, 2)
 path_matrix <- sp::coordinates(r)[path_cells, ]
 dist_over_surface(path_matrix, r)
-sqrt(5^2 + (10-5)^2)
+sqrt(5^2 + (10 - 5)^2)
 
 #### Example (2): Total distance between two example diagonal points
 path_cells <- c(1, 5)
@@ -55,7 +59,7 @@ sqrt(sqrt(5^2 + 5^2)^2 + (5 - 1)^2)
 path_cells <- c(1, 2, 3)
 path_matrix <- sp::coordinates(r)[path_cells, ]
 dist_over_surface(path_matrix, r)
-sqrt(5^2 + (10-5)^2) + sqrt(5^2 + (10-3)^2)
+sqrt(5^2 + (10 - 5)^2) + sqrt(5^2 + (10 - 3)^2)
 
 #### Example (4): Total distance along an even longer path
 path_cells <- c(1, 2, 3, 6, 8)

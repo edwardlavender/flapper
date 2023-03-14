@@ -36,9 +36,11 @@ This function extends \code{\link[flapper]{get_detection_area_sum}} to calculate
 \examples{
 #### Define SpatialPointsDataFrame with receiver locations and deployment dates
 proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-                        proj_wgs84)
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+xy <- sp::SpatialPoints(
+  dat_moorings[, c("receiver_long", "receiver_lat")],
+  proj_wgs84
+)
 xy <- sp::spTransform(xy, proj_utm)
 xy <- sp::SpatialPointsDataFrame(xy, data = dat_moorings)
 
@@ -48,27 +50,30 @@ dat <- get_detection_area_ts(xy)
 #### Example (2): Adjust detection range, include coastline and use parallel processing
 # For areas with complex coastline, this will reduce the speed of the algorithm
 # So we will also supply a cluster to improve the computation time.
-if(flapper_run_parallel){
+if (flapper_run_parallel) {
   dat <- get_detection_area_ts(xy,
-                               detection_range = 500,
-                               coastline = dat_coast,
-                               cl = parallel::makeCluster(2L),
-                               varlist = "dat_coast"
-                               )
+    detection_range = 500,
+    coastline = dat_coast,
+    cl = parallel::makeCluster(2L),
+    varlist = "dat_coast"
+  )
 }
 
 #### Example (3) Hide or customise the plot
 dat <- get_detection_area_ts(xy, plot = FALSE)
 dat <-
   get_detection_area_ts(xy,
-                        pretty_axis_args =
-                          list(
-                            axis = list(list(format = "\%b-\%y"),
-                                        list()
-                                        )),
-                       xlab = "Time (month-year)",
-                       ylab = expression(paste("Area (", m^2, ")")),
-                       type = "l")
+    pretty_axis_args =
+      list(
+        axis = list(
+          list(format = "\%b-\%y"),
+          list()
+        )
+      ),
+    xlab = "Time (month-year)",
+    ylab = expression(paste("Area (", m^2, ")")),
+    type = "l"
+  )
 
 }
 \author{

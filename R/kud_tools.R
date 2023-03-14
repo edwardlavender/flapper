@@ -15,12 +15,12 @@
 #' @author Edward Lavender
 #' @export
 
-kud_habitat <- function(map, mask = map, mask_inside = FALSE, plot = TRUE,...){
+kud_habitat <- function(map, mask = map, mask_inside = FALSE, plot = TRUE, ...) {
   par_param <- graphics::par(no.readonly = TRUE)
   area <- raster::setValues(map, 1)
-  if(!is.null(mask)) area <- mask_io(area, mask = mask, mask_inside = mask_inside, updatevalue = 0)
+  if (!is.null(mask)) area <- mask_io(area, mask = mask, mask_inside = mask_inside, updatevalue = 0)
   grid <- methods::as(area, "SpatialPixelsDataFrame")
-  if(plot) sp::plot(grid,...)
+  if (plot) sp::plot(grid, ...)
   on.exit(graphics::par(par_param), add = TRUE)
   return(grid)
 }
@@ -56,20 +56,23 @@ kud_habitat <- function(map, mask = map, mask_inside = FALSE, plot = TRUE,...){
 #' prettyGraphics::pretty_map(add_polys = list(x = sea, col = "skyblue"))
 #' # Simulate path
 #' n <- 1000
-#' path_ls <- sim_path_sa(n = n,
-#'                        area = sea,
-#'                        sim_step = function(...) stats::rgamma(1, shape = 20, scale = 20),
-#'                        seed = 1,
-#'                        plot = FALSE
-#'                        )
+#' path_ls <- sim_path_sa(
+#'   n = n,
+#'   area = sea,
+#'   sim_step = function(...) stats::rgamma(1, shape = 20, scale = 20),
+#'   seed = 1,
+#'   plot = FALSE
+#' )
 #' prettyGraphics::add_sp_path(path_ls$xy_mat,
-#'                             col = viridis::viridis(n),
-#'                             length = 0.02)
+#'   col = viridis::viridis(n),
+#'   length = 0.02
+#' )
 #' ## (2) Define path as a SpatialPointsDataFrame (SpatialPoints is not allowed)
 #' path <- sp::SpatialPointsDataFrame(
 #'   path_ls$xy_mat,
 #'   data = data.frame(ID = factor(rep(1, nrow(path_ls$xy_mat)))),
-#'                     proj4string = raster::crs(dat_coast))
+#'   proj4string = raster::crs(dat_coast)
+#' )
 #' ## (3) Define grid over which to implement estimation
 #' # ... The grid needs to be sufficiently small to capture the coastline
 #' # ... reasonably while being large enough to enable calculation
@@ -100,20 +103,26 @@ kud_habitat <- function(map, mask = map, mask_inside = FALSE, plot = TRUE,...){
 #' ud_raw_r <- raster::raster(ud_raw[[1]])
 #' ud_pro_r <- raster::raster(ud_pro[[1]])
 #' pp <- graphics::par(mfrow = c(1, 2))
-#' prettyGraphics::pretty_map(add_rasters = list(x = ud_raw_r),
-#'                            add_polys = list(x = dat_coast),
-#'                            add_paths = list(x = path,
-#'                                             col = viridis::viridis(n),
-#'                                             lwd = 0.25,
-#'                                             length = 0.02)
-#'                            )
-#' prettyGraphics::pretty_map(add_rasters = list(x = ud_pro_r),
-#'                            add_polys = list(x = dat_coast),
-#'                            add_paths = list(x = path,
-#'                                             col = viridis::viridis(n),
-#'                                             lwd = 0.25,
-#'                                             length = 0.02)
-#'                            )
+#' prettyGraphics::pretty_map(
+#'   add_rasters = list(x = ud_raw_r),
+#'   add_polys = list(x = dat_coast),
+#'   add_paths = list(
+#'     x = path,
+#'     col = viridis::viridis(n),
+#'     lwd = 0.25,
+#'     length = 0.02
+#'   )
+#' )
+#' prettyGraphics::pretty_map(
+#'   add_rasters = list(x = ud_pro_r),
+#'   add_polys = list(x = dat_coast),
+#'   add_paths = list(
+#'     x = path,
+#'     col = viridis::viridis(n),
+#'     lwd = 0.25,
+#'     length = 0.02
+#'   )
+#' )
 #' graphics::par(pp)
 #'
 #' #### Further analysis can be implemented as usual
@@ -134,26 +143,40 @@ kud_habitat <- function(map, mask = map, mask_inside = FALSE, plot = TRUE,...){
 #' vol_pro_r[vol_pro_r[] > 95] <- NA
 #' # Plot
 #' pp <- graphics::par(mfrow = c(1, 2))
-#' prettyGraphics::pretty_map(add_rasters = list(x = vol_raw_r),
-#'                            add_polys = list(list(x = dat_coast),
-#'                                             list(x = ver_raw,
-#'                                                  border = "blue",
-#'                                                  lwd = 2)),
-#'                            add_paths = list(x = path,
-#'                                             col = viridis::viridis(n),
-#'                                             lwd = 0.25,
-#'                                             length = 0.02)
-#'                            )
-#' prettyGraphics::pretty_map(add_rasters = list(x = vol_pro_r),
-#'                            add_polys = list(list(x = dat_coast),
-#'                                             list(x = ver_pro,
-#'                                                  border = "blue",
-#'                                                  lwd = 2)),
-#'                            add_paths = list(x = path,
-#'                                             col = viridis::viridis(n),
-#'                                             lwd = 0.25,
-#'                                             length = 0.02)
-#'                            )
+#' prettyGraphics::pretty_map(
+#'   add_rasters = list(x = vol_raw_r),
+#'   add_polys = list(
+#'     list(x = dat_coast),
+#'     list(
+#'       x = ver_raw,
+#'       border = "blue",
+#'       lwd = 2
+#'     )
+#'   ),
+#'   add_paths = list(
+#'     x = path,
+#'     col = viridis::viridis(n),
+#'     lwd = 0.25,
+#'     length = 0.02
+#'   )
+#' )
+#' prettyGraphics::pretty_map(
+#'   add_rasters = list(x = vol_pro_r),
+#'   add_polys = list(
+#'     list(x = dat_coast),
+#'     list(
+#'       x = ver_pro,
+#'       border = "blue",
+#'       lwd = 2
+#'     )
+#'   ),
+#'   add_paths = list(
+#'     x = path,
+#'     col = viridis::viridis(n),
+#'     lwd = 0.25,
+#'     length = 0.02
+#'   )
+#' )
 #' graphics::par(pp)
 #'
 #' @source This forum is a useful resource: http://r-sig-geo.2731867.n2.nabble.com/Walruses-and-adehabitatHR-class-estUDm-exclusion-of-non-habitat-pixels-and-summary-over-all-animals-td6497315.html.
@@ -165,18 +188,17 @@ NULL
 #' @rdname kud_around_coastline
 #' @export
 
-kud_around_coastline <- function(xy, grid,...) {
-
+kud_around_coastline <- function(xy, grid, ...) {
   ## Define raw UD
-  ud <- adehabitatHR::kernelUD(xy, grid = grid,...)
+  ud <- adehabitatHR::kernelUD(xy, grid = grid, ...)
   names_ud <- names(ud)
 
   ## Checks
-  if(!inherits(xy, "SpatialPointsDataFrame")){
+  if (!inherits(xy, "SpatialPointsDataFrame")) {
     message("'xy' is not a SpatialPointsDataFrame: returning raw UD as post-processing cannot be implemented.")
     return(ud)
   }
-  if(!inherits(grid, "SpatialPointsDataFrame")){
+  if (!inherits(grid, "SpatialPointsDataFrame")) {
     message("'grid' is not a SpatialPixelsDataFrame: returning raw UD as post-processing cannot be implemented.")
     return(ud)
   }
@@ -221,10 +243,9 @@ kud_around_coastline <- function(xy, grid,...) {
 #' @rdname kud_around_coastline
 #' @export
 
-kud_around_coastline_fast <- function(xy, grid,...) {
-
+kud_around_coastline_fast <- function(xy, grid, ...) {
   ## Define raw UD
-  ud <- adehabitatHR::kernelUD(xy, grid = grid,...)
+  ud <- adehabitatHR::kernelUD(xy, grid = grid, ...)
 
   ## Define SpatialGridDataFrames:
   # This assumes xy is a SpatialPointsDataFrame
@@ -249,4 +270,3 @@ kud_around_coastline_fast <- function(xy, grid,...) {
   ## Return
   return(ud_ade)
 }
-

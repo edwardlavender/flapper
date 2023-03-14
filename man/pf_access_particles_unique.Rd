@@ -32,7 +32,8 @@ pf_access_particles_unique(dat_dcpf_histories)
 pf_access_particles_unique(dat_dcpf_histories$history)
 # Supply a cluster to speed up the algorithm (for very large lists)
 pf_access_particles_unique(dat_dcpf_histories$history,
-                           cl = parallel::makeCluster(2L))
+  cl = parallel::makeCluster(2L)
+)
 
 #### Example (2): Access unique particles when 'history' is a list of file paths
 
@@ -49,13 +50,15 @@ out_pf <- do.call(pf, pf_args)
 pf_access_particles_unique(pf_access_history_files(root, use_list = TRUE))
 # Supply a cluster to speed up the algorithm (for very large lists)
 pf_access_particles_unique(pf_access_history_files(root, use_list = TRUE),
-                           cl = parallel::makeCluster(2L))
+  cl = parallel::makeCluster(2L)
+)
 
 ## Access particle histories using the 'memory_safe' option
 # For large lists, this is likely to be slower
 # ... but it may be the only option in some cases.
 pf_access_particles_unique(pf_access_history_files(root, use_list = TRUE),
-                           use_memory_safe = TRUE)
+  use_memory_safe = TRUE
+)
 
 }
 \seealso{

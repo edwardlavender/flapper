@@ -45,26 +45,34 @@ where \eqn{depth_{t + 1}} for the final (\eqn{n^{th}}) observation is defined as
 \examples{
 #### Example (1) Explore mobility for single individual
 mob <-
-  acs_setup_mobility(depth = dat_archival$depth[dat_archival$individual_id == 25],
-                     mobility = 200)
+  acs_setup_mobility(
+    depth = dat_archival$depth[dat_archival$individual_id == 25],
+    mobility = 200
+  )
 
 #### Example (2) Customise histogram
 # ... suppress plot with plot =  FALSE
 # ... suppress add_* lists with NULL or customise
 # ... pass args to prettyGraphics::pretty_hist() via ...
 mob <-
-  acs_setup_mobility(depth = dat_archival$depth[dat_archival$individual_id == 25],
-                      mobility = 200,
-                      add_mobility = NULL,
-                      add_rug = list(side = 3, pos = 25000,
-                                     col = "darkred", lwd = 0.25, ticksize = 0.01),
-                      breaks = 25)
+  acs_setup_mobility(
+    depth = dat_archival$depth[dat_archival$individual_id == 25],
+    mobility = 200,
+    add_mobility = NULL,
+    add_rug = list(
+      side = 3, pos = 25000,
+      col = "darkred", lwd = 0.25, ticksize = 0.01
+    ),
+    breaks = 25
+  )
 
 #### Example (3) Explore mobility for mulitple individuals
 pp <- graphics::par(mfrow = c(2, 2))
-mob_ls <- lapply(unique(dat_archival$individual_id), function(id){
-  acs_setup_mobility(depth = dat_archival$depth[dat_archival$individual_id == id],
-                      mobility = 200)
+mob_ls <- lapply(unique(dat_archival$individual_id), function(id) {
+  acs_setup_mobility(
+    depth = dat_archival$depth[dat_archival$individual_id == id],
+    mobility = 200
+  )
 })
 graphics::par(pp)
 

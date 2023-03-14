@@ -46,20 +46,23 @@ For the AC* algorithms, note that in some coastal settings the representation of
 # CRS of receiver locations as recorded in dat_moorings
 proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
 # CRS of receiver locations required
-proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 # Define SpatialPoints object
 xy_wgs84 <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 xy_utm <- sp::spTransform(xy_wgs84, proj_utm)
 # Link with receiver IDs to define a SpatialPointsDataFrame
 xy_utm <-
- sp::SpatialPointsDataFrame(xy_utm,
-                            dat_moorings[, "receiver_id", drop = FALSE])
+  sp::SpatialPointsDataFrame(
+    xy_utm,
+    dat_moorings[, "receiver_id", drop = FALSE]
+  )
 
 #### Example (1): Define a list of containers with specified parameters
 # ... (Argument values are small to reduce computation time for examples)
-containers <- acs_setup_containers(xy = xy_utm,
-                                 detection_range = 500
-                                 )
+containers <- acs_setup_containers(
+  xy = xy_utm,
+  detection_range = 500
+)
 # A list of SpatialPolygonsDataFrames is returned
 # with elements from 1:max(xy_utm$receiver_id)
 # NULL elements correspond to numbers in this sequence that do not refer to receivers
@@ -67,31 +70,35 @@ containers <- acs_setup_containers(xy = xy_utm,
 containers
 
 #### Example (2): Visualise the containers produced via plot = TRUE
-containers <- acs_setup_containers(xy = xy_utm,
-                                  detection_range = 500,
-                                  plot = TRUE
-                                  )
+containers <- acs_setup_containers(
+  xy = xy_utm,
+  detection_range = 500,
+  plot = TRUE
+)
 
 #### Example (3): Remove areas of the containers that overlap with coastline
-containers <- acs_setup_containers(xy = xy_utm,
-                                  detection_range = 500,
-                                  plot = TRUE,
-                                  coastline = dat_coast
-                                  )
+containers <- acs_setup_containers(
+  xy = xy_utm,
+  detection_range = 500,
+  plot = TRUE,
+  coastline = dat_coast
+)
 
 #### Example (4): Remove areas of the containers beyond a boundary
 xy_utm_coords <- sp::coordinates(xy_utm)
-boundaries <- raster::extent(min(xy_utm_coords[, 1]),
-                             max(xy_utm_coords[, 1]),
-                             min(xy_utm_coords[, 2]),
-                             max(xy_utm_coords[, 2])
-                        )
-containers <- acs_setup_containers(xy = xy_utm,
-                                  detection_range = 500,
-                                  plot = TRUE,
-                                  coastline = dat_coast,
-                                  boundaries = boundaries
-                                  )
+boundaries <- raster::extent(
+  min(xy_utm_coords[, 1]),
+  max(xy_utm_coords[, 1]),
+  min(xy_utm_coords[, 2]),
+  max(xy_utm_coords[, 2])
+)
+containers <- acs_setup_containers(
+  xy = xy_utm,
+  detection_range = 500,
+  plot = TRUE,
+  coastline = dat_coast,
+  boundaries = boundaries
+)
 
 }
 \author{

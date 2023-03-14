@@ -35,8 +35,9 @@
 #' # ... using pf_simplify() with return = "archive"
 #' dat_dcpf_histories_connected <-
 #'   pf_simplify(dat_dcpf_histories,
-#'              summarise_pr = TRUE,
-#'              return = "archive")
+#'     summarise_pr = TRUE,
+#'     return = "archive"
+#'   )
 #' ## Path based implementation
 #' # The example data 'dat_dcpf_paths' contains a sample of paths reconstructed
 #' # ... by the DCPF algorithm and we can also implement the function for these paths.
@@ -57,12 +58,16 @@
 #'
 #' #### Example (3): Customise the map(s)
 #' pp <- par(mfrow = c(1, 2))
-#' pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy,
-#'             add_rasters = list(col = grDevices::grey.colors(n = 100)),
-#'             xlab = "x", ylab = "y")
-#' pf_plot_map(dat_dcpf_paths, map = dat_dc$args$bathy,
-#'             add_rasters = list(col = grDevices::topo.colors(n = 100)),
-#'             xlab = "x", ylab = "y")
+#' pf_plot_map(dat_dcpf_histories_connected,
+#'   map = dat_dc$args$bathy,
+#'   add_rasters = list(col = grDevices::grey.colors(n = 100)),
+#'   xlab = "x", ylab = "y"
+#' )
+#' pf_plot_map(dat_dcpf_paths,
+#'   map = dat_dc$args$bathy,
+#'   add_rasters = list(col = grDevices::topo.colors(n = 100)),
+#'   xlab = "x", ylab = "y"
+#' )
 #' par(pp)
 #'
 #' @seealso \code{\link[flapper]{pf}} implements PF. \code{\link[flapper]{pf_simplify}} assembles paths from particle histories. \code{\link[flapper]{pf_plot_history}} visualises particle histories. \code{\link[flapper]{pf_plot_1d}}, \code{\link[flapper]{pf_plot_2d}} and \code{\link[flapper]{pf_plot_3d}} provide plotting routines for paths. \code{\link[flapper]{pf_loglik}} calculates the log-probability of each path.
@@ -74,7 +79,7 @@ pf_plot_map <- function(xpf,
                         transform = NULL,
                         scale = c("original", "max", "sum"),
                         plot = TRUE,
-                        add_rasters = list(),...){
+                        add_rasters = list(), ...) {
   #### Check inputs
   check_class(input = xpf, to_class = c("pf_archive", "pf_path"))
   scale <- match.arg(scale)
@@ -83,18 +88,26 @@ pf_plot_map <- function(xpf,
 
   ## pf_archive implementation
   # Extract particle histories as a single dataframe (and check for duplicate particles)
-  if(inherits(xpf, "pf_archive")){
+  if (inherits(xpf, "pf_archive")) {
     dat <- lapply(1:length(xpf$history), function(t) {
       elm <- xpf$history[[t]][, c("id_current", "pr_current"), drop = FALSE]
-      if(any(duplicated(elm$id_current))) {
-        if(xpf$method != "pf_simplify"){
-          warning(paste0("xpf$history[[", t, "]] contains duplicate cells. ",
-                         "Implementing pf_simplify() with 'summarise_pr = TRUE' and return = 'archive' specified first is advised."),
-                  immediate. = TRUE, call. = FALSE)
+      if (any(duplicated(elm$id_current))) {
+        if (xpf$method != "pf_simplify") {
+          warning(
+            paste0(
+              "xpf$history[[", t, "]] contains duplicate cells. ",
+              "Implementing pf_simplify() with 'summarise_pr = TRUE' and return = 'archive' specified first is advised."
+            ),
+            immediate. = TRUE, call. = FALSE
+          )
         } else {
-          warning(paste0("xpf$history[[", t, "]] contains duplicate cells. ",
-                         "Did you implement pf_simplify() without 'summarise_pr = TRUE'?"),
-                  immediate. = TRUE, call. = FALSE)
+          warning(
+            paste0(
+              "xpf$history[[", t, "]] contains duplicate cells. ",
+              "Did you implement pf_simplify() without 'summarise_pr = TRUE'?"
+            ),
+            immediate. = TRUE, call. = FALSE
+          )
         }
       }
       return(elm)
@@ -105,7 +118,7 @@ pf_plot_map <- function(xpf,
     dat$path_id <- 1L
 
     ## pf_path implementation
-  } else if(inherits(xpf, "pf_path")){
+  } else if (inherits(xpf, "pf_path")) {
     dat <- xpf[, c("cell_id", "cell_pr", "path_id")]
     n <- length(which(dat$path_id == dat$path_id[1]))
   }
@@ -123,22 +136,22 @@ pf_plot_map <- function(xpf,
   wt_freq <-
     dat %>%
     dplyr::group_by(.data$path_id, .data$cell_id) %>%
-    dplyr::summarise(score = sum(.data$cell_pr)/n) %>%
+    dplyr::summarise(score = sum(.data$cell_pr) / n) %>%
     dplyr::ungroup() %>%
     dplyr::group_by(.data$cell_id) %>%
     dplyr::summarise(score = mean(.data$score))
 
   #### Transform and scale cell scores
   # Transform weighted frequencies
-  if(!is.null(transform)) {
+  if (!is.null(transform)) {
     wt_freq$score <- transform(wt_freq$score)
-    if(any(is.na(wt_freq$score))) stop("'transform' function has created NAs.")
+    if (any(is.na(wt_freq$score))) stop("'transform' function has created NAs.")
   }
   # Re-scale weighted frequencies e.g. so that the maximum value has a score of one
-  if(scale == "max"){
-    wt_freq$score <- wt_freq$score/max(wt_freq$score)
-  } else if(scale == "sum"){
-    wt_freq$score <- wt_freq$score/sum(wt_freq$score)
+  if (scale == "max") {
+    wt_freq$score <- wt_freq$score / max(wt_freq$score)
+  } else if (scale == "sum") {
+    wt_freq$score <- wt_freq$score / sum(wt_freq$score)
   }
 
   #### Assign scores to map
@@ -147,10 +160,12 @@ pf_plot_map <- function(xpf,
   p <- raster::mask(p, map)
 
   #### Plot map and return outputs
-  if(plot){
-    if(!is.null(add_rasters)) add_rasters$x <- p
-    prettyGraphics::pretty_map(x = p,
-                               add_rasters = add_rasters,...)
+  if (plot) {
+    if (!is.null(add_rasters)) add_rasters$x <- p
+    prettyGraphics::pretty_map(
+      x = p,
+      add_rasters = add_rasters, ...
+    )
   }
   return(invisible(p))
 }
@@ -226,18 +241,22 @@ pf_plot_map <- function(xpf,
 #' ## Implementation based on particles
 #' pp <- par(mfrow = c(1, 2), mar = c(3, 3, 3, 3))
 #' pf_kud_1(out_dcpf_particles_1,
-#'          bathy = bathy,
-#'          sample_size = 500,
-#'          estimate_ud = kud_around_coastline_fast, grid = grid)
+#'   bathy = bathy,
+#'   sample_size = 500,
+#'   estimate_ud = kud_around_coastline_fast, grid = grid
+#' )
 #' ## Implementation based on paths
-#' if(flapper_run_parallel){
+#' if (flapper_run_parallel) {
 #'   pf_kud_1(out_dcpf_paths,
-#'            bathy = bathy,
-#'            sample_size = 500,
-#'            estimate_ud = kud_around_coastline_fast, grid = grid)
-#'   prettyGraphics::add_sp_path(x = out_dcpf_paths$cell_x,
-#'                               y = out_dcpf_paths$cell_y,
-#'                               length = 0.01)
+#'     bathy = bathy,
+#'     sample_size = 500,
+#'     estimate_ud = kud_around_coastline_fast, grid = grid
+#'   )
+#'   prettyGraphics::add_sp_path(
+#'     x = out_dcpf_paths$cell_x,
+#'     y = out_dcpf_paths$cell_y,
+#'     length = 0.01
+#'   )
 #' }
 #' par(pp)
 #'
@@ -245,35 +264,41 @@ pf_plot_map <- function(xpf,
 #' ## Implementation based on particles
 #' pp <- par(mfrow = c(1, 2), mar = c(3, 3, 3, 3))
 #' pf_kud_2(out_dcpf_particles_2,
-#'          bathy = bathy,
-#'          estimate_ud = kud_around_coastline, grid = grid)
+#'   bathy = bathy,
+#'   estimate_ud = kud_around_coastline, grid = grid
+#' )
 #' ## Implementation based on paths
 #' pf_kud_2(out_dcpf_paths,
-#'          bathy = bathy,
-#'          estimate_ud = kud_around_coastline, grid = grid)
-#' prettyGraphics::add_sp_path(x = out_dcpf_paths$cell_x, y = out_dcpf_paths$cell_y,
-#'                             length = 0.01)
+#'   bathy = bathy,
+#'   estimate_ud = kud_around_coastline, grid = grid
+#' )
+#' prettyGraphics::add_sp_path(
+#'   x = out_dcpf_paths$cell_x, y = out_dcpf_paths$cell_y,
+#'   length = 0.01
+#' )
 #' par(pp)
 #'
 #' #### Example (3): For improved speed with pf_kud_1(), use parallelisation
 #' ## Implementation based on particles
 #' pp <- par(mfrow = c(1, 2), mar = c(3, 3, 3, 3))
 #' pf_kud_1(out_dcpf_particles_1,
-#'          bathy = bathy,
-#'          sample_size = 500,
-#'          estimate_ud = flapper::kud_around_coastline_fast, grid = grid,
-#'          chunks = 2L,
-#'          cl = parallel::makeCluster(2L))
+#'   bathy = bathy,
+#'   sample_size = 500,
+#'   estimate_ud = flapper::kud_around_coastline_fast, grid = grid,
+#'   chunks = 2L,
+#'   cl = parallel::makeCluster(2L)
+#' )
 #' ## Implementation based on paths
-#' if(flapper_run_parallel){
+#' if (flapper_run_parallel) {
 #'   cl <- parallel::makeCluster(2L)
 #'   parallel::clusterEvalQ(cl = cl, library(raster))
 #'   pf_kud_1(out_dcpf_paths,
-#'            bathy = bathy,
-#'            sample_size = 500,
-#'            estimate_ud = flapper::kud_around_coastline_fast, grid = grid,
-#'            chunks = 2L,
-#'            cl = cl)
+#'     bathy = bathy,
+#'     sample_size = 500,
+#'     estimate_ud = flapper::kud_around_coastline_fast, grid = grid,
+#'     chunks = 2L,
+#'     cl = cl
+#'   )
 #' }
 #' par(pp)
 #'
@@ -281,40 +306,50 @@ pf_plot_map <- function(xpf,
 #' ## Implementation based on particles
 #' pp <- par(mfrow = c(1, 2), mar = c(3, 3, 3, 3))
 #' pf_kud_2(out_dcpf_particles_2,
-#'          bathy = bathy,
-#'          sample_size = 50, # sample 50 particles overall
-#'          estimate_ud = kud_around_coastline, grid = grid)
+#'   bathy = bathy,
+#'   sample_size = 50, # sample 50 particles overall
+#'   estimate_ud = kud_around_coastline, grid = grid
+#' )
 #' ## Implementation based on paths
 #' pf_kud_2(out_dcpf_paths,
-#'          bathy = bathy,
-#'          sample_size = 50, # sample 50 particles per path
-#'          estimate_ud = kud_around_coastline, grid = grid)
+#'   bathy = bathy,
+#'   sample_size = 50, # sample 50 particles per path
+#'   estimate_ud = kud_around_coastline, grid = grid
+#' )
 #' par(pp)
 #'
 #' #### Example (5): Compare pf_kud_1() and pf_kud_2()
 #' pp <- par(mfrow = c(2, 2), mar = c(3, 3, 3, 3))
-#' kud_1a <- pf_kud_1(xpf = out_dcpf_particles_1,
-#'                    bathy = out_dcpf_particles$args$bathy,
-#'                    sample_size = out_dcpf_particles$args$n,
-#'                    estimate_ud = kud_around_coastline_fast, grid = grid,
-#'                    plot = TRUE)
+#' kud_1a <- pf_kud_1(
+#'   xpf = out_dcpf_particles_1,
+#'   bathy = out_dcpf_particles$args$bathy,
+#'   sample_size = out_dcpf_particles$args$n,
+#'   estimate_ud = kud_around_coastline_fast, grid = grid,
+#'   plot = TRUE
+#' )
 #'
-#' kud_1b <- pf_kud_1(xpf = out_dcpf_particles_1,
-#'                    bathy = out_dcpf_particles$args$bathy,
-#'                    sample_size = 500,
-#'                    estimate_ud = kud_around_coastline_fast, grid = grid,
-#'                    plot = TRUE)
+#' kud_1b <- pf_kud_1(
+#'   xpf = out_dcpf_particles_1,
+#'   bathy = out_dcpf_particles$args$bathy,
+#'   sample_size = 500,
+#'   estimate_ud = kud_around_coastline_fast, grid = grid,
+#'   plot = TRUE
+#' )
 #'
-#' kud_1c <- pf_kud_1(xpf = out_dcpf_particles_1,
-#'                    bathy = out_dcpf_particles$args$bathy,
-#'                    sample_size = 5000,
-#'                    estimate_ud = kud_around_coastline_fast, grid = grid,
-#'                    plot = TRUE)
+#' kud_1c <- pf_kud_1(
+#'   xpf = out_dcpf_particles_1,
+#'   bathy = out_dcpf_particles$args$bathy,
+#'   sample_size = 5000,
+#'   estimate_ud = kud_around_coastline_fast, grid = grid,
+#'   plot = TRUE
+#' )
 #'
-#' kud_1d <- pf_kud_2(xpf = out_dcpf_particles_2,
-#'                  bathy = out_dcpf_particles$args$bathy,
-#'                  estimate_ud = kud_around_coastline, grid = grid,
-#'                  plot = TRUE)
+#' kud_1d <- pf_kud_2(
+#'   xpf = out_dcpf_particles_2,
+#'   bathy = out_dcpf_particles$args$bathy,
+#'   estimate_ud = kud_around_coastline, grid = grid,
+#'   plot = TRUE
+#' )
 #' par(pp)
 #'
 #' @seealso \code{\link[flapper]{pf}}, \code{\link[flapper]{pf_simplify}}, \code{\link[flapper]{pf_plot_map}}, \code{\link[adehabitatHR]{kernelUD}}, \code{\link[flapper]{kud_around_coastline}}, \code{\link[flapper]{kud_around_coastline_fast}}, \code{\link[flapper]{eval_by_kud}}
@@ -333,16 +368,14 @@ pf_kud_1 <- function(xpf,
                      bathy,
                      sample_size = NULL,
                      estimate_ud = adehabitatHR::kernelUD,
-                     grid,..., scale = FALSE,
+                     grid, ..., scale = FALSE,
                      plot_by_time = FALSE, prompt = TRUE,
                      chunks = 1L, cl = NULL, varlist = NULL,
                      mask = NULL, plot = TRUE,
-                     verbose = TRUE
-){
-
+                     verbose = TRUE) {
   #### Checks
-  cat_to_console <- function(..., show = verbose){
-    if(show) cat(paste(..., "\n"))
+  cat_to_console <- function(..., show = verbose) {
+    if (show) cat(paste(..., "\n"))
   }
   t_onset <- Sys.time()
   cat_to_console(paste0("flapper::pf_kud_1() called (@ ", t_onset, ")..."))
@@ -350,26 +383,27 @@ pf_kud_1 <- function(xpf,
   check_class(input = xpf, to_class = c("pf_archive", "pf_path"))
   crs_bathy <- crs_grid <- crs_mask <- NULL
   crs_bathy <- raster::crs(bathy)
-  if(!is.null(grid)) if(!inherits(grid, c("numeric", "integer"))) crs_grid <- raster::crs(grid)
-  if(!is.null(mask)) crs_mask <- raster::crs(mask)
+  if (!is.null(grid)) if (!inherits(grid, c("numeric", "integer"))) crs_grid <- raster::crs(grid)
+  if (!is.null(mask)) crs_mask <- raster::crs(mask)
   crs <- list(crs_bathy, crs_grid, crs_mask)
   crs <- compact(crs)
-  if(!length(unique(crs)) == 1L){
+  if (!length(unique(crs)) == 1L) {
     warning("The CRS(s) of spatial layer(s) ('bathy', 'grid' and 'mask', if applicable) are not identical.",
-            immediate. = TRUE, call. = FALSE)
+      immediate. = TRUE, call. = FALSE
+    )
   }
   crs_spp <- sapply(crs, function(x) !is.na(x))
-  if(any(crs_spp)){
+  if (any(crs_spp)) {
     crs <- crs[[which(crs_spp)[1]]]
   } else {
     crs <- sp::CRS(as.character(NA))
   }
   message("CRS taken as: '", crs, "'.")
-  if(plot_by_time & !is.null(cl)) {
+  if (plot_by_time & !is.null(cl)) {
     warning("'plot_by_time' ignored for 'cl' != NULL.", immediate. = TRUE, call. = FALSE)
     plot_by_time <- FALSE
   }
-  if(chunks <= 1L & !is.null(cl)){
+  if (chunks <= 1L & !is.null(cl)) {
     warning("'cl' supplied but 'chunks <= 1L': ignoring 'cl'.", immediate. = TRUE, call. = FALSE)
     cl_stop(cl)
     cl <- NULL
@@ -377,7 +411,7 @@ pf_kud_1 <- function(xpf,
 
   #### Define a dataframe of particle locations through time
   cat_to_console("... Processing sampled locations...")
-  if(inherits(xpf, "pf_archive")){
+  if (inherits(xpf, "pf_archive")) {
     particles_by_t <-
       lapply(1:length(xpf$history), function(t) {
         elm <- xpf$history[[t]]
@@ -388,7 +422,7 @@ pf_kud_1 <- function(xpf,
       })
     particles <- do.call(rbind, particles_by_t)
     particles[, c("cell_x", "cell_y")] <- raster::xyFromCell(bathy, particles$cell_id)
-  } else if(inherits(xpf, "pf_path")){
+  } else if (inherits(xpf, "pf_path")) {
     particles <- data.frame(xpf)
     particles <- particles[, c("timestep", "cell_id", "cell_pr", "cell_x", "cell_y")]
   }
@@ -396,9 +430,9 @@ pf_kud_1 <- function(xpf,
 
   #### Define chunks
   cat_to_console("... Defining chunk(s)...")
-  if(chunks <= 1L){
+  if (chunks <= 1L) {
     particles$chunk <- 1L
-  } else{
+  } else {
     particles$chunk <- cut(particles$timestep, chunks)
   }
   particles_by_chunk <- split(particles, particles$chunk)
@@ -408,60 +442,61 @@ pf_kud_1 <- function(xpf,
   # Define blank raster that provides the foundation for KUDs
   blank <- raster::setValues(bathy, 0)
   # Loop over each 'chunk' and calculate cumulative KUD for that chunk
-  kud_by_chunk <- cl_lapply(particles_by_chunk, cl = cl, varlist = varlist, fun = function(particles_for_chunk){
+  kud_by_chunk <- cl_lapply(particles_by_chunk, cl = cl, varlist = varlist, fun = function(particles_for_chunk) {
     # Isolate particles for that chunk
     particles_by_t <- split(particles_for_chunk, particles_for_chunk$timestep)
     # Define blank UD
     ud <- blank
     # Loop over each time step and add to UD
-    for(t in 1:length(particles_by_t)){
+    for (t in 1:length(particles_by_t)) {
       # Get particles for time step
       particles_for_t <- particles_by_t[[t]]
       # If the number of unique locations is fewer than 5, we won't implement kernel smoothing
-      if(length(unique(particles_for_t$cell_id)) < 5){
+      if (length(unique(particles_for_t$cell_id)) < 5) {
         message(paste0("Fewer than five unique cells for kernel estimation at time ", t, "."))
         denom <- sum(particles_for_t$cell_pr)
         particles_for_t <-
           particles_for_t %>%
           dplyr::group_by(.data$cell_id) %>%
-          dplyr::mutate(cell_pr = sum(.data$cell_pr/denom)) %>%
+          dplyr::mutate(cell_pr = sum(.data$cell_pr / denom)) %>%
           dplyr::slice(1L) %>%
           data.frame()
         ud_for_t <- blank
         ud_for_t[particles_for_t$cell_id] <- particles_for_t$cell_pr
-      # Implement kernel smoothing
+        # Implement kernel smoothing
       } else {
         # Implement resampling, if specified, within the loop (to minimise memory requirements)
-        if(!is.null(sample_size)){
+        if (!is.null(sample_size)) {
           particles_for_t <-
             particles_for_t %>%
             dplyr::slice_sample(n = sample_size, weight_by = .data$cell_pr, replace = TRUE)
         }
         # Get locations
         xy_for_t <- sp::SpatialPointsDataFrame(particles_for_t[, c("cell_x", "cell_y")],
-                                               data = data.frame(ID = factor(rep(1, nrow(particles_for_t)))),
-                                               proj4string = crs)
+          data = data.frame(ID = factor(rep(1, nrow(particles_for_t)))),
+          proj4string = crs
+        )
         # Get UD for timestep
-        ud_for_t <- estimate_ud(xy_for_t, grid = grid,...)
-        if(inherits(ud_for_t, "estUD")){
+        ud_for_t <- estimate_ud(xy_for_t, grid = grid, ...)
+        if (inherits(ud_for_t, "estUD")) {
           ud_for_t <- raster::raster(ud_for_t)
-        } else if(inherits(ud_for_t, "estUDm")){
+        } else if (inherits(ud_for_t, "estUDm")) {
           ud_for_t <- raster::raster(ud_for_t[[1]])
         }
         # Resample UD onto common grid
         ud_for_t <- raster::resample(ud_for_t, blank, method = "bilinear")
       }
       # Add UD to cumulative UD for chunk
-      if(scale){
+      if (scale) {
         min_ud <- raster::cellStats(ud_for_t, "min")
         max_ud <- raster::cellStats(ud_for_t, "max")
-        ud_for_t <- (ud_for_t - min_ud)/(max_ud - min_ud)
+        ud_for_t <- (ud_for_t - min_ud) / (max_ud - min_ud)
       }
       ud <- sum(ud, ud_for_t, na.rm = TRUE)
       # Visualise cumulative UD (if specified)
-      if(plot_by_time){
+      if (plot_by_time) {
         raster::plot(ud, main = paste("chunk", particles_for_t$chunk[1], ": time ", t))
-        if(prompt) readline(prompt = "Press [Enter] to continue...")
+        if (prompt) readline(prompt = "Press [Enter] to continue...")
       }
     }
     return(ud)
@@ -470,28 +505,31 @@ pf_kud_1 <- function(xpf,
   #### Process KUDs
   cat_to_console("... Processing KUD(s)...")
   ## Summarise across chunks
-  if(chunks < 2L){
+  if (chunks < 2L) {
     kud <- kud_by_chunk[[1]]
   } else {
     kud_stack <- raster::stack(kud_by_chunk)
     kud <- raster::calc(kud_stack, sum, na.rm = TRUE)
   }
   ## Mask KUD
-  if(!is.null(mask)) kud <- raster::mask(kud, mask)
-  kud <- kud/raster::cellStats(kud, "sum")
+  if (!is.null(mask)) kud <- raster::mask(kud, mask)
+  kud <- kud / raster::cellStats(kud, "sum")
 
   #### Plot KUD
   cat_to_console("... Plotting KUD...")
   ext <- raster::extent(bathy)
-  if(plot) prettyGraphics::pretty_map(add_rasters = list(x = kud),
-                                      xlim = ext[1:2], ylim = ext[3:4])
+  if (plot) {
+    prettyGraphics::pretty_map(
+      add_rasters = list(x = kud),
+      xlim = ext[1:2], ylim = ext[3:4]
+    )
+  }
 
   #### Return kud
   t_end <- Sys.time()
   total_duration <- difftime(t_end, t_onset, units = "mins")
   cat_to_console(paste0("... flapper::pf_kud_1() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
   return(kud)
-
 }
 
 
@@ -508,33 +546,33 @@ pf_kud_2 <- function(xpf,
                      grid, ...,
                      mask = NULL,
                      plot = TRUE,
-                     verbose = TRUE){
-
+                     verbose = TRUE) {
   #### Checks
-  cat_to_console <- function(..., show = verbose){
-    if(show) cat(paste(..., "\n"))
+  cat_to_console <- function(..., show = verbose) {
+    if (show) cat(paste(..., "\n"))
   }
   t_onset <- Sys.time()
   cat_to_console(paste0("flapper::pf_kud_2() called (@ ", t_onset, ")..."))
   cat_to_console("... Setting up function...")
   check_class(input = xpf, to_class = c("pf_archive", "pf_path"))
-  if(inherits(xpf, "pf_path")){
-    if(isTRUE(all.equal(estimate_ud, kud_around_coastline_fast))){
+  if (inherits(xpf, "pf_path")) {
+    if (isTRUE(all.equal(estimate_ud, kud_around_coastline_fast))) {
       stop("flapper::kud_around_coastline_fast() cannot be used for 'pf_path' class objects.", call. = FALSE)
     }
   }
   crs_bathy <- crs_grid <- crs_mask <- NULL
   crs_bathy <- raster::crs(bathy)
-  if(!is.null(grid)) if(!inherits(grid, c("numeric", "integer"))) crs_grid <- raster::crs(grid)
-  if(!is.null(mask)) crs_mask <- raster::crs(mask)
+  if (!is.null(grid)) if (!inherits(grid, c("numeric", "integer"))) crs_grid <- raster::crs(grid)
+  if (!is.null(mask)) crs_mask <- raster::crs(mask)
   crs <- list(crs_bathy, crs_grid, crs_mask)
   crs <- compact(crs)
-  if(!length(unique(crs)) == 1L){
+  if (!length(unique(crs)) == 1L) {
     warning("The CRS(s) of spatial layer(s) ('bathy', 'grid' and 'mask', if applicable) are not identical.",
-            immediate. = TRUE, call. = FALSE)
+      immediate. = TRUE, call. = FALSE
+    )
   }
   crs_spp <- sapply(crs, function(x) !is.na(x))
-  if(any(crs_spp)){
+  if (any(crs_spp)) {
     crs <- crs[[which(crs_spp)[1]]]
   } else {
     crs <- sp::CRS(as.character(NA))
@@ -546,11 +584,10 @@ pf_kud_2 <- function(xpf,
   ######################################
   #### pf_archive approach
 
-  if(inherits(xpf, "pf_archive")){
-
+  if (inherits(xpf, "pf_archive")) {
     #### Get cell probabilities and coordinates
     cat_to_console("... Processing sampled locations...")
-    if(xpf$method != "pf_simplify"){
+    if (xpf$method != "pf_simplify") {
       warning("xpf$method != 'pf_simplify'", immediate. = TRUE, call. = FALSE)
     }
     particles_by_t <-
@@ -566,10 +603,13 @@ pf_kud_2 <- function(xpf,
 
     #### Sample locations according to their probability
     # For consistency with the paths approach below, particles are not sampled within time steps
-    if(!is.null(sample_size)){
+    if (!is.null(sample_size)) {
       n_particles <- length(which(particles$timestep == particles$timestep[1]))
-      if(sample_size > n_particles) warning("'sample_size' is greater than the number of particles.",
-                                            immediate. = TRUE, call. = FALSE)
+      if (sample_size > n_particles) {
+        warning("'sample_size' is greater than the number of particles.",
+          immediate. = TRUE, call. = FALSE
+        )
+      }
       particles <-
         particles %>%
         # dplyr::group_by(.data$timestep) %>%
@@ -581,32 +621,34 @@ pf_kud_2 <- function(xpf,
     particles_spdf <- sp::SpatialPointsDataFrame(
       particles[, c("cell_x", "cell_y")],
       data = data.frame(ID = factor(rep(1, nrow(particles)))),
-      proj4string = crs)
-    ud <- estimate_ud(xy = particles_spdf, grid = grid,...)
+      proj4string = crs
+    )
+    ud <- estimate_ud(xy = particles_spdf, grid = grid, ...)
 
     #### Process KUD
     cat_to_console("... Processing KUD(s)...")
-    if(inherits(ud, "estUDm")) ud <- ud[[1]]
-    if(!inherits(ud, "RasterLayer")){
+    if (inherits(ud, "estUDm")) ud <- ud[[1]]
+    if (!inherits(ud, "RasterLayer")) {
       ud <- raster::raster(ud)
     }
     ud <- raster::resample(ud, bathy)
-    if(!is.null(mask)) ud <- raster::mask(ud, mask)
+    if (!is.null(mask)) ud <- raster::mask(ud, mask)
 
 
     ######################################
     #### pf_path approach
-
-  } else if(inherits(xpf, "pf_path")){
-
+  } else if (inherits(xpf, "pf_path")) {
     #### Get cell coordinates
     particles <- data.frame(xpf)
 
     #### Sub sample
-    if(!is.null(sample_size)){
+    if (!is.null(sample_size)) {
       n_particles <- length(which(particles$path_id == particles$path_id[1]))
-      if(sample_size > n_particles) warning("'sample_size' is greater than the number of particles.",
-                                            immediate. = TRUE, call. = FALSE)
+      if (sample_size > n_particles) {
+        warning("'sample_size' is greater than the number of particles.",
+          immediate. = TRUE, call. = FALSE
+        )
+      }
       particles$index <- 1:nrow(particles)
       particles <-
         particles %>%
@@ -621,16 +663,17 @@ pf_kud_2 <- function(xpf,
     particles_spdf <- sp::SpatialPointsDataFrame(
       particles[, c("cell_x", "cell_y")],
       data = data.frame(ID = factor(particles$path_id)),
-      proj4string = crs)
-    ud_by_path <- estimate_ud(xy = particles_spdf, grid = grid,...)
+      proj4string = crs
+    )
+    ud_by_path <- estimate_ud(xy = particles_spdf, grid = grid, ...)
 
     #### Combine KUDs across paths
     ## Convert KUDs to rasterStack
     cat_to_console("... Processing KUD(s)...")
-    ud_by_path <- pbapply::pblapply(ud_by_path, function(ud){
+    ud_by_path <- pbapply::pblapply(ud_by_path, function(ud) {
       ud <- raster::raster(ud)
       ud <- raster::resample(ud, blank)
-      if(!is.null(mask)) ud <- raster::mask(ud, mask)
+      if (!is.null(mask)) ud <- raster::mask(ud, mask)
       return(ud)
     })
     ud_by_path <- raster::stack(ud_by_path)
@@ -638,13 +681,17 @@ pf_kud_2 <- function(xpf,
   }
 
   #### Renormalise KUDs
-  ud <- ud/raster::cellStats(ud, "sum")
+  ud <- ud / raster::cellStats(ud, "sum")
 
   #### Visualise KUD
   cat_to_console("... Plotting KUD...")
   ext <- raster::extent(bathy)
-  if(plot) prettyGraphics::pretty_map(add_rasters = list(x = ud),
-                                      xlim = ext[1:2], ylim = ext[3:4])
+  if (plot) {
+    prettyGraphics::pretty_map(
+      add_rasters = list(x = ud),
+      xlim = ext[1:2], ylim = ext[3:4]
+    )
+  }
 
   #### Return KUD
   t_end <- Sys.time()

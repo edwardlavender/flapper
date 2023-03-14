@@ -26,31 +26,36 @@ To calculate distances between specific receiver pairs, call \code{\link[raster]
 }
 \examples{
 #### Example (1): Implementation using lat/long coordinates
-dat <- data.frame(receiver_id = dat_moorings$receiver_id,
-                  receiver_long = dat_moorings$receiver_long,
-                  receiver_lat = dat_moorings$receiver_lat
-                  )
+dat <- data.frame(
+  receiver_id = dat_moorings$receiver_id,
+  receiver_long = dat_moorings$receiver_long,
+  receiver_lat = dat_moorings$receiver_lat
+)
 # Compute distances
 dist_btw_receivers_km <- dist_btw_receivers(dat)
 head(dist_btw_receivers_km)
 
 #### Example (2): Implementation using planar coordinates
 proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-xy         <- sp::SpatialPoints(dat[, c("receiver_long", "receiver_lat")],
-                                proj_wgs84)
-xy         <- sp::spTransform(xy, proj_utm)
-xy         <- sp::coordinates(xy)
-dat <- data.frame(receiver_id = dat_moorings$receiver_id,
-                  receiver_easting = xy[, 1],
-                  receiver_northing = xy[, 2])
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+xy <- sp::SpatialPoints(
+  dat[, c("receiver_long", "receiver_lat")],
+  proj_wgs84
+)
+xy <- sp::spTransform(xy, proj_utm)
+xy <- sp::coordinates(xy)
+dat <- data.frame(
+  receiver_id = dat_moorings$receiver_id,
+  receiver_easting = xy[, 1],
+  receiver_northing = xy[, 2]
+)
 head(dist_btw_receivers(dat))
 
 #### Example (3): Post-process distances via the f argument
 dist_btw_receivers_km_round <- dist_btw_receivers(dat, f = round)
 head(dist_btw_receivers_km_round)
 # convert distances to m
-dist_btw_receivers_m <- dist_btw_receivers(dat, f = function(x) x*1000)
+dist_btw_receivers_m <- dist_btw_receivers(dat, f = function(x) x * 1000)
 head(dist_btw_receivers_m)
 
 #### Example (4) Return distances in a matrix

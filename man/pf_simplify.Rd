@@ -98,7 +98,7 @@ Following the identification of pairwise cell movements, if \code{return = "arch
 summary(dat_dcpf_histories)
 
 #### Example (1): The default implementation
-paths_1   <- pf_simplify(dat_dcpf_histories)
+paths_1 <- pf_simplify(dat_dcpf_histories)
 
 ## Demonstration that the distance and probabilities calculations are correct
 # The simple method below works if three conditions are met:
@@ -110,19 +110,23 @@ require(rlang)
 paths_1 <-
   paths_1 \%>\%
   dplyr::group_by(.data$path_id) \%>\%
-  dplyr::mutate(cell_xp = dplyr::lag(.data$cell_x),
-                cell_yp = dplyr::lag(.data$cell_y),
-                cell_dist_chk = sqrt((.data$cell_xp - .data$cell_x)^2 +
-                                       (.data$cell_yp - .data$cell_y)^2),
-                cell_pr_chk = dat_dcpf_histories$args$calc_movement_pr(.data$cell_dist_chk),
-                dist_equal = .data$cell_dist_chk == .data$cell_dist_chk,
-                pr_equal = .data$cell_pr == .data$cell_pr_chk) \%>\%
+  dplyr::mutate(
+    cell_xp = dplyr::lag(.data$cell_x),
+    cell_yp = dplyr::lag(.data$cell_y),
+    cell_dist_chk = sqrt((.data$cell_xp - .data$cell_x)^2 +
+      (.data$cell_yp - .data$cell_y)^2),
+    cell_pr_chk = dat_dcpf_histories$args$calc_movement_pr(.data$cell_dist_chk),
+    dist_equal = .data$cell_dist_chk == .data$cell_dist_chk,
+    pr_equal = .data$cell_pr == .data$cell_pr_chk
+  ) \%>\%
   data.frame()
 utils::head(paths_1)
 
 ## Demonstration that the depths of sampled cells are correct
-paths_1$cell_z_chk <- raster::extract(dat_dcpf_histories$args$bathy,
-                                      paths_1$cell_id)
+paths_1$cell_z_chk <- raster::extract(
+  dat_dcpf_histories$args$bathy,
+  paths_1$cell_id
+)
 all.equal(paths_1$cell_z, paths_1$cell_z_chk)
 
 ## Compare depth time series
@@ -135,7 +139,8 @@ pf_plot_1d(paths_1, dat_dc$args$archival)
 pf_loglik(paths_1)
 # 2-d visualisation
 pf_plot_2d(paths_1, dat_dcpf_histories$args$bathy,
-           add_paths = list(length = 0.05))
+  add_paths = list(length = 0.05)
+)
 # 3-d visualisation
 pf_plot_3d(paths_1, dat_dcpf_histories$args$bathy)
 
@@ -157,13 +162,14 @@ paths_2 <- pf_simplify(out_dcpf_2, calc_distance = "lcp")
 system.time(
   invisible(utils::capture.output(
     pf_simplify(out_dcpf_2, calc_distance = "lcp")
-    ))
-  )
+  ))
+)
 
 ## Demonstrate the LCP calculations are correct
 paths_2_lcps <- lcp_interp(paths_2,
-                            out_dcpf_2$args$bathy,
-                            calc_distance = TRUE)
+  out_dcpf_2$args$bathy,
+  calc_distance = TRUE
+)
 head(cbind(paths_2$dist, paths_2_lcps$dist_lcp$dist))
 
 ## Trial options for increasing speed of shortest-distance calculations
@@ -178,8 +184,9 @@ graph <- lcp_graph_surface(out_dcpf_2$args$bathy, costs$dist_total)
 system.time(
   invisible(utils::capture.output(
     pf_simplify(out_dcpf_2,
-                calc_distance = "lcp",
-                calc_distance_graph = graph)
+      calc_distance = "lcp",
+      calc_distance_graph = graph
+    )
   ))
 )
 # Speed up shortest-distance calculations via (b) the lower Euclid dist limit
@@ -189,9 +196,10 @@ graph <- lcp_graph_surface(out_dcpf_2$args$bathy, costs$dist_total)
 system.time(
   invisible(utils::capture.output(
     pf_simplify(out_dcpf_2,
-                calc_distance = "lcp",
-                calc_distance_graph = graph,
-                calc_distance_limit = 100)
+      calc_distance = "lcp",
+      calc_distance_graph = graph,
+      calc_distance_limit = 100
+    )
   ))
 )
 # Speed up shortest-distance calculations via (c) the barrier
@@ -201,10 +209,11 @@ sf::st_crs(coastline) <- NA
 system.time(
   invisible(utils::capture.output(
     pf_simplify(out_dcpf_2,
-                calc_distance = "lcp",
-                calc_distance_graph = graph,
-                calc_distance_limit = 100,
-                calc_distance_barrier = coastline)
+      calc_distance = "lcp",
+      calc_distance_graph = graph,
+      calc_distance_limit = 100,
+      calc_distance_barrier = coastline
+    )
   ))
 )
 # Speed up calculations via (d) mobility limits
@@ -216,11 +225,12 @@ system.time(
 system.time(
   invisible(utils::capture.output(
     pf_simplify(out_dcpf_2,
-                calc_distance = "lcp",
-                calc_distance_graph = graph,
-                calc_distance_limit = 100,
-                mobility = 200,
-                mobility_from_origin = 200)
+      calc_distance = "lcp",
+      calc_distance_graph = graph,
+      calc_distance_limit = 100,
+      mobility = 200,
+      mobility_from_origin = 200
+    )
   ))
 )
 # Speed up calculations via (e) parallelisation
@@ -243,14 +253,17 @@ unique(paths_3c$path_id)
 # Again, this doesn't make a difference here, but it can when there are
 # ... more particles.
 paths_4a <- pf_simplify(dat_dcpf_histories,
-                          max_n_copies = 5,
-                          max_n_copies_sampler = "random")
+  max_n_copies = 5,
+  max_n_copies_sampler = "random"
+)
 paths_4b <- pf_simplify(dat_dcpf_histories,
-                          max_n_copies = 5,
-                          max_n_copies_sampler = "weighted")
+  max_n_copies = 5,
+  max_n_copies_sampler = "weighted"
+)
 paths_4c <- pf_simplify(dat_dcpf_histories,
-                          max_n_copies = 5,
-                          max_n_copies_sampler = "max")
+  max_n_copies = 5,
+  max_n_copies_sampler = "max"
+)
 # Compare retained paths
 pf_loglik(paths_3a)
 pf_loglik(paths_3b)
@@ -271,9 +284,13 @@ dat_dcpf_histories$args$origin
 # ... with the coordinates re-defined on bathy:
 paths_5a <- pf_simplify(dat_dcpf_histories)
 paths_5a[1, c("cell_x", "cell_y")]
-raster::xyFromCell(dat_dcpf_histories$args$bathy,
-                   raster::cellFromXY(dat_dcpf_histories$args$bathy,
-                                      dat_dcpf_histories$args$origin))
+raster::xyFromCell(
+  dat_dcpf_histories$args$bathy,
+  raster::cellFromXY(
+    dat_dcpf_histories$args$bathy,
+    dat_dcpf_histories$args$origin
+  )
+)
 head(paths_5a)
 # If specified, the origin is dropped with add_origin = FALSE
 paths_5b <- pf_simplify(dat_dcpf_histories, add_origin = FALSE)
@@ -300,15 +317,17 @@ table(duplicated(out_dcpf_6b$history[[1]]$id_current))
 # Now, there is only one (the most likely) record of sampled cells
 # ... at each time step.
 out_dcpf_6c <- pf_simplify(out_dcpf_6b,
-                           summarise_pr = TRUE,
-                           return = "archive")
+  summarise_pr = TRUE,
+  return = "archive"
+)
 head(out_dcpf_6c$history[[1]])
 table(duplicated(out_dcpf_6c$history[[1]]$id_current))
 ## Make movement paths
 # Again, we use out_dcpf_6b to skip distance calculations.
 out_dcpf_6d <- pf_simplify(out_dcpf_6b,
-                           max_n_copies = 2L,
-                           return = "path")
+  max_n_copies = 2L,
+  return = "path"
+)
 ## Compare resultant maps
 # The map for all particles is influenced by particles that were 'dead ends',
 # ... which isn't ideal for a map of space use.
@@ -322,23 +341,27 @@ out_dcpf_6d <- pf_simplify(out_dcpf_6b,
 # ... for a sample of sampled particles.
 pp <- par(mfrow = c(2, 2), oma = c(2, 2, 2, 2), mar = c(2, 4, 2, 4))
 paa <- list(side = 1:4, axis = list(labels = FALSE))
-transform = NULL
+transform <- NULL
 m_1 <- pf_plot_map(out_dcpf_6a, dcpf_args$bathy,
-                   transform = transform,
-                   pretty_axis_args = paa, main = "all samples")
+  transform = transform,
+  pretty_axis_args = paa, main = "all samples"
+)
 m_2 <- pf_plot_map(out_dcpf_6b, dcpf_args$bathy,
-                   transform = transform,
-                   pretty_axis_args = paa, main = "connected samples")
+  transform = transform,
+  pretty_axis_args = paa, main = "connected samples"
+)
 m_3 <- pf_plot_map(out_dcpf_6c, dcpf_args$bathy,
-                   transform = transform,
-                   pretty_axis_args = paa, main = "unique, connected samples")
+  transform = transform,
+  pretty_axis_args = paa, main = "unique, connected samples"
+)
 m_4 <- pf_plot_map(out_dcpf_6d, dcpf_args$bathy,
-                   transform = transform,
-                   pretty_axis_args = paa, main = "paths")
+  transform = transform,
+  pretty_axis_args = paa, main = "paths"
+)
 par(pp)
 # Note that all locations in reconstructed paths are derived from PF samples
 all(out_dcpf_6d$cell_id[out_dcpf_6d$timestep != 0] \%in\%
-      do.call(rbind, out_dcpf_6c$history)$id_current)
+  do.call(rbind, out_dcpf_6c$history)$id_current)
 # But the paths only contain a subset of sampled particles
 h_6a <- lapply(out_dcpf_6a$history, function(elm) elm[, "id_current"])
 table(unique(unlist(h_6a)) \%in\% out_dcpf_6d$cell_id[out_dcpf_6d$timestep != 0])

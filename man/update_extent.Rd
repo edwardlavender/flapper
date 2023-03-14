@@ -21,9 +21,11 @@ This function updates a \code{\link[raster]{raster}}'s \code{\link[raster]{exten
 }
 \examples{
 # Define example raster
-r <- raster::raster(nrows = 3, ncols = 3,
-                    resolution = c(5, 5),
-                    ext = raster::extent(0, 15, 0, 15))
+r <- raster::raster(
+  nrows = 3, ncols = 3,
+  resolution = c(5, 5),
+  ext = raster::extent(0, 15, 0, 15)
+)
 # Increase raster extent by 5 units in every direction
 update_extent(r, 5)
 # Decrease raster extent by 5 units in every direction

@@ -87,16 +87,16 @@ id <- 25
 acc <- dat_acoustics[dat_acoustics$individual_id == id, ]
 arc <- dat_archival[dat_archival$individual_id == id, ]
 # Focus on the subset of data for which we have both acoustic and archival detections
-acc <- acc[acc$timestamp >= min(arc$timestamp) - 2*60 &
-             acc$timestamp <= max(arc$timestamp) + 2*60, ]
-arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
-             arc$timestamp <= max(acc$timestamp) + 2*60, ]
+acc <- acc[acc$timestamp >= min(arc$timestamp) - 2 * 60 &
+  acc$timestamp <= max(arc$timestamp) + 2 * 60, ]
+arc <- arc[arc$timestamp >= min(acc$timestamp) - 2 * 60 &
+  arc$timestamp <= max(acc$timestamp) + 2 * 60, ]
 # We'll focus on a one day period with overlapping detection/depth time series for speed
 end <- as.POSIXct("2016-03-18")
 acc <- acc[acc$timestamp <= end, ]
 arc <- arc[arc$timestamp <= end, ]
-arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
-             arc$timestamp <= max(acc$timestamp) + 2*60, ]
+arc <- arc[arc$timestamp >= min(acc$timestamp) - 2 * 60 &
+  arc$timestamp <= max(acc$timestamp) + 2 * 60, ]
 # Process time series (if necessary)
 # ... Observations should be processed to the nearest time step
 # ... Duplicate detections should be dropped
@@ -104,13 +104,14 @@ arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
 #### Example (1) Implement ACDC algorithm with default arguments
 # This implements the algorithm on a single core, printing messages
 # ... to the console to monitor function progress.
-out_acdc <- acdc(acoustics = acc,
-                 archival = arc,
-                 bathy = dat_gebco,
-                 detection_containers = dat_containers,
-                 mobility = 200,
-                 calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
-                 )
+out_acdc <- acdc(
+  acoustics = acc,
+  archival = arc,
+  bathy = dat_gebco,
+  detection_containers = dat_containers,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
+)
 # The function returns a list with four elements
 # ... archive contains the results of the algorithm, implemented by the back-end
 # ... function .acs(). The other elements provide the time series
@@ -118,14 +119,15 @@ out_acdc <- acdc(acoustics = acc,
 summary(out_acdc)
 
 #### Example (2): Write messages to file to monitor function progress via 'con'
-out_acdc <- acdc(acoustics = acc,
-                 archival = arc,
-                 bathy = dat_gebco,
-                 detection_containers = dat_containers,
-                 mobility = 200,
-                 calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                 con = tempdir()
-                 )
+out_acdc <- acdc(
+  acoustics = acc,
+  archival = arc,
+  bathy = dat_gebco,
+  detection_containers = dat_containers,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+  con = tempdir()
+)
 acdc_log <- readLines(paste0(tempdir(), "/acdc_log.txt"))
 utils::head(acdc_log, 10)
 file.remove(paste0(tempdir(), "/acdc_log.txt"))
@@ -133,28 +135,30 @@ file.remove(paste0(tempdir(), "/acdc_log.txt"))
 #### Example (3): Implement the algorithm and return spatial information
 # Specify save_record_spatial = NULL to include spatial information for all time steps
 # ... or a vector to include this information for specific time steps
-out_acdc <- acdc(acoustics = acc,
-                 archival = arc,
-                 bathy = dat_gebco,
-                 detection_containers = dat_containers,
-                 mobility = 200,
-                 calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                 save_record_spatial = NULL
-                 )
+out_acdc <- acdc(
+  acoustics = acc,
+  archival = arc,
+  bathy = dat_gebco,
+  detection_containers = dat_containers,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+  save_record_spatial = NULL
+)
 
 #### Example (4): Implement the algorithm in parallel e.g. by supplying a cluster
 # If verbose = TRUE (the default), it is necessary to specify a directory
 # ... into which dot_acdc_log_*.txt files are saved (i.e., messages
 # ... cannot be written to the console in parallel)
-out_acdc <- acdc(acoustics = acc,
-                 archival = arc,
-                 bathy = dat_gebco,
-                 detection_containers = dat_containers,
-                 mobility = 200,
-                 calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                 con = tempdir(),
-                 cl = parallel::makeCluster(2L)
-                 )
+out_acdc <- acdc(
+  acoustics = acc,
+  archival = arc,
+  bathy = dat_gebco,
+  detection_containers = dat_containers,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+  con = tempdir(),
+  cl = parallel::makeCluster(2L)
+)
 ## Check logs
 list.files(tempdir())
 # "acdc_log.txt" contains the log for the overall function
@@ -171,76 +175,84 @@ utils::tail(acdc_log_1)
 summary(out_acdc)
 # Note that the last observation of each time series overlaps with the
 # ... first observation for the next chunk, to prevent loss of information
-lapply(out_acdc$ts_by_chunk,
-  function(chunk) chunk$acoustics[c(1, nrow(chunk$acoustics)), ])
+lapply(
+  out_acdc$ts_by_chunk,
+  function(chunk) chunk$acoustics[c(1, nrow(chunk$acoustics)), ]
+)
 
 #### Example (5) Biologically meaningful chunks can be specified via
 # .. the 'split' argument or by passing a list of acoustic time series
 # .. already split by list of dataframes to 'acoustics'
 ## Using the split argument:
-out_acdc <- acdc(acoustics = acc,
-                 archival = arc,
-                 bathy = dat_gebco,
-                 detection_containers = dat_containers,
-                 mobility = 200,
-                 calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                 con = tempdir(),
-                 cl = parallel::makeCluster(2L),
-                 split = "2 hours"
-                 )
+out_acdc <- acdc(
+  acoustics = acc,
+  archival = arc,
+  bathy = dat_gebco,
+  detection_containers = dat_containers,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+  con = tempdir(),
+  cl = parallel::makeCluster(2L),
+  split = "2 hours"
+)
 ## Passing a list of dataframes
 # This option can provide more flexibility than split.
 # ... This example could also be used using split, as described above,
 # ... but this is not the case for all time categories (e.g., seasons).
 acc$chunk <- cut(acc$timestamp, "2 hours")
-acc_ls    <- split(acc, acc$chunk)
-out_acdc  <- acdc(acoustics = acc_ls,
-                  archival = arc,
-                  bathy = dat_gebco,
-                  detection_containers = dat_containers,
-                  mobility = 200,
-                  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                  con = tempdir(),
-                  cl = parallel::makeCluster(2L)
-                  )
+acc_ls <- split(acc, acc$chunk)
+out_acdc <- acdc(
+  acoustics = acc_ls,
+  archival = arc,
+  bathy = dat_gebco,
+  detection_containers = dat_containers,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+  con = tempdir(),
+  cl = parallel::makeCluster(2L)
+)
 
 #### Example (5) Implement the algorithm for multiple individuals
 # ... To do this, it is necessary to apply the function iteratively
 # ... to each individual.
 # Pre-processing to define computation time
 # ... E.g., careful definition of time series
-if(flapper_run_slow){
+if (flapper_run_slow) {
   # Define cluster
   cluster <- FALSE
-  if(cluster){
+  if (cluster) {
     cl <- parallel::makeCluster(2L)
-    parallel::clusterExport(cl = cl, varlist = c("acdc",
-                                                 "dat_archival",
-                                                 "dat_gebco",
-                                                 "dat_containers"
-                                                  ))
-  } else cl <- NULL
+    parallel::clusterExport(cl = cl, varlist = c(
+      "acdc",
+      "dat_archival",
+      "dat_gebco",
+      "dat_containers"
+    ))
+  } else {
+    cl <- NULL
+  }
   # Implement algorithm for each individual
   acdc_out_by_id <-
-    pbapply::pblapply(split(dat_acoustics, dat_acoustics$individual_id), cl = cl, function(acc){
+    pbapply::pblapply(split(dat_acoustics, dat_acoustics$individual_id), cl = cl, function(acc) {
       # Define individual-specific folder in which to save function logs
       dir_global <- paste0(tempdir(), "/")
-      dir_id     <- paste0(dir_global, acc$individual_id[1], "/")
-      if(!dir.exists(dir_id)) dir.create(dir_id)
+      dir_id <- paste0(dir_global, acc$individual_id[1], "/")
+      if (!dir.exists(dir_id)) dir.create(dir_id)
       # Focus on a small sample of time series for speed
       acc <- acc[1:3, ]
       # Isolate archival data for individual
       arc <- dat_archival[dat_archival$individual_id == acc$id[1], ]
       # Implement algorithm
-      acdc_out <- acdc(acoustics = acc,
-                       archival = dat_archival,
-                       bathy = dat_gebco,
-                       detection_containers = dat_containers,
-                       mobility = 200,
-                       calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                       save_record_spatial = 1:10L,
-                       con = dir_id
-                       )
+      acdc_out <- acdc(
+        acoustics = acc,
+        archival = dat_archival,
+        bathy = dat_gebco,
+        detection_containers = dat_containers,
+        mobility = 200,
+        calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+        save_record_spatial = 1:10L,
+        con = dir_id
+      )
       # Include logs in output
       acdc_log <- lapply(list.files(dir_id, full.names = TRUE), readLines)
       # Simplify the results at this stage or outside of this loop
@@ -249,7 +261,7 @@ if(flapper_run_slow){
       out <- list(acdc_id = acc$individual_id[1], acdc_out = acdc_out, acdc_log = acdc_log)
       return(out)
     })
-  if(!is.null(cl)) parallel::stopCluster(cl)
+  if (!is.null(cl)) parallel::stopCluster(cl)
   summary(acdc_out_by_id)
 }
 

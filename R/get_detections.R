@@ -31,11 +31,13 @@
 #' det_pr <- get_detection_pr(beta_0 = 2.5, beta_1 = -0.006, inv_link = stats::pnorm)
 #'
 #' #### Example (3): Modify graphical properties
-#' det_pr <- get_detection_pr(beta_0 = 2.5,
-#'                            beta_1 = -0.006,
-#'                            type = "l",
-#'                            xlab = "Distance (m)",
-#'                            ylab = "Detection Probability")
+#' det_pr <- get_detection_pr(
+#'   beta_0 = 2.5,
+#'   beta_1 = -0.006,
+#'   type = "l",
+#'   xlab = "Distance (m)",
+#'   ylab = "Detection Probability"
+#' )
 #'
 #' #### Example (4): Modify return options
 #' # Only graph
@@ -53,7 +55,7 @@ get_detection_pr <- function(distance = 1:1000,
                              beta_0 = 2.5,
                              beta_1 = -0.01,
                              inv_link = stats::plogis,
-                             output = 3L,...){
+                             output = 3L, ...) {
   #### Checks
   stopifnot(length(beta_0) == 1 & length(beta_1) == 1)
   output <- check_value(input = output, supp = 1:3, warn = TRUE, default = 3L)
@@ -65,19 +67,21 @@ get_detection_pr <- function(distance = 1:1000,
   Y <- inv_link(X %*% beta)
   Y <- as.numeric(Y)
   # Add attributes
-  attributes(Y)$X        <- X
-  attributes(Y)$beta     <- beta
+  attributes(Y)$X <- X
+  attributes(Y)$beta <- beta
   attributes(Y)$inv_link <- inv_link
 
   #### Visualise detection probabilities
-  if(output %in% c(1, 3)){
-    prettyGraphics::pretty_plot(X[, 2], Y,...)
+  if (output %in% c(1, 3)) {
+    prettyGraphics::pretty_plot(X[, 2], Y, ...)
   }
 
   #### Return detection probabilities
-  if(output %in% c(2, 3)){
+  if (output %in% c(2, 3)) {
     return(Y)
-  } else return(invisible())
+  } else {
+    return(invisible())
+  }
 }
 
 
@@ -101,9 +105,11 @@ get_detection_pr <- function(distance = 1:1000,
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
 #' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-#'                         proj_wgs84)
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+#' xy <- sp::SpatialPoints(
+#'   dat_moorings[, c("receiver_long", "receiver_lat")],
+#'   proj_wgs84
+#' )
 #' xy <- sp::spTransform(xy, proj_utm)
 #'
 #' #### Example (1): Get the simplest containers around receivers
@@ -129,40 +135,40 @@ get_detection_pr <- function(distance = 1:1000,
 #' sp_2
 #' # The total area of the former will be smaller, since areas covered
 #' # ... by multiple receivers are merged
-#' rgeos::gArea(sp_1); rgeos::gArea(sp_2)
+#' rgeos::gArea(sp_1)
+#' rgeos::gArea(sp_2)
 #' # But it can be more convenient to use the latter format in some cases
 #' # ... because it is easy to isolate specific containers:
 #' raster::plot(dat_coast)
-#' raster::plot(sp_1[1], add = TRUE, col = "red")  # single feature
+#' raster::plot(sp_1[1], add = TRUE, col = "red") # single feature
 #' raster::plot(sp_2[1], add = TRUE, col = "blue") # isolate specific features
 #'
 #' @author Edward Lavender
 #' @export
 
 get_detection_containers <- function(xy,
-                                    detection_range = 425,
-                                    resolution = 1000,
-                                    boundaries = NULL, coastline = NULL,
-                                    plot = TRUE,...){
-
+                                     detection_range = 425,
+                                     resolution = 1000,
+                                     boundaries = NULL, coastline = NULL,
+                                     plot = TRUE, ...) {
   #### Checks
   # Check xy is a SpatialPoints object or similar
   check_class(input = xy, to_class = c("SpatialPoints", "SpatialPointsDataFrame"), type = "stop")
-  check...(c("spgeom", "width", "quadsegs"),...)
+  check...(c("spgeom", "width", "quadsegs"), ...)
   #### Define buffers around receivers equal to detection radius
-  xy_buf <- rgeos::gBuffer(xy, width = detection_range, quadsegs = resolution,...)
+  xy_buf <- rgeos::gBuffer(xy, width = detection_range, quadsegs = resolution, ...)
 
   #### Clip around boundaries/coastline (if applicable)
-  if(!is.null(boundaries)){
-    if(length(xy_buf) == 1) {
+  if (!is.null(boundaries)) {
+    if (length(xy_buf) == 1) {
       xy_buf <- raster::crop(xy_buf, boundaries)
     } else {
       xy_buf <- lapply(1:length(xy_buf), function(i) raster::crop(xy_buf[i, ], boundaries))
       xy_buf <- do.call(raster::bind, xy_buf)
     }
   }
-  if(!is.null(coastline)) {
-    if(length(xy_buf) == 1) {
+  if (!is.null(coastline)) {
+    if (length(xy_buf) == 1) {
       xy_buf <- rgeos::gDifference(xy_buf, coastline)
     } else {
       xy_buf <- lapply(1:length(xy_buf), function(i) rgeos::gDifference(xy_buf[i, ], coastline))
@@ -171,8 +177,8 @@ get_detection_containers <- function(xy,
   }
 
   #### Plot [update to use pretty_map()]
-  if(plot){
-    if(!is.null(coastline)) {
+  if (plot) {
+    if (!is.null(coastline)) {
       raster::plot(coastline)
       graphics::points(xy, pch = 4)
     } else {
@@ -183,7 +189,6 @@ get_detection_containers <- function(xy,
 
   #### Return outputs
   return(xy_buf)
-
 }
 
 
@@ -210,49 +215,57 @@ get_detection_containers <- function(xy,
 #' #### Define receiver containers
 #' ## Define receiver locations as a SpatialPoints object with a UTM CRS
 #' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 #' rownames(dat_moorings) <- dat_moorings$receiver_id
-#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-#'                         proj_wgs84)
+#' xy <- sp::SpatialPoints(
+#'   dat_moorings[, c("receiver_long", "receiver_lat")],
+#'   proj_wgs84
+#' )
 #' xy <- sp::spTransform(xy, proj_utm)
 #' ## Get receiver-specific detection containers
 #' # ... via get_detection_containers with byid = TRUE
 #' containers <- get_detection_containers(xy, byid = TRUE)
 #' ## Link detection containers with receiver IDs and deployment dates
 #' # ... in a SpatialPointsDataFrame, as required for this function.
-#' containers_df <- dat_moorings[, c("receiver_id",
-#'                                  "receiver_start_date",
-#'                                  "receiver_end_date")]
+#' containers_df <- dat_moorings[, c(
+#'   "receiver_id",
+#'   "receiver_start_date",
+#'   "receiver_end_date"
+#' )]
 #' row.names(containers_df) <- names(containers)
 #' containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
 #'
 #' ## Simulate some receiver 'servicing' dates for demonstration purposes
 #' set.seed(1)
 #' # Loop over each receiver...
-#' services_by_receiver <- lapply(split(dat_moorings, 1:nrow(dat_moorings)), function(din){
+#' services_by_receiver <- lapply(split(dat_moorings, 1:nrow(dat_moorings)), function(din) {
 #'   # For the receiver, simulate the number of servicing events
 #'   n <- sample(0:3, 1)
 #'   dout <- NULL
-#'   if(n > 0){
+#'   if (n > 0) {
 #'     # simulate the timing of servicing events
 #'     dates <- sample(seq(min(din$receiver_start_date), max(din$receiver_end_date), "days"), n)
-#'     dout <- data.frame(receiver_id = rep(din$receiver_id, length(dates)),
-#'                        service_start_date = dates,
-#'                        service_end_date = dates)
+#'     dout <- data.frame(
+#'       receiver_id = rep(din$receiver_id, length(dates)),
+#'       service_start_date = dates,
+#'       service_end_date = dates
+#'     )
 #'   }
 #'   return(dout)
 #' })
 #' services <- do.call(rbind, services_by_receiver)
 #' rownames(services) <- NULL
-#' if(nrow(services) == 0) services <- NULL
+#' if (nrow(services) == 0) services <- NULL
 #'
 #' #### Example (1): Implement function using containers alone
 #' overlaps_1 <- get_detection_containers_overlap(containers = containers)
 #' summary(overlaps_1)
 #'
 #' #### Example (2): Account for servicing dates
-#' overlaps_2 <- get_detection_containers_overlap(containers = containers,
-#'                                               services = services)
+#' overlaps_2 <- get_detection_containers_overlap(
+#'   containers = containers,
+#'   services = services
+#' )
 #' # Examine the first few simulated servicing events
 #' services[1:3, ]
 #' # Show that the list_by_date element for the first servicing event
@@ -265,45 +278,54 @@ get_detection_containers <- function(xy,
 #' # ... includes overlapping receivers in overlaps_1 but not overlaps_2:
 #' r_id <- services$receiver_id[1]
 #' overlaps_1$list_by_receiver[[r_id]][overlaps_1$list_by_receiver[[r_id]]$timestamp %in%
-#'                                       services$service_start_date[services$receiver_id == r_id], ]
+#'   services$service_start_date[services$receiver_id == r_id], ]
 #' overlaps_2$list_by_receiver[[r_id]][overlaps_2$list_by_receiver[[r_id]]$timestamp %in%
-#'                                       services$service_start_date[services$receiver_id == r_id], ]
+#'   services$service_start_date[services$receiver_id == r_id], ]
 #'
 #' @seealso \code{\link[flapper]{get_detection_containers}} creates detection containers.
 #' @author Edward Lavender
 #' @export
 
 
-get_detection_containers_overlap <- function(containers, services = NULL){
-
+get_detection_containers_overlap <- function(containers, services = NULL) {
   #### Checks
   ## packages
-  if(!requireNamespace("tidyr", quietly = TRUE)) stop("Please install 'tidyr': this function requires the tidyr::pivot_longer() routine.")
+  if (!requireNamespace("tidyr", quietly = TRUE)) stop("Please install 'tidyr': this function requires the tidyr::pivot_longer() routine.")
   ## containers
-  if(!inherits(containers, "SpatialPolygonsDataFrame")) stop("'containers' must be a SpatialPolygonsDataFrame.")
+  if (!inherits(containers, "SpatialPolygonsDataFrame")) stop("'containers' must be a SpatialPolygonsDataFrame.")
   ## moorings
   moorings <- data.frame(containers)
-  check_names(input = moorings, req = c("receiver_id", "receiver_start_date", "receiver_end_date"),
-              extract_names = colnames, type = all)
-  if(is.numeric(moorings$receiver_id)) moorings$receiver_id <- as.integer(moorings$receiver_id)
-  if(!is.integer(moorings$receiver_id))
+  check_names(
+    input = moorings, req = c("receiver_id", "receiver_start_date", "receiver_end_date"),
+    extract_names = colnames, type = all
+  )
+  if (is.numeric(moorings$receiver_id)) moorings$receiver_id <- as.integer(moorings$receiver_id)
+  if (!is.integer(moorings$receiver_id)) {
     stop(paste("Argument 'xy$receiver_id' must be of class 'integer', not class(es):"), class(moorings$receiver_id))
-  if(any(moorings$receiver_id <= 0))
+  }
+  if (any(moorings$receiver_id <= 0)) {
     stop("Argument 'xy$receiver_id' cannot contain receiver IDs <= 0.")
-  if(any(duplicated(moorings$receiver_id )))
+  }
+  if (any(duplicated(moorings$receiver_id))) {
     stop("Argument 'xy$receiver_id' contains duplicate elements.")
+  }
   ## services
-  if(!is.null(services)){
-    check_names(input = services, req = c("receiver_id", "service_start_date", "service_end_date"),
-                extract_names = colnames, type = all)
-    if(is.numeric(services$receiver_id)) services$receiver_id <- as.integer(services$receiver_id)
-    if(!is.integer(services$receiver_id))
+  if (!is.null(services)) {
+    check_names(
+      input = services, req = c("receiver_id", "service_start_date", "service_end_date"),
+      extract_names = colnames, type = all
+    )
+    if (is.numeric(services$receiver_id)) services$receiver_id <- as.integer(services$receiver_id)
+    if (!is.integer(services$receiver_id)) {
       stop(paste("Argument 'services$receiver_id' must be of class 'integer', not class(es):"), class(services$receiver_id))
-    if(!all(unique(services$receiver_id) %in% unique(moorings$receiver_id))){
+    }
+    if (!all(unique(services$receiver_id) %in% unique(moorings$receiver_id))) {
       message("Not all receivers in services$receiver_id are in moorings$receiver_id.")
     }
-    services$interval <- lubridate::interval(services$service_start_date,
-                                             services$service_end_date)
+    services$interval <- lubridate::interval(
+      services$service_start_date,
+      services$service_end_date
+    )
   }
 
   #### Define receiver activity status matrix
@@ -311,16 +333,17 @@ get_detection_containers_overlap <- function(containers, services = NULL){
   # We'll start from this point because it accounts for receiver activity status (including servicing).
   # We'll then update this, for each receiver, to define whether or not, if that receiver was active on a given date
   # ... which other receivers (if any) it overlapped in space (and time) with.
-  rs_active_mat <- make_matrix_receivers(moorings = moorings,
-                                         services = services,
-                                         delta_t = "days",
-                                         as_POSIXct = NULL)
+  rs_active_mat <- make_matrix_receivers(
+    moorings = moorings,
+    services = services,
+    delta_t = "days",
+    as_POSIXct = NULL
+  )
 
   #### Define a list, with one dataframe element per receiver, that defines, for each time step, the overlapping receivers (0, 1)
   # Loop over each container...
   containers_ls <- lapply(1:length(containers), function(i) containers[i, ])
   list_by_receiver <- pbapply::pblapply(containers_ls, function(container) {
-
     #### Collect container and receiver status information
     # container <- containers_ls[[2]]
     # Copy receiver activity status matrix
@@ -340,8 +363,7 @@ get_detection_containers_overlap <- function(containers, services = NULL){
     int_1 <- rgeos::gIntersects(container, containers_sbt, byid = TRUE)
 
     ## (B) If there are any overlapping receivers,
-    if(any(int_1)){
-
+    if (any(int_1)) {
       ## Process 'overlap' when the receiver was not active
       # ... Any time there is a '0' for activity status of the current receiver (e.g., due to servicing),
       # ... there can be no overlap with that receiver
@@ -364,7 +386,9 @@ get_detection_containers_overlap <- function(containers, services = NULL){
       info[, !(colnames(info) %in% containers_that_overlapped$receiver_id)] <- 0
 
       ## (C) If there aren't any spatially overlapping receivers, then the whole matrix just takes on 0
-    } else  info[] <- 0
+    } else {
+      info[] <- 0
+    }
 
     #### Process dataframe
     rnms <- rownames(info)
@@ -381,11 +405,13 @@ get_detection_containers_overlap <- function(containers, services = NULL){
 
   #### On each date, get the vector of overlapping receivers
   # Note that not every receiver in this list will necessarily overlap with every other receiver though.
-  lbd <- lapply(list_by_receiver, function(d){
-    tidyr::pivot_longer(data = d,
-                        cols = 3:ncol(d),
-                        names_to = "receiver_id_2",
-                        names_transform = list(receiver_id_2 = as.integer))
+  lbd <- lapply(list_by_receiver, function(d) {
+    tidyr::pivot_longer(
+      data = d,
+      cols = 3:ncol(d),
+      names_to = "receiver_id_2",
+      names_transform = list(receiver_id_2 = as.integer)
+    )
   })
   lbd <- dplyr::bind_rows(lbd) %>% dplyr::filter(.data$value == 1)
   lbd <- lapply(split(lbd, lbd$timestamp), function(d) unique(c(d$receiver_id[1], d$receiver_id_2)))
@@ -393,19 +419,23 @@ get_detection_containers_overlap <- function(containers, services = NULL){
   ##### Process outputs
   # For the list_by_receiver, we will have one element for each receiver from 1:max(moorings$receiver_id)
   # ... (for each indexing)
-  list_by_receiver <- lapply(as.integer(1:max(moorings$receiver_id)), function(i){
-    if(i %in% moorings$receiver_id) return(list_by_receiver[[as.character(i)]]) else return(NULL)
+  list_by_receiver <- lapply(as.integer(1:max(moorings$receiver_id)), function(i) {
+    if (i %in% moorings$receiver_id) {
+      return(list_by_receiver[[as.character(i)]])
+    } else {
+      return(NULL)
+    }
   })
   # For the list_by_date (lbd), we will have one element for each date from the start to the end of the array
   list_by_date <- list()
-  for(day in as.character(seq(min(moorings$receiver_start_date), max(moorings$receiver_end_date), "days"))){
-    if(is.null(lbd[[day]])) list_by_date[[day]] <- NULL else list_by_date[[day]] <- lbd[[day]]
+  for (day in as.character(seq(min(moorings$receiver_start_date), max(moorings$receiver_end_date), "days"))) {
+    if (is.null(lbd[[day]])) list_by_date[[day]] <- NULL else list_by_date[[day]] <- lbd[[day]]
   }
 
   #### Return outputs
   out <- list()
   out$list_by_receiver <- list_by_receiver
-  out$list_by_date     <- list_by_date
+  out$list_by_date <- list_by_date
   return(out)
 }
 
@@ -429,9 +459,11 @@ get_detection_containers_overlap <- function(containers, services = NULL){
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
 #' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-#'                         proj_wgs84)
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+#' xy <- sp::SpatialPoints(
+#'   dat_moorings[, c("receiver_long", "receiver_lat")],
+#'   proj_wgs84
+#' )
 #' xy <- sp::spTransform(xy, proj_utm)
 #'
 #' #### Example (1): Calculate the total area sampled by receivers
@@ -457,18 +489,21 @@ get_detection_containers_overlap <- function(containers, services = NULL){
 get_detection_area_sum <- function(xy,
                                    detection_range = 425,
                                    coastline = NULL,
-                                   scale = 1/(1000^2),
-                                   plot = TRUE,...){
-
+                                   scale = 1 / (1000^2),
+                                   plot = TRUE, ...) {
   #### Checks
   # If xy is empty, return area = 0
-  if(length(xy) == 0) return(0)
+  if (length(xy) == 0) {
+    return(0)
+  }
 
   #### Define detection containers
-  xy_buf <- get_detection_containers(xy = xy,
-                                    detection_range = detection_range,
-                                    coastline = coastline,
-                                    plot = plot,...)
+  xy_buf <- get_detection_containers(
+    xy = xy,
+    detection_range = detection_range,
+    coastline = coastline,
+    plot = plot, ...
+  )
 
   #### Calculate area (m2) covered by buffers overall
   xy_area <- rgeos::gArea(xy_buf) * scale
@@ -494,9 +529,11 @@ get_detection_area_sum <- function(xy,
 #' @examples
 #' #### Define SpatialPointsDataFrame with receiver locations and deployment dates
 #' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-#'                         proj_wgs84)
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+#' xy <- sp::SpatialPoints(
+#'   dat_moorings[, c("receiver_long", "receiver_lat")],
+#'   proj_wgs84
+#' )
 #' xy <- sp::spTransform(xy, proj_utm)
 #' xy <- sp::SpatialPointsDataFrame(xy, data = dat_moorings)
 #'
@@ -506,44 +543,46 @@ get_detection_area_sum <- function(xy,
 #' #### Example (2): Adjust detection range, include coastline and use parallel processing
 #' # For areas with complex coastline, this will reduce the speed of the algorithm
 #' # So we will also supply a cluster to improve the computation time.
-#' if(flapper_run_parallel){
+#' if (flapper_run_parallel) {
 #'   dat <- get_detection_area_ts(xy,
-#'                                detection_range = 500,
-#'                                coastline = dat_coast,
-#'                                cl = parallel::makeCluster(2L),
-#'                                varlist = "dat_coast"
-#'                                )
+#'     detection_range = 500,
+#'     coastline = dat_coast,
+#'     cl = parallel::makeCluster(2L),
+#'     varlist = "dat_coast"
+#'   )
 #' }
 #'
 #' #### Example (3) Hide or customise the plot
 #' dat <- get_detection_area_ts(xy, plot = FALSE)
 #' dat <-
 #'   get_detection_area_ts(xy,
-#'                         pretty_axis_args =
-#'                           list(
-#'                             axis = list(list(format = "%b-%y"),
-#'                                         list()
-#'                                         )),
-#'                        xlab = "Time (month-year)",
-#'                        ylab = expression(paste("Area (", m^2, ")")),
-#'                        type = "l")
+#'     pretty_axis_args =
+#'       list(
+#'         axis = list(
+#'           list(format = "%b-%y"),
+#'           list()
+#'         )
+#'       ),
+#'     xlab = "Time (month-year)",
+#'     ylab = expression(paste("Area (", m^2, ")")),
+#'     type = "l"
+#'   )
 #'
 #' @author Edward Lavender
 #' @export
 #'
 
 get_detection_area_ts <- function(xy,
-                              detection_range = 425,
-                              coastline = NULL,
-                              scale = 1/(1000^2),
-                              plot = TRUE,
-                              verbose = TRUE,
-                              cl = NULL,
-                              varlist = NULL,...){
-
+                                  detection_range = 425,
+                                  coastline = NULL,
+                                  scale = 1 / (1000^2),
+                                  plot = TRUE,
+                                  verbose = TRUE,
+                                  cl = NULL,
+                                  varlist = NULL, ...) {
   #### Checks
   t_onset <- Sys.time()
-  cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+  cat_to_console <- function(..., show = verbose) if (show) cat(paste(..., "\n"))
   cat_to_console(paste0("flapper::get_detection_area_ts() called (@ ", t_onset, ")..."))
   cat_to_console("... Implementing function checks...")
   check_class(input = xy, to_class = "SpatialPointsDataFrame", type = "stop")
@@ -552,13 +591,15 @@ get_detection_area_ts <- function(xy,
   #### Implement algorithm
   cat_to_console("... Implementing algorithm...")
   rdate_seq <- seq.Date(min(xy$receiver_start_date), max(xy$receiver_end_date), 1)
-  rcov <- cl_lapply(rdate_seq, cl = cl, varlist = varlist, fun = function(rdate){
+  rcov <- cl_lapply(rdate_seq, cl = cl, varlist = varlist, fun = function(rdate) {
     pos <- which(xy$receiver_start_date <= rdate & xy$receiver_end_date >= rdate)
-    receiver_area <- get_detection_area_sum(xy = xy[pos, ],
-                                            detection_range = detection_range,
-                                            coastline = coastline,
-                                            scale = scale,
-                                            plot = FALSE)
+    receiver_area <- get_detection_area_sum(
+      xy = xy[pos, ],
+      detection_range = detection_range,
+      coastline = coastline,
+      scale = scale,
+      plot = FALSE
+    )
     d <- data.frame(date = rdate, n = length(pos), receiver_area = receiver_area)
     return(d)
   })
@@ -566,14 +607,13 @@ get_detection_area_ts <- function(xy,
 
   #### Visualise time series
   cat_to_console("... Visualising time series")
-  if(plot) prettyGraphics::pretty_plot(rcov$date, rcov$receiver_area,...)
+  if (plot) prettyGraphics::pretty_plot(rcov$date, rcov$receiver_area, ...)
 
   #### Return outputs
   t_end <- Sys.time()
   duration <- difftime(t_end, t_onset, units = "mins")
   cat_to_console(paste0("... flapper::get_detection_area_ts() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
   return(rcov)
-
 }
 
 
@@ -599,60 +639,72 @@ get_detection_area_ts <- function(xy,
 #'
 #' @examples
 #' #### Example (1): Number of operational receivers over an acoustic telemetry study
-#' dat_n <- get_n_operational_ts(data = dat_moorings,
-#'                               start = "receiver_start_date",
-#'                               stop = "receiver_end_date")
+#' dat_n <- get_n_operational_ts(
+#'   data = dat_moorings,
+#'   start = "receiver_start_date",
+#'   stop = "receiver_end_date"
+#' )
 #' utils::head(dat_n)
 #'
 #' #### Example (2): Number of individuals at liberty over a tagging study
 #' # Define 'tag_end_date' as hypothetical end date of a study
 #' # ...  and assume that all individuals remained tagged until this time
 #' dat_ids$tag_end_date <- as.Date("2017-06-05")
-#' dat_n <- get_n_operational_ts(data = dat_ids,
-#'                               start = "tag_start_date",
-#'                               stop = "tag_end_date")
+#' dat_n <- get_n_operational_ts(
+#'   data = dat_ids,
+#'   start = "tag_start_date",
+#'   stop = "tag_end_date"
+#' )
 #'
 #' #### Example (3): Specify the time period under consideration
-#' dat_n <- get_n_operational_ts(data = dat_ids,
-#'                               start = "tag_start_date",
-#'                               stop = "tag_end_date",
-#'                               times = seq(min(dat_moorings$receiver_start_date),
-#'                                           max(dat_moorings$receiver_end_date), 1)
-#'                               )
+#' dat_n <- get_n_operational_ts(
+#'   data = dat_ids,
+#'   start = "tag_start_date",
+#'   stop = "tag_end_date",
+#'   times = seq(
+#'     min(dat_moorings$receiver_start_date),
+#'     max(dat_moorings$receiver_end_date), 1
+#'   )
+#' )
 #'
 #' #### Example (4): Suppress or customise the plot
-#' dat_n <- get_n_operational_ts(data = dat_ids,
-#'                               start = "tag_start_date",
-#'                               stop = "tag_end_date",
-#'                               plot = FALSE)
-#' dat_n <- get_n_operational_ts(data = dat_ids,
-#'                               start = "tag_start_date",
-#'                               stop = "tag_end_date",
-#'                               xlab = "Time", ylab = "N (individuals)",
-#'                               type = "l")
+#' dat_n <- get_n_operational_ts(
+#'   data = dat_ids,
+#'   start = "tag_start_date",
+#'   stop = "tag_end_date",
+#'   plot = FALSE
+#' )
+#' dat_n <- get_n_operational_ts(
+#'   data = dat_ids,
+#'   start = "tag_start_date",
+#'   stop = "tag_end_date",
+#'   xlab = "Time", ylab = "N (individuals)",
+#'   type = "l"
+#' )
 #'
 #' #### Example (5): Additional examples with simulated data
 #' # Example with one unit deployed on each day
-#' tmp <- data.frame(id = 1:3L,
-#'                   start = as.Date(c("2016-01-01", "2016-01-02", "2016-01-03")),
-#'                   stop = as.Date(c("2016-01-01", "2016-01-02", "2016-01-03"))
-#'                   )
+#' tmp <- data.frame(
+#'   id = 1:3L,
+#'   start = as.Date(c("2016-01-01", "2016-01-02", "2016-01-03")),
+#'   stop = as.Date(c("2016-01-01", "2016-01-02", "2016-01-03"))
+#' )
 #' get_n_operational_ts(data = tmp, start = "start", stop = "stop")
 #' # Example with one unit deployed over a longer period
-#' tmp <- data.frame(id = 1:3L,
-#'                   start = as.Date(c("2016-01-01", "2016-01-02", "2016-01-03")),
-#'                   stop = as.Date(c("2016-01-10", "2016-01-02", "2016-01-03"))
-#'                   )
+#' tmp <- data.frame(
+#'   id = 1:3L,
+#'   start = as.Date(c("2016-01-01", "2016-01-02", "2016-01-03")),
+#'   stop = as.Date(c("2016-01-10", "2016-01-02", "2016-01-03"))
+#' )
 #' get_n_operational_ts(data = tmp, start = "start", stop = "stop")
 #'
 #' @author Edward Lavender
 #' @export
 #'
 
-get_n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,...){
-
+get_n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE, ...) {
   #### Define a sequence of times that span the range of the data, if required.
-  if(is.null(times)){
+  if (is.null(times)) {
     times <- seq(min(data[, start], na.rm = TRUE), max(data[, stop], na.rm = TRUE), by = "days")
   }
 
@@ -660,12 +712,12 @@ get_n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,..
   count <- data.frame(time = times)
   count$n <- 0
   data$interval <- lubridate::interval(data[, start], data[, stop])
-  for(i in 1:nrow(count)){
+  for (i in 1:nrow(count)) {
     count$n[i] <- sum(count$time[i] %within% data$interval)
   }
 
   #### Plot the results
-  if(plot) prettyGraphics::pretty_plot(count$time, count$n,...)
+  if (plot) prettyGraphics::pretty_plot(count$time, count$n, ...)
 
   #### Return the dataframe
   return(count)
@@ -700,54 +752,55 @@ get_n_operational_ts <- function(data, start, stop, times = NULL, plot = TRUE,..
 #' dat <- get_id_rec_overlap(dat_ids, dat_moorings)
 #'
 #' #### Example (2): Temporal overlap between all combinations of specified
-#' #... individuals/receivers
+#' # ... individuals/receivers
 #' dat <- get_id_rec_overlap(dat_ids,
-#'                           dat_moorings,
-#'                           individual_id = c(25, 26),
-#'                           receiver_id = c(3, 4),
-#'                           type = 2L)
+#'   dat_moorings,
+#'   individual_id = c(25, 26),
+#'   receiver_id = c(3, 4),
+#'   type = 2L
+#' )
 #'
 #' #### Example (3): Temporal overlap between specified individual/receiver pairs
 #' dat <- get_id_rec_overlap(dat_ids,
-#'                           dat_moorings,
-#'                           individual_id = c(25, 26),
-#'                           receiver_id = c(3, 4),
-#'                           type = 1L)
+#'   dat_moorings,
+#'   individual_id = c(25, 26),
+#'   receiver_id = c(3, 4),
+#'   type = 1L
+#' )
 #'
 #' #### Example (4): Match temporal overlap to another dataframe
 #' dat_acoustics$get_id_rec_overlap <-
 #'   get_id_rec_overlap(dat_ids,
-#'                      dat_moorings,
-#'                      match_to = dat_acoustics,
-#'                      type = 1L)
+#'     dat_moorings,
+#'     match_to = dat_acoustics,
+#'     type = 1L
+#'   )
 #'
 #' @author Edward Lavender
 #' @export
 #'
 
 get_id_rec_overlap <- function(ids,
-                           moorings,
-                           individual_id = NULL,
-                           receiver_id = NULL,
-                           type = 1L,
-                           match_to = NULL){
-
+                               moorings,
+                               individual_id = NULL,
+                               receiver_id = NULL,
+                               type = 1L,
+                               match_to = NULL) {
   #### Checks
   # Dataframes must contains required names
   check_names(input = ids, req = c("individual_id", "tag_start_date", "tag_end_date"), extract_names = colnames, type = all)
   check_names(input = moorings, req = c("receiver_id", "receiver_start_date", "receiver_end_date"), extract_names = colnames, type = all)
-  if(!is.null(match_to)) check_names(input = match_to, req = c("individual_id", "receiver_id"), extract_names = colnames, type = all)
+  if (!is.null(match_to)) check_names(input = match_to, req = c("individual_id", "receiver_id"), extract_names = colnames, type = all)
   # Check input to type
   type <- check_value(input = type, supp = 1:2L)
 
   #### Define dataframe with individuals and receivers
   ## Option (1) Both individual_id and receiver_id have been supplied
   # ... in which case we will define a dataframe for these specific individuals based on type
-  if(!is.null(individual_id) & !is.null(receiver_id)) {
-
+  if (!is.null(individual_id) & !is.null(receiver_id)) {
     # If type == 1, then we will consider each pair of individuals and receivers
-    if(type == 1L) {
-      if(length(individual_id) != length(receiver_id)) {
+    if (type == 1L) {
+      if (length(individual_id) != length(receiver_id)) {
         stop("Both 'individual_id' and 'receiver_id' have been specified and type = 1L but length(individual_id) != length(receiver_id).")
       }
       dat <- data.frame(individual_id = individual_id, receiver_id = receiver_id)
@@ -759,48 +812,47 @@ get_id_rec_overlap <- function(ids,
 
     ## Option (2) Use all combinations of individuals/receivers
   } else {
-
     # Filter out any unwanted individuals or receivers
-    if(!is.null(individual_id)) ids <- ids[which(ids$individual_id %in% individual_id), ]
-    if(!is.null(receiver_id)) moorings <- moorings[which(moorings$receiver_id %in% receiver_id), ]
+    if (!is.null(individual_id)) ids <- ids[which(ids$individual_id %in% individual_id), ]
+    if (!is.null(receiver_id)) moorings <- moorings[which(moorings$receiver_id %in% receiver_id), ]
     # Define dataframe
     # This will only include receivers that recorded detections
-    dat <- expand.grid(individual_id = unique(ids$individual_id),
-                       receiver_id = unique(moorings$receiver_id))
-
+    dat <- expand.grid(
+      individual_id = unique(ids$individual_id),
+      receiver_id = unique(moorings$receiver_id)
+    )
   }
 
   #### Define dates
   # Define start/end dates for individuals' time at liberty
-  dat$tag_start_date      <- ids$tag_start_date[match(dat$individual_id, ids$individual_id)]
-  dat$tag_end_date        <- ids$tag_end_date[match(dat$individual_id, ids$individual_id)]
+  dat$tag_start_date <- ids$tag_start_date[match(dat$individual_id, ids$individual_id)]
+  dat$tag_end_date <- ids$tag_end_date[match(dat$individual_id, ids$individual_id)]
   # Define start/end dates for receivers' deployment time
   dat$receiver_start_date <- moorings$receiver_start_date[match(dat$receiver_id, moorings$receiver_id)]
-  dat$receiver_end_date   <- moorings$receiver_end_date[match(dat$receiver_id, moorings$receiver_id)]
+  dat$receiver_end_date <- moorings$receiver_end_date[match(dat$receiver_id, moorings$receiver_id)]
   # Define intervals
-  dat$tag_interval       <- lubridate::interval(dat$tag_start_date, dat$tag_end_date)
-  dat$receiver_interval  <- lubridate::interval(dat$receiver_start_date, dat$receiver_end_date)
+  dat$tag_interval <- lubridate::interval(dat$tag_start_date, dat$tag_end_date)
+  dat$receiver_interval <- lubridate::interval(dat$receiver_start_date, dat$receiver_end_date)
 
   #### Calculate overlap
   # Define the overlap in days, including the first day of overlap (+1)
   dat$id_rec_overlap <- lubridate::day(lubridate::as.period(lubridate::intersect(dat$tag_interval, dat$receiver_interval), "days")) + 1
 
   #### Match detection days to another dataframe, if requested
-  if(!is.null(match_to)) {
+  if (!is.null(match_to)) {
     dat$key <- paste0(dat$individual_id, "-", dat$receiver_id)
-    match_to$key  <- paste0(match_to$individual_id, "-", match_to$receiver_id)
+    match_to$key <- paste0(match_to$individual_id, "-", match_to$receiver_id)
     match_to$id_rec_overlap <- dat$id_rec_overlap[match(match_to$key, dat$key)]
     out <- match_to$id_rec_overlap
-    if(any(is.na(out))){
+    if (any(is.na(out))) {
       message(sum(is.na(out)), "NAs identified in matched vector of id_rec_overlap.")
     }
-  } else{
+  } else {
     out <- dat
   }
 
   #### Return outputs
   return(out)
-
 }
 
 
@@ -824,63 +876,72 @@ get_id_rec_overlap <- function(ids,
 #' @examples
 #' #### Define receiver locations as a SpatialPoints object with a UTM CRS
 #' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-#'                         proj_wgs84)
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+#' xy <- sp::SpatialPoints(
+#'   dat_moorings[, c("receiver_long", "receiver_lat")],
+#'   proj_wgs84
+#' )
 #' xy <- sp::spTransform(xy, proj_utm)
 #'
 #' #### Example (1): Extract all depth values within each receiver's container
 #' depths_by_container <-
-#'   get_detection_containers_envir(xy = xy,
-#'                                 detection_range = 425,
-#'                                 coastline = dat_coast,
-#'                                 envir = dat_gebco
-#'                                 )
+#'   get_detection_containers_envir(
+#'     xy = xy,
+#'     detection_range = 425,
+#'     coastline = dat_coast,
+#'     envir = dat_gebco
+#'   )
 #' # The function returns a list of dataframes, one for each receiver
 #' # ... with the cell IDs and the value of the environmental variable
 #' utils::str(depths_by_container)
 #' # Collapse the list and compare conditions across receivers
 #' depths_by_container <-
-#'   lapply(1:length(depths_by_container), function(i){
+#'   lapply(1:length(depths_by_container), function(i) {
 #'     d <- depths_by_container[[i]]
 #'     d$receiver_id <- dat_moorings$receiver_id[i]
 #'     return(d)
 #'   })
 #' depths_by_container <- dplyr::bind_rows(depths_by_container)
-#' prettyGraphics::pretty_boxplot(depths_by_container$receiver_id,
-#'                                depths_by_container$envir)
+#' prettyGraphics::pretty_boxplot(
+#'   depths_by_container$receiver_id,
+#'   depths_by_container$envir
+#' )
 #'
 #' #### Example (2): Extract a random sample of values
 #' # (We'll keep the values small for speed)
 #' depths_by_container <-
-#'   get_detection_containers_envir(xy = xy,
-#'                                 detection_range = 425,
-#'                                 coastline = dat_coast,
-#'                                 envir = dat_gebco,
-#'                                 sample_size = 2
-#'                                 )
+#'   get_detection_containers_envir(
+#'     xy = xy,
+#'     detection_range = 425,
+#'     coastline = dat_coast,
+#'     envir = dat_gebco,
+#'     sample_size = 2
+#'   )
 #' utils::str(depths_by_container)
 #'
 #' #### Example (3) Extract a random sample of values with weighted probabilities
 #' # Define detection probability function based only on distance
 #' calc_detection_pr <-
-#'   function(dist){
-#'     dpr <- get_detection_pr(distance = dist,
-#'                             beta_0 = 2.5,
-#'                             beta_1 = -0.01,
-#'                             inv_link = stats::plogis,
-#'                             output = 2L)
+#'   function(dist) {
+#'     dpr <- get_detection_pr(
+#'       distance = dist,
+#'       beta_0 = 2.5,
+#'       beta_1 = -0.01,
+#'       inv_link = stats::plogis,
+#'       output = 2L
+#'     )
 #'     return(dpr)
 #'   }
 #' # Implement sampling with replacement according to detection probability
 #' depths_by_container <-
-#'   get_detection_containers_envir(xy = xy,
-#'                                 detection_range = 425,
-#'                                 coastline = dat_coast,
-#'                                 envir = dat_gebco,
-#'                                 sample_size = 2,
-#'                                 sample_probs = calc_detection_pr
-#'                                 )
+#'   get_detection_containers_envir(
+#'     xy = xy,
+#'     detection_range = 425,
+#'     coastline = dat_coast,
+#'     envir = dat_gebco,
+#'     sample_size = 2,
+#'     sample_probs = calc_detection_pr
+#'   )
 #' # Each element of the outputted list includes the 'cell' and 'envir' column
 #' # ... as well as 'dist' and 'prob' that define the distance of that cell
 #' # ... from the location in xy and the corresponding detection probability
@@ -889,28 +950,30 @@ get_id_rec_overlap <- function(ids,
 #'
 #' #### Example (4) Sampling without replacement via sample_replace = FALSE
 #' depths_by_container <-
-#'   get_detection_containers_envir(xy = xy,
-#'                                 detection_range = 425,
-#'                                 coastline = dat_coast,
-#'                                 envir = dat_gebco,
-#'                                 sample_size = 2,
-#'                                 sample_probs = calc_detection_pr,
-#'                                 sample_replace = FALSE
-#'                                 )
+#'   get_detection_containers_envir(
+#'     xy = xy,
+#'     detection_range = 425,
+#'     coastline = dat_coast,
+#'     envir = dat_gebco,
+#'     sample_size = 2,
+#'     sample_probs = calc_detection_pr,
+#'     sample_replace = FALSE
+#'   )
 #' utils::str(depths_by_container)
 #'
 #' #### Example (5) Parallelise the algorithm via cl and varlist arguments
 #' depths_by_container <-
-#'   get_detection_containers_envir(xy = xy,
-#'                                 detection_range = 425,
-#'                                 coastline = dat_coast,
-#'                                 envir = dat_gebco,
-#'                                 sample_size = 2,
-#'                                 sample_probs = calc_detection_pr,
-#'                                 sample_replace = FALSE,
-#'                                 cl = parallel::makeCluster(2L),
-#'                                 varlist = c("dat_gebco","calc_detection_pr")
-#'                                 )
+#'   get_detection_containers_envir(
+#'     xy = xy,
+#'     detection_range = 425,
+#'     coastline = dat_coast,
+#'     envir = dat_gebco,
+#'     sample_size = 2,
+#'     sample_probs = calc_detection_pr,
+#'     sample_replace = FALSE,
+#'     cl = parallel::makeCluster(2L),
+#'     varlist = c("dat_gebco", "calc_detection_pr")
+#'   )
 #' utils::str(depths_by_container)
 #'
 #' @author Edward Lavender
@@ -918,42 +981,42 @@ get_id_rec_overlap <- function(ids,
 #'
 
 get_detection_containers_envir <- function(xy,
-                                          detection_range,
-                                          coastline,
-                                          plot = FALSE,
-                                          envir,
-                                          sample_size = NULL,
-                                          sample_replace = TRUE,
-                                          sample_probs = NULL,
-                                          cl = NULL,
-                                          varlist = NULL,
-                                          verbose = TRUE,...){
-
+                                           detection_range,
+                                           coastline,
+                                           plot = FALSE,
+                                           envir,
+                                           sample_size = NULL,
+                                           sample_replace = TRUE,
+                                           sample_probs = NULL,
+                                           cl = NULL,
+                                           varlist = NULL,
+                                           verbose = TRUE, ...) {
   #### Checks
   t_onset <- Sys.time()
-  cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+  cat_to_console <- function(..., show = verbose) if (show) cat(paste(..., "\n"))
   cat_to_console(paste0("flapper::get_detection_containers_envir() called (@ ", t_onset, ")..."))
   cat_to_console("... Implementing function checks...")
-  if(is.null(sample_size)){
-    if(!is.null(sample_probs)) message("sample_size = NULL: input to 'sample_probs' ignored.")
+  if (is.null(sample_size)) {
+    if (!is.null(sample_probs)) message("sample_size = NULL: input to 'sample_probs' ignored.")
     sample_probs <- NULL
   }
-  check...("byid",...)
+  check...("byid", ...)
 
   #### Define detection containers
   cat_to_console("... Defining detection container(s)...")
-  xy_buf <- get_detection_containers(xy = xy,
-                                    detection_range = detection_range,
-                                    coastline = coastline,
-                                    plot = plot,
-                                    byid = TRUE,...)
+  xy_buf <- get_detection_containers(
+    xy = xy,
+    detection_range = detection_range,
+    coastline = coastline,
+    plot = plot,
+    byid = TRUE, ...
+  )
   xy_buf_ls <- lapply(1:length(xy_buf), function(i) xy_buf[i])
 
   #### Extract conditions
   cat_to_console("... Extracting environmental conditions from detection area(s)...")
   ls_envir <-
-    cl_lapply(xy_buf_ls, cl = cl, varlist = varlist, fun = function(container){
-
+    cl_lapply(xy_buf_ls, cl = cl, varlist = varlist, fun = function(container) {
       ## Extract conditions
       # Create list of conditions sampled by each receiver
       envir_sampled <- raster::extract(envir, container, cellnumbers = TRUE)
@@ -962,7 +1025,7 @@ get_detection_containers_envir <- function(xy,
       colnames(dat) <- c("cell", "envir")
 
       ## Define distances
-      if(!is.null(sample_probs)){
+      if (!is.null(sample_probs)) {
         rdist <- raster::distanceFromPoints(envir, xy)
         dist_sampled <- raster::extract(rdist, container, cellnumbers = TRUE)
         dist_sampled <- dist_sampled[[1]]
@@ -973,25 +1036,25 @@ get_detection_containers_envir <- function(xy,
 
       ## Return outputs
       return(dat)
-
     })
 
   #### Sample values according to their probability
-  if(!is.null(sample_size)) {
-    ls_envir_sample <- lapply(ls_envir, function(d){
-      if(!is.null(sample_probs)){
+  if (!is.null(sample_size)) {
+    ls_envir_sample <- lapply(ls_envir, function(d) {
+      if (!is.null(sample_probs)) {
         d$prob <- sample_probs(d$dist)
-      } else d$prob <- NULL
+      } else {
+        d$prob <- NULL
+      }
       envir_sampled <- d[sample(1:nrow(d), size = sample_size, replace = sample_replace, prob = d$prob), ]
       return(envir_sampled)
     })
-  } else{
+  } else {
     ls_envir_sample <- ls_envir
   }
 
   #### Return outputs
   return(ls_envir_sample)
-
 }
 
 
@@ -1023,23 +1086,26 @@ get_detection_containers_envir <- function(xy,
 #'
 #' #### Example (2) Detection days between specified individual/receiver pairs
 #' dat <- get_detection_days(dat_acoustics,
-#'                           individual_id = c(25, 28),
-#'                           receiver_id = c(3, 24),
-#'                           type = 1L)
+#'   individual_id = c(25, 28),
+#'   receiver_id = c(3, 24),
+#'   type = 1L
+#' )
 #' utils::head(dat)
 #'
 #' #### Example (3) Detection days between all combinations of specified
-#' #... individuals/receivers
+#' # ... individuals/receivers
 #' dat <- get_detection_days(dat_acoustics,
-#'                           individual_id = c(25, 28),
-#'                           receiver_id = c(3, 24),
-#'                           type = 2L)
+#'   individual_id = c(25, 28),
+#'   receiver_id = c(3, 24),
+#'   type = 2L
+#' )
 #' utils::head(dat)
 #'
 #' #### Example (4) Match detection days to another dataframe
 #' dat_acoustics$detection_days <- get_detection_days(dat_acoustics,
-#'                                                    match_to = dat_acoustics,
-#'                                                    type = 1L)
+#'   match_to = dat_acoustics,
+#'   type = 1L
+#' )
 #'
 #' utils::head(dat_acoustics)
 #'
@@ -1060,53 +1126,62 @@ get_detection_days <- function(acoustics,
                                individual_id = NULL,
                                receiver_id = NULL,
                                type = c(1L, 2L),
-                               match_to = NULL,...){
+                               match_to = NULL, ...) {
   #### Checks
   # Dataframes must contains required names
   check_names(input = acoustics, req = c("individual_id", "receiver_id", "timestamp"), extract_names = colnames, type = all)
-  if(!is.null(match_to)) check_names(input = match_to, req = c("individual_id", "receiver_id"), extract_names = colnames, type = all)
+  if (!is.null(match_to)) check_names(input = match_to, req = c("individual_id", "receiver_id"), extract_names = colnames, type = all)
   # Define type (use check_value() rather than match.arg() for backwards compatibility)
   type <- type[1]
   type <- check_value(input = type, supp = c(1L, 2L))
   # Check dots
-  if(length(list(...)) > 0L){
+  if (length(list(...)) > 0L) {
     warning("All arguments passed to get_detection_days() via ... are ignored.",
-            immediate. = TRUE, call. = FALSE)
+      immediate. = TRUE, call. = FALSE
+    )
   }
 
   #### Calculate detection days
   ## Filter acoustics by individual_id and receiver_id (if necessary)
-  if(!is.null(individual_id)){
+  if (!is.null(individual_id)) {
     bool <- !(individual_id %in% acoustics$individual_id)
-    if(any(bool)){
-      if(all(bool)){
+    if (any(bool)) {
+      if (all(bool)) {
         stop("No individual IDs in 'acoustics$individual_id'.", call. = FALSE)
-      } else{
-        warning(paste0(length(which(bool)), "/", length(bool),
-                       " individual IDs not in 'acoustics$individual_id' dropped."),
-                immediate. = TRUE, call. = FALSE)
+      } else {
+        warning(
+          paste0(
+            length(which(bool)), "/", length(bool),
+            " individual IDs not in 'acoustics$individual_id' dropped."
+          ),
+          immediate. = TRUE, call. = FALSE
+        )
         individual_id <- individual_id[individual_id %in% acoustics$individual_id]
       }
     }
     iid <- individual_id
-    if(!is.null(iid)){
+    if (!is.null(iid)) {
       acoustics <- acoustics %>% dplyr::filter(.data$individual_id %in% iid)
     }
   }
-  if(!is.null(receiver_id)){
+  if (!is.null(receiver_id)) {
     bool <- !(receiver_id %in% acoustics$receiver_id)
-    if(any(bool)){
-      if(all(bool)){
+    if (any(bool)) {
+      if (all(bool)) {
         stop("No receiver IDs in 'acoustics$receiver_id'.", call. = FALSE)
       } else {
-        warning(paste0(length(which(bool)), "/", length(bool),
-                       " individual IDs not in 'acoustics$receiver_id' dropped."),
-                immediate. = TRUE, call. = FALSE)
+        warning(
+          paste0(
+            length(which(bool)), "/", length(bool),
+            " individual IDs not in 'acoustics$receiver_id' dropped."
+          ),
+          immediate. = TRUE, call. = FALSE
+        )
         receiver_id <- receiver_id[receiver_id %in% acoustics$receiver_id]
       }
     }
     rid <- receiver_id
-    if(!is.null(rid)){
+    if (!is.null(rid)) {
       acoustics <- acoustics %>% dplyr::filter(.data$receiver_id %in% rid)
     }
   }
@@ -1119,14 +1194,15 @@ get_detection_days <- function(acoustics,
     dplyr::mutate(key = paste(.data$individual_id, .data$receiver_id))
 
   ## Extract counts for specific individual/receiver pairs or all combinations of individuals/receivers
-  if(!is.null(individual_id) && !is.null(receiver_id)){
-    if(type == 1L){
-      if(length(individual_id) != length(receiver_id)) {
+  if (!is.null(individual_id) && !is.null(receiver_id)) {
+    if (type == 1L) {
+      if (length(individual_id) != length(receiver_id)) {
         stop("Both 'individual_id' and 'receiver_id' have been specified and type = 1L but length(individual_id) != length(receiver_id).",
-             call. = FALSE)
+          call. = FALSE
+        )
       }
       out <- out %>% dplyr::filter(.data$key %in% paste(individual_id, receiver_id))
-    } else if(type == 2L){
+    } else if (type == 2L) {
       out <-
         expand.grid(individual_id = individual_id, receiver_id = receiver_id) %>%
         dplyr::mutate(key = paste(.data$individual_id, .data$receiver_id)) %>%
@@ -1135,21 +1211,20 @@ get_detection_days <- function(acoustics,
   }
 
   #### Match detection days to another dataframe, if requested
-  if(is.null(match_to)) {
+  if (is.null(match_to)) {
     out$key <- NULL
-    out     <- as.data.frame(out)
+    out <- as.data.frame(out)
   } else {
-    match_to$key            <- paste(match_to$individual_id, match_to$receiver_id)
+    match_to$key <- paste(match_to$individual_id, match_to$receiver_id)
     match_to$detection_days <- out$detection_days[match(match_to$key, out$key)]
-    out                     <- match_to$detection_days
-    if(any(is.na(out))){
+    out <- match_to$detection_days
+    if (any(is.na(out))) {
       message(sum(is.na(out)), " NAs identified in matched vector of detection days.")
     }
   }
 
   #### Return outputs
   return(out)
-
 }
 
 
@@ -1183,7 +1258,8 @@ get_detection_days <- function(acoustics,
 #'   data.frame(
 #'     timestamp =
 #'       as.POSIXct(
-#'         c("2016-01-01", # one week of continuous detections
+#'         c(
+#'           "2016-01-01", # one week of continuous detections
 #'           "2016-01-02",
 #'           "2016-01-03",
 #'           "2016-01-04",
@@ -1199,7 +1275,10 @@ get_detection_days <- function(acoustics,
 #'           "2016-03-02",
 #'           "2016-03-03",
 #'           "2016-03-04",
-#'           "2016-03-05")))
+#'           "2016-03-05"
+#'         )
+#'       )
+#'   )
 #'
 #' #### Example (1): Implement function with default options
 #' # ... (for one individual, with a daily time interval)
@@ -1231,28 +1310,30 @@ get_detection_clumps <-
   function(acoustics,
            fct = NULL,
            interval = "days",
-           summarise = TRUE){
-
+           summarise = TRUE) {
     #### Checks
     check_names(input = acoustics, req = c("timestamp", fct), type = all)
     splitter <- fct
-    if(is.null(fct)) {
+    if (is.null(fct)) {
       splitter <- "individual_id"
       acoustics[, splitter] <- 1L
     }
 
     #### Define a sequence of times at which to identify whether or not detections were recorded
-    times <- seq(min(lubridate::floor_date(acoustics$timestamp, interval)),
-                 max(lubridate::ceiling_date(acoustics$timestamp, interval)),
-                 interval)
+    times <- seq(
+      min(lubridate::floor_date(acoustics$timestamp, interval)),
+      max(lubridate::ceiling_date(acoustics$timestamp, interval)),
+      interval
+    )
     acoustics$timestamp <- lubridate::round_date(acoustics$timestamp, interval)
-    if(!identical(class(acoustics$timestamp), class(times)))
+    if (!identical(class(acoustics$timestamp), class(times))) {
       stop("class(acoustics$timestamp) and class(times) are not identical.")
+    }
 
     #### Define a dataframe with .....
     counts_by_id <-
       # Loop over each individual
-      lapply(split(acoustics, acoustics[, splitter]), function(d){
+      lapply(split(acoustics, acoustics[, splitter]), function(d) {
         # Identify whether detections were recorded at each timestamp
         bool <- times %in% d$timestamp
         # For each group of consecutive times when detections were made
@@ -1267,9 +1348,11 @@ get_detection_clumps <-
           dplyr::group_by(.data$grp) %>%
           dplyr::mutate(n = dplyr::n()) %>%
           dplyr::slice(1L)
-        if(!summarise){
-          out <- data.frame(n_intervals = tmp$n,
-                            timestamp   = tmp$timestamp)
+        if (!summarise) {
+          out <- data.frame(
+            n_intervals = tmp$n,
+            timestamp = tmp$timestamp
+          )
           out <- out %>% dplyr::arrange(.data$timestamp)
         } else {
           # Get the frequency distribution of the lengths of strings of consecutive detections
@@ -1278,13 +1361,15 @@ get_detection_clumps <-
           # ... e.g., 15 occasions when the number of intervals in a string of consecutive detections
           # ... was only one, 5 occasions when consecutive detections lasted for two days (etc.)
           out <- table(tmp$n)
-          out <- data.frame(n_intervals = as.integer(names(out)),
-                            n_occasions = as.numeric(out))
+          out <- data.frame(
+            n_intervals = as.integer(names(out)),
+            n_occasions = as.numeric(out)
+          )
           out$eg_occasions <- tmp$timestamp[match(out$n_intervals, tmp$n)]
           out <- out %>% dplyr::arrange(.data$n_intervals)
         }
 
-        if(!is.null(fct)) out[, fct] <- d[1, fct]
+        if (!is.null(fct)) out[, fct] <- d[1, fct]
         return(out)
       })
     counts <- do.call(rbind, counts_by_id)
@@ -1328,16 +1413,20 @@ get_detection_clumps <-
 #' ## (see ?flapper::get_detection_container_overlaps)
 #' # Define receiver locations
 #' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 #' rownames(dat_moorings) <- dat_moorings$receiver_id
-#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-#'                         proj_wgs84)
+#' xy <- sp::SpatialPoints(
+#'   dat_moorings[, c("receiver_long", "receiver_lat")],
+#'   proj_wgs84
+#' )
 #' xy <- sp::spTransform(xy, proj_utm)
 #' # Get receiver-specific detection containers
 #' containers <- get_detection_containers(xy, byid = TRUE)
-#' containers_df <- dat_moorings[, c("receiver_id",
-#'                                  "receiver_start_date",
-#'                                  "receiver_end_date")]
+#' containers_df <- dat_moorings[, c(
+#'   "receiver_id",
+#'   "receiver_start_date",
+#'   "receiver_end_date"
+#' )]
 #' row.names(containers_df) <- names(containers)
 #' containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
 #' # Define detection container overlaps
@@ -1351,11 +1440,13 @@ get_detection_clumps <-
 #' # For some individuals, there are simultaneous detections at receivers with
 #' # ... non overlapping detection containers, suggesting these are probably too small.
 #' dat_by_id <-
-#'   lapply(split(dat_acoustics, dat_acoustics$individual_id),
-#'          function(acc_for_id){
-#'            print(paste("individual_id", acc_for_id$individual_id[1], "-------"))
-#'            get_detection_overlaps(acoustics = acc_for_id, overlaps = overlaps)
-#'          })
+#'   lapply(
+#'     split(dat_acoustics, dat_acoustics$individual_id),
+#'     function(acc_for_id) {
+#'       print(paste("individual_id", acc_for_id$individual_id[1], "-------"))
+#'       get_detection_overlaps(acoustics = acc_for_id, overlaps = overlaps)
+#'     }
+#'   )
 #' ## Test this hypothesis by re-implementing approach with larger containers
 #' # Re-define containers and receiver overlap
 #' containers <- get_detection_containers(xy, detection_range = 750, byid = TRUE)
@@ -1363,11 +1454,13 @@ get_detection_clumps <-
 #' overlaps <- get_detection_containers_overlap(containers = containers)
 #' # Re-implement algorithm
 #' dat_by_id <-
-#'   lapply(split(dat_acoustics, dat_acoustics$individual_id),
-#'          function(acc_for_id){
-#'            print(paste("individual_id", acc_for_id$individual_id[1], "-------"))
-#'            get_detection_overlaps(acoustics = acc_for_id, overlaps = overlaps)
-#'          })
+#'   lapply(
+#'     split(dat_acoustics, dat_acoustics$individual_id),
+#'     function(acc_for_id) {
+#'       print(paste("individual_id", acc_for_id$individual_id[1], "-------"))
+#'       get_detection_overlaps(acoustics = acc_for_id, overlaps = overlaps)
+#'     }
+#'   )
 #' # There are now no observations within clock_drift at receivers with
 #' # ... non-overlapping containers.
 #'
@@ -1375,11 +1468,10 @@ get_detection_clumps <-
 #' @export
 #'
 
-get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5){
-
+get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5) {
   #### Checks
   check_names(input = acoustics, req = c("timestamp", "receiver_id"), type = all)
-  if(!is.null(overlaps)) {
+  if (!is.null(overlaps)) {
     check_names(input = overlaps, req = "list_by_receiver", type = all)
     overlaps <- overlaps$list_by_receiver
   }
@@ -1392,7 +1484,7 @@ get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5){
   acoustics <- acoustics[, c("timestamp_1", "receiver_id_1")]
   # Get original order
   acoustics$index <- 1:nrow(acoustics)
-  if(is.unsorted(acoustics$timestamp_1)) {
+  if (is.unsorted(acoustics$timestamp_1)) {
     message("'acoustics' is not sorted by timestamp: are there detections for multiple individuals (there shouldn't be)? Sorting 'acoustics' by timestamp...")
     acoustics <- acoustics[order(acoustics$timestamp_1), ]
   }
@@ -1403,7 +1495,7 @@ get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5){
   acoustics$diff_time <- as.numeric(difftime(acoustics$timestamp_2, acoustics$timestamp_1, units = "secs"))
   # Filter observations that occurred within 'clock_drift'
   acoustics <- acoustics[acoustics$receiver_id_1 != acoustics$receiver_id_2 &
-                           acoustics$diff_time <= clock_drift, ]
+    acoustics$diff_time <= clock_drift, ]
 
   #### Determine the number of observations that occurred within the clock drift
   n <- nrow(acoustics)
@@ -1412,7 +1504,7 @@ get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5){
   #### Examine which of these occurred at receivers with overlapping detection containers
   # For each receiver, for each date, we will identify whether detections within the clock drift
   # ... occurred at a spatially overlapping receiver.
-  if(n > 0 & !is.null(overlaps)) {
+  if (n > 0 & !is.null(overlaps)) {
     # receiver_id_2 as a character
     acoustics$receiver_id_2_char <- as.character(acoustics$receiver_id_2)
     # Define a column to distinguish detection dates
@@ -1422,21 +1514,22 @@ get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5){
     # Update acoustics with information on whether or not detections occurred at an overlapping receiver
     acc_by_receiver <-
       # For each receiver...
-      lapply(split(acoustics, acoustics$receiver_id_1), function(acc_by_receiver){
+      lapply(split(acoustics, acoustics$receiver_id_1), function(acc_by_receiver) {
         # Get  receiver-specific overlaps matrix
         # acc_by_receiver <- split(acoustics, acoustics$receiver_id_1)[[1]]
         overlap_for_receiver <- overlaps[[acc_by_receiver$receiver_id_1[1]]]
         stopifnot(acc_by_receiver$receiver_id[1] == overlap_for_receiver$receiver_id[1])
         # For each date...
         acc_by_receiver_by_date <-
-          lapply(split(acc_by_receiver, acc_by_receiver$timestamp_date), function(acc_by_receiver_on_date){
+          lapply(split(acc_by_receiver, acc_by_receiver$timestamp_date), function(acc_by_receiver_on_date) {
             # Get date-specific overlaps matrix
             # acc_by_receiver_on_date <- split(acc_by_receiver, acc_by_receiver$timestamp_date)[[1]]
             overlap_for_receiver_on_date <-
-              overlap_for_receiver[which(overlap_for_receiver$timestamp %in% acc_by_receiver_on_date$timestamp_date[1]),
-                                   , drop = FALSE]
+              overlap_for_receiver[which(overlap_for_receiver$timestamp %in% acc_by_receiver_on_date$timestamp_date[1]), ,
+                drop = FALSE
+              ]
             # For each detection...
-            for(i in 1:nrow(acc_by_receiver_on_date)){
+            for (i in 1:nrow(acc_by_receiver_on_date)) {
               # Work out whether or not that detection occurred at an overlapping receiver
               acc_by_receiver_on_date$detection_in_overlapping_container[i] <-
                 overlap_for_receiver_on_date[, acc_by_receiver_on_date$receiver_id_2_char[i]] == 1
@@ -1453,12 +1546,12 @@ get_detection_overlaps <- function(acoustics, overlaps = NULL, clock_drift = 5){
     n_at_non_overlapping_receivers <- length(which(acoustics$detection_in_overlapping_container == 0))
     message("Of these, there are ", n_at_non_overlapping_receivers, " observation(s) within ", clock_drift, " secs that are not in overlapping containers.")
     # Examine the receiver combinations at which simultaneous detections at non-overlapping receivers occurred:
-    if(n_at_non_overlapping_receivers > 0){
+    if (n_at_non_overlapping_receivers > 0) {
       acoustics$key <- paste0(acoustics$receiver_id_1, "-", acoustics$receiver_id_2)
       keys <- do.call(rbind, strsplit(unique(acoustics$key), split = "-", fixed = TRUE))
       keys <- data.frame(keys)
       keys$key <- NA
-      for(i in 1:nrow(keys)){
+      for (i in 1:nrow(keys)) {
         keys$key[i] <- paste0(sort(c(keys[i, 1], keys[i, 2])), collapse = "-")
       }
       keys <- keys[!duplicated(keys$key), ]
@@ -1516,18 +1609,20 @@ get_residents <- function(acoustics,
                           resident_threshold_duration = c(91.2501, 365.25),
                           resident_labels = c("S", "L"),
                           non_resident_label = "N",
-                          keep = NULL){
+                          keep = NULL) {
   #### Checks
   check_names(input = acoustics, req = c("timestamp", fct), type = all)
   stopifnot(length(resident_threshold_gap) == 1L)
-  if(is.unsorted(resident_threshold_duration))
+  if (is.unsorted(resident_threshold_duration)) {
     stop("'resident_threshold_duration' should be a sorted, numeric vector.")
-  if(length(resident_threshold_duration) != length(resident_labels))
+  }
+  if (length(resident_threshold_duration) != length(resident_labels)) {
     stop("The number of resident_threshold_duration(s) and resident_label(s) should be the same.")
+  }
 
   #### Split based on individual ID
   splitter <- fct
-  if(is.null(fct)) {
+  if (is.null(fct)) {
     splitter <- "individual_id"
     acoustics[, splitter] <- 1L
   }
@@ -1537,9 +1632,10 @@ get_residents <- function(acoustics,
     acoustics %>%
     dplyr::group_by(.data[[splitter]]) %>%
     dplyr::arrange(.data$timestamp) %>%
-    dplyr::mutate(gap = Tools4ETS::serial_difference(.data$timestamp, units = "days"),
-                  flag = Tools4ETS::flag_ts(.data$timestamp, duration_threshold = 24 * 60 * resident_threshold_gap, flag = 3)$flag3,
-                  key = paste0(.data[[splitter]], "-", .data$flag)
+    dplyr::mutate(
+      gap = Tools4ETS::serial_difference(.data$timestamp, units = "days"),
+      flag = Tools4ETS::flag_ts(.data$timestamp, duration_threshold = 24 * 60 * resident_threshold_gap, flag = 3)$flag3,
+      key = paste0(.data[[splitter]], "-", .data$flag)
     ) %>%
     dplyr::group_by(.data$key) %>%
     dplyr::mutate(time = as.numeric(difftime(max(.data$timestamp), min(.data$timestamp), units = "days"))) %>%
@@ -1550,15 +1646,14 @@ get_residents <- function(acoustics,
     dplyr::mutate(resident = factor(non_resident_label, levels = sort(c(non_resident_label, resident_labels)))) %>%
     data.frame()
   # Drop excess columns
-  residents <- residents[,  c(splitter, keep, "time", "resident")]
-  if(is.null(fct)) residents[, splitter] <- NULL
+  residents <- residents[, c(splitter, keep, "time", "resident")]
+  if (is.null(fct)) residents[, splitter] <- NULL
 
   #### Assign residency categories
-  for(i in 1:length(resident_threshold_duration)){
+  for (i in 1:length(resident_threshold_duration)) {
     residents$resident[residents$time >= resident_threshold_duration[i]] <- resident_labels[i]
   }
 
   #### Return dataframe
   return(residents)
 }
-

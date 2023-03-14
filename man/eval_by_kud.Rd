@@ -71,22 +71,25 @@ This function can be combined with \code{\link[flapper]{sim_array}}, \code{\link
 
 #### Step (1) Simulate an array in an area
 # We will pack the area with receivers to generate lots of detections
-array_ls <- sim_array(boundaries = raster::extent(dat_coast),
-                      coastline = dat_coast,
-                      n_receivers = 1000,
-                      arrangement = "regular",
-                      seed = 1)
+array_ls <- sim_array(
+  boundaries = raster::extent(dat_coast),
+  coastline = dat_coast,
+  n_receivers = 1000,
+  arrangement = "regular",
+  seed = 1
+)
 raster::lines(dat_coast)
 array <- array_ls$array
 
 #### Step (2) Simulate a movement path in this area
 n <- 500
-path_ls <- sim_path_sa(n = n,
-                       sim_step = function(...) stats::rgamma(1, shape = 25, scale = 25),
-                       area = array$sea,
-                       seed = 1,
-                       plot = FALSE
-                       )
+path_ls <- sim_path_sa(
+  n = n,
+  sim_step = function(...) stats::rgamma(1, shape = 25, scale = 25),
+  area = array$sea,
+  seed = 1,
+  plot = FALSE
+)
 prettyGraphics::add_sp_path(path_ls$xy_mat, col = viridis::viridis(n), length = 0.02)
 
 #### Step (3) Simulate and aggregate detections over some delta_t interval
@@ -94,10 +97,12 @@ prettyGraphics::add_sp_path(path_ls$xy_mat, col = viridis::viridis(n), length = 
 # ... and determining whether or not the individual is detected in that interval
 # ... and then aggregating detections over some interval e.g., X mins
 # ... (In reality, we would need to consider this choice carefully).
-det_ls <- sim_detections(path = path_ls$xy_mat,
-                         xy = sp::coordinates(array$xy),
-                         calc_detection_pr = function(dist) ifelse(dist < 700, 1, 0),
-                         delta_t = 10)
+det_ls <- sim_detections(
+  path = path_ls$xy_mat,
+  xy = sp::coordinates(array$xy),
+  calc_detection_pr = function(dist) ifelse(dist < 700, 1, 0),
+  delta_t = 10
+)
 
 str(det_ls)
 
@@ -108,19 +113,23 @@ coas <- coa(mat = det_ls$agg$det_mat, xy = sp::coordinates(array$xy))
 path_true <- path_ls$xy_mat
 path_true <-
   sp::SpatialPointsDataFrame(path_true,
-                             data = data.frame(ID = factor(rep(1, nrow(path_true)))),
-                             proj4string = raster::crs(dat_coast))
+    data = data.frame(ID = factor(rep(1, nrow(path_true)))),
+    proj4string = raster::crs(dat_coast)
+  )
 path_coa <- coas
 path_coa <-
   sp::SpatialPointsDataFrame(path_coa,
-                             data = data.frame(ID = factor(rep(1, nrow(path_coa)))),
-                             proj4string = raster::crs(dat_coast))
+    data = data.frame(ID = factor(rep(1, nrow(path_coa)))),
+    proj4string = raster::crs(dat_coast)
+  )
 
 #### Example (1): Implement algorithm using default options
-eval_by_kud(path_sim = path_true,
-            path_est = path_coa,
-            grid = 60,
-            array = array)
+eval_by_kud(
+  path_sim = path_true,
+  path_est = path_coa,
+  grid = 60,
+  array = array
+)
 
 #### Example (2): Account for coastline via kud_around_coastline()
 # Define grid of habitat/non habitat
@@ -129,42 +138,53 @@ raster::values(r) <- 0
 r <- raster::mask(r, dat_coast, updatevalue = 1)
 habitat <- methods::as(r, "SpatialPixelsDataFrame")
 # Implement algorithm
-eval_by_kud(path_sim = path_true,
-            path_est = path_coa,
-            estimate_ud = kud_around_coastline,
-            grid = habitat,
-            array = array)
+eval_by_kud(
+  path_sim = path_true,
+  path_est = path_coa,
+  estimate_ud = kud_around_coastline,
+  grid = habitat,
+  array = array
+)
 
 #### Example (3): Plot customisation options
 # Use add_* lists to customise main plotting features
 # ... such as receivers and land (but also the movement paths etc.)
-eval_by_kud(path_sim = path_true,
-            path_est = path_coa,
-            estimate_ud = kud_around_coastline,
-            grid = habitat,
-            array = array,
-            add_receivers = list(pch = "."),
-            add_land = list(col = "darkgreen"))
+eval_by_kud(
+  path_sim = path_true,
+  path_est = path_coa,
+  estimate_ud = kud_around_coastline,
+  grid = habitat,
+  array = array,
+  add_receivers = list(pch = "."),
+  add_land = list(col = "darkgreen")
+)
 # Use 'process' to focus on contours of the home range of interest
-process <- function(r) { r[r > 95] <- NA; return(r) }
-eval_by_kud(path_sim = path_true,
-            path_est = path_coa,
-            estimate_ud = kud_around_coastline,
-            grid = habitat,
-            process = process,
-            array = array,
-            add_receivers = list(pch = "."),
-            add_land = list(col = "darkgreen"))
+process <- function(r) {
+  r[r > 95] <- NA
+  return(r)
+}
+eval_by_kud(
+  path_sim = path_true,
+  path_est = path_coa,
+  estimate_ud = kud_around_coastline,
+  grid = habitat,
+  process = process,
+  array = array,
+  add_receivers = list(pch = "."),
+  add_land = list(col = "darkgreen")
+)
 # Pass other arguments to via ... to pretty map
-eval_by_kud(path_sim = path_true,
-            path_est = path_coa,
-            estimate_ud = kud_around_coastline,
-            grid = habitat,
-            process = process,
-            array = array,
-            add_receivers = list(pch = "."),
-            add_land = list(col = "darkgreen"),
-            xlab = "x", ylab = "y")
+eval_by_kud(
+  path_sim = path_true,
+  path_est = path_coa,
+  estimate_ud = kud_around_coastline,
+  grid = habitat,
+  process = process,
+  array = array,
+  add_receivers = list(pch = "."),
+  add_land = list(col = "darkgreen"),
+  xlab = "x", ylab = "y"
+)
 
 #### Results
 # In this case, with a regularly spaced and dense array, the COA metric

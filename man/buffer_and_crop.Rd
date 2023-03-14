@@ -28,12 +28,14 @@ This is a simple wrapper for \code{\link[rgeos]{gBuffer}} and \code{\link[raster
 # Define an example raster
 nrw <- ncl <- 50
 r <- raster::raster(nrow = nrw, ncol = ncl)
-r[] <- stats::runif(nrw*ncl, 0, 1)
+r[] <- stats::runif(nrw * ncl, 0, 1)
 # Buffer and crop the raster around an example location
 xy <- sp::SpatialPoints(matrix(c(0, 0), ncol = 2))
-r2  <- buffer_and_crop(to_buffer = xy,
-                          to_crop = r,
-                          buffer = list(width = 10))
+r2 <- buffer_and_crop(
+  to_buffer = xy,
+  to_crop = r,
+  buffer = list(width = 10)
+)
 # Visualise outputs
 pp <- par(mfrow = c(1, 2))
 raster::plot(r)

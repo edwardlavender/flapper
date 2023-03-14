@@ -54,37 +54,42 @@ For coupled simulation--analysis workflows (such as \code{\link[flapper]{sim_arr
 }
 \examples{
 #### Step (1) Simulate an array in an area
-array_ls <- sim_array(boundaries = raster::extent(dat_coast),
-                      coastline = dat_coast,
-                      n_receivers = 100,
-                      arrangement = "regular",
-                      seed = 1)
+array_ls <- sim_array(
+  boundaries = raster::extent(dat_coast),
+  coastline = dat_coast,
+  n_receivers = 100,
+  arrangement = "regular",
+  seed = 1
+)
 raster::lines(dat_coast)
 
 #### Step (2) Simulate a movement path in this area
 n <- 500
-path_ls <- sim_path_sa(n = n,
-                       sim_step = function(...) stats::rgamma(1, shape = 25, scale = 25),
-                       area = array_ls$array$sea,
-                       seed = 1,
-                       plot = FALSE
-                       )
+path_ls <- sim_path_sa(
+  n = n,
+  sim_step = function(...) stats::rgamma(1, shape = 25, scale = 25),
+  area = array_ls$array$sea,
+  seed = 1,
+  plot = FALSE
+)
 prettyGraphics::add_sp_path(path_ls$xy_mat, col = viridis::viridis(n), length = 0.02)
 
 #### Step (3) Simulate detections
 ## (A) Extract path and receiver coordinates from simulated outcomes above
 path <- path_ls$xy_mat
-xy   <- array_ls$array$xy
-xy   <- sp::coordinates(xy)
+xy <- array_ls$array$xy
+xy <- sp::coordinates(xy)
 ## (B) Simulate detections under different probability functions (see below).
 
 #### Example (1) Threshold probability function
 # Define detection pr function
 calc_detection_pr <- function(dist) ifelse(dist < 425, 1, 0)
 # Simulate detections
-dets_sim <- sim_detections(path = path,
-                           xy = xy,
-                           calc_detection_pr = calc_detection_pr)
+dets_sim <- sim_detections(
+  path = path,
+  xy = xy,
+  calc_detection_pr = calc_detection_pr
+)
 # The function returns a list of matrices that define the distances,
 # ... probabilities and detections for each time stamp (row) and each receiver
 # ... (column)
@@ -92,10 +97,12 @@ utils::str(dets_sim)
 # Examine probabilities
 table(dets_sim$prob_mat)
 # We can also aggregate detections via delta_t
-dets_sim <- sim_detections(path = path,
-                           xy = xy,
-                           calc_detection_pr = calc_detection_pr,
-                           delta_t = 10)
+dets_sim <- sim_detections(
+  path = path,
+  xy = xy,
+  calc_detection_pr = calc_detection_pr,
+  delta_t = 10
+)
 # In this case, the function returns a list with 'agg' and 'raw' elements
 # ... The 'agg' elements contain aggregated matrices and the 'raw' elements
 # ... contain the matrices described above.
@@ -105,27 +112,35 @@ table(dets_sim$agg$det_mat)
 
 #### Example (2) Logistic probability function
 calc_detection_pr <- function(dist) stats::plogis(2.5 + -0.01 * dist)
-dets_sim <- sim_detections(path = path,
-                           xy = xy,
-                           calc_detection_pr = calc_detection_pr)
+dets_sim <- sim_detections(
+  path = path,
+  xy = xy,
+  calc_detection_pr = calc_detection_pr
+)
 
 #### Example (3) Spatially varying probability function
 # Define spatially varying beta parameter (e.g., reflecting 2 habitat types)
 area <- array_ls$array$area
-area_r <- raster::raster(x = raster::extent(area),
-                         crs = raster::crs(area))
+area_r <- raster::raster(
+  x = raster::extent(area),
+  crs = raster::crs(area)
+)
 area_r[] <- 0L
-beta_surface <- sim_surface(blank = area_r,
-                            n = 2L,
-                            sim_values = list(function(n) -0.05,
-                                              function(n) -0.01),
-                            mask = array_ls$array$sea)
+beta_surface <- sim_surface(
+  blank = area_r,
+  n = 2L,
+  sim_values = list(
+    function(n) -0.05,
+    function(n) -0.01
+  ),
+  mask = array_ls$array$sea
+)
 # Extract receiver specific beta values
 xy_sp <- sp::SpatialPoints(xy, proj4string = raster::crs(area_r))
 beta <- raster::extract(beta_surface, xy_sp)
 # Visualise simulated detection probability surface at some suitable distances
 pp <- graphics::par(mfrow = c(2, 2))
-lapply(c(0, 50, 100, 500), function(dist){
+lapply(c(0, 50, 100, 500), function(dist) {
   r <- raster::calc(beta_surface, function(beta) stats::plogis(2.5 + beta * dist))
   raster::plot(r)
 })
@@ -135,10 +150,12 @@ calc_detection_pr <- function(dist) stats::plogis(2.5 + beta * dist)
 # Simulate detections
 # ... Define by_timestep = TRUE so that that distances from each receiver
 # ... are combined appropriately with beta values for each receiver
-dets_sim <- sim_detections(path = path,
-                           xy = xy,
-                           calc_detection_pr = calc_detection_pr,
-                           by_timestep = TRUE)
+dets_sim <- sim_detections(
+  path = path,
+  xy = xy,
+  calc_detection_pr = calc_detection_pr,
+  by_timestep = TRUE
+)
 
 }
 \seealso{

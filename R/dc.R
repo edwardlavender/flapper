@@ -47,13 +47,19 @@
 #' acdc_plot_record(dc_summary)
 #' ## Examine overall map via a raster* plotting function
 #' # Each cell shows expected proportion of time steps spent in each cell
-#' prettyGraphics::pretty_map(add_rasters = list(x = dc_summary$map),
-#'                            add_polys = list(x = dat_coast))
+#' prettyGraphics::pretty_map(
+#'   add_rasters = list(x = dc_summary$map),
+#'   add_polys = list(x = dat_coast)
+#' )
 #' # Convert counts on map to percentages
-#' prettyGraphics::pretty_map(add_rasters =
-#'                              list(x = dc_summary$map/nrow(depth) * 100,
-#'                                   zlim = c(0, 100)),
-#'                            add_polys = list(x = dat_coast))
+#' prettyGraphics::pretty_map(
+#'   add_rasters =
+#'     list(
+#'       x = dc_summary$map / nrow(depth) * 100,
+#'       zlim = c(0, 100)
+#'     ),
+#'   add_polys = list(x = dat_coast)
+#' )
 #' # Check for occasions when the individual's depth was not consistent
 #' # ... with the depth data for the area and the depth error e.g., possibly
 #' # ... due to movement beyond this area:
@@ -64,19 +70,21 @@
 #' # ... tag error
 #' # ... tidal range
 #' # ... a depth-dependent bathymetry error
-#' cde <- function(depth){
-#'   e <- 4.77 + 2.5 + sqrt(0.5 ^2 + (0.013 * depth)^2)
+#' cde <- function(depth) {
+#'   e <- 4.77 + 2.5 + sqrt(0.5^2 + (0.013 * depth)^2)
 #'   e <- matrix(c(-e, e), nrow = 2)
 #'   return(e)
-#'   }
+#' }
 #' # Vectorise function over depths (essential)
 #' cde <- Vectorize(cde)
 #' ## Implement algorithm with  depth-dependent error
 #' out_dc <- dc(archival = depth, bathy = dat_gebco, calc_depth_error = cde)
 #'
 #' #### Example (3): Write timestep-specific maps of allowed positions to file
-#' out_dc <- dc(archival = depth, bathy = dat_gebco,
-#'              write_record_spatial_for_pf = list(filename = tempdir()))
+#' out_dc <- dc(
+#'   archival = depth, bathy = dat_gebco,
+#'   write_record_spatial_for_pf = list(filename = tempdir())
+#' )
 #' list.files(tempdir())
 #'
 #' #### Example (4): Implement the algorithm in parallel
@@ -85,42 +93,50 @@
 #' at1 <- Sys.time()
 #' cl <- parallel::makeCluster(2L)
 #' parallel::clusterEvalQ(cl = cl, library(raster))
-#' out_dc <- dc(archival = depth,
-#'              bathy = dat_gebco,
-#'              plot_ts = FALSE,
-#'              split = 1,
-#'              cl = cl)
+#' out_dc <- dc(
+#'   archival = depth,
+#'   bathy = dat_gebco,
+#'   plot_ts = FALSE,
+#'   split = 1,
+#'   cl = cl
+#' )
 #' at2 <- Sys.time()
 #' # Approach (2)
 #' bt1 <- Sys.time()
 #' cl <- parallel::makeCluster(2L)
 #' parallel::clusterEvalQ(cl = cl, library(raster))
-#' out_dc <- dc(archival = depth,
-#'              bathy = dat_gebco,
-#'              plot_ts = FALSE,
-#'              split = 5,
-#'              cl = cl)
+#' out_dc <- dc(
+#'   archival = depth,
+#'   bathy = dat_gebco,
+#'   plot_ts = FALSE,
+#'   split = 5,
+#'   cl = cl
+#' )
 #' bt2 <- Sys.time()
 #' # Compare timings
 #' difftime(at2, at1)
 #' difftime(bt2, bt1)
 #'
 #' #### Example (5): Write messages to file via con
-#' out_dc <- dc(archival = depth, bathy = dat_gebco,
-#'              con = paste0(tempdir(), "/dc_log.txt"))
+#' out_dc <- dc(
+#'   archival = depth, bathy = dat_gebco,
+#'   con = paste0(tempdir(), "/dc_log.txt")
+#' )
 #' readLines(paste0(tempdir(), "/dc_log.txt"))
 #'
 #' #### Example (6) Compare an automated vs. manual implementation of DC
 #'
 #' ## (A) Compare step-wise results for randomly select time steps
 #' # Implement algorithm (using default calc_depth_error)
-#' out_dc <- dc(archival = depth,
-#'              bathy = dat_gebco,
-#'              save_record_spatial = NULL)
+#' out_dc <- dc(
+#'   archival = depth,
+#'   bathy = dat_gebco,
+#'   save_record_spatial = NULL
+#' )
 #' # Compare results for randomly selected time steps to manual implementation
 #' # ... with the same simple calc_depth_error model
 #' pp <- graphics::par(mfrow = c(5, 2))
-#' for(i in sample(1:nrow(depth), 5)){
+#' for (i in sample(1:nrow(depth), 5)) {
 #'   # Extract map created via dc()
 #'   raster::plot(out_dc$archive[[1]]$record[[i]]$spatial[[1]]$map_timestep)
 #'   # Compare to manual creation of map
@@ -130,15 +146,17 @@
 #'
 #' ## (B) Compare the chunk-wise results and manual implementation
 #' # Implement algorithm chunk-wise
-#' out_dc <- dc(archival = depth,
-#'              bathy = dat_gebco,
-#'              save_record_spatial = NULL,
-#'              split = 10L)
+#' out_dc <- dc(
+#'   archival = depth,
+#'   bathy = dat_gebco,
+#'   save_record_spatial = NULL,
+#'   split = 10L
+#' )
 #' # Get overall map via acdc_simplify()
 #' map_1 <- acdc_simplify(out_dc, type = "dc", mask = dat_gebco)$map
 #' # Get overall map via a simple custom approach
 #' map_2 <- raster::setValues(dat_gebco, 0)
-#' for(i in 1:nrow(depth)){
+#' for (i in 1:nrow(depth)) {
 #'   map_2 <- map_2 + (dat_gebco >= depth$depth[i] - 2.5 & dat_gebco <= depth$depth[i] + 2.5)
 #' }
 #' map_2 <- raster::mask(map_2, dat_gebco)
@@ -167,19 +185,17 @@ dc <- function(archival,
                con = "",
                split = NULL,
                cl = NULL,
-               varlist = NULL
-               ){
-
+               varlist = NULL) {
   #### Set up function
   t_onset <- Sys.time()
-  if(con != ""){
-    if(!verbose) {
+  if (con != "") {
+    if (!verbose) {
       message("Input to 'con' ignored since verbose = FALSE.")
     } else {
       # Check directory
       check_dir(input = dirname(con))
       # Write black file to directory if required
-      if(!file.exists(con)){
+      if (!file.exists(con)) {
         message(paste0(con, " does not exist: attempting to write file in specified directory..."))
         file.create(file1 = con)
         message("... Blank file successfully written to file.")
@@ -187,8 +203,8 @@ dc <- function(archival,
     }
   }
   append_messages <- ifelse(con == "", FALSE, TRUE)
-  cat_to_cf <- function(..., message = verbose, file = con, append = append_messages){
-    if(message) cat(paste(..., "\n"), file = con, append = append)
+  cat_to_cf <- function(..., message = verbose, file = con, append = append_messages) {
+    if (message) cat(paste(..., "\n"), file = con, append = append)
   }
 
   #### Initiate function with storage container for outputs
@@ -196,49 +212,56 @@ dc <- function(archival,
   cat_to_cf("... Setting up function...")
   out <- list(archive = NULL, ts_by_chunk = NULL, time = NULL, args = NULL)
   out$time <- data.frame(event = "onset", time = t_onset)
-  if(save_args){
-    out$args <- list(archival = archival,
-                     bathy = bathy,
-                     plot_ts = plot_ts,
-                     calc_depth_error = calc_depth_error,
-                     check_availability = check_availability,
-                     normalise = normalise,
-                     save_record_spatial = save_record_spatial,
-                     write_record_spatial_for_pf = write_record_spatial_for_pf,
-                     save_args = save_args,
-                     verbose = verbose,
-                     con = con,
-                     split = split,
-                     cl = cl,
-                     varlist = varlist
-                     )
-    }
+  if (save_args) {
+    out$args <- list(
+      archival = archival,
+      bathy = bathy,
+      plot_ts = plot_ts,
+      calc_depth_error = calc_depth_error,
+      check_availability = check_availability,
+      normalise = normalise,
+      save_record_spatial = save_record_spatial,
+      write_record_spatial_for_pf = write_record_spatial_for_pf,
+      save_args = save_args,
+      verbose = verbose,
+      con = con,
+      split = split,
+      cl = cl,
+      varlist = varlist
+    )
+  }
 
   #### Checks
   ## Check archival dataframe
-  if(!inherits(archival, "data.frame")) stop("'archival' must be a data.frame")
+  if (!inherits(archival, "data.frame")) stop("'archival' must be a data.frame")
   check_names(input = archival, req = "depth", extract_names = colnames, type = all)
-  if(any(is.na(archival$depth))) stop("'archival$depth' contains NAs.")
+  if (any(is.na(archival$depth))) stop("'archival$depth' contains NAs.")
   ## Check calc_depth_error
   de <- calc_depth_error(archival$depth)
-  if(inherits(de, "matrix")){
-    if(nrow(de) == 2){
-      if(ncol(de) == 1) { message("'calc_depth_error' function taken to be independent of depth.")
+  if (inherits(de, "matrix")) {
+    if (nrow(de) == 2) {
+      if (ncol(de) == 1) {
+        message("'calc_depth_error' function taken to be independent of depth.")
       } else {
         message("'calc_depth_error' taken to depend on depth.")
       }
-      if(any(de[1, ] > 0) | any(de[2, ] < 0)) stop("'calc_depth_error' should be a function that returns a two-row matrix with lower (negative) adjustment(s) (top row) and upper (positive) adjustment(s) (bottom row).'", call. = FALSE)
-    } else stop("'calc_depth_error' should return a two-row matrix.", call. = FALSE)
-  } else stop("'calc_depth_error' should return a two-row matrix.", call. = FALSE)
+      if (any(de[1, ] > 0) | any(de[2, ] < 0)) stop("'calc_depth_error' should be a function that returns a two-row matrix with lower (negative) adjustment(s) (top row) and upper (positive) adjustment(s) (bottom row).'", call. = FALSE)
+    } else {
+      stop("'calc_depth_error' should return a two-row matrix.", call. = FALSE)
+    }
+  } else {
+    stop("'calc_depth_error' should return a two-row matrix.", call. = FALSE)
+  }
   ## Check cluster
-  if(is.null(split) & !is.null(cl)) {
+  if (is.null(split) & !is.null(cl)) {
     warning("'cl' argument ignored unless 'split' is supplied.",
-            immediate. = TRUE, call. = TRUE)
+      immediate. = TRUE, call. = TRUE
+    )
     cl <- NULL
     varlist <- NULL
   }
   ## Check write_record_spatial_for_pf inputs
-  if(!is.null(write_record_spatial_for_pf)){
+  if (!is.null(write_record_spatial_for_pf)) {
     check_named_list(input = write_record_spatial_for_pf)
     check_names(input = write_record_spatial_for_pf, req = "filename")
     write_record_spatial_for_pf$filename <- check_dir(input = write_record_spatial_for_pf$filename, check_slash = TRUE)
@@ -247,75 +270,80 @@ dc <- function(archival,
 
   #### Set up objects for algorithm
   ## Archival index (for saving the spatial record)
-  if(rlang::has_name(archival, "timestep_cumulative")) {
+  if (rlang::has_name(archival, "timestep_cumulative")) {
     warning("'archival$timestep_cumulative overwritten.", immediate. = TRUE, call. = FALSE)
   }
   archival$timestep_cumulative <- 1:nrow(archival)
-  if(is.null(save_record_spatial)) save_record_spatial <- archival$timestep_cumulative
+  if (is.null(save_record_spatial)) save_record_spatial <- archival$timestep_cumulative
   ## Archival time series with depth error
   cat_to_cf("... Implementing calc_depth_error()...")
   archival$depth_lwr <- archival$depth + calc_depth_error(archival$depth)[1, ]
   archival$depth_upr <- archival$depth + calc_depth_error(archival$depth)[2, ]
   ## Archival time series with availability
-  if(check_availability) archival$availability <- NA
+  if (check_availability) archival$availability <- NA
   ## Archival time series as list (by chunk)
-  if(is.null(split)){
+  if (is.null(split)) {
     archival_ls <- list(archival)
   } else {
-    archival_ls <- split(archival, rep(1:ceiling(nrow(archival)/split), each = split)[1:nrow(archival)])
+    archival_ls <- split(archival, rep(1:ceiling(nrow(archival) / split), each = split)[1:nrow(archival)])
   }
   out$ts_by_chunk <- lapply(archival_ls, function(d) list(acoustics = NULL, archival = d))
   ## Blank map for updating
   blank <- raster::setValues(bathy, 0)
 
   #### Plot time series (for each chunk)
-  if(plot_ts){
+  if (plot_ts) {
     cat_to_cf("... Plotting movement time series (for each chunk)...")
-    if(length(archival_ls) < 25) pp <- graphics::par(mfrow = prettyGraphics::par_mf(length(archival_ls)))
-    lapply(archival_ls, function(d){
-      if(nrow(d) == 1) pt <- "p" else pt <- "l"
-      prettyGraphics::pretty_plot(1:nrow(d), abs(d$depth) * - 1,
-                                  pretty_axis_args = list(side = 3:2),
-                                  xlab = "Time (index)", ylab = "Depth (m)",
-                                  type = pt)
+    if (length(archival_ls) < 25) pp <- graphics::par(mfrow = prettyGraphics::par_mf(length(archival_ls)))
+    lapply(archival_ls, function(d) {
+      if (nrow(d) == 1) pt <- "p" else pt <- "l"
+      prettyGraphics::pretty_plot(1:nrow(d), abs(d$depth) * -1,
+        pretty_axis_args = list(side = 3:2),
+        xlab = "Time (index)", ylab = "Depth (m)",
+        type = pt
+      )
       graphics::lines(1:nrow(d), abs(d$depth_lwr) * -1, lty = 3, col = "royalblue", type = pt)
       graphics::lines(1:nrow(d), abs(d$depth_upr) * -1, lty = 3, col = "royalblue", type = pt)
     })
-    if(length(archival_ls) < 25) graphics::par(pp)
+    if (length(archival_ls) < 25) graphics::par(pp)
   }
 
   #### Implement algorithm
   ## Initiation
   out$time <- rbind(out$time, data.frame(event = "algorithm_initiation", time = Sys.time()))
-  if(is.null(split)){
+  if (is.null(split)) {
     cat_to_cf("... Implementing algorithm over time steps...")
   } else {
     cat_to_cf("... Implementing algorithm over chunks...")
   }
   ## Implement .dc() algorithm over chunks
-  .out_by_chunk <- cl_lapply(archival_ls, cl = cl, varlist = varlist, fun = function(d){
+  .out_by_chunk <- cl_lapply(archival_ls, cl = cl, varlist = varlist, fun = function(d) {
     # Define storage container for chunk-specific outputs
-    .out <- list(map = NULL,
-                 record = list(),
-                 time = NULL,
-                 args = NULL,
-                 chunks = NULL,
-                 simplify = FALSE)
+    .out <- list(
+      map = NULL,
+      record = list(),
+      time = NULL,
+      args = NULL,
+      chunks = NULL,
+      simplify = FALSE
+    )
     use <- blank
-    for(i in 1:nrow(d)){
+    for (i in 1:nrow(d)) {
       avail <- bathy >= d$depth_lwr[i] & bathy <= d$depth_upr[i]
-      if(check_availability) d$availability[i] <- raster::maxValue(avail) == 1
-      if(normalise) avail <- avail/raster::cellStats(avail, "sum")
-      if(!is.null(write_record_spatial_for_pf)){
+      if (check_availability) d$availability[i] <- raster::maxValue(avail) == 1
+      if (normalise) avail <- avail / raster::cellStats(avail, "sum")
+      if (!is.null(write_record_spatial_for_pf)) {
         write_record_spatial_for_pf$x <- avail
         write_record_spatial_for_pf$filename <- paste0(write_record_spatial_for_pf_dir, "arc_", d$timestep_cumulative[i])
         do.call(raster::writeRaster, write_record_spatial_for_pf)
       }
       use <- use + avail
-      .out$record[[i]] <- list(dat = d[i, , drop = FALSE],
-                               spatial = list())
-      if(save_record_spatial[1] != 0) {
-        if(d$timestep_cumulative[i] %in% save_record_spatial){
+      .out$record[[i]] <- list(
+        dat = d[i, , drop = FALSE],
+        spatial = list()
+      )
+      if (save_record_spatial[1] != 0) {
+        if (d$timestep_cumulative[i] %in% save_record_spatial) {
           .out$record[[i]]$spatial[[1]] <- list(map_timestep = avail, map_cumulative = use)
         }
       }

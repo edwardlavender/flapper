@@ -19,7 +19,7 @@
 #' @author Edward Lavender
 #' @export
 
-pf_setup_movement_pr <- function(distance,...) {
+pf_setup_movement_pr <- function(distance, ...) {
   pr <- stats::plogis(10 + distance * -0.05)
   pr[distance > 500] <- 0
   return(pr)
@@ -49,12 +49,14 @@ pf_setup_movement_pr <- function(distance,...) {
 #' dir.create(root)
 #' # Implement the AC algorithm for some example time series
 #' acc <- dat_acoustics[dat_acoustics$individual_id == 25, ][1:5, ]
-#' out_ac <- ac(acoustics = acc,
-#'              step = 120,
-#'              bathy = dat_gebco,
-#'              detection_containers = dat_containers,
-#'              mobility = 250,
-#'              write_record_spatial_for_pf = list(filename = root))
+#' out_ac <- ac(
+#'   acoustics = acc,
+#'   step = 120,
+#'   bathy = dat_gebco,
+#'   detection_containers = dat_containers,
+#'   mobility = 250,
+#'   write_record_spatial_for_pf = list(filename = root)
+#' )
 #' # List the files for pf()
 #' files <- pf_setup_record(root, type = "acs", pattern = "*.grd")
 #' utils::head(files)
@@ -66,9 +68,11 @@ pf_setup_movement_pr <- function(distance,...) {
 #' dir.create(root)
 #' # Implement the DC algorithm for some example time series
 #' depth <- dat_archival[dat_archival$individual_id == 25, ][1:5, ]
-#' out_dc <- dc(archival = depth,
-#'              bathy = dat_gebco,
-#'              write_record_spatial_for_pf = list(filename = root))
+#' out_dc <- dc(
+#'   archival = depth,
+#'   bathy = dat_gebco,
+#'   write_record_spatial_for_pf = list(filename = root)
+#' )
 #' # List the files for pf()
 #' files <- pf_setup_record(root, type = "dc", pattern = "*.grd")
 #' utils::head(files)
@@ -78,50 +82,56 @@ pf_setup_movement_pr <- function(distance,...) {
 #' @author Edward Lavender
 #' @export
 
-pf_setup_record <- function(root, type = c("acs", "dc"), use_absolute_paths = FALSE,...){
-  if(!requireNamespace("stringr", quietly = TRUE)){
+pf_setup_record <- function(root, type = c("acs", "dc"), use_absolute_paths = FALSE, ...) {
+  if (!requireNamespace("stringr", quietly = TRUE)) {
     stop("This function requires the 'stringr' package. Please install it before continuing with install.packages('stringr').")
   }
-  check...("full.names",...)
+  check...("full.names", ...)
   type <- match.arg(type)
   check_dir(input = root)
-  files <- list.files(root,...)
+  files <- list.files(root, ...)
   msg_unrecognised <- "File naming structure is unrecognised."
-  if(type == "acs"){
-    if(!grepl("chu", files[1], fixed = TRUE)){
+  if (type == "acs") {
+    if (!grepl("chu", files[1], fixed = TRUE)) {
       warning("File naming structure is unrecognised.", immediate. = TRUE)
-      if(grepl("arc", files[1], fixed = TRUE)){
-        if(utils::askYesNo("...Did you mean type = 'dc'?")){
+      if (grepl("arc", files[1], fixed = TRUE)) {
+        if (utils::askYesNo("...Did you mean type = 'dc'?")) {
           type <- "dc"
-        } else stop(msg_unrecognised)
-      } else stop(msg_unrecognised)
+        } else {
+          stop(msg_unrecognised)
+        }
+      } else {
+        stop(msg_unrecognised)
+      }
     }
-  } else if(type == "dc"){
-    if(!grepl("arc", files[1], fixed = TRUE)){
+  } else if (type == "dc") {
+    if (!grepl("arc", files[1], fixed = TRUE)) {
       stop(msg_unrecognised)
     }
   }
-  if(length(unique(tools::file_ext(files))) != 1L)
+  if (length(unique(tools::file_ext(files))) != 1L) {
     warning("Multiple file types (extensions) identified in 'root'. Did you forget to pass 'pattern' to list.files()?",
-            immediate. = TRUE, call. = FALSE)
+      immediate. = TRUE, call. = FALSE
+    )
+  }
   files <- data.frame(index = 1:length(files), name = files)
-  if(type == "acs"){
+  if (type == "acs") {
     files[, c("chu_id", "acc_id", "arc_id")] <- stringr::str_split_fixed(files$name, "_", 6)[, c(2, 4, 6)]
     files$chu_id <- as.integer(files$chu_id)
     files$acc_id <- as.integer(files$acc_id)
-  } else if(type == "dc"){
+  } else if (type == "dc") {
     files[, "arc_id"] <- stringr::str_split_fixed(files$name, "_", 2)[, 2]
   }
   ext <- tools::file_ext(files$name)
   n <- nchar(ext) + 1
-  files$arc_id <- as.integer(substr(files$arc_id, 1, nchar(files$arc_id)-n))
-  if(type == "acs"){
+  files$arc_id <- as.integer(substr(files$arc_id, 1, nchar(files$arc_id) - n))
+  if (type == "acs") {
     files <- files %>% dplyr::arrange(.data$chu_id, .data$acc_id, .data$arc_id)
-  } else if(type == "dc"){
+  } else if (type == "dc") {
     files <- files %>% dplyr::arrange(.data$arc_id)
   }
-  files <- list.files(root, full.names = TRUE,...)[files$index]
-  if(use_absolute_paths) {
+  files <- list.files(root, full.names = TRUE, ...)[files$index]
+  if (use_absolute_paths) {
     files <- sapply(files, function(f) tools::file_path_as_absolute(f))
     names(files) <- NULL
   }
@@ -150,8 +160,10 @@ pf_setup_record <- function(root, type = c("acs", "dc"), use_absolute_paths = FA
 #'
 #' #### Example (2): Use GRASS for Euclidean distance calculations
 #' # Specification for GRASS-7.4.4 on MacOS
-#' pf_setup_optimisers(use_calc_distance_euclid_backend_grass = TRUE,
-#'                     use_grass_dir = "/Applications/GRASS-7.4.4.app/Contents/Resources")
+#' pf_setup_optimisers(
+#'   use_calc_distance_euclid_backend_grass = TRUE,
+#'   use_grass_dir = "/Applications/GRASS-7.4.4.app/Contents/Resources"
+#' )
 #' # This list should be passed to the 'optimisers' argument in pf().
 #'
 #' @seealso \code{\link[flapper]{pf}}
@@ -160,13 +172,16 @@ pf_setup_record <- function(root, type = c("acs", "dc"), use_absolute_paths = FA
 
 pf_setup_optimisers <- function(use_raster_operations = TRUE,
                                 use_calc_distance_euclid_backend_grass = FALSE,
-                                use_grass_dir = NULL){
-  out <- list(use_raster_operations = use_raster_operations,
-              use_calc_distance_euclid_backend_grass = use_calc_distance_euclid_backend_grass,
-              use_grass_dir = use_grass_dir)
-  if(use_calc_distance_euclid_backend_grass & is.null(use_grass_dir)){
+                                use_grass_dir = NULL) {
+  out <- list(
+    use_raster_operations = use_raster_operations,
+    use_calc_distance_euclid_backend_grass = use_calc_distance_euclid_backend_grass,
+    use_grass_dir = use_grass_dir
+  )
+  if (use_calc_distance_euclid_backend_grass & is.null(use_grass_dir)) {
     warning("'use_calc_distance_euclid_backend_grass' specified but 'use_grass_dir' is NULL.",
-            immediate. = TRUE, call. = FALSE)
+      immediate. = TRUE, call. = FALSE
+    )
   }
   class(out) <- c(class(out), "pf_optimiser")
   return(out)

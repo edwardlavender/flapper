@@ -23,21 +23,29 @@ The function implements \code{\link[data.table]{foverlaps}} to overlap the timin
 \examples{
 #### Define example data
 # In this example, we have two receivers, but one has been re-deployed:
-moorings <- data.frame(receiver = c(1, 1, 2),
-                       receiver_id = c(1, 2, 3),
-                       start_date = as.POSIXct(c("2016-01-01",
-                                                 "2016-01-02",
-                                                 "2016-01-01"), tz = "UTC"),
-                       end_date = as.POSIXct(c("2016-01-02",
-                                               "2016-01-03",
-                                               "2016-01-02"), tz = "UTC")
-                       )
+moorings <- data.frame(
+  receiver = c(1, 1, 2),
+  receiver_id = c(1, 2, 3),
+  start_date = as.POSIXct(c(
+    "2016-01-01",
+    "2016-01-02",
+    "2016-01-01"
+  ), tz = "UTC"),
+  end_date = as.POSIXct(c(
+    "2016-01-02",
+    "2016-01-03",
+    "2016-01-02"
+  ), tz = "UTC")
+)
 # Our observational dataframe contains receivers but not unique receiver IDs:
-acoustics <- data.frame(receiver = c(1, 1, 2),
-                       timestamp = as.POSIXct(c("2016-01-01 00:30:00",
-                                                 "2016-01-02 00:30:00",
-                                                 "2016-01-01 00:30:00"), tz = "UTC")
-                                              )
+acoustics <- data.frame(
+  receiver = c(1, 1, 2),
+  timestamp = as.POSIXct(c(
+    "2016-01-01 00:30:00",
+    "2016-01-02 00:30:00",
+    "2016-01-01 00:30:00"
+  ), tz = "UTC")
+)
 
 #### Example (1): Add unique receiver IDs to the observational dataframe
 # The first observation corresponds to receiver 1;

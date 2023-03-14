@@ -11,16 +11,19 @@
 #' @examples
 #' #### Define detection matrix
 #' # Simulate array
-#' array <- sim_array(boundaries = raster::extent(-1000, 1000, -1000, 1000),
-#'                    n_receivers = 24, seed = 1)
+#' array <- sim_array(
+#'   boundaries = raster::extent(-1000, 1000, -1000, 1000),
+#'   n_receivers = 24, seed = 1
+#' )
 #' # Simulate movement in this area
 #' path <- sim_path_sa(n = 50, area = array$array$area, seed = 1)
 #' # Simulate a detection matrix
-#' detections <- sim_detections(n = 100,
-#'                              path = path$xy_mat,
-#'                              xy = sp::coordinates(array$array$xy),
-#'                              calc_detection_pr = function(dist) ifelse(dist < 425, 1, 0),
-#'                              )
+#' detections <- sim_detections(
+#'   n = 100,
+#'   path = path$xy_mat,
+#'   xy = sp::coordinates(array$array$xy),
+#'   calc_detection_pr = function(dist) ifelse(dist < 425, 1, 0),
+#' )
 #' # Extract matrix
 #' mat <- detections$det_mat
 #' # Define row names
@@ -42,7 +45,7 @@
 #' @export
 #'
 
-make_df_detections <- function(acoustics, only_keep_detections = FALSE, set_names = FALSE, as_POSIXct = as.POSIXct){
+make_df_detections <- function(acoustics, only_keep_detections = FALSE, set_names = FALSE, as_POSIXct = as.POSIXct) {
   nrw <- nrow(acoustics)
   dat_ls <- lapply(1:ncol(acoustics), function(i) {
     d <- data.frame(timestamp = 1:nrw, receiver_id = i, detection = acoustics[, i])
@@ -50,21 +53,23 @@ make_df_detections <- function(acoustics, only_keep_detections = FALSE, set_name
   })
   dat <- do.call(rbind, dat_ls)
   rownames(dat) <- NULL
-  if(only_keep_detections) {
+  if (only_keep_detections) {
     dat <- dat[dat$detection == 1, ]
     dat$detection <- NULL
   }
-  if(set_names) {
-    if(!is.null(rownames(acoustics))) {
+  if (set_names) {
+    if (!is.null(rownames(acoustics))) {
       dat$timestamp <- rownames(acoustics)[match(dat$timestamp, 1:nrow(acoustics))]
-      if(!is.null(as_POSIXct)) dat$timestamp <- as_POSIXct(dat$timestamp)
-    } else message("'set_names' not implemented for rows: 'acoustics' does not contain row names.")
-    if(!is.null(colnames(acoustics))) {
+      if (!is.null(as_POSIXct)) dat$timestamp <- as_POSIXct(dat$timestamp)
+    } else {
+      message("'set_names' not implemented for rows: 'acoustics' does not contain row names.")
+    }
+    if (!is.null(colnames(acoustics))) {
       dat$receiver_id <- factor(colnames(acoustics))[match(dat$receiver_id, 1:ncol(acoustics))]
-    } else message("'set_names' not implemented for columns: 'acoustics' does not contain column names.")
+    } else {
+      message("'set_names' not implemented for columns: 'acoustics' does not contain column names.")
+    }
   }
   dat <- dat[order(dat$timestamp, dat$receiver), ]
   return(dat)
 }
-
-

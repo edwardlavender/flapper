@@ -93,22 +93,22 @@ gebco <- raster::resample(dat_gebco, blank)
 #### Step (3) Prepare movement time series for algorithm(s)
 # Add required columns to dataframes:
 dat_acoustics$timestamp_num <- as.numeric(dat_acoustics$timestamp)
-dat_archival$timestamp_num  <- as.numeric(dat_archival$timestamp)
+dat_archival$timestamp_num <- as.numeric(dat_archival$timestamp)
 # Focus on an example individual
 id <- 25
 acc <- dat_acoustics[dat_acoustics$individual_id == id, ]
 arc <- dat_archival[dat_archival$individual_id == id, ]
 # Focus on the subset of data for which we have both acoustic and archival detections
-acc <- acc[acc$timestamp >= min(arc$timestamp) - 2*60 &
-             acc$timestamp <= max(arc$timestamp) + 2*60, ]
-arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
-             arc$timestamp <= max(acc$timestamp) + 2*60, ]
+acc <- acc[acc$timestamp >= min(arc$timestamp) - 2 * 60 &
+  acc$timestamp <= max(arc$timestamp) + 2 * 60, ]
+arc <- arc[arc$timestamp >= min(acc$timestamp) - 2 * 60 &
+  arc$timestamp <= max(acc$timestamp) + 2 * 60, ]
 # We'll focus on a one day period with overlapping detection/depth time series for speed
 end <- as.POSIXct("2016-03-18")
 acc <- acc[acc$timestamp <= end, ]
 arc <- arc[arc$timestamp <= end, ]
-arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
-             arc$timestamp <= max(acc$timestamp) + 2*60, ]
+arc <- arc[arc$timestamp >= min(acc$timestamp) - 2 * 60 &
+  arc$timestamp <= max(acc$timestamp) + 2 * 60, ]
 # Process time series
 # ... Detections should be rounded to the nearest step
 # ... Duplicate detections
@@ -117,104 +117,121 @@ arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
 # ... This step has already been implemented for dat_acoustics.
 
 #### Example (1) Implement AC algorithm with default arguments
-out_acdc_1 <- flapper:::.acs(acoustics = acc,
-                             bathy = gebco,
-                             detection_containers = dat_containers,
-                             mobility = 200
-                             )
+out_acdc_1 <- flapper:::.acs(
+  acoustics = acc,
+  bathy = gebco,
+  detection_containers = dat_containers,
+  mobility = 200
+)
 
 #### Example (2) Implement ACDC algorithm with default arguments
-out_acdc_2 <- flapper:::.acs(acoustics = acc,
-                             archival = arc,
-                             bathy = gebco,
-                             detection_containers = dat_containers,
-                             mobility = 200,
-                             calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
-                             )
+out_acdc_2 <- flapper:::.acs(
+  acoustics = acc,
+  archival = arc,
+  bathy = gebco,
+  detection_containers = dat_containers,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
+)
 
 #### Example (3) Implement AC or ACDC algorithm with detection probability kernels
 
 ## (A) Get detection container overlaps
 # Define receiver locations as a SpatialPointsDataFrame object with a UTM CRS
 proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 rownames(dat_moorings) <- dat_moorings$receiver_id
-xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-                        proj_wgs84)
+xy <- sp::SpatialPoints(
+  dat_moorings[, c("receiver_long", "receiver_lat")],
+  proj_wgs84
+)
 xy <- sp::spTransform(xy, proj_utm)
-xy <- sp::SpatialPointsDataFrame(xy, dat_moorings[, c("receiver_id",
-                                                      "receiver_start_date",
-                                                      "receiver_end_date")])
+xy <- sp::SpatialPointsDataFrame(xy, dat_moorings[, c(
+  "receiver_id",
+  "receiver_start_date",
+  "receiver_end_date"
+)])
 # Get detection overlap(s) as a SpatialPolygonsDataFrame
-containers <- get_detection_containers(xy = sp::SpatialPoints(xy),
-                                     detection_range = 425,
-                                     coastline = dat_coast,
-                                     byid = TRUE)
-containers_df <- dat_moorings[, c("receiver_id",
-                                 "receiver_start_date",
-                                 "receiver_end_date")]
+containers <- get_detection_containers(
+  xy = sp::SpatialPoints(xy),
+  detection_range = 425,
+  coastline = dat_coast,
+  byid = TRUE
+)
+containers_df <- dat_moorings[, c(
+  "receiver_id",
+  "receiver_start_date",
+  "receiver_end_date"
+)]
 row.names(containers_df) <- names(containers)
 containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
-overlaps <- get_detection_containers_overlap(containers =  containers)
+overlaps <- get_detection_containers_overlap(containers = containers)
 
 ## (B) Define detection probability function based on distance and detection_range
 calc_dpr <-
-  function(x){
+  function(x) {
     ifelse(x <= 425, stats::plogis(2.5 + -0.02 * x), 0)
   }
 
 ## (C) Get detection kernels (a slow step)
-kernels <- acs_setup_detection_kernels(xy = xy,
-                                       containers = dat_containers,
-                                       overlaps = overlaps,
-                                       calc_detection_pr = calc_dpr,
-                                       bathy = gebco)
+kernels <- acs_setup_detection_kernels(
+  xy = xy,
+  containers = dat_containers,
+  overlaps = overlaps,
+  calc_detection_pr = calc_dpr,
+  bathy = gebco
+)
 ## (D) Implement algorithm
-out_acdc_3 <- flapper:::.acs(acoustics = acc,
-                             archival = arc,
-                             bathy = gebco,
-                             detection_containers = dat_containers,
-                             detection_kernels = kernels,
-                             detection_kernels_overlap = overlaps$list_by_receiver,
-                             detection_time_window = 10,
-                             mobility = 200,
-                             calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
-                             )
+out_acdc_3 <- flapper:::.acs(
+  acoustics = acc,
+  archival = arc,
+  bathy = gebco,
+  detection_containers = dat_containers,
+  detection_kernels = kernels,
+  detection_kernels_overlap = overlaps$list_by_receiver,
+  detection_time_window = 10,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
+)
 
 #### Example (4): Compare outputs with/without detection probability and normalisation
 ## Without detection kernels
-out_acdc_4a <- flapper:::.acs(acoustics = acc,
-                              archival = arc,
-                              bathy = gebco,
-                              detection_containers = dat_containers,
-                              mobility = 200,
-                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
-                              )
-out_acdc_4b <- flapper:::.acs(acoustics = acc,
-                              archival = arc,
-                              bathy = gebco,
-                              detection_containers = dat_containers,
-                              normalise = TRUE,
-                              mobility = 200,
-                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
-                              )
+out_acdc_4a <- flapper:::.acs(
+  acoustics = acc,
+  archival = arc,
+  bathy = gebco,
+  detection_containers = dat_containers,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
+)
+out_acdc_4b <- flapper:::.acs(
+  acoustics = acc,
+  archival = arc,
+  bathy = gebco,
+  detection_containers = dat_containers,
+  normalise = TRUE,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
+)
 ## With detection kernels
-out_acdc_4c <- flapper:::.acs(acoustics = acc,
-                              archival = arc,
-                              bathy = gebco,
-                              detection_containers = dat_containers,
-                              detection_kernels = kernels,
-                              mobility = 200,
-                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
-                              )
-out_acdc_4d <- flapper:::.acs(acoustics = acc,
-                              archival = arc,
-                              bathy = gebco,
-                               detection_containers = dat_containers,
-                              detection_kernels = kernels, normalise = TRUE,
-                              mobility = 200,
-                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
-                              )
+out_acdc_4c <- flapper:::.acs(
+  acoustics = acc,
+  archival = arc,
+  bathy = gebco,
+  detection_containers = dat_containers,
+  detection_kernels = kernels,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
+)
+out_acdc_4d <- flapper:::.acs(
+  acoustics = acc,
+  archival = arc,
+  bathy = gebco,
+  detection_containers = dat_containers,
+  detection_kernels = kernels, normalise = TRUE,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
+)
 ## Comparison of final maps
 pp <- par(mfrow = c(2, 2))
 raster::plot(out_acdc_4a$map, main = "4a")
@@ -224,15 +241,16 @@ raster::plot(out_acdc_4d$map, main = "4d")
 par(pp)
 
 #### Example (5): Implement AC or ACDC algorithm and write messages to file via 'con'
-out_acdc_5 <- flapper:::.acs(acoustics = acc,
-                             archival = arc,
-                             bathy = gebco,
-                             detection_containers = dat_containers,
-                             mobility = 200,
-                             calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                             verbose = TRUE,
-                             con = paste0(tempdir(), "/", "acdc_log.txt")
-                             )
+out_acdc_5 <- flapper:::.acs(
+  acoustics = acc,
+  archival = arc,
+  bathy = gebco,
+  detection_containers = dat_containers,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+  verbose = TRUE,
+  con = paste0(tempdir(), "/", "acdc_log.txt")
+)
 # Check log
 utils::head(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
 utils::tail(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
@@ -240,17 +258,17 @@ utils::tail(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
 #### Example (6): Implement AC or ACDC algorithm and return spatial information
 # Specify save_record_spatial = NULL to include spatial information for all time steps
 # ... (used for plotting) or a vector to include this information for specific time steps
-out_acdc_6 <- flapper:::.acs(acoustics = acc,
-                             archival = arc,
-                             bathy = gebco,
-                             detection_containers = dat_containers,
-                             mobility = 200,
-                             calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-                             save_record_spatial = NULL,
-                             verbose = TRUE,
-                             con = paste0(tempdir(), "/", "acdc_log.txt")
-                             )
-
+out_acdc_6 <- flapper:::.acs(
+  acoustics = acc,
+  archival = arc,
+  bathy = gebco,
+  detection_containers = dat_containers,
+  mobility = 200,
+  calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+  save_record_spatial = NULL,
+  verbose = TRUE,
+  con = paste0(tempdir(), "/", "acdc_log.txt")
+)
 
 }
 \seealso{

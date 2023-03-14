@@ -80,9 +80,11 @@
 #' xy <- matrix(c(708886.3, 6254404), ncol = 2)
 #' ## Define 'observed' depth time series using absolute values
 #' # Imagine these are observations made every two minutes
-#' depth <- c(163.06, 159.71, 153.49, 147.04, 139.86, 127.19, 114.75,
-#'            99.44,  87.01,  78.16,  70.03,  60.23,  49.96,  35.39,
-#'            27.75,  20.13,  12.73,  11.32)
+#' depth <- c(
+#'   163.06, 159.71, 153.49, 147.04, 139.86, 127.19, 114.75,
+#'   99.44, 87.01, 78.16, 70.03, 60.23, 49.96, 35.39,
+#'   27.75, 20.13, 12.73, 11.32
+#' )
 #' depth <- data.frame(depth = depth)
 #'
 #' ## Define surface over which movement occurred
@@ -94,10 +96,10 @@
 #' # ... we will focus on a small area around the origin. We could
 #' # ... also process the raster in other ways (e.g., mask any areas of land)
 #' # ... to improve efficiency.
-#' surface    <- dat_gebco
+#' surface <- dat_gebco
 #' boundaries <- raster::extent(707884.6, 709884.6, 6253404, 6255404)
-#' blank      <- raster::raster(boundaries, res = c(5, 5))
-#' surface    <- raster::resample(surface, blank)
+#' blank <- raster::raster(boundaries, res = c(5, 5))
+#' surface <- raster::resample(surface, blank)
 #'
 #' ## Define depth error function
 #' # Because the bathymetry data is very coarse, and the bathymetry is
@@ -114,15 +116,19 @@
 #' # ... if necessary, but for brevity we don't implement that here.
 #'
 #' ## Visualise movement surface, with starting location overlaid
-#' prettyGraphics::pretty_map(add_rasters = list(x = surface),
-#'                            add_points = list(x = xy),
-#'                            verbose = FALSE)
+#' prettyGraphics::pretty_map(
+#'   add_rasters = list(x = surface),
+#'   add_points = list(x = xy),
+#'   verbose = FALSE
+#' )
 #'
 #' #### Step (2): Use the DC algorithm to get individual's the possible locations
-#' dc_out <- dc(archival = depth,
-#'              bathy = surface,
-#'              calc_depth_error = cde,
-#'              save_record_spatial = NULL)
+#' dc_out <- dc(
+#'   archival = depth,
+#'   bathy = surface,
+#'   calc_depth_error = cde,
+#'   save_record_spatial = NULL
+#' )
 #' # Extract time-specific maps
 #' # ... Either directly for single chunk implementations of dc()
 #' record <- dc_out$archive$record
@@ -134,12 +140,14 @@
 #' lapply(record, function(r) raster::plot(r))
 #'
 #' #### Example (1): Implement algorithm using default options
-#' out_1 <- pf(record = record,
-#'             origin  = xy,
-#'             calc_distance = "euclid",
-#'             calc_movement_pr = pf_setup_movement_pr,
-#'             n = 10L,
-#'             seed = 1)
+#' out_1 <- pf(
+#'   record = record,
+#'   origin = xy,
+#'   calc_distance = "euclid",
+#'   calc_movement_pr = pf_setup_movement_pr,
+#'   n = 10L,
+#'   seed = 1
+#' )
 #' # The function returns a pf_archive-class object
 #' class(out_1)
 #' utils::str(out_1)
@@ -157,12 +165,14 @@
 #' record_pointer <- data.frame(index = 1:length(record_pointer), name = record_pointer)
 #' record_pointer <- record_pointer[order(as.integer(record_pointer$name)), ]
 #' record_pointer <- list.files(tmp_root, full.names = TRUE)[record_pointer$index]
-#' out_2 <- pf(record = record_pointer,
-#'             origin  = xy,
-#'             calc_distance = "euclid",
-#'             calc_movement_pr = pf_setup_movement_pr,
-#'             n = 10L,
-#'             seed = 1)
+#' out_2 <- pf(
+#'   record = record_pointer,
+#'   origin = xy,
+#'   calc_distance = "euclid",
+#'   calc_movement_pr = pf_setup_movement_pr,
+#'   n = 10L,
+#'   seed = 1
+#' )
 #'
 #' #### Example (3): Implement a blanket mobility restriction
 #' # This can improve computational efficiency but offers no improvement
@@ -170,13 +180,15 @@
 #' # ... focusing in on a specific area matches the speed gains of
 #' # ... implementing the distance/movement
 #' # ... pr calculations over a smaller area at each time step)
-#' out_3 <- pf(record = record,
-#'             origin  = xy,
-#'             calc_distance = "euclid",
-#'             calc_movement_pr = pf_setup_movement_pr,
-#'             mobility = 250,
-#'             n = 10L,
-#'            seed = 1)
+#' out_3 <- pf(
+#'   record = record,
+#'   origin = xy,
+#'   calc_distance = "euclid",
+#'   calc_movement_pr = pf_setup_movement_pr,
+#'   mobility = 250,
+#'   n = 10L,
+#'   seed = 1
+#' )
 #' # Algorithm duration during testing ~0.04 minutes
 #'
 #' #### Example (4): Implement algorithm using shortest distances
@@ -184,24 +196,28 @@
 #' # To speed up the initial stages of the algorithm, you can supply the graph
 #' # ... required for least-cost calculations via calc_distance_graph, but for
 #' # ... brevity we don't implement that here.
-#' out_4 <- pf(record = record,
-#'             origin  = xy,
-#'             calc_distance = "lcp",
-#'             bathy = surface,
-#'             calc_movement_pr = pf_setup_movement_pr,
-#'             n = 10L,
-#'             seed = 1)
+#' out_4 <- pf(
+#'   record = record,
+#'   origin = xy,
+#'   calc_distance = "lcp",
+#'   bathy = surface,
+#'   calc_movement_pr = pf_setup_movement_pr,
+#'   n = 10L,
+#'   seed = 1
+#' )
 #' # This option is slower: algorithm duration during testing ~0.73 minutes
 #'
 #' #### Example (5): Implement algorithm using shortest distances with mobility restriction
-#' out_5 <- pf(record = record,
-#'             origin  = xy,
-#'             calc_distance = "lcp",
-#'             bathy = surface,
-#'             calc_movement_pr = pf_setup_movement_pr,
-#'             mobility = 250,
-#'             n = 10L,
-#'             seed = 1)
+#' out_5 <- pf(
+#'   record = record,
+#'   origin = xy,
+#'   calc_distance = "lcp",
+#'   bathy = surface,
+#'   calc_movement_pr = pf_setup_movement_pr,
+#'   mobility = 250,
+#'   n = 10L,
+#'   seed = 1
+#' )
 #' # Algorithm duration during testing ~0.63 minutes
 #' # With shortest distances, the mobility restriction makes more difference
 #' # ... in improving the computation time, because calculations are more involved.
@@ -209,30 +225,34 @@
 #' #### Example (6): Parallelisation for Euclidean distances is via cl argument
 #' # ... which implements parallelisation across paths. This is only implemented
 #' # ... for calc_distance_euclid_fast = FALSE, which is rarely desirable.
-#' out_6 <- pf(record = record,
-#'             origin  = xy,
-#'             calc_distance = "euclid",
-#'             calc_distance_euclid_fast = FALSE,
-#'             calc_movement_pr = pf_setup_movement_pr,
-#'             mobility = 250,
-#'             n = 10L,
-#'             cl = parallel::makeCluster(2L),
-#'             seed = 1)
+#' out_6 <- pf(
+#'   record = record,
+#'   origin = xy,
+#'   calc_distance = "euclid",
+#'   calc_distance_euclid_fast = FALSE,
+#'   calc_movement_pr = pf_setup_movement_pr,
+#'   mobility = 250,
+#'   n = 10L,
+#'   cl = parallel::makeCluster(2L),
+#'   seed = 1
+#' )
 #'
 #' #### Example (7): Parallelisation for shortest distances is usually best
 #' # ... via use_all_cores = TRUE
 #' # However, the benefits of parallelisation depend on the number of least-cost
 #' # ... paths calculations that need to be performed, which depends on the size
 #' # ... of bathy, and may be minimal (or negative) for small areas.
-#' out_7 <- pf(record = record,
-#'             origin  = xy,
-#'             calc_distance = "lcp",
-#'             bathy = surface,
-#'             calc_movement_pr = pf_setup_movement_pr,
-#'             mobility = 250,
-#'             n = 10L,
-#'             use_all_cores = TRUE,
-#'             seed = 1)
+#' out_7 <- pf(
+#'   record = record,
+#'   origin = xy,
+#'   calc_distance = "lcp",
+#'   bathy = surface,
+#'   calc_movement_pr = pf_setup_movement_pr,
+#'   mobility = 250,
+#'   n = 10L,
+#'   use_all_cores = TRUE,
+#'   seed = 1
+#' )
 #' # But the speed benefits in this case are minimal.
 #' # Algorithm duration during testing ~0.61 minutes.
 #'
@@ -249,7 +269,7 @@
 #' depth$va_abs <- abs(depth$depth - dplyr::lead(depth$depth))
 #' depth$va_abs[nrow(depth)] <- 0
 #' ## Define movement model, depending on distance and a dataframe with other information
-#' setup_movement_pr <- function(distance, data){
+#' setup_movement_pr <- function(distance, data) {
 #'   beta <- -0.05 + -0.005 * data$va_abs
 #'   pr <- stats::plogis(10 + distance * beta)
 #'   pr[distance > 500] <- 0
@@ -258,18 +278,20 @@
 #' ## Examine the movement model with distance and VA
 #' pr <- setup_movement_pr(1:1000, data.frame(va_abs = 0))
 #' prettyGraphics::pretty_plot(pr, type = "n")
-#' for(va_abs in seq(min(depth$va_abs), max(depth$va_abs), length.out = 5)){
-#'   lines(1:1000, setup_movement_pr(1:1000, data.frame(va_abs = va_abs)), lwd = 0.25 + va_abs/5)
+#' for (va_abs in seq(min(depth$va_abs), max(depth$va_abs), length.out = 5)) {
+#'   lines(1:1000, setup_movement_pr(1:1000, data.frame(va_abs = va_abs)), lwd = 0.25 + va_abs / 5)
 #' }
 #' ## Implement algorithm with adjusted movement model
-#' out_8 <- pf(record = record,
-#'             data = depth,
-#'             origin  = xy,
-#'             calc_distance = "euclid",
-#'             calc_movement_pr = setup_movement_pr,
-#'             mobility = 250,
-#'             n = 10L,
-#'             seed = 1)
+#' out_8 <- pf(
+#'   record = record,
+#'   data = depth,
+#'   origin = xy,
+#'   calc_distance = "euclid",
+#'   calc_movement_pr = setup_movement_pr,
+#'   mobility = 250,
+#'   n = 10L,
+#'   seed = 1
+#' )
 #'
 #' #### Dealing with convergence failures.
 #' # The algorithm can fail to converge. There are a variety of options
@@ -282,16 +304,18 @@
 #'
 #' #### Example (9): Update particle histories from an earlier time step
 #' # ... via update_history and update_history_from_time_step
-#' out_9 <- pf(record = record,
-#'             data = depth,
-#'             origin  = xy,
-#'             calc_distance = "euclid",
-#'             calc_movement_pr = setup_movement_pr,
-#'             mobility = 250,
-#'             n = 10L,
-#'             seed = 1,
-#'             update_history = out_8$history,
-#'             update_history_from_time_step = 5)
+#' out_9 <- pf(
+#'   record = record,
+#'   data = depth,
+#'   origin = xy,
+#'   calc_distance = "euclid",
+#'   calc_movement_pr = setup_movement_pr,
+#'   mobility = 250,
+#'   n = 10L,
+#'   seed = 1,
+#'   update_history = out_8$history,
+#'   update_history_from_time_step = 5
+#' )
 #'
 #' #### Example (10): Implement re-sampling via resample
 #' # Here, for demonstration purposes, we implement the algorithm from
@@ -300,15 +324,17 @@
 #' # ... fewer than 10 unique positions.
 #' # ... (Normally resample would be less than n.)
 #' # In this example, the function re-samples candidate starting positions at t = 9
-#' out_10 <- pf(record = record,
-#'              data = depth,
-#'              origin  = xy,
-#'              calc_distance = "euclid",
-#'              calc_movement_pr = pf_setup_movement_pr,
-#'              mobility = 250,
-#'              n = 10L,
-#'              resample = 10,
-#'              seed = 1)
+#' out_10 <- pf(
+#'   record = record,
+#'   data = depth,
+#'   origin = xy,
+#'   calc_distance = "euclid",
+#'   calc_movement_pr = pf_setup_movement_pr,
+#'   mobility = 250,
+#'   n = 10L,
+#'   resample = 10,
+#'   seed = 1
+#' )
 #'
 #' #### Example (10): A simulation workflow
 #' # This example provides a simulation workflow for comparing simulated and
@@ -324,17 +350,20 @@
 #' ## (B) Define area for simulation
 #' # Here, we use the sample area as above, but reduce the resolution
 #' # ... for example speed.
-#' dat_gebco_planar <- raster::raster(crs = raster::crs(dat_gebco),
-#'                                    ext = raster::extent(dat_gebco),
-#'                                    resolution = 25)
+#' dat_gebco_planar <- raster::raster(
+#'   crs = raster::crs(dat_gebco),
+#'   ext = raster::extent(dat_gebco),
+#'   resolution = 25
+#' )
 #' dat_gebco_planar <- raster::resample(dat_gebco, dat_gebco_planar, method = "bilinear")
 #' # Define 'sea' for movement simulation
 #' dat_coast <- raster::crop(dat_coast, raster::extent(dat_gebco))
 #' dat_sea <- invert_poly(dat_coast)
 #' # Visualise area
 #' prettyGraphics::pretty_map(dat_gebco_planar,
-#'                            add_rasters = list(x = dat_gebco_planar),
-#'                            add_polys = list(x = dat_sea))
+#'   add_rasters = list(x = dat_gebco_planar),
+#'   add_polys = list(x = dat_sea)
+#' )
 #'
 #' ## (C) Simulate movement path
 #' # Define movement parameters
@@ -344,52 +373,65 @@
 #' origin_sim <- sp::spsample(dat_sea, n = 1, type = "random")
 #' origin_sim <- sp::coordinates(origin_sim)
 #' # Simulate path
-#' path_sim <- sim_path_sa(n = 10,
-#'                         p_1 = origin_sim,
-#'                         area = dat_sea,
-#'                         sim_step = sim_steps,
-#'                         add_rasters = list(x = dat_gebco_planar),
-#'                         seed = seed)
+#' path_sim <- sim_path_sa(
+#'   n = 10,
+#'   p_1 = origin_sim,
+#'   area = dat_sea,
+#'   sim_step = sim_steps,
+#'   add_rasters = list(x = dat_gebco_planar),
+#'   seed = seed
+#' )
 #' # Get resultant depth time series
 #' path_sim <- path_sim$xy_mat
-#' path_sim <- data.frame(path_id = 1,
-#'                        cell_id = raster::cellFromXY(dat_gebco_planar, path_sim),
-#'                        cell_x = path_sim[, 1],
-#'                        cell_y = path_sim[, 2],
-#'                        timestep = 1:nrow(path_sim))
+#' path_sim <- data.frame(
+#'   path_id = 1,
+#'   cell_id = raster::cellFromXY(dat_gebco_planar, path_sim),
+#'   cell_x = path_sim[, 1],
+#'   cell_y = path_sim[, 2],
+#'   timestep = 1:nrow(path_sim)
+#' )
 #' path_sim$cell_z <- raster::extract(dat_gebco_planar, path_sim$cell_id)
 #' prettyGraphics::pretty_plot(path_sim$cell_z, type = "l")
 #' # Check simulated movements on the scale of the grid
 #' sp::spDists(raster::xyFromCell(dat_gebco_planar, path_sim$cell_id),
-#'             segments = TRUE)
+#'   segments = TRUE
+#' )
 #' # Simulate 'observed' depth time series given some error
 #' # ... For illustration, we will make the error smaller in this example
 #' cde <- function(...) matrix(c(-2.5, 2.5), nrow = 2)
-#' depth_obs <- runif(length(path_sim$cell_z),
-#'                    path_sim$cell_z + cde(path_sim$cell_z)[1],
-#'                    path_sim$cell_z + cde(path_sim$cell_z)[2])
+#' depth_obs <- runif(
+#'   length(path_sim$cell_z),
+#'   path_sim$cell_z + cde(path_sim$cell_z)[1],
+#'   path_sim$cell_z + cde(path_sim$cell_z)[2]
+#' )
 #' depth_obs <- data.frame(depth = depth_obs)
 #' # Compare 'true' and 'observed' depth time series
 #' pf_plot_1d(path_sim, depth_obs,
-#'            type = "b", cex = 0.5,
-#'            add_lines = list(col = "royalblue", type = "l"))
+#'   type = "b", cex = 0.5,
+#'   add_lines = list(col = "royalblue", type = "l")
+#' )
 #'
 #' ## Implement dc() on 'observed' time series
-#' dc_out <- dc(archival = depth_obs,
-#'              bathy = dat_gebco_planar,
-#'              calc_depth_error = cde,
-#'              save_record_spatial = NULL)
+#' dc_out <- dc(
+#'   archival = depth_obs,
+#'   bathy = dat_gebco_planar,
+#'   calc_depth_error = cde,
+#'   save_record_spatial = NULL
+#' )
 #'
 #' ## Implement pf() on the results from dc()
 #' # We will assume that the origin was known.
 #' # ... We will mostly use the default options.
 #' history_dcpf <-
-#'   pf(record = acdc_access_maps(acdc_simplify(dc_out, type = "dc"),
-#'                                type = "map_timestep"),
-#'      origin = origin_sim,
-#'      calc_distance = "euclid",
-#'      mobility = 200,
-#'      n = 10L)
+#'   pf(
+#'     record = acdc_access_maps(acdc_simplify(dc_out, type = "dc"),
+#'       type = "map_timestep"
+#'     ),
+#'     origin = origin_sim,
+#'     calc_distance = "euclid",
+#'     mobility = 200,
+#'     n = 10L
+#'   )
 #'
 #' ## Visualise particle histories in relation to simulated paths
 #' # Here, each plot shows the particles sampled at a particular time step
@@ -398,11 +440,12 @@
 #' # ... is shown in black.
 #' pp <- graphics::par(mfrow = c(3, 4))
 #' pf_plot_history(history_dcpf,
-#'                 add_particles = list(pch = 21),
-#'                 add_paths = list(x = path_sim$cell_x, path_sim$cell_y, length = 0.05),
-#'                 xlim = range(path_sim$cell_x), ylim = range(path_sim$cell_y),
-#'                 crop_spatial = TRUE,
-#'                 prompt = FALSE)
+#'   add_particles = list(pch = 21),
+#'   add_paths = list(x = path_sim$cell_x, path_sim$cell_y, length = 0.05),
+#'   xlim = range(path_sim$cell_x), ylim = range(path_sim$cell_y),
+#'   crop_spatial = TRUE,
+#'   prompt = FALSE
+#' )
 #' graphics::par(pp)
 #'
 #' ## Assemble paths
@@ -417,12 +460,14 @@
 #' path_dcpf <-
 #'   path_dcpf %>%
 #'   dplyr::group_by(.data$path_id) %>%
-#'   dplyr::mutate(cell_x2 = dplyr::lag(.data$cell_x),
-#'                 cell_y2 = dplyr::lag(.data$cell_y),
-#'                 dist_1 = sqrt((.data$cell_x2 - .data$cell_x)^2 +
-#'                                 (.data$cell_y2 -.data$ cell_y)^2))
+#'   dplyr::mutate(
+#'     cell_x2 = dplyr::lag(.data$cell_x),
+#'     cell_y2 = dplyr::lag(.data$cell_y),
+#'     dist_1 = sqrt((.data$cell_x2 - .data$cell_x)^2 +
+#'       (.data$cell_y2 - .data$ cell_y)^2)
+#'   )
 #' path_dcpf
-#' range(path_dcpf$dist_1, na.rm =TRUE)
+#' range(path_dcpf$dist_1, na.rm = TRUE)
 #'
 #' ## Visualise paths
 #' # Zoom around path
@@ -432,13 +477,18 @@
 #' area <- raster::crop(dat_gebco_planar, boundaries)
 #' # Define function to add simulated path for comparison
 #' add_paths_sim <-
-#'   function() prettyGraphics::add_sp_path(path_sim$cell_x, path_sim$cell_y,
-#'                                          lwd = 2, length = 0.01)
+#'   function() {
+#'     prettyGraphics::add_sp_path(path_sim$cell_x, path_sim$cell_y,
+#'       lwd = 2, length = 0.01
+#'     )
+#'   }
 #' # Make plots
-#' if(interactive()){
-#'   pf_plot_2d(path_dcpf, area, add_paths = list(length = 0.05),
-#'              add_additional = add_paths_sim,
-#'              prompt = TRUE)
+#' if (interactive()) {
+#'   pf_plot_2d(path_dcpf, area,
+#'     add_paths = list(length = 0.05),
+#'     add_additional = add_paths_sim,
+#'     prompt = TRUE
+#'   )
 #' }
 #'
 #' #### Example (11): Write a dataframe of sampled particles to file at each time step
@@ -446,16 +496,21 @@
 #' root <- paste0(tempdir(), "/pf/")
 #' dir.create(root)
 #' # Implement PF, writing the history of particle samples at each time step
-#' out_11 <- pf(record = record,
-#'              origin  = xy,
-#'              write_history = list(file = root))
+#' out_11 <- pf(
+#'   record = record,
+#'   origin = xy,
+#'   write_history = list(file = root)
+#' )
 #' # Read the record into R
 #' history_from_file <- lapply(pf_access_history_files(root), readRDS)
 #' # Show that the history recorded in 'out_11' is the same as that recorded by the saved files
-#' length(out_11$history); length(history_from_file)
+#' length(out_11$history)
+#' length(history_from_file)
 #' identical(out_11$history, history_from_file)
-#' cbind(out_11$history[[1]],
-#'       history_from_file[[1]])
+#' cbind(
+#'   out_11$history[[1]],
+#'   history_from_file[[1]]
+#' )
 #'
 #' @return The function returns a \code{\link[flapper]{pf_archive-class}} object. This is a named list that includes the parameters used to generate function outputs (`args') and the particles sampled at each time step (`history'). The latter can be assembled into a dataframe of movement paths via \code{\link[flapper]{pf_simplify}}.
 #'
@@ -483,18 +538,17 @@ pf <- function(record,
                cl = NULL, use_all_cores = FALSE,
                seed = NULL,
                verbose = TRUE, con = "",
-               optimisers = pf_setup_optimisers()){
-
+               optimisers = pf_setup_optimisers()) {
   #### Set up function
   t_onset <- Sys.time()
-  if(con != ""){
-    if(!verbose) {
+  if (con != "") {
+    if (!verbose) {
       message("Input to 'con' ignored since verbose = FALSE.")
     } else {
       # Check directory
       check_dir(input = dirname(con))
       # Write black file to directory if required
-      if(!file.exists(con)){
+      if (!file.exists(con)) {
         message(paste0(con, " does not exist: attempting to write file in specified directory..."))
         file.create(file1 = con)
         message("... Blank file successfully written to file.")
@@ -503,38 +557,40 @@ pf <- function(record,
   }
   ## Define function
   append_messages <- ifelse(con == "", FALSE, TRUE)
-  cat_to_cf <- function(..., message = verbose, file = con, append = append_messages){
-    if(message) cat(paste(..., "\n"), file = con, append = append)
+  cat_to_cf <- function(..., message = verbose, file = con, append = append_messages) {
+    if (message) cat(paste(..., "\n"), file = con, append = append)
   }
   cat_to_cf(paste0("flapper::pf() called (@ ", t_onset, ")..."))
   cat_to_cf("... Setting up function...")
 
   #### Define storage container for outputs
-  if(!is.null(seed)) set.seed(seed)
-  out_pf <- list(history = NULL,
-                 method = "pf",
-                 args = list(record = record,
-                             data = data,
-                             origin = origin,
-                             calc_distance = calc_distance,
-                             calc_distance_euclid_fast = calc_distance_euclid_fast,
-                             bathy = bathy,
-                             calc_distance_graph = calc_distance_graph,
-                             calc_movement_pr = calc_movement_pr,
-                             calc_movement_pr_from_origin = calc_movement_pr_from_origin,
-                             mobility = mobility,
-                             mobility_from_origin = mobility_from_origin,
-                             n = n,
-                             resample = resample,
-                             update_history = update_history,
-                             update_history_from_time_step = update_history_from_time_step,
-                             write_history = write_history,
-                             cl = cl,
-                             use_all_cores = use_all_cores,
-                             seed = seed,
-                             verbose = verbose,
-                             optimisers = optimisers
-                 )
+  if (!is.null(seed)) set.seed(seed)
+  out_pf <- list(
+    history = NULL,
+    method = "pf",
+    args = list(
+      record = record,
+      data = data,
+      origin = origin,
+      calc_distance = calc_distance,
+      calc_distance_euclid_fast = calc_distance_euclid_fast,
+      bathy = bathy,
+      calc_distance_graph = calc_distance_graph,
+      calc_movement_pr = calc_movement_pr,
+      calc_movement_pr_from_origin = calc_movement_pr_from_origin,
+      mobility = mobility,
+      mobility_from_origin = mobility_from_origin,
+      n = n,
+      resample = resample,
+      update_history = update_history,
+      update_history_from_time_step = update_history_from_time_step,
+      write_history = write_history,
+      cl = cl,
+      use_all_cores = use_all_cores,
+      seed = seed,
+      verbose = verbose,
+      optimisers = optimisers
+    )
   )
 
   #### Checks
@@ -543,92 +599,101 @@ pf <- function(record,
   check_class(input = optimisers, to_class = "pf_optimiser", type = "stop")
 
   ## Check data and define data_1 and data_t_next if unsupplied
-  if(!is.null(data)){
-    if(!inherits(data, "data.frame")) stop("'data' must be a data.frame")
-    if(length(record) != nrow(data)) stop("The number of records (`length(record)`) does not equal the number of observations in 'data' (`nrow(data)`).")
+  if (!is.null(data)) {
+    if (!inherits(data, "data.frame")) stop("'data' must be a data.frame")
+    if (length(record) != nrow(data)) stop("The number of records (`length(record)`) does not equal the number of observations in 'data' (`nrow(data)`).")
     data <- data.table::as.data.table(data)
-  } else data_1 <- data_t_next <- NULL
+  } else {
+    data_1 <- data_t_next <- NULL
+  }
 
   ## Define blank list to store path histories
-  if(is.null(update_history)) history <- list() else history <- update_history
+  if (is.null(update_history)) history <- list() else history <- update_history
   ## Check record and define record raster param
-  record_1   <- record[[1]]
+  record_1 <- record[[1]]
   read_records <- FALSE
-  if(inherits(record_1, "character")){
+  if (inherits(record_1, "character")) {
     read_records <- TRUE
-    if(!file.exists(record_1)) stop(paste0("record[[1]] ('", record_1, "') does not exist."))
-    record_1     <- raster::raster(record_1)
+    if (!file.exists(record_1)) stop(paste0("record[[1]] ('", record_1, "') does not exist."))
+    record_1 <- raster::raster(record_1)
   }
-  n_cell       <- raster::ncell(record_1)
-  all_cells    <- 1:n_cell
-  proj         <- raster::crs(record_1)
-  boundaries   <- raster::extent(record_1)
+  n_cell <- raster::ncell(record_1)
+  all_cells <- 1:n_cell
+  proj <- raster::crs(record_1)
+  boundaries <- raster::extent(record_1)
   record_1_sbt <- record_1
   ## Check origin
-  if(!is.null(origin)) if(!inherits(origin, "matrix")) stop("'origin' coordinates must be supplied as a matrix.")
+  if (!is.null(origin)) if (!inherits(origin, "matrix")) stop("'origin' coordinates must be supplied as a matrix.")
 
   ## Check re-sample
-  if(!is.null(resample)){
-    if(resample > n) stop("'resample' must be <= 'n'.")
+  if (!is.null(resample)) {
+    if (resample > n) stop("'resample' must be <= 'n'.")
   }
 
   ## Check and set up distance calculations and associated cluster options
-  calc_distance             <- match.arg(calc_distance)
+  calc_distance <- match.arg(calc_distance)
   out_pf$args$calc_distance <- calc_distance
-  if(calc_distance == "lcp") {
-    if(is.null(bathy)) stop("'bathy' must be supplied if calc_distance = 'lcp'. ")
-    if(!all.equal(raster::res(bathy)[1], raster::res(bathy)[2])){
+  if (calc_distance == "lcp") {
+    if (is.null(bathy)) stop("'bathy' must be supplied if calc_distance = 'lcp'. ")
+    if (!all.equal(raster::res(bathy)[1], raster::res(bathy)[2])) {
       stop("raster::res(bathy)[1] must equal raster::res(bathy)[2] for this option.")
     }
-    raster_comparison <- tryCatch(raster::compareRaster(record_1, bathy), error = function(e) return(e))
-    if(inherits(raster_comparison, "error")){
+    raster_comparison <- tryCatch(raster::compareRaster(record_1, bathy), error = function(e) {
+      return(e)
+    })
+    if (inherits(raster_comparison, "error")) {
       warning("record[[1]] and 'bathy' have different properties",
-              immediate. = TRUE, call. = FALSE)
+        immediate. = TRUE, call. = FALSE
+      )
       stop(raster_comparison)
     }
-    if(is.null(calc_distance_graph)){
+    if (is.null(calc_distance_graph)) {
       cat_to_cf("... Setting up cost-surface for calc_distance = 'lcp'...")
       costs <- lcp_costs(bathy, verbose = verbose)
-      cost  <- costs$dist_total
+      cost <- costs$dist_total
       calc_distance_graph <- lcp_graph_surface(surface = bathy, cost = cost, verbose = verbose)
       out_pf$args$calc_distance_graph <- calc_distance_graph
     }
-    if(is.null(mobility_from_origin)) bathy_sbt_1 <- bathy
-    if(is.null(mobility)) bathy_sbt <- bathy
+    if (is.null(mobility_from_origin)) bathy_sbt_1 <- bathy
+    if (is.null(mobility)) bathy_sbt <- bathy
   } else {
-    if(optimisers$use_calc_distance_euclid_backend_grass){
-      if(!requireNamespace("fasterRaster", quietly = TRUE)){
+    if (optimisers$use_calc_distance_euclid_backend_grass) {
+      if (!requireNamespace("fasterRaster", quietly = TRUE)) {
         stop("'The 'fasterRaster' package is required if optimisers$use_calc_distance_euclid_backend_grass = TRUE.")
       }
-      if(is.null(optimisers$use_grass_dir)) stop("For 'optimisers$use_calc_distance_euclid_backend_grass' distances method, 'optimisers$use_grass_dir' must be specified.")
+      if (is.null(optimisers$use_grass_dir)) stop("For 'optimisers$use_calc_distance_euclid_backend_grass' distances method, 'optimisers$use_grass_dir' must be specified.")
     }
-    if(use_all_cores){
+    if (use_all_cores) {
       warning("use_all_cores = TRUE ignored for calc_distance = 'euclid'.",
-              call. = FALSE, immediate. = TRUE)
+        call. = FALSE, immediate. = TRUE
+      )
       use_all_cores <- FALSE
     }
-    if(calc_distance_euclid_fast){
-      if(!is.null(cl)){
+    if (calc_distance_euclid_fast) {
+      if (!is.null(cl)) {
         warning("'cl' argument ignored for calc_distance_euclid_fast = TRUE.",
-                call. = FALSE, immediate. = TRUE)
+          call. = FALSE, immediate. = TRUE
+        )
         cl <- NULL
       }
     }
-    if(!is.null(calc_distance_graph)){
+    if (!is.null(calc_distance_graph)) {
       warning("'calc_distance_graph' ignored for calc_distance = 'euclid'.",
-              call. = FALSE, immediate = TRUE)
+        call. = FALSE, immediate = TRUE
+      )
       calc_distance_graph <- NULL
     }
   }
   # Other cluster options
-  if(!is.null(cl) & use_all_cores){
+  if (!is.null(cl) & use_all_cores) {
     warning("'cl' and 'use_all_cores' cannot both be specified: setting cl = NULL.",
-            call. = FALSE, immediate. = TRUE)
+      call. = FALSE, immediate. = TRUE
+    )
     cl <- NULL
   }
   .cl <- cl
   # Write history to file
-  if(!is.null(write_history)){
+  if (!is.null(write_history)) {
     check_named_list(input = write_history)
     check_names(input = write_history, req = "file")
     write_history$file <- check_dir(input = write_history$file, check_slash = TRUE)
@@ -639,64 +704,74 @@ pf <- function(record,
 
 
   #### For first time step define set of cells that the individual could have occupied
-  if(is.null(update_history)) {
+  if (is.null(update_history)) {
     cat_to_cf("... Determining the set of possible starting locations (t = 1)...")
-    if(optimisers$use_raster_operations){
+    if (optimisers$use_raster_operations) {
       cells_at_time_current <- raster::Which(x = record_1 > 0, cells = TRUE, na.rm = TRUE)
       cells_at_time_current <-
-        data.table::data.table(id_current = cells_at_time_current,
-                               pr_current = raster::extract(record_1, cells_at_time_current))
+        data.table::data.table(
+          id_current = cells_at_time_current,
+          pr_current = raster::extract(record_1, cells_at_time_current)
+        )
     } else {
       cells_at_time_current <-
-        data.table::data.table(id_current = all_cells,
-                               pr_current = as.vector(record_1))
+        data.table::data.table(
+          id_current = all_cells,
+          pr_current = as.vector(record_1)
+        )
     }
 
     # Adjust cell probabilities by distance from origin, if applicable, using mobility model
-    if(!is.null(origin)){
+    if (!is.null(origin)) {
       # Re-define origin on record_1 grid for consistency
       # ... This is necessary so that Euclidean and LCP distances are calculated in the same way
       origin_cell_id <- raster::cellFromXY(record_1, origin)
       origin <- raster::xyFromCell(record_1, origin_cell_id)
       # Crop raster to focus on area within mobility_from_origin for speed
-      if(!is.null(mobility_from_origin)){
+      if (!is.null(mobility_from_origin)) {
         origin_sp <- sp::SpatialPoints(origin, proj4string = proj)
-        buf       <- rgeos::gBuffer(origin_sp, width = mobility_from_origin)
+        buf <- rgeos::gBuffer(origin_sp, width = mobility_from_origin)
       }
       # Get distances
-      if(calc_distance == "euclid"){
-        if(!is.null(mobility_from_origin)) {
+      if (calc_distance == "euclid") {
+        if (!is.null(mobility_from_origin)) {
           record_1_sbt <- raster::crop(record_1, buf)
           record_1_sbt <- raster::mask(record_1, buf)
         }
-        if(!optimisers$use_calc_distance_euclid_backend_grass){
+        if (!optimisers$use_calc_distance_euclid_backend_grass) {
           dist_1 <- raster::distanceFromPoints(record_1_sbt, origin)
         } else {
-          dist_1 <- fasterRaster::fasterVectToRastDistance(rast = record_1_sbt,
-                                                           vect = sp::SpatialPointsDataFrame(coords = origin,
-                                                                                             data = data.frame(id = 1:nrow(origin)),
-                                                                                             proj4string = proj),
-                                                           grassDir = optimisers$use_grass_dir)
+          dist_1 <- fasterRaster::fasterVectToRastDistance(
+            rast = record_1_sbt,
+            vect = sp::SpatialPointsDataFrame(
+              coords = origin,
+              data = data.frame(id = 1:nrow(origin)),
+              proj4string = proj
+            ),
+            grassDir = optimisers$use_grass_dir
+          )
         }
         # if(!is.null(mobility_from_origin)) dist_1 <- raster::extend(dist_1, boundaries, NA)
-      } else if(calc_distance == "lcp"){
-        if(!is.null(mobility_from_origin)) bathy_sbt_1 <- raster::mask(bathy, buf)
-        dist_1 <- lcp_from_point(origin = origin,
-                                 destination = raster::Which(x = record_1 > 0, cells = TRUE, na.rm = TRUE),
-                                 surface = bathy_sbt_1,
-                                 graph = calc_distance_graph,
-                                 use_all_cores = use_all_cores,
-                                 verbose = verbose)
+      } else if (calc_distance == "lcp") {
+        if (!is.null(mobility_from_origin)) bathy_sbt_1 <- raster::mask(bathy, buf)
+        dist_1 <- lcp_from_point(
+          origin = origin,
+          destination = raster::Which(x = record_1 > 0, cells = TRUE, na.rm = TRUE),
+          surface = bathy_sbt_1,
+          graph = calc_distance_graph,
+          use_all_cores = use_all_cores,
+          verbose = verbose
+        )
       }
       # Convert distances to movement probabilities and combine with location probabilities
-      if(!is.null(data)) data_1 <- data[1, , drop = FALSE]
-      if(optimisers$use_raster_operations){
+      if (!is.null(data)) data_1 <- data[1, , drop = FALSE]
+      if (optimisers$use_raster_operations) {
         pr_1 <- raster::calc(dist_1, function(x) calc_movement_pr_from_origin(x, data_1))
         pr_1 <- pr_1 * record_1_sbt
-        if(calc_distance == "euclid" & !is.null(mobility_from_origin)) pr_1 <- raster::extend(pr_1, boundaries, 0)
+        if (calc_distance == "euclid" & !is.null(mobility_from_origin)) pr_1 <- raster::extend(pr_1, boundaries, 0)
         cells_at_time_current[, pr_current := raster::extract(pr_1, cells_at_time_current$id)]
       } else {
-        if(calc_distance == "euclid" & !is.null(mobility_from_origin)) dist_1 <- raster::extend(dist_1, boundaries, 0)
+        if (calc_distance == "euclid" & !is.null(mobility_from_origin)) dist_1 <- raster::extend(dist_1, boundaries, 0)
         cells_at_time_current[, dist := as.vector(dist_1)]
         cells_at_time_current[, pr_current := calc_movement_pr_from_origin(pr_current, data_1)]
         cells_at_time_current[, pr_current := pr_current * as.vector(record_1)]
@@ -705,22 +780,23 @@ pf <- function(record,
     cells_at_time_current[is.na(pr_current), pr_current := 0]
   } else {
     cat_to_cf("... Using update_history...")
-    cat_to_cf(paste0("... Determining the set of possible starting locations for update (t = ",
-                          update_history_from_time_step, ")..."))
+    cat_to_cf(paste0(
+      "... Determining the set of possible starting locations for update (t = ",
+      update_history_from_time_step, ")..."
+    ))
     cells_at_time_current <- history[[update_history_from_time_step]]
   }
 
 
   #### Implement algorithm iteratively
   cat_to_cf("... Implementing algorithm iteratively over time steps...")
-  for(t in update_history_from_time_step:length(record)){
-
+  for (t in update_history_from_time_step:length(record)) {
     #### For the current time step, select likely cells
     ## Check there are available cells at the current time step; if not
     # ... movement model is insufficient
     # ... algorithm 'unlucky' in that all n paths up to this point are 'dead ends'
     cat_to_cf(paste0("... ... Time = ", t, "..."))
-    if(all(cells_at_time_current$pr_current == 0)) {
+    if (all(cells_at_time_current$pr_current == 0)) {
       message("The probability of all cells at time ", t, " is 0. Either (1) the algorithm has been 'unlucky' and all n = ", n, " particles up to this point have led to 'dead ends', (2) the mobility model ('mobility') is too limiting and/or (3) other model assumptions have been violated. The function will now stop, returning outputs up until this point.")
       out_pf$history <- history
       class(out_pf) <- c(class(out_pf), "pf_archive")
@@ -729,82 +805,93 @@ pf <- function(record,
     ## Select cells
     # Initial selection
     cat_to_cf("... ... ... Selecting candidate starting positions for the current time step...")
-    cells_at_time_current_sbt <- cells_at_time_current[sample(x = 1:length(cells_at_time_current$id_current),
-                                                              size = n,
-                                                              prob = cells_at_time_current$pr_current,
-                                                              replace = TRUE), ]
+    cells_at_time_current_sbt <- cells_at_time_current[sample(
+      x = 1:length(cells_at_time_current$id_current),
+      size = n,
+      prob = cells_at_time_current$pr_current,
+      replace = TRUE
+    ), ]
     # Re-implement selection, equally across all cells with non 0 Pr, if fewer than a threshold number of cells have been selected
-    if(!is.null(resample)) {
-      if(length(unique(cells_at_time_current_sbt$id_current)) < resample){
+    if (!is.null(resample)) {
+      if (length(unique(cells_at_time_current_sbt$id_current)) < resample) {
         cat_to_cf("... ... ... ... Resampling candidate starting positions for the current time step...")
         cells_at_time_current[, pr_current_adj := pr_current]
         cells_at_time_current[pr_current_adj != 0, pr_current_adj := 1]
-        cells_at_time_current_sbt <- cells_at_time_current[sample(x = 1:length(cells_at_time_current$id_current),
-                                                                  size = n,
-                                                                  prob = cells_at_time_current$pr_current_adj,
-                                                                  replace = TRUE), ]
+        cells_at_time_current_sbt <- cells_at_time_current[sample(
+          x = 1:length(cells_at_time_current$id_current),
+          size = n,
+          prob = cells_at_time_current$pr_current_adj,
+          replace = TRUE
+        ), ]
         cells_at_time_current[, pr_current_adj := NULL]
       }
     }
-    cells_at_time_current_sbt$timestep  <- t
+    cells_at_time_current_sbt$timestep <- t
     rownames(cells_at_time_current_sbt) <- NULL
     history[[t]] <- as.data.frame(cells_at_time_current_sbt)
     # Write history to file (if specified)
-    if(!is.null(write_history)){
-      write_history$object   <- history[[t]]
+    if (!is.null(write_history)) {
+      write_history$object <- history[[t]]
       write_history$file <- paste0(write_history_dir, "pf_", t, ".rds")
       do.call(saveRDS, write_history)
     }
 
     #### For each particle, identify possible next locations
-    if(t <= (length(record) - 1)) {
-
+    if (t <= (length(record) - 1)) {
       ## Set up
       cat_to_cf("... ... ... For each particle, getting the possible positions for the next time step...")
 
       # Get record for next time step
       record_at_time_next <- record[[t + 1]]
-      if(read_records) record_at_time_next <- raster::raster(record_at_time_next)
+      if (read_records) record_at_time_next <- raster::raster(record_at_time_next)
       record_sbt <- record_at_time_next
-      if(!is.null(data)) data_t_next <- data[t + 1, , drop = FALSE]
+      if (!is.null(data)) data_t_next <- data[t + 1, , drop = FALSE]
 
       ## Fast euclidean distances method
-      if(calc_distance == "euclid" & calc_distance_euclid_fast){
+      if (calc_distance == "euclid" & calc_distance_euclid_fast) {
         # Get cell IDs and coordinates for the 'current' time step
         # ... (using record_at_time_next and cells_at_time_current_sbt)
         cell_all_xy <- raster::xyFromCell(record_at_time_next, cells_at_time_current_sbt$id_current)
-        if(!is.null(mobility)){
+        if (!is.null(mobility)) {
           cell_all_sp <- sp::SpatialPoints(cell_all_xy, proj4string = proj)
-          buf         <- rgeos::gBuffer(cell_all_sp, width = mobility)
-          record_sbt  <- raster::crop(record_at_time_next, buf)
-          record_sbt  <- raster::mask(record_sbt, buf)
+          buf <- rgeos::gBuffer(cell_all_sp, width = mobility)
+          record_sbt <- raster::crop(record_at_time_next, buf)
+          record_sbt <- raster::mask(record_sbt, buf)
         }
         # Get distances around cells
-        if(!optimisers$use_calc_distance_euclid_backend_grass){
+        if (!optimisers$use_calc_distance_euclid_backend_grass) {
           dist_all <- raster::distanceFromPoints(record_sbt, cell_all_xy)
         } else {
-          dist_all <- fasterRaster::fasterVectToRastDistance(rast = record_sbt,
-                                                             vect = sp::SpatialPointsDataFrame(coords = cell_all_xy,
-                                                                                               data = data.frame(id = 1:nrow(cell_all_xy)),
-                                                                                               proj4string = proj),
-                                                             grassDir = optimisers$use_grass_dir)
+          dist_all <- fasterRaster::fasterVectToRastDistance(
+            rast = record_sbt,
+            vect = sp::SpatialPointsDataFrame(
+              coords = cell_all_xy,
+              data = data.frame(id = 1:nrow(cell_all_xy)),
+              proj4string = proj
+            ),
+            grassDir = optimisers$use_grass_dir
+          )
         }
         # if(!is.null(mobility)) dist_all <- raster::extend(dist_all, boundaries, NA)
         # Get probabilities based on distance and combine with layer of possible locations for next time step
-        if(optimisers$use_raster_operations){
+        if (optimisers$use_raster_operations) {
           pr_all <- raster::calc(dist_all, function(x) calc_movement_pr(x, data_t_next))
           pr_all <- pr_all * record_sbt
-          if(calc_distance == "euclid" & !is.null(mobility)) pr_all <- raster::extend(pr_all, boundaries, 0)
-          pr_all <- data.table::data.table(id_previous = NA,
-                                           pr_previous = NA,
-                                           id_current = all_cells,
-                                           pr_current = as.vector(pr_all))
+          if (calc_distance == "euclid" & !is.null(mobility)) pr_all <- raster::extend(pr_all, boundaries, 0)
+          pr_all <- data.table::data.table(
+            id_previous = NA,
+            pr_previous = NA,
+            id_current = all_cells,
+            pr_current = as.vector(pr_all)
+          )
         } else {
-          if(calc_distance == "euclid" & !is.null(mobility)) dist_all <- raster::extend(dist_all, boundaries, 0)
-          pr_all <- data.table::data.table(id_previous = NA,
-                                           pr_previous = NA,
-                                           id_current = all_cells,
-                                           dist = as.vector(dist_all))
+          if (calc_distance == "euclid" & !is.null(mobility)) dist_all <- raster::extend(dist_all, boundaries, 0)
+          pr_all <- data.table::data.table(
+            id_previous = NA,
+            pr_previous = NA,
+            id_current = all_cells,
+            dist = as.vector(dist_all)
+          )
           pr_all[, pr_current := calc_movement_pr(dist, data_t_next)]
           pr_all[, pr_current := pr_current * as.vector(record_at_time_next)]
           pr_all[, dist := NULL]
@@ -814,62 +901,72 @@ pf <- function(record,
 
         ## Other distance methods (point-by-point)
       } else {
-        cells_from_current_to_next <- pbapply::pblapply(1:n, cl = .cl, function(j){
+        cells_from_current_to_next <- pbapply::pblapply(1:n, cl = .cl, function(j) {
           # Define location
           # j <- 1
-          cell_j    <- cells_at_time_current_sbt[j, ]
+          cell_j <- cells_at_time_current_sbt[j, ]
           cell_j_xy <- raster::xyFromCell(record_at_time_next, cell_j$id_current)
           # Subset record_1 around location for speed
-          if(!is.null(mobility)){
+          if (!is.null(mobility)) {
             cell_j_sp <- sp::SpatialPoints(cell_j_xy, proj4string = proj)
-            buf       <- rgeos::gBuffer(cell_j_sp, width = mobility)
+            buf <- rgeos::gBuffer(cell_j_sp, width = mobility)
           }
-          if(calc_distance == "euclid"){
-            if(!is.null(mobility)) {
+          if (calc_distance == "euclid") {
+            if (!is.null(mobility)) {
               record_sbt <- raster::crop(record_at_time_next, buf)
               record_sbt <- raster::mask(record_sbt, buf)
             }
-            if(!optimisers$use_calc_distance_euclid_backend_grass){
+            if (!optimisers$use_calc_distance_euclid_backend_grass) {
               dist_j <- raster::distanceFromPoints(record_sbt, cell_j_xy)
             } else {
-              dist_j <- fasterRaster::fasterVectToRastDistance(rast = record_sbt,
-                                                               vect = sp::SpatialPointsDataFrame(coords = cell_j_xy,
-                                                                                                 data = data.frame(id = 1L),
-                                                                                                 proj4string = proj),
-                                                               grassDir = optimisers$use_grass_dir)
+              dist_j <- fasterRaster::fasterVectToRastDistance(
+                rast = record_sbt,
+                vect = sp::SpatialPointsDataFrame(
+                  coords = cell_j_xy,
+                  data = data.frame(id = 1L),
+                  proj4string = proj
+                ),
+                grassDir = optimisers$use_grass_dir
+              )
             }
-          } else if(calc_distance == "lcp"){
-            if(!is.null(mobility)) bathy_sbt <- raster::mask(bathy, buf)
-            dist_j <- lcp_from_point(origin = cell_j_xy,
-                                     destination = raster::Which(record_at_time_next > 0, cells = TRUE, na.rm = TRUE),
-                                     surface = bathy_sbt,
-                                     graph = calc_distance_graph,
-                                     use_all_cores = use_all_cores,
-                                     verbose = FALSE)
+          } else if (calc_distance == "lcp") {
+            if (!is.null(mobility)) bathy_sbt <- raster::mask(bathy, buf)
+            dist_j <- lcp_from_point(
+              origin = cell_j_xy,
+              destination = raster::Which(record_at_time_next > 0, cells = TRUE, na.rm = TRUE),
+              surface = bathy_sbt,
+              graph = calc_distance_graph,
+              use_all_cores = use_all_cores,
+              verbose = FALSE
+            )
           }
           pr_j <- raster::calc(dist_j, function(x) calc_movement_pr(x, data_t_next))
           pr_j <- pr_j * record_sbt
-          if(calc_distance == "euclid" & !is.null(mobility)) pr_j <- raster::extend(pr_j, boundaries, 0)
-          pr_j <- data.table::data.table(id_current = cell_j$id_current,
-                                         pr_current = cell_j$pr_current,
-                                         id_next = 1:n_cell,
-                                         pr_next = as.vector(pr_j))
+          if (calc_distance == "euclid" & !is.null(mobility)) pr_j <- raster::extend(pr_j, boundaries, 0)
+          pr_j <- data.table::data.table(
+            id_current = cell_j$id_current,
+            pr_current = cell_j$pr_current,
+            id_next = 1:n_cell,
+            pr_next = as.vector(pr_j)
+          )
           pr_j <- pr_j[which(pr_j$pr_next > 0), ]
-          if(nrow(pr_j) == 0) pr_j <- NULL
+          if (nrow(pr_j) == 0) pr_j <- NULL
           return(pr_j)
         })
         cells_from_current_to_next <- compact(cells_from_current_to_next)
         cells_from_current_to_next <- do.call(rbind, cells_from_current_to_next)
-        if(is.null(cells_from_current_to_next)){
-          cells_from_current_to_next <- data.table::data.table(id_current = integer(),
-                                                               pr_current = numeric(),
-                                                               id_next = integer(),
-                                                               pr_next = numeric())
+        if (is.null(cells_from_current_to_next)) {
+          cells_from_current_to_next <- data.table::data.table(
+            id_current = integer(),
+            pr_current = numeric(),
+            id_next = integer(),
+            pr_next = numeric()
+          )
         }
       }
 
       ## Processing
-      if(nrow(cells_from_current_to_next) == 0L){
+      if (nrow(cells_from_current_to_next) == 0L) {
         message("Unable to sample any cells at time ", t, " for the next location for any of the ", n, " particles. Either (1) the algorithm has been 'unlucky' and all n = ", n, " particles up to this point have led to 'dead ends', (2) the mobility model ('mobility') is too limiting and/or (3) the depth error parameter from 'calc_depth_error' is too small. The function will now stop, returning outputs up until this point.")
         out_pf$history <- history
         class(out_pf) <- c(class(out_pf), "pf_archive")
@@ -886,10 +983,9 @@ pf <- function(record,
   class(out_pf) <- c(class(out_pf), "pf_archive")
 
   #### Return outputs
-  if(!is.null(seed)) set.seed(NULL)
+  if (!is.null(seed)) set.seed(NULL)
   t_end <- Sys.time()
   total_duration <- difftime(t_end, t_onset, units = "mins")
   cat_to_cf(paste0("... flapper::pf() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
   return(out_pf)
-
 }

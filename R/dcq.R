@@ -27,95 +27,111 @@
 #' coastline <- prettyGraphics::dat_coast_around_oban
 #'
 #' #### Example (1) Implement the dcq() algorithm with 25 m bins
-#' dcq_maps <- dcq(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 25,
-#'               plot = FALSE)
+#' dcq_maps <- dcq(
+#'   archival_ls = archival_ls,
+#'   bathy = bathy,
+#'   bin = 25,
+#'   plot = FALSE
+#' )
 #' # The function returns a list of rasters, with one raster
 #' # ... for each time unit.
 #' dcq_maps
 #'
 #' #### Example (2): Implement the algorithm in parallel:
-#' dcq_maps <- dcq(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 25,
-#'               plot = FALSE,
-#'               cl = parallel::makeCluster(2L))
+#' dcq_maps <- dcq(
+#'   archival_ls = archival_ls,
+#'   bathy = bathy,
+#'   bin = 25,
+#'   plot = FALSE,
+#'   cl = parallel::makeCluster(2L)
+#' )
 #'
 #' #### Example (3): Visualise the function outputs on one page
 #' # ... using standard options.
 #' # Examine results with 25 m bin
-#' dcq_maps <- dcq(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 25,
-#'               plot = TRUE,
-#'               one_page = TRUE)
+#' dcq_maps <- dcq(
+#'   archival_ls = archival_ls,
+#'   bathy = bathy,
+#'   bin = 25,
+#'   plot = TRUE,
+#'   one_page = TRUE
+#' )
 #' # Examine results with a higher resolution bin
-#' dcq_maps <- dcq(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 5,
-#'               plot = TRUE,
-#'               one_page = TRUE)
+#' dcq_maps <- dcq(
+#'   archival_ls = archival_ls,
+#'   bathy = bathy,
+#'   bin = 5,
+#'   plot = TRUE,
+#'   one_page = TRUE
+#' )
 #'
 #' #### Example (4): Plot customisation options
 #' # fix zlim to be constant across all plots to enable comparability
-#' dcq_maps <- dcq(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 5,
-#'               plot = TRUE,
-#'               one_page = TRUE,
-#'               fix_zlim = TRUE)
+#' dcq_maps <- dcq(
+#'   archival_ls = archival_ls,
+#'   bathy = bathy,
+#'   bin = 5,
+#'   plot = TRUE,
+#'   one_page = TRUE,
+#'   fix_zlim = TRUE
+#' )
 #' # fix zlim using custom limits across all plots
-#' dcq_maps <- dcq(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 5,
-#'               plot = TRUE,
-#'               one_page = TRUE,
-#'               fix_zlim = c(0, 5000))
+#' dcq_maps <- dcq(
+#'   archival_ls = archival_ls,
+#'   bathy = bathy,
+#'   bin = 5,
+#'   plot = TRUE,
+#'   one_page = TRUE,
+#'   fix_zlim = c(0, 5000)
+#' )
 #' # Transform the returned and plotted rasters by supplying a function to the
 #' # ... transform argument
-#' dcq_maps <- dcq(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 5,
-#'               plot = TRUE,
-#'               one_page = TRUE,
-#'               transform = sqrt)
+#' dcq_maps <- dcq(
+#'   archival_ls = archival_ls,
+#'   bathy = bathy,
+#'   bin = 5,
+#'   plot = TRUE,
+#'   one_page = TRUE,
+#'   transform = sqrt
+#' )
 #' # Customise the plot further via before_plot, after_plot functions
 #' # ... and other arguments passed via ... E.g., note the need to include
 #' # ... add = TRUE because the raster plot is added to the plot of the coastline.
-#' dcq_maps <- dcq(archival_ls = archival_ls,
-#'               bathy = bathy,
-#'               bin = 5,
-#'               plot = TRUE,
-#'               one_page = TRUE,
-#'               transform = sqrt,
-#'               fix_zlim = FALSE,
-#'               before_plot = function(x) raster::plot(coastline),
-#'               after_plot = function(x) raster::lines(coastline),
-#'               add = TRUE,
-#'               col = topo.colors(100))
+#' dcq_maps <- dcq(
+#'   archival_ls = archival_ls,
+#'   bathy = bathy,
+#'   bin = 5,
+#'   plot = TRUE,
+#'   one_page = TRUE,
+#'   transform = sqrt,
+#'   fix_zlim = FALSE,
+#'   before_plot = function(x) raster::plot(coastline),
+#'   after_plot = function(x) raster::lines(coastline),
+#'   add = TRUE,
+#'   col = topo.colors(100)
+#' )
 #'
 #' @export
 #' @author Edward Lavender
 #'
 
 dcq <- function(archival_ls,
-               bathy,
-               bin = 10, transform = NULL,
-               plot = TRUE, before_plot = NULL, after_plot = NULL, fix_zlim = FALSE, one_page = FALSE,
-               cl = NULL, varlist = NULL,
-               verbose = TRUE,...){
-
+                bathy,
+                bin = 10, transform = NULL,
+                plot = TRUE, before_plot = NULL, after_plot = NULL, fix_zlim = FALSE, one_page = FALSE,
+                cl = NULL, varlist = NULL,
+                verbose = TRUE, ...) {
   #### Checks
-  cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+  cat_to_console <- function(..., show = verbose) if (show) cat(paste(..., "\n"))
   cat_to_console("flapper::dcq() called...")
   cat_to_console("... Step 1: Checking user inputs...")
   check_class(input = archival_ls, to_class = "list", type = "stop")
-  sapply(1:length(archival_ls), function(i){
-    check_names(arg = paste0("archival_ls[[", i, "]]"),
-                input = archival_ls[[i]],
-                req = c("depth", "time_unit")
-                )
+  sapply(1:length(archival_ls), function(i) {
+    check_names(
+      arg = paste0("archival_ls[[", i, "]]"),
+      input = archival_ls[[i]],
+      req = c("depth", "time_unit")
+    )
   })
 
   #### Define the frequency of use of different depth bins
@@ -126,13 +142,13 @@ dcq <- function(archival_ls,
   cat_to_console("... Step 2: Calculating the number of observations within each depth bin for each time unit...")
   max_depth <- max(sapply(archival_ls, function(d) max(d$depth, na.rm = TRUE)))
   use_freq_by_time_unit <-
-    pbapply::pblapply(archival_ls, cl = NULL, function(df){
+    pbapply::pblapply(archival_ls, cl = NULL, function(df) {
       ## Define histogram breaks from from 0 to the max depth by the size of the depth bin specified.
       breaks <- seq(0, max_depth, by = bin)
       ## Because we've specified a regular sequence, the maximum value of the break
       # ... might be less than the maximum depth, which will cause errors when we create the histogram,
       # ... so, if this is the case, we'll add an extra interval:
-      if(max(breaks) < max_depth) breaks <- c(breaks, breaks[length(breaks)] + bin)
+      if (max(breaks) < max_depth) breaks <- c(breaks, breaks[length(breaks)] + bin)
       ## Create a histogram of counts of observations at each depth in a vector of breaks
       # Use right = TRUE so the frequency in a bin defined by lower and upper
       # ... values x and y is over the interval >= x but < y.
@@ -141,14 +157,14 @@ dcq <- function(archival_ls,
       # ... and the corresponding count of depth records in that bin.
       use_freq <- data.frame(time_unit = df$time_unit[1], mids = h$mids, counts = h$counts)
       # Add the lower and upper values associated with each bin
-      use_freq$lower <- use_freq$mids - bin/2
-      use_freq$upper <- use_freq$mids + bin/2
+      use_freq$lower <- use_freq$mids - bin / 2
+      use_freq$upper <- use_freq$mids + bin / 2
       # Return the dataframe
       return(use_freq)
     })
 
   #### Define a function to get the cell numbers of cells whose value lies within a specified range
-  .cells_from_val <- function(y){
+  .cells_from_val <- function(y) {
     return(cells_from_val(x = bathy, y = y, interval = 1L, cells = TRUE, na.rm = TRUE))
   }
 
@@ -161,50 +177,52 @@ dcq <- function(archival_ls,
   area_use <- bathy
   area_use <- raster::setValues(area_use, 0)
   area_use_ls <- cl_lapply(use_freq_by_time_unit,
-                           cl = cl,
-                           varlist = varlist,
-                           fun = function(use_freq){
-    # use_freq <- use_freq_by_time_unit[[1]]
-    # Determine the cell IDs of cells which lie within the lower and upper values
-    # ... of each depth bin:
-    cells_by_interval <- lapply(split(use_freq[, c("lower", "upper")], 1:nrow(use_freq)), FUN = function(y){
-      cells <- .cells_from_val(as.numeric(y))
-      return(cells)
-    })
-    # Update the area use raster in each of these cells based on the number of times that depth bin was used:
-    # Loop over every element in cells_by_interval (i.e. every depth bin...)
-    for(i in 1:length(cells_by_interval)) {
-      area_use[cells_by_interval[[i]]] <- use_freq$counts[i]
+    cl = cl,
+    varlist = varlist,
+    fun = function(use_freq) {
+      # use_freq <- use_freq_by_time_unit[[1]]
+      # Determine the cell IDs of cells which lie within the lower and upper values
+      # ... of each depth bin:
+      cells_by_interval <- lapply(split(use_freq[, c("lower", "upper")], 1:nrow(use_freq)), FUN = function(y) {
+        cells <- .cells_from_val(as.numeric(y))
+        return(cells)
+      })
+      # Update the area use raster in each of these cells based on the number of times that depth bin was used:
+      # Loop over every element in cells_by_interval (i.e. every depth bin...)
+      for (i in 1:length(cells_by_interval)) {
+        area_use[cells_by_interval[[i]]] <- use_freq$counts[i]
+      }
+      # Transform the raster, if required
+      if (!is.null(transform)) area_use <- transform(area_use)
+      # Return a list of objects
+      ls <- list(
+        cells_by_interval = cells_by_interval,
+        area_use = area_use
+      )
+      return(ls)
     }
-    # Transform the raster, if required
-    if(!is.null(transform)) area_use <- transform(area_use)
-    # Return a list of objects
-    ls <- list(cells_by_interval = cells_by_interval,
-               area_use = area_use)
-    return(ls)
-  })
+  )
 
   #### Visualise map of depth/space use for each time unit
-  if(plot){
-
+  if (plot) {
     ## Define plotting area
     cat_to_console("... Step 4: Mapping the results...")
-    if(one_page) {
-      if(length(area_use_ls) > 25) {
+    if (one_page) {
+      if (length(area_use_ls) > 25) {
         message("The number of time units > 25: ignoring one_page = TRUE...")
         one_page <- FALSE
       }
     }
-    if(one_page) {
+    if (one_page) {
       par_param <- graphics::par(no.readonly = TRUE)
       pp <- graphics::par(mfrow = prettyGraphics::par_mf(length(area_use_ls)))
       on.exit(graphics::par(par_param), add = TRUE)
     }
 
     ## Define zlim, if requested
-    if(is.logical(fix_zlim)) {
-      if(fix_zlim){
-        range_use <- lapply(area_use_ls, function(time_unit){
+    if (is.logical(fix_zlim)) {
+      if (fix_zlim) {
+        range_use <- lapply(area_use_ls, function(time_unit) {
           area_use <- time_unit$area_use
           min_use <- raster::cellStats(area_use, stat = "min", na.rm = TRUE)
           max_use <- raster::cellStats(area_use, stat = "max", na.rm = TRUE)
@@ -222,10 +240,10 @@ dcq <- function(archival_ls,
       # Isolate raster
       area_use <- time_unit$area_use
       # Initial plot (e.g., plot coastline)
-      if(!is.null(before_plot)) before_plot()
+      if (!is.null(before_plot)) before_plot()
       # Define time-specific zlim, if requested
-      if(is.logical(fix_zlim)){
-        if(!fix_zlim) {
+      if (is.logical(fix_zlim)) {
+        if (!fix_zlim) {
           min_use <- raster::cellStats(area_use, stat = "min", na.rm = TRUE)
           max_use <- raster::cellStats(area_use, stat = "max", na.rm = TRUE)
           zlim <- c(min_use, max_use)
@@ -234,14 +252,13 @@ dcq <- function(archival_ls,
         zlim <- fix_zlim
       }
       # Create map
-      fields::image.plot(area_use, zlim = zlim,...)
+      fields::image.plot(area_use, zlim = zlim, ...)
       # Updates (e.g., re-add coastline)
-      if(!is.null(after_plot)) after_plot()
+      if (!is.null(after_plot)) after_plot()
     })
   }
 
   #### Return outputs
   out <- lapply(area_use_ls, function(elm) elm$area_use)
   return(out)
-
 }

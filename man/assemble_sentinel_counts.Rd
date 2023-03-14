@@ -35,26 +35,39 @@ This function assembles a dataframe of counts of transmissions/detections from s
 \examples{
 #### Example (1): Use default options and example dataframes, which contain
 # ... all required columns:
-sentinel_counts <- assemble_sentinel_counts(sentinel = dat_sentinel,
-                                            moorings = dat_moorings)
-head(sentinel_counts); tail(sentinel_counts);
-
+sentinel_counts <- assemble_sentinel_counts(
+  sentinel = dat_sentinel,
+  moorings = dat_moorings
+)
+head(sentinel_counts)
+tail(sentinel_counts)
 #### Example (2): Adjust time window
-sentinel_counts <- assemble_sentinel_counts(sentinel = dat_sentinel,
-                                            moorings = dat_moorings,
-                                            breaks = "days")
-head(sentinel_counts); tail(sentinel_counts);
-
+sentinel_counts <- assemble_sentinel_counts(
+  sentinel = dat_sentinel,
+  moorings = dat_moorings,
+  breaks = "days"
+)
+head(sentinel_counts)
+tail(sentinel_counts)
 #### Example (2): Adjust maximum detection distance and supply dist_btw_receivers
-dist_btw_receivers_m <- dist_btw_receivers(dat_moorings[, c("receiver_id",
-                                                            "receiver_long",
-                                                            "receiver_lat")],
-                                           f = function(x) return(x*1000))
-sentinel_counts <- assemble_sentinel_counts(sentinel = dat_sentinel,
-                                            moorings = dat_moorings,
-                                            detection_range = 1500,
-                                            dist_btw_receivers = dist_btw_receivers_m)
-head(sentinel_counts); tail(sentinel_counts)
+dist_btw_receivers_m <- dist_btw_receivers(
+  dat_moorings[, c(
+    "receiver_id",
+    "receiver_long",
+    "receiver_lat"
+  )],
+  f = function(x) {
+    return(x * 1000)
+  }
+)
+sentinel_counts <- assemble_sentinel_counts(
+  sentinel = dat_sentinel,
+  moorings = dat_moorings,
+  detection_range = 1500,
+  dist_btw_receivers = dist_btw_receivers_m
+)
+head(sentinel_counts)
+tail(sentinel_counts)
 
 }
 \author{

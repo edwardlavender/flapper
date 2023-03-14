@@ -22,16 +22,18 @@
 #' # We will use particles sampled by a particle filtering algorithm
 #' # ... to create a UD:
 #' particles <- pf_simplify(dat_dcpf_histories,
-#'                          summarise_pr = max,
-#'                          return = "archive")
+#'   summarise_pr = max,
+#'   return = "archive"
+#' )
 #' # Define grids for UD estimation
-#' map       <- dat_dcpf_histories$args$bathy
-#' habitat   <- kud_habitat(map, plot = FALSE)
+#' map <- dat_dcpf_histories$args$bathy
+#' habitat <- kud_habitat(map, plot = FALSE)
 #' # Define UD as a raster
-#' ud        <- pf_kud_2(particles,
-#'                       bathy = map, grid = habitat,
-#'                       estimate_ud = kud_around_coastline,
-#'                       plot = FALSE)
+#' ud <- pf_kud_2(particles,
+#'   bathy = map, grid = habitat,
+#'   estimate_ud = kud_around_coastline,
+#'   plot = FALSE
+#' )
 #'
 #' #### Plot UD and home range estimators
 #' pp <- par(mfrow = c(2, 2))
@@ -57,27 +59,30 @@ NULL
 #' @name get_hr
 #' @export
 
-get_hr_prop <- function(x, prop = 0.5, plot = TRUE, add_raster = list(), add_contour = list(),...){
-  if(!requireNamespace("spatialEco", quietly = TRUE))
+get_hr_prop <- function(x, prop = 0.5, plot = TRUE, add_raster = list(), add_contour = list(), ...) {
+  if (!requireNamespace("spatialEco", quietly = TRUE)) {
     stop("This function requires the 'spatialEco' package.", call. = FALSE)
+  }
   check_class(input = x, to_class = c("SpatRaster", "RasterLayer"), type = "stop")
-  if(length(prop) != 1L)
+  if (length(prop) != 1L) {
     stop("'prop' should be a single number (proportion).", call. = FALSE)
+  }
   if (inherits(x, "RasterLayer")) {
-    if(!requireNamespace("terra", quietly = TRUE))
+    if (!requireNamespace("terra", quietly = TRUE)) {
       stop("This function requires the 'terra' package.", call. = FALSE)
+    }
     x <- terra::rast(x)
   }
   x <- spatialEco::raster.vol(x, p = prop, sample = FALSE)
   if (inherits(x, "SpatRaster")) x <- raster::raster(x)
-  if(plot) {
-    if(!is.null(add_raster)) add_raster$x <- x
-    prettyGraphics::pretty_map(add_rasters = add_raster,...)
-    if(!is.null(add_contour)) {
+  if (plot) {
+    if (!is.null(add_raster)) add_raster$x <- x
+    prettyGraphics::pretty_map(add_rasters = add_raster, ...)
+    if (!is.null(add_contour)) {
       add_contour$x <- x
-      if(is.null(add_contour$add)) add_contour$add <- TRUE
-      if(is.null(add_contour$nlevels)) add_contour$nlevels <- 1
-      if(is.null(add_contour$drawlabels)) add_contour$drawlabels <- FALSE
+      if (is.null(add_contour$add)) add_contour$add <- TRUE
+      if (is.null(add_contour$nlevels)) add_contour$nlevels <- 1
+      if (is.null(add_contour$drawlabels)) add_contour$drawlabels <- FALSE
       do.call(raster::contour, add_contour)
     }
   }
@@ -88,24 +93,22 @@ get_hr_prop <- function(x, prop = 0.5, plot = TRUE, add_raster = list(), add_con
 #' @name get_hr
 #' @export
 
-get_hr_core <- function(x, plot = TRUE, add_raster = list(), add_contour = list(),...){
-  get_hr_prop(x = x, prop = 0.5, plot = plot, add_raster = add_raster, add_contour = add_contour,...)
+get_hr_core <- function(x, plot = TRUE, add_raster = list(), add_contour = list(), ...) {
+  get_hr_prop(x = x, prop = 0.5, plot = plot, add_raster = add_raster, add_contour = add_contour, ...)
 }
 
 #### get_hr_home()
 #' @name get_hr
 #' @export
 
-get_hr_home <- function(x, plot = TRUE, add_raster = list(), add_contour = list(),...){
-  get_hr_prop(x = x, prop = 0.95, plot = plot, add_raster = add_raster, add_contour = add_contour,...)
+get_hr_home <- function(x, plot = TRUE, add_raster = list(), add_contour = list(), ...) {
+  get_hr_prop(x = x, prop = 0.95, plot = plot, add_raster = add_raster, add_contour = add_contour, ...)
 }
 
 #### get_hr_full()
 #' @name get_hr
 #' @export
 
-get_hr_full <- function(x, plot = TRUE, add_raster = list(), add_contour = list(),...){
-  get_hr_prop(x = x, prop = 1, plot = plot, add_raster = add_raster, add_contour = add_contour,...)
+get_hr_full <- function(x, plot = TRUE, add_raster = list(), add_contour = list(), ...) {
+  get_hr_prop(x = x, prop = 1, plot = plot, add_raster = add_raster, add_contour = add_contour, ...)
 }
-
-

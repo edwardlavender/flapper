@@ -130,9 +130,11 @@ In these scenarios, the function returns a message that it is about to fail and 
 xy <- matrix(c(708886.3, 6254404), ncol = 2)
 ## Define 'observed' depth time series using absolute values
 # Imagine these are observations made every two minutes
-depth <- c(163.06, 159.71, 153.49, 147.04, 139.86, 127.19, 114.75,
-           99.44,  87.01,  78.16,  70.03,  60.23,  49.96,  35.39,
-           27.75,  20.13,  12.73,  11.32)
+depth <- c(
+  163.06, 159.71, 153.49, 147.04, 139.86, 127.19, 114.75,
+  99.44, 87.01, 78.16, 70.03, 60.23, 49.96, 35.39,
+  27.75, 20.13, 12.73, 11.32
+)
 depth <- data.frame(depth = depth)
 
 ## Define surface over which movement occurred
@@ -144,10 +146,10 @@ depth <- data.frame(depth = depth)
 # ... we will focus on a small area around the origin. We could
 # ... also process the raster in other ways (e.g., mask any areas of land)
 # ... to improve efficiency.
-surface    <- dat_gebco
+surface <- dat_gebco
 boundaries <- raster::extent(707884.6, 709884.6, 6253404, 6255404)
-blank      <- raster::raster(boundaries, res = c(5, 5))
-surface    <- raster::resample(surface, blank)
+blank <- raster::raster(boundaries, res = c(5, 5))
+surface <- raster::resample(surface, blank)
 
 ## Define depth error function
 # Because the bathymetry data is very coarse, and the bathymetry is
@@ -164,15 +166,19 @@ cde <- function(...) matrix(c(-30, 30), nrow = 2)
 # ... if necessary, but for brevity we don't implement that here.
 
 ## Visualise movement surface, with starting location overlaid
-prettyGraphics::pretty_map(add_rasters = list(x = surface),
-                           add_points = list(x = xy),
-                           verbose = FALSE)
+prettyGraphics::pretty_map(
+  add_rasters = list(x = surface),
+  add_points = list(x = xy),
+  verbose = FALSE
+)
 
 #### Step (2): Use the DC algorithm to get individual's the possible locations
-dc_out <- dc(archival = depth,
-             bathy = surface,
-             calc_depth_error = cde,
-             save_record_spatial = NULL)
+dc_out <- dc(
+  archival = depth,
+  bathy = surface,
+  calc_depth_error = cde,
+  save_record_spatial = NULL
+)
 # Extract time-specific maps
 # ... Either directly for single chunk implementations of dc()
 record <- dc_out$archive$record
@@ -184,12 +190,14 @@ record <- lapply(dc_out_summary$record, function(r) r$spatial[[1]]$map_timestep)
 lapply(record, function(r) raster::plot(r))
 
 #### Example (1): Implement algorithm using default options
-out_1 <- pf(record = record,
-            origin  = xy,
-            calc_distance = "euclid",
-            calc_movement_pr = pf_setup_movement_pr,
-            n = 10L,
-            seed = 1)
+out_1 <- pf(
+  record = record,
+  origin = xy,
+  calc_distance = "euclid",
+  calc_movement_pr = pf_setup_movement_pr,
+  n = 10L,
+  seed = 1
+)
 # The function returns a pf_archive-class object
 class(out_1)
 utils::str(out_1)
@@ -207,12 +215,14 @@ record_pointer <- substr(record_pointer, 1, nchar(record_pointer) - 4)
 record_pointer <- data.frame(index = 1:length(record_pointer), name = record_pointer)
 record_pointer <- record_pointer[order(as.integer(record_pointer$name)), ]
 record_pointer <- list.files(tmp_root, full.names = TRUE)[record_pointer$index]
-out_2 <- pf(record = record_pointer,
-            origin  = xy,
-            calc_distance = "euclid",
-            calc_movement_pr = pf_setup_movement_pr,
-            n = 10L,
-            seed = 1)
+out_2 <- pf(
+  record = record_pointer,
+  origin = xy,
+  calc_distance = "euclid",
+  calc_movement_pr = pf_setup_movement_pr,
+  n = 10L,
+  seed = 1
+)
 
 #### Example (3): Implement a blanket mobility restriction
 # This can improve computational efficiency but offers no improvement
@@ -220,13 +230,15 @@ out_2 <- pf(record = record_pointer,
 # ... focusing in on a specific area matches the speed gains of
 # ... implementing the distance/movement
 # ... pr calculations over a smaller area at each time step)
-out_3 <- pf(record = record,
-            origin  = xy,
-            calc_distance = "euclid",
-            calc_movement_pr = pf_setup_movement_pr,
-            mobility = 250,
-            n = 10L,
-           seed = 1)
+out_3 <- pf(
+  record = record,
+  origin = xy,
+  calc_distance = "euclid",
+  calc_movement_pr = pf_setup_movement_pr,
+  mobility = 250,
+  n = 10L,
+  seed = 1
+)
 # Algorithm duration during testing ~0.04 minutes
 
 #### Example (4): Implement algorithm using shortest distances
@@ -234,24 +246,28 @@ out_3 <- pf(record = record,
 # To speed up the initial stages of the algorithm, you can supply the graph
 # ... required for least-cost calculations via calc_distance_graph, but for
 # ... brevity we don't implement that here.
-out_4 <- pf(record = record,
-            origin  = xy,
-            calc_distance = "lcp",
-            bathy = surface,
-            calc_movement_pr = pf_setup_movement_pr,
-            n = 10L,
-            seed = 1)
+out_4 <- pf(
+  record = record,
+  origin = xy,
+  calc_distance = "lcp",
+  bathy = surface,
+  calc_movement_pr = pf_setup_movement_pr,
+  n = 10L,
+  seed = 1
+)
 # This option is slower: algorithm duration during testing ~0.73 minutes
 
 #### Example (5): Implement algorithm using shortest distances with mobility restriction
-out_5 <- pf(record = record,
-            origin  = xy,
-            calc_distance = "lcp",
-            bathy = surface,
-            calc_movement_pr = pf_setup_movement_pr,
-            mobility = 250,
-            n = 10L,
-            seed = 1)
+out_5 <- pf(
+  record = record,
+  origin = xy,
+  calc_distance = "lcp",
+  bathy = surface,
+  calc_movement_pr = pf_setup_movement_pr,
+  mobility = 250,
+  n = 10L,
+  seed = 1
+)
 # Algorithm duration during testing ~0.63 minutes
 # With shortest distances, the mobility restriction makes more difference
 # ... in improving the computation time, because calculations are more involved.
@@ -259,30 +275,34 @@ out_5 <- pf(record = record,
 #### Example (6): Parallelisation for Euclidean distances is via cl argument
 # ... which implements parallelisation across paths. This is only implemented
 # ... for calc_distance_euclid_fast = FALSE, which is rarely desirable.
-out_6 <- pf(record = record,
-            origin  = xy,
-            calc_distance = "euclid",
-            calc_distance_euclid_fast = FALSE,
-            calc_movement_pr = pf_setup_movement_pr,
-            mobility = 250,
-            n = 10L,
-            cl = parallel::makeCluster(2L),
-            seed = 1)
+out_6 <- pf(
+  record = record,
+  origin = xy,
+  calc_distance = "euclid",
+  calc_distance_euclid_fast = FALSE,
+  calc_movement_pr = pf_setup_movement_pr,
+  mobility = 250,
+  n = 10L,
+  cl = parallel::makeCluster(2L),
+  seed = 1
+)
 
 #### Example (7): Parallelisation for shortest distances is usually best
 # ... via use_all_cores = TRUE
 # However, the benefits of parallelisation depend on the number of least-cost
 # ... paths calculations that need to be performed, which depends on the size
 # ... of bathy, and may be minimal (or negative) for small areas.
-out_7 <- pf(record = record,
-            origin  = xy,
-            calc_distance = "lcp",
-            bathy = surface,
-            calc_movement_pr = pf_setup_movement_pr,
-            mobility = 250,
-            n = 10L,
-            use_all_cores = TRUE,
-            seed = 1)
+out_7 <- pf(
+  record = record,
+  origin = xy,
+  calc_distance = "lcp",
+  bathy = surface,
+  calc_movement_pr = pf_setup_movement_pr,
+  mobility = 250,
+  n = 10L,
+  use_all_cores = TRUE,
+  seed = 1
+)
 # But the speed benefits in this case are minimal.
 # Algorithm duration during testing ~0.61 minutes.
 
@@ -299,7 +319,7 @@ out_7 <- pf(record = record,
 depth$va_abs <- abs(depth$depth - dplyr::lead(depth$depth))
 depth$va_abs[nrow(depth)] <- 0
 ## Define movement model, depending on distance and a dataframe with other information
-setup_movement_pr <- function(distance, data){
+setup_movement_pr <- function(distance, data) {
   beta <- -0.05 + -0.005 * data$va_abs
   pr <- stats::plogis(10 + distance * beta)
   pr[distance > 500] <- 0
@@ -308,18 +328,20 @@ setup_movement_pr <- function(distance, data){
 ## Examine the movement model with distance and VA
 pr <- setup_movement_pr(1:1000, data.frame(va_abs = 0))
 prettyGraphics::pretty_plot(pr, type = "n")
-for(va_abs in seq(min(depth$va_abs), max(depth$va_abs), length.out = 5)){
-  lines(1:1000, setup_movement_pr(1:1000, data.frame(va_abs = va_abs)), lwd = 0.25 + va_abs/5)
+for (va_abs in seq(min(depth$va_abs), max(depth$va_abs), length.out = 5)) {
+  lines(1:1000, setup_movement_pr(1:1000, data.frame(va_abs = va_abs)), lwd = 0.25 + va_abs / 5)
 }
 ## Implement algorithm with adjusted movement model
-out_8 <- pf(record = record,
-            data = depth,
-            origin  = xy,
-            calc_distance = "euclid",
-            calc_movement_pr = setup_movement_pr,
-            mobility = 250,
-            n = 10L,
-            seed = 1)
+out_8 <- pf(
+  record = record,
+  data = depth,
+  origin = xy,
+  calc_distance = "euclid",
+  calc_movement_pr = setup_movement_pr,
+  mobility = 250,
+  n = 10L,
+  seed = 1
+)
 
 #### Dealing with convergence failures.
 # The algorithm can fail to converge. There are a variety of options
@@ -332,16 +354,18 @@ out_8 <- pf(record = record,
 
 #### Example (9): Update particle histories from an earlier time step
 # ... via update_history and update_history_from_time_step
-out_9 <- pf(record = record,
-            data = depth,
-            origin  = xy,
-            calc_distance = "euclid",
-            calc_movement_pr = setup_movement_pr,
-            mobility = 250,
-            n = 10L,
-            seed = 1,
-            update_history = out_8$history,
-            update_history_from_time_step = 5)
+out_9 <- pf(
+  record = record,
+  data = depth,
+  origin = xy,
+  calc_distance = "euclid",
+  calc_movement_pr = setup_movement_pr,
+  mobility = 250,
+  n = 10L,
+  seed = 1,
+  update_history = out_8$history,
+  update_history_from_time_step = 5
+)
 
 #### Example (10): Implement re-sampling via resample
 # Here, for demonstration purposes, we implement the algorithm from
@@ -350,15 +374,17 @@ out_9 <- pf(record = record,
 # ... fewer than 10 unique positions.
 # ... (Normally resample would be less than n.)
 # In this example, the function re-samples candidate starting positions at t = 9
-out_10 <- pf(record = record,
-             data = depth,
-             origin  = xy,
-             calc_distance = "euclid",
-             calc_movement_pr = pf_setup_movement_pr,
-             mobility = 250,
-             n = 10L,
-             resample = 10,
-             seed = 1)
+out_10 <- pf(
+  record = record,
+  data = depth,
+  origin = xy,
+  calc_distance = "euclid",
+  calc_movement_pr = pf_setup_movement_pr,
+  mobility = 250,
+  n = 10L,
+  resample = 10,
+  seed = 1
+)
 
 #### Example (10): A simulation workflow
 # This example provides a simulation workflow for comparing simulated and
@@ -374,17 +400,20 @@ set.seed(seed)
 ## (B) Define area for simulation
 # Here, we use the sample area as above, but reduce the resolution
 # ... for example speed.
-dat_gebco_planar <- raster::raster(crs = raster::crs(dat_gebco),
-                                   ext = raster::extent(dat_gebco),
-                                   resolution = 25)
+dat_gebco_planar <- raster::raster(
+  crs = raster::crs(dat_gebco),
+  ext = raster::extent(dat_gebco),
+  resolution = 25
+)
 dat_gebco_planar <- raster::resample(dat_gebco, dat_gebco_planar, method = "bilinear")
 # Define 'sea' for movement simulation
 dat_coast <- raster::crop(dat_coast, raster::extent(dat_gebco))
 dat_sea <- invert_poly(dat_coast)
 # Visualise area
 prettyGraphics::pretty_map(dat_gebco_planar,
-                           add_rasters = list(x = dat_gebco_planar),
-                           add_polys = list(x = dat_sea))
+  add_rasters = list(x = dat_gebco_planar),
+  add_polys = list(x = dat_sea)
+)
 
 ## (C) Simulate movement path
 # Define movement parameters
@@ -394,52 +423,65 @@ prettyGraphics::pretty_hist(stats::rgamma(10000, shape = 15, scale = 5), breaks 
 origin_sim <- sp::spsample(dat_sea, n = 1, type = "random")
 origin_sim <- sp::coordinates(origin_sim)
 # Simulate path
-path_sim <- sim_path_sa(n = 10,
-                        p_1 = origin_sim,
-                        area = dat_sea,
-                        sim_step = sim_steps,
-                        add_rasters = list(x = dat_gebco_planar),
-                        seed = seed)
+path_sim <- sim_path_sa(
+  n = 10,
+  p_1 = origin_sim,
+  area = dat_sea,
+  sim_step = sim_steps,
+  add_rasters = list(x = dat_gebco_planar),
+  seed = seed
+)
 # Get resultant depth time series
 path_sim <- path_sim$xy_mat
-path_sim <- data.frame(path_id = 1,
-                       cell_id = raster::cellFromXY(dat_gebco_planar, path_sim),
-                       cell_x = path_sim[, 1],
-                       cell_y = path_sim[, 2],
-                       timestep = 1:nrow(path_sim))
+path_sim <- data.frame(
+  path_id = 1,
+  cell_id = raster::cellFromXY(dat_gebco_planar, path_sim),
+  cell_x = path_sim[, 1],
+  cell_y = path_sim[, 2],
+  timestep = 1:nrow(path_sim)
+)
 path_sim$cell_z <- raster::extract(dat_gebco_planar, path_sim$cell_id)
 prettyGraphics::pretty_plot(path_sim$cell_z, type = "l")
 # Check simulated movements on the scale of the grid
 sp::spDists(raster::xyFromCell(dat_gebco_planar, path_sim$cell_id),
-            segments = TRUE)
+  segments = TRUE
+)
 # Simulate 'observed' depth time series given some error
 # ... For illustration, we will make the error smaller in this example
 cde <- function(...) matrix(c(-2.5, 2.5), nrow = 2)
-depth_obs <- runif(length(path_sim$cell_z),
-                   path_sim$cell_z + cde(path_sim$cell_z)[1],
-                   path_sim$cell_z + cde(path_sim$cell_z)[2])
+depth_obs <- runif(
+  length(path_sim$cell_z),
+  path_sim$cell_z + cde(path_sim$cell_z)[1],
+  path_sim$cell_z + cde(path_sim$cell_z)[2]
+)
 depth_obs <- data.frame(depth = depth_obs)
 # Compare 'true' and 'observed' depth time series
 pf_plot_1d(path_sim, depth_obs,
-           type = "b", cex = 0.5,
-           add_lines = list(col = "royalblue", type = "l"))
+  type = "b", cex = 0.5,
+  add_lines = list(col = "royalblue", type = "l")
+)
 
 ## Implement dc() on 'observed' time series
-dc_out <- dc(archival = depth_obs,
-             bathy = dat_gebco_planar,
-             calc_depth_error = cde,
-             save_record_spatial = NULL)
+dc_out <- dc(
+  archival = depth_obs,
+  bathy = dat_gebco_planar,
+  calc_depth_error = cde,
+  save_record_spatial = NULL
+)
 
 ## Implement pf() on the results from dc()
 # We will assume that the origin was known.
 # ... We will mostly use the default options.
 history_dcpf <-
-  pf(record = acdc_access_maps(acdc_simplify(dc_out, type = "dc"),
-                               type = "map_timestep"),
-     origin = origin_sim,
-     calc_distance = "euclid",
-     mobility = 200,
-     n = 10L)
+  pf(
+    record = acdc_access_maps(acdc_simplify(dc_out, type = "dc"),
+      type = "map_timestep"
+    ),
+    origin = origin_sim,
+    calc_distance = "euclid",
+    mobility = 200,
+    n = 10L
+  )
 
 ## Visualise particle histories in relation to simulated paths
 # Here, each plot shows the particles sampled at a particular time step
@@ -448,11 +490,12 @@ history_dcpf <-
 # ... is shown in black.
 pp <- graphics::par(mfrow = c(3, 4))
 pf_plot_history(history_dcpf,
-                add_particles = list(pch = 21),
-                add_paths = list(x = path_sim$cell_x, path_sim$cell_y, length = 0.05),
-                xlim = range(path_sim$cell_x), ylim = range(path_sim$cell_y),
-                crop_spatial = TRUE,
-                prompt = FALSE)
+  add_particles = list(pch = 21),
+  add_paths = list(x = path_sim$cell_x, path_sim$cell_y, length = 0.05),
+  xlim = range(path_sim$cell_x), ylim = range(path_sim$cell_y),
+  crop_spatial = TRUE,
+  prompt = FALSE
+)
 graphics::par(pp)
 
 ## Assemble paths
@@ -467,12 +510,14 @@ require(rlang)
 path_dcpf <-
   path_dcpf \%>\%
   dplyr::group_by(.data$path_id) \%>\%
-  dplyr::mutate(cell_x2 = dplyr::lag(.data$cell_x),
-                cell_y2 = dplyr::lag(.data$cell_y),
-                dist_1 = sqrt((.data$cell_x2 - .data$cell_x)^2 +
-                                (.data$cell_y2 -.data$ cell_y)^2))
+  dplyr::mutate(
+    cell_x2 = dplyr::lag(.data$cell_x),
+    cell_y2 = dplyr::lag(.data$cell_y),
+    dist_1 = sqrt((.data$cell_x2 - .data$cell_x)^2 +
+      (.data$cell_y2 - .data$ cell_y)^2)
+  )
 path_dcpf
-range(path_dcpf$dist_1, na.rm =TRUE)
+range(path_dcpf$dist_1, na.rm = TRUE)
 
 ## Visualise paths
 # Zoom around path
@@ -482,13 +527,18 @@ boundaries <- raster::extent(xlim, ylim)
 area <- raster::crop(dat_gebco_planar, boundaries)
 # Define function to add simulated path for comparison
 add_paths_sim <-
-  function() prettyGraphics::add_sp_path(path_sim$cell_x, path_sim$cell_y,
-                                         lwd = 2, length = 0.01)
+  function() {
+    prettyGraphics::add_sp_path(path_sim$cell_x, path_sim$cell_y,
+      lwd = 2, length = 0.01
+    )
+  }
 # Make plots
-if(interactive()){
-  pf_plot_2d(path_dcpf, area, add_paths = list(length = 0.05),
-             add_additional = add_paths_sim,
-             prompt = TRUE)
+if (interactive()) {
+  pf_plot_2d(path_dcpf, area,
+    add_paths = list(length = 0.05),
+    add_additional = add_paths_sim,
+    prompt = TRUE
+  )
 }
 
 #### Example (11): Write a dataframe of sampled particles to file at each time step
@@ -496,16 +546,21 @@ if(interactive()){
 root <- paste0(tempdir(), "/pf/")
 dir.create(root)
 # Implement PF, writing the history of particle samples at each time step
-out_11 <- pf(record = record,
-             origin  = xy,
-             write_history = list(file = root))
+out_11 <- pf(
+  record = record,
+  origin = xy,
+  write_history = list(file = root)
+)
 # Read the record into R
 history_from_file <- lapply(pf_access_history_files(root), readRDS)
 # Show that the history recorded in 'out_11' is the same as that recorded by the saved files
-length(out_11$history); length(history_from_file)
+length(out_11$history)
+length(history_from_file)
 identical(out_11$history, history_from_file)
-cbind(out_11$history[[1]],
-      history_from_file[[1]])
+cbind(
+  out_11$history[[1]],
+  history_from_file[[1]]
+)
 
 }
 \seealso{

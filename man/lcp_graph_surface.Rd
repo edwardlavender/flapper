@@ -29,10 +29,10 @@ This is a wrapper for the \code{\link[cppRouting]{makegraph}} function.
 # ... specific area (for speed), within which we need to
 # ... we need to regularise the resolution:
 boundaries <- raster::extent(707884.6, 709884.6, 6253404, 6255404)
-blank      <- raster::raster(boundaries, res = c(5, 5))
-r          <- raster::resample(dat_gebco, blank)
+blank <- raster::raster(boundaries, res = c(5, 5))
+r <- raster::resample(dat_gebco, blank)
 # Define costs
-costs      <- lcp_costs(r)
+costs <- lcp_costs(r)
 
 #### Step (2): Make graph for LCP analysis
 graph <- lcp_graph_surface(surface = r, cost = costs$dist_total)

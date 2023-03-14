@@ -20,17 +20,17 @@ This function is a wrapper for \code{\link[rgeos]{gIntersection}} that extracts 
 \examples{
 ## Define raster parameters (for sampling/plotting)
 set.seed(1)
-n        <- raster::ncell(dat_gebco)
-xy       <- raster::coordinates(dat_gebco)
-utm      <- raster::crs(dat_gebco)
-cols     <- c("black", "red", "orange", "green", lwd = 2)
-col_int  <- scales::alpha("dimgrey", 0.5)
+n <- raster::ncell(dat_gebco)
+xy <- raster::coordinates(dat_gebco)
+utm <- raster::crs(dat_gebco)
+cols <- c("black", "red", "orange", "green", lwd = 2)
+col_int <- scales::alpha("dimgrey", 0.5)
 
 ## Define example polygons
 n_poly <- 4
-polys <- lapply(1:n_poly, function(i){
-  xy_i     <- xy[sample(1:n, 1), , drop = FALSE]
-  xy_i     <- sp::SpatialPoints(xy_i, utm)
+polys <- lapply(1:n_poly, function(i) {
+  xy_i <- xy[sample(1:n, 1), , drop = FALSE]
+  xy_i <- sp::SpatialPoints(xy_i, utm)
   xy_i_buf <- rgeos::gBuffer(xy_i, width = 10000)
   return(xy_i_buf)
 })
@@ -58,7 +58,8 @@ raster::plot(get_intersection(polys[1]), add = TRUE, col = col_int)
 raster::plot(dat_gebco)
 lapply(1:length(polys), function(i) raster::lines(polys[[i]], col = cols[i]))
 raster::plot(get_intersection(list(polys[[1]], NULL, NULL, polys[[4]])),
-             add = TRUE, col = col_int)
+  add = TRUE, col = col_int
+)
 
 }
 \seealso{

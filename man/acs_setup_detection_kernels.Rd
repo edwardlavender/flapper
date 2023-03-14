@@ -73,15 +73,19 @@ However, it is worth noting that, within acoustic containers, unrealistic areas 
 moorings <- dat_moorings[1:5, ]
 # Define receiver locations as a SpatialPoints object with a UTM CRS
 proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-xy <- sp::SpatialPoints(moorings[, c("receiver_long", "receiver_lat")],
-                        proj_wgs84)
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+xy <- sp::SpatialPoints(
+  moorings[, c("receiver_long", "receiver_lat")],
+  proj_wgs84
+)
 xy <- sp::spTransform(xy, proj_utm)
 # Link receiver IDs, locations and deployment dates to form a SpatialPointsDataFrame
 # ... Note required column names and class types.
-xy <- sp::SpatialPointsDataFrame(xy, moorings[, c("receiver_id",
-                                                  "receiver_start_date",
-                                                  "receiver_end_date")])
+xy <- sp::SpatialPointsDataFrame(xy, moorings[, c(
+  "receiver_id",
+  "receiver_start_date",
+  "receiver_end_date"
+)])
 
 ## Define bathymetric map of area for which AC* algorithm(s) will be implemented
 # ... The resolution must be sufficiently high
@@ -97,7 +101,7 @@ surface <- raster::resample(dat_gebco, surface)
 # ... (defined in flapper::acs_setup_containers()).
 # ... Here, we assume detection_range = 425 m.
 calc_dpr <-
-  function(x){
+  function(x) {
     ifelse(x <= 425, stats::plogis(2.5 + -0.02 * x), 0)
   }
 plot(0:1000, calc_dpr(0:1000), type = "l")
@@ -111,11 +115,13 @@ overlaps <-
   )
 
 #### Example (1): Implement function using default options
-kernels <- acs_setup_detection_kernels(xy = xy,
-                                       containers = dat_containers,
-                                       overlaps = overlaps,
-                                       calc_detection_pr = calc_dpr,
-                                       bathy = surface)
+kernels <- acs_setup_detection_kernels(
+  xy = xy,
+  containers = dat_containers,
+  overlaps = overlaps,
+  calc_detection_pr = calc_dpr,
+  bathy = surface
+)
 
 # Examine list elements
 summary(kernels)

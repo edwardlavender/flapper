@@ -44,15 +44,18 @@ pf_plot_2d(paths, bathy)
 #### Example (2): Plot customisation options
 # Customise the appearance of the path(s)
 pf_plot_2d(paths, bathy,
-             add_paths = list(length = 0.075, col = viridis::viridis(100)))
+  add_paths = list(length = 0.075, col = viridis::viridis(100))
+)
 # Pass arguments to prettyGraphics::pretty_map() via ... , e.g.:
 pf_plot_2d(paths, bathy, xlab = "Easting (UTM)", ylab = "Northing (UTM)")
 
 #### Example (3): Plot individual paths separately
-if(interactive()){
+if (interactive()) {
   pp <- graphics::par(mfrow = c(3, 4))
-  pf_plot_2d(paths, bathy, add_paths = list(length = 0.01),
-               prompt = TRUE, verbose = FALSE)
+  pf_plot_2d(paths, bathy,
+    add_paths = list(length = 0.01),
+    prompt = TRUE, verbose = FALSE
+  )
   graphics::par(pp)
 }
 

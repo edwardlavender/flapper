@@ -13,9 +13,11 @@
 #'
 #' @examples
 #' # Define example raster
-#' r <- raster::raster(nrows = 3, ncols = 3,
-#'                     resolution = c(5, 5),
-#'                     ext = raster::extent(0, 15, 0, 15))
+#' r <- raster::raster(
+#'   nrows = 3, ncols = 3,
+#'   resolution = c(5, 5),
+#'   ext = raster::extent(0, 15, 0, 15)
+#' )
 #' # Increase raster extent by 5 units in every direction
 #' update_extent(r, 5)
 #' # Decrease raster extent by 5 units in every direction
@@ -27,8 +29,8 @@
 #' @export
 #'
 
-update_extent <- function(x, x_shift, y_shift = x_shift){
-  if(inherits(x, "RasterLayer")) x <- raster::extent(x)
+update_extent <- function(x, x_shift, y_shift = x_shift) {
+  if (inherits(x, "RasterLayer")) x <- raster::extent(x)
   x[1] <- x[1] - x_shift
   x[2] <- x[2] + x_shift
   x[3] <- x[3] - y_shift
@@ -53,12 +55,14 @@ update_extent <- function(x, x_shift, y_shift = x_shift){
 #' # Define an example raster
 #' nrw <- ncl <- 50
 #' r <- raster::raster(nrow = nrw, ncol = ncl)
-#' r[] <- stats::runif(nrw*ncl, 0, 1)
+#' r[] <- stats::runif(nrw * ncl, 0, 1)
 #' # Buffer and crop the raster around an example location
 #' xy <- sp::SpatialPoints(matrix(c(0, 0), ncol = 2))
-#' r2  <- buffer_and_crop(to_buffer = xy,
-#'                           to_crop = r,
-#'                           buffer = list(width = 10))
+#' r2 <- buffer_and_crop(
+#'   to_buffer = xy,
+#'   to_crop = r,
+#'   buffer = list(width = 10)
+#' )
 #' # Visualise outputs
 #' pp <- par(mfrow = c(1, 2))
 #' raster::plot(r)
@@ -71,13 +75,13 @@ update_extent <- function(x, x_shift, y_shift = x_shift){
 
 buffer_and_crop <- function(to_buffer,
                             to_crop,
-                            buffer = NULL,...){
-  if(!is.null(buffer)){
+                            buffer = NULL, ...) {
+  if (!is.null(buffer)) {
     check_class(input = buffer, to_class = "list", type = "stop")
-    if(!rlang::has_name(to_buffer, "spgeom")) buffer$spgeom <- to_buffer
+    if (!rlang::has_name(to_buffer, "spgeom")) buffer$spgeom <- to_buffer
     to_buffer <- do.call(rgeos::gBuffer, buffer)
   }
-  out <- raster::crop(to_crop, raster::extent(to_buffer),...)
+  out <- raster::crop(to_crop, raster::extent(to_buffer), ...)
   return(out)
 }
 
@@ -97,17 +101,17 @@ buffer_and_crop <- function(to_buffer,
 #' @examples
 #' ## Define raster parameters (for sampling/plotting)
 #' set.seed(1)
-#' n        <- raster::ncell(dat_gebco)
-#' xy       <- raster::coordinates(dat_gebco)
-#' utm      <- raster::crs(dat_gebco)
-#' cols     <- c("black", "red", "orange", "green", lwd = 2)
-#' col_int  <- scales::alpha("dimgrey", 0.5)
+#' n <- raster::ncell(dat_gebco)
+#' xy <- raster::coordinates(dat_gebco)
+#' utm <- raster::crs(dat_gebco)
+#' cols <- c("black", "red", "orange", "green", lwd = 2)
+#' col_int <- scales::alpha("dimgrey", 0.5)
 #'
 #' ## Define example polygons
 #' n_poly <- 4
-#' polys <- lapply(1:n_poly, function(i){
-#'   xy_i     <- xy[sample(1:n, 1), , drop = FALSE]
-#'   xy_i     <- sp::SpatialPoints(xy_i, utm)
+#' polys <- lapply(1:n_poly, function(i) {
+#'   xy_i <- xy[sample(1:n, 1), , drop = FALSE]
+#'   xy_i <- sp::SpatialPoints(xy_i, utm)
 #'   xy_i_buf <- rgeos::gBuffer(xy_i, width = 10000)
 #'   return(xy_i_buf)
 #' })
@@ -135,23 +139,24 @@ buffer_and_crop <- function(to_buffer,
 #' raster::plot(dat_gebco)
 #' lapply(1:length(polys), function(i) raster::lines(polys[[i]], col = cols[i]))
 #' raster::plot(get_intersection(list(polys[[1]], NULL, NULL, polys[[4]])),
-#'              add = TRUE, col = col_int)
+#'   add = TRUE, col = col_int
+#' )
 #'
 #' @seealso \code{\link[rgeos]{gIntersection}}
 #' @author Edward Lavender
 #' @export
 
-get_intersection <- function(x,...){
+get_intersection <- function(x, ...) {
   stopifnot(inherits(x, "list"))
   x <- compact(x)
   stopifnot(length(x) >= 1L)
-  if(length(x) == 1L) {
+  if (length(x) == 1L) {
     int <- x[[1]]
   } else {
-    int <- rgeos::gIntersection(x[[1]], x[[2]],...)
-    if(length(x) > 2L){
-      for(i in 3:length(x)){
-        int <- rgeos::gIntersection(int, x[[i]],...)
+    int <- rgeos::gIntersection(x[[1]], x[[2]], ...)
+    if (length(x) > 2L) {
+      for (i in 3:length(x)) {
+        int <- rgeos::gIntersection(int, x[[i]], ...)
       }
     }
   }
@@ -175,7 +180,7 @@ get_intersection <- function(x,...){
 #' @author Edward Lavender
 #' @export
 
-xy_from_click <- function(){
+xy_from_click <- function() {
   cat("Please click locations on the map and press [Esc] when you are done...\n")
   xy <- graphics::locator()
   xy <- matrix(c(xy$x, xy$y), ncol = 2, byrow = FALSE)
@@ -203,16 +208,17 @@ xy_from_click <- function(){
 #' }
 #' @return The function returns a \code{\link[raster]{raster}} and, if \code{plot = TRUE}, a plot of the area before/after cropping.
 #' @examples
-#' if(interactive()) crop_from_click(dat_gebco)
+#' if (interactive()) crop_from_click(dat_gebco)
 #' @author Edward Lavender
 #' @export
 #'
 
-crop_from_click <- function(x, plot = TRUE,...){
+crop_from_click <- function(x, plot = TRUE, ...) {
   # Plot the raster
-  if(plot){
+  if (plot) {
     prettyGraphics::pretty_map(x,
-                               add_rasters = list(x = x),...)
+      add_rasters = list(x = x), ...
+    )
   }
   # Capture interactively defined locations
   cat("Please click four boundary locations on the map and press [Esc] when you are done...")
@@ -225,9 +231,10 @@ crop_from_click <- function(x, plot = TRUE,...){
   # Crop raster
   x_crop <- raster::crop(x, ext)
   # Plot cropped raster and return
-  if(plot){
+  if (plot) {
     prettyGraphics::pretty_map(x_crop,
-                               add_rasters = list(x = x_crop),...)
+      add_rasters = list(x = x_crop), ...
+    )
   }
   return(x_crop)
 }
@@ -257,19 +264,21 @@ crop_from_click <- function(x, plot = TRUE,...){
 #' raster::plot(dat_sea, col = "skyblue")
 #' graphics::par(pp)
 #' # The CRS of the two objects is identical
-#' raster::crs(dat_coast); raster::crs(dat_sea)
+#' raster::crs(dat_coast)
+#' raster::crs(dat_sea)
 #' # Compare the classes of the two objects
-#' class(dat_coast); class(dat_sea)
+#' class(dat_coast)
+#' class(dat_sea)
 #' @author Edward Lavender
 #' @export
 #'
 
-invert_poly <- function(x, boundaries = raster::extent(x),...){
+invert_poly <- function(x, boundaries = raster::extent(x), ...) {
   boundary_xy <- raster::coordinates(boundaries)
   boundary_poly <- sp::Polygon(boundary_xy)
   boundary_sp_poly <- sp::SpatialPolygons(list(sp::Polygons(list(boundary_poly), ID = 1)))
   raster::crs(boundary_sp_poly) <- raster::crs(x)
-  x <- rgeos::gDifference(boundary_sp_poly, x,...)
+  x <- rgeos::gDifference(boundary_sp_poly, x, ...)
   return(x)
 }
 
@@ -292,7 +301,7 @@ invert_poly <- function(x, boundaries = raster::extent(x),...){
 #' # Define an example RasterLayer
 #' ncl <- 10
 #' nrw <- 10
-#' n   <- ncl*nrw
+#' n <- ncl * nrw
 #' mat <- matrix(1:n, ncol = ncl, nrow = nrw, byrow = TRUE)
 #' r <- raster::raster(mat)
 #' # Visualise example RasterLayer
@@ -312,18 +321,18 @@ invert_poly <- function(x, boundaries = raster::extent(x),...){
 #' @author Edward Lavender
 #' @export
 
-cells_from_val <- function(x, y, interval = 1L, cells = TRUE, na.rm = TRUE){
-  if(length(y) == 1){
+cells_from_val <- function(x, y, interval = 1L, cells = TRUE, na.rm = TRUE) {
+  if (length(y) == 1) {
     cells <- raster::Which(x == y, cells = cells, na.rm = na.rm)
-  } else if(length(y) == 2){
+  } else if (length(y) == 2) {
     interval <- check_value(input = interval, supp = 1:2, warn = TRUE, default = 1)
-    if(y[2] <= y[1]) stop("Nonsensical y range supplied: y[2] <= y[1].")
-    if(interval == 1){
+    if (y[2] <= y[1]) stop("Nonsensical y range supplied: y[2] <= y[1].")
+    if (interval == 1) {
       cells <- raster::Which(x >= y[1] & x <= y[2], cells = cells, na.rm = na.rm)
-    } else if(interval == 2){
+    } else if (interval == 2) {
       cells <- raster::Which(x > y[1] & x < y[2], cells = cells, na.rm = na.rm)
     }
-  } else{
+  } else {
     stop("length(y) does not equal 1 or 2.")
   }
   return(cells)
@@ -373,9 +382,9 @@ cells_from_val <- function(x, y, interval = 1L, cells = TRUE, na.rm = TRUE){
 #' @export
 #'
 
-mask_io <- function(x, mask, mask_inside = FALSE,...){
+mask_io <- function(x, mask, mask_inside = FALSE, ...) {
   # Re-define mask if we are masking points inside the mask:
-  if(mask_inside){
+  if (mask_inside) {
     area <- raster::extent(x)
     area <- sp::Polygon(raster::coordinates(area))
     area <- sp::SpatialPolygons(list(sp::Polygons(list(area), ID = 1)))
@@ -383,7 +392,7 @@ mask_io <- function(x, mask, mask_inside = FALSE,...){
     mask <- rgeos::gDifference(area, mask)
   }
   # Mask raster
-  x_masked <- raster::mask(x = x, mask = mask,...)
+  x_masked <- raster::mask(x = x, mask = mask, ...)
   return(x_masked)
 }
 
@@ -413,7 +422,7 @@ mask_io <- function(x, mask, mask_inside = FALSE,...){
 
 split_raster_equally <- function(r, n) {
   # Check for plyr
-  if(!requireNamespace("plyr", quietly = TRUE)) stop("This function requires the 'plyr' package.")
+  if (!requireNamespace("plyr", quietly = TRUE)) stop("This function requires the 'plyr' package.")
   # get total number of non NA grid cells
   mean.r <- raster::calc(r, function(x) {
     s <- sum(!is.na(x))
@@ -421,25 +430,27 @@ split_raster_equally <- function(r, n) {
     return(s)
   })
   ntotal <- sum(stats::na.omit(raster::values(mean.r)))
-  if (n > ncol(mean.r)/2) {
-    n <- ncol(mean.r)/2
+  if (n > ncol(mean.r) / 2) {
+    n <- ncol(mean.r) / 2
     warning(paste("SplitRasterEqually: n changed to", n))
   }
 
   # compute optimal splitting based on weighted quantile
   xy <- raster::coordinates(mean.r)
-  df <- data.frame(lon = xy[,1], val = raster::extract(mean.r, xy))
+  df <- data.frame(lon = xy[, 1], val = raster::extract(mean.r, xy))
   df <- stats::na.omit(df)
   x.best <- stats::quantile(df$lon, seq(0, 1, length = n + 1), na.rm = TRUE)
 
   # split raster according to optimal splitting
-  tiles.l <- plyr::llply(as.list(1:(length(x.best)-1)), function(i) {
+  tiles.l <- plyr::llply(as.list(1:(length(x.best) - 1)), function(i) {
     xmin <- x.best[i]
-    xmax <- x.best[i +1 ]
-    tile.r <- raster::crop(r, raster::extent(xmin,
-                                             xmax,
-                                             raster::extent(mean.r)@ymin,
-                                             raster::extent(mean.r)@ymax))
+    xmax <- x.best[i + 1]
+    tile.r <- raster::crop(r, raster::extent(
+      xmin,
+      xmax,
+      raster::extent(mean.r)@ymin,
+      raster::extent(mean.r)@ymax
+    ))
     return(tile.r)
   })
 
@@ -466,24 +477,30 @@ split_raster_equally <- function(r, n) {
 #' @examples
 #' #### Example (1): Simulate values across the whole raster
 #' sim_surface(dat_gebco,
-#'             sim_values = function(n) stats::runif(n = n, 0, 1))
+#'   sim_values = function(n) stats::runif(n = n, 0, 1)
+#' )
 #' sim_surface(dat_gebco,
-#'             sim_values = function(n) stats::rnorm(n = n, 0, 1))
+#'   sim_values = function(n) stats::rnorm(n = n, 0, 1)
+#' )
 #'
 #' #### Example (2): Simulate values differently across different areas
 #' # .. by defining the number of areas into which to split the raster
 #' # .. and a list of function(s)
 #' sim_surface(dat_gebco,
-#'             n = 2, sim_values = list(function(n) stats::runif(n = n, 0, 1),
-#'                                      function(n) stats::runif(n = n, 10, 11))
-#'             )
+#'   n = 2, sim_values = list(
+#'     function(n) stats::runif(n = n, 0, 1),
+#'     function(n) stats::runif(n = n, 10, 11)
+#'   )
+#' )
 #'
 #' #### Example (3): Include a spatial mask
 #' sim_surface(dat_gebco,
-#'             n = 2, sim_values = list(function(n) stats::runif(n = n, 9, 10),
-#'                                     function(n) stats::runif(n = n, 10, 11)),
-#'             mask = dat_coast, mask_inside = TRUE
-#'             )
+#'   n = 2, sim_values = list(
+#'     function(n) stats::runif(n = n, 9, 10),
+#'     function(n) stats::runif(n = n, 10, 11)
+#'   ),
+#'   mask = dat_coast, mask_inside = TRUE
+#' )
 #'
 #' @author Edward Lavender
 #' @export
@@ -492,24 +509,22 @@ sim_surface <- function(blank,
                         n = 1L,
                         sim_values,
                         mask = NULL, mask_inside = FALSE,
-                        plot = 1:2L){
-
+                        plot = 1:2L) {
   #### Simulate values across a single raster
-  if(n == 1L) {
+  if (n == 1L) {
     ncells <- raster::ncell(blank)
     surface <- blank
     raster::values(surface) <- sim_values(ncells)
 
     #### Simulate values across pieces of a raster
   } else {
-
     # Split the raster equally
-    if(!inherits(sim_values, "list")) stop("If n > 1L, 'sim_values' should be a list of function(s).")
+    if (!inherits(sim_values, "list")) stop("If n > 1L, 'sim_values' should be a list of function(s).")
     blank_ls <- split_raster_equally(r = blank, n = n)
 
     # Loop over the list of blank rasters and list of functions
     # ... to apply to each chunk
-    surface_ls <- mapply(blank_ls, sim_values, FUN = function(r, sv){
+    surface_ls <- mapply(blank_ls, sim_values, FUN = function(r, sv) {
       ncells <- raster::ncell(r)
       raster::values(r) <- sv(ncells)
       return(r)
@@ -520,14 +535,14 @@ sim_surface <- function(blank,
   }
 
   #### Mask surface
-  if(!is.null(mask)) surface <- mask_io(x = surface, mask = mask, mask_inside = mask_inside, updatevalue = NA)
+  if (!is.null(mask)) surface <- mask_io(x = surface, mask = mask, mask_inside = mask_inside, updatevalue = NA)
 
   #### Plot surface
-  if(1L %in% plot & 2L %in% plot) pp <- graphics::par(mfrow = c(1, 2)) else pp <- graphics::par()
-  if(1L %in% plot) {
+  if (1L %in% plot & 2L %in% plot) pp <- graphics::par(mfrow = c(1, 2)) else pp <- graphics::par()
+  if (1L %in% plot) {
     raster::hist(surface)
   }
-  if(2L %in% plot) {
+  if (2L %in% plot) {
     prettyGraphics::pretty_map(add_rasters = list(x = surface), verbose = FALSE)
   }
   graphics::par(pp)
@@ -582,18 +597,26 @@ sim_surface <- function(blank,
 #' #### Example (1): Implement function using barrier only
 #'
 #' ## Define example starting and ending locations
-#' start <- matrix(c(701854.9, 6260399,
-#'                   709202.5, 6258892), ncol = 2, byrow = TRUE)
-#' end <- matrix(c(706753.3, 6264261,
-#'                 709673.5, 6257102), ncol = 2, byrow = TRUE)
+#' start <- matrix(c(
+#'   701854.9, 6260399,
+#'   709202.5, 6258892
+#' ), ncol = 2, byrow = TRUE)
+#' end <- matrix(c(
+#'   706753.3, 6264261,
+#'   709673.5, 6257102
+#' ), ncol = 2, byrow = TRUE)
 #'
 #' ## Visualise segments
 #' # ... The first segment crosses the coastline (our barrier)
 #' # ... The second segment does not cross the coastline (our barrier)
-#' graphics::arrows(x0 = start[1, 1], y0 = start[1, 2],
-#'                  x1 = end[1, 1], y1 = end[1, 2])
-#' graphics::arrows(x0 = start[2, 1], y0 = start[2, 2],
-#'                  x1 = end[2, 1], y1 = end[2, 2])
+#' graphics::arrows(
+#'   x0 = start[1, 1], y0 = start[1, 2],
+#'   x1 = end[1, 1], y1 = end[1, 2]
+#' )
+#' graphics::arrows(
+#'   x0 = start[2, 1], y0 = start[2, 2],
+#'   x1 = end[2, 1], y1 = end[2, 2]
+#' )
 #'
 #' ## Implement function
 #' segments_cross_barrier(start, end, barrier = barrier)
@@ -605,25 +628,29 @@ sim_surface <- function(blank,
 #' dat_dist <- raster::distance(dat_dist)
 #'
 #' ## Implement function for a specified mobility parameter
-#' segments_cross_barrier(start, end, barrier = barrier,
-#'                        distance = dat_dist, mobility = 500)
+#' segments_cross_barrier(start, end,
+#'   barrier = barrier,
+#'   distance = dat_dist, mobility = 500
+#' )
 #'
 #' #### Example (3): With many locations, supplying distance improves speed
 #'
 #' ## Sample a large number of random starting/ending locations
 #' start <- raster::sampleRandom(dat_gebco, size = 3000, xy = TRUE)[, 1:2]
-#' end   <- raster::sampleRandom(dat_gebco, size = 3000, xy = TRUE)[, 1:2]
+#' end <- raster::sampleRandom(dat_gebco, size = 3000, xy = TRUE)[, 1:2]
 #'
 #' ## Compare the duration of the function without/with distance included
 #' # The first method without distance is much slower than the second method
 #' # (~0.714 s versus 0.131 s for 3000 locations)
 #' system.time(
 #'   int_1 <- segments_cross_barrier(start, end, barrier = barrier)
-#'   )
+#' )
 #' system.time(
-#'   int_2 <- segments_cross_barrier(start, end, barrier = barrier,
-#'                                   distance = dat_dist, mobility = 500)
+#'   int_2 <- segments_cross_barrier(start, end,
+#'     barrier = barrier,
+#'     distance = dat_dist, mobility = 500
 #'   )
+#' )
 #'
 #' ## The two approaches return identical solutions:
 #' identical(int_1, int_2)
@@ -631,43 +658,48 @@ sim_surface <- function(blank,
 #' @return Edward Lavender
 #' @export
 
-segments_cross_barrier <- function(start, end, barrier, distance = NULL, mobility = NULL){
-
+segments_cross_barrier <- function(start, end, barrier, distance = NULL, mobility = NULL) {
   ## Define point boundaries
   xlim <- range(c(start[, 1], end[, 1]))
   ylim <- range(c(start[, 2], end[, 2]))
-  boundaries <- matrix(c(xlim[1], ylim[1],
-                         xlim[2], ylim[1],
-                         xlim[2], ylim[2],
-                         xlim[1], ylim[2]), ncol = 2, byrow = TRUE)
+  boundaries <- matrix(c(
+    xlim[1], ylim[1],
+    xlim[2], ylim[1],
+    xlim[2], ylim[2],
+    xlim[1], ylim[2]
+  ), ncol = 2, byrow = TRUE)
   boundaries <- rbind(boundaries, boundaries[1, , drop = FALSE])
   boundaries <- sf::st_polygon(list(boundaries))
   # plot(boundaries)
 
   ## Option (1): If the points' boundaries contain barrier(s),
   # ... we will work out for each line whether or not it crosses the barrier
-  if(sf::st_intersects(boundaries, barrier, sparse = FALSE)){
+  if (sf::st_intersects(boundaries, barrier, sparse = FALSE)) {
     # Define point matrices as dataframes
     start <- data.frame(start[, 1:2])
-    end   <- data.frame(end[, 1:2])
+    end <- data.frame(end[, 1:2])
     colnames(start) <- colnames(end) <- c("x", "y")
     # If 'distance' has been supplied, we will focus on the subset of lines
     # ... for which at least one of the points is within 'mobility' of the barrier.
     # ... This should reduce the number of spatial intersections that are
     # ... required in many situations.
-    if(!is.null(distance)){
-      dat <- data.frame(index = seq_len(nrow(start)),
-                        dist_1 = raster::extract(distance, start),
-                        dist_2 = raster::extract(distance, end),
-                        int    = FALSE)
+    if (!is.null(distance)) {
+      dat <- data.frame(
+        index = seq_len(nrow(start)),
+        dist_1 = raster::extract(distance, start),
+        dist_2 = raster::extract(distance, end),
+        int = FALSE
+      )
       dat$bool <- (dat$dist_1 < mobility) | (dat$dist_2 < mobility)
-      dat_sbt  <- dat %>% dplyr::filter(.data$bool)
-      if(nrow(dat_sbt) > 0L){
+      dat_sbt <- dat %>% dplyr::filter(.data$bool)
+      if (nrow(dat_sbt) > 0L) {
         start <- start[dat_sbt$index, , drop = FALSE]
-        end   <- end[dat_sbt$index, , drop = FALSE]
-      } else start <- data.frame()
+        end <- end[dat_sbt$index, , drop = FALSE]
+      } else {
+        start <- data.frame()
+      }
     }
-    if(nrow(start) > 0L){
+    if (nrow(start) > 0L) {
       # Assign line IDs
       start$linestring_id <- end$linestring_id <- seq_len(nrow(start))
       # Define lines
@@ -675,19 +707,24 @@ segments_cross_barrier <- function(start, end, barrier, distance = NULL, mobilit
         dplyr::bind_rows(start, end) %>%
         dplyr::arrange(.data$linestring_id)
       lines <- sfheaders::sf_linestring(lines,
-                                        x = "x", y = "y",
-                                        linestring_id = "linestring_id")
+        x = "x", y = "y",
+        linestring_id = "linestring_id"
+      )
       sf::st_crs(lines) <- sf::st_crs(barrier)
       int <- sf::st_intersects(lines, barrier, sparse = FALSE)
-      if(!is.null(distance)){
+      if (!is.null(distance)) {
         dat$int[dat_sbt$index] <- int
         return(matrix(dat$int, ncol = 1))
-      } else return(int)
+      } else {
+        return(int)
+      }
+    } else {
+      return(matrix(FALSE, nrow = nrow(end), ncol = 1))
+    }
 
-    } else return(matrix(FALSE, nrow = nrow(end), ncol = 1))
-
-  ## Option (2): If the points' boundaries do not enclose any barriers
-  # ... then none of the Euclidean paths can cross the barrier
-  } else return(matrix(FALSE, nrow = nrow(end), ncol = 1))
-
+    ## Option (2): If the points' boundaries do not enclose any barriers
+    # ... then none of the Euclidean paths can cross the barrier
+  } else {
+    return(matrix(FALSE, nrow = nrow(end), ncol = 1))
+  }
 }

@@ -54,12 +54,15 @@ This function requires the \code{\link[animation]{animation}} package.
 dir_current <- getwd()
 setwd(tempdir())
 acdc_record <- acdc_simplify(dat_acdc)
-acdc_animate_record(expr_param =
-                     list(record = acdc_record,
-                          add_coastline = list(x = dat_coast, col = "darkgreen"),
-                          plot = 1:5,
-                          fix_zlim = FALSE)
-                    )
+acdc_animate_record(
+  expr_param =
+    list(
+      record = acdc_record,
+      add_coastline = list(x = dat_coast, col = "darkgreen"),
+      plot = 1:5,
+      fix_zlim = FALSE
+    )
+)
 setwd(dir_current)
 }
 \author{

@@ -24,10 +24,12 @@
 #' x <- dat_gebco_wgs84
 #' x <- matrix(c(-5.616532, 56.50279), ncol = 2)
 #' # Plot area
-#' prettyGraphics::pretty_map(add_rasters = list(x = dat_gebco_wgs84),
-#'                            add_polys = list(x = dat_coast_wgs84),
-#'                            add_points = list(x = x),
-#'                            verbose = FALSE)
+#' prettyGraphics::pretty_map(
+#'   add_rasters = list(x = dat_gebco_wgs84),
+#'   add_polys = list(x = dat_coast_wgs84),
+#'   add_points = list(x = x),
+#'   verbose = FALSE
+#' )
 #' # Check depth in area using available data
 #' raster::extract(dat_gebco_wgs84, x)
 #' # Query database
@@ -37,8 +39,10 @@
 #' # Alternative databases, such as EMOD bathymetry
 #' query_open_topo(x = x, db = "emod2018", verbose = FALSE)
 #' # Set interpolation
-#' query_open_topo(x = x, db = "emod2018",
-#'                 interpolation = "cubic", verbose = FALSE)
+#' query_open_topo(
+#'   x = x, db = "emod2018",
+#'   interpolation = "cubic", verbose = FALSE
+#' )
 #'
 #' #### Example (2): Queries with multiple coordinates
 #' # Define a random sample of coordinates
@@ -56,22 +60,28 @@
 #' # ... hence the restrictions on the resolution specified here.
 #' x <- raster::extent(dat_coast_wgs84)
 #' depth <- query_open_topo(x = x, nrows = 10, ncols = 10, db = "gebco2020")
-#' prettyGraphics::pretty_map(add_rasters = list(x = depth),
-#'                            add_polys = list(x = dat_coast_wgs84),
-#'                            verbose = FALSE)
+#' prettyGraphics::pretty_map(
+#'   add_rasters = list(x = depth),
+#'   add_polys = list(x = dat_coast_wgs84),
+#'   verbose = FALSE
+#' )
 #'
 #' #### Example (4): Queries from a masked raster
 #' # Focus on a small area
 #' ext <- raster::extent(c(-5.709508, -5.648977, 56.48656, 56.50267))
 #' x <- raster::crop(dat_gebco_wgs84, ext)
-#' prettyGraphics::pretty_map(add_rasters = list(x = x),
-#'                            add_polys = list(x = dat_coast_wgs84),
-#'                            verbose = FALSE)
+#' prettyGraphics::pretty_map(
+#'   add_rasters = list(x = x),
+#'   add_polys = list(x = dat_coast_wgs84),
+#'   verbose = FALSE
+#' )
 #' # Query database
 #' depth <- query_open_topo(x = x, db = "gebco2020")
-#' prettyGraphics::pretty_map(add_rasters = list(x = depth),
-#'                            add_polys = list(x = dat_coast_wgs84),
-#'                            verbose = FALSE)
+#' prettyGraphics::pretty_map(
+#'   add_rasters = list(x = depth),
+#'   add_polys = list(x = dat_coast_wgs84),
+#'   verbose = FALSE
+#' )
 #' }
 #'
 #' @seealso Open Topo Data (https://www.opentopodata.org/).
@@ -83,40 +93,37 @@ query_open_topo <- function(x,
                             db = "gebco2020",
                             interpolation = "bilinear",
                             encoding = NULL,
-                            verbose = TRUE,...){
-
+                            verbose = TRUE, ...) {
   #### Set up
   t_onset <- Sys.time()
-  cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+  cat_to_console <- function(..., show = verbose) if (show) cat(paste(..., "\n"))
   cat_to_console(paste0("flapper::query_open_topo() called (@ ", t_onset, ")..."))
 
   #### Checks
   cat_to_console("... Processing 'x'...")
   # Check required packages
-  if(!requireNamespace("httr", quietly = TRUE)) stop("This function requires the 'httr' package. Please install it with `install.packages('httr')` first.")
-  if(!requireNamespace("jsonlite", quietly = TRUE)) stop("This function requires the 'jsonlite' package. Please install it with `install.packages('jsonlite')` first.")
+  if (!requireNamespace("httr", quietly = TRUE)) stop("This function requires the 'httr' package. Please install it with `install.packages('httr')` first.")
+  if (!requireNamespace("jsonlite", quietly = TRUE)) stop("This function requires the 'jsonlite' package. Please install it with `install.packages('jsonlite')` first.")
   # Save inputted 'x'
   .x <- x
   # Check class of 'x' is appropriate
-  if(!inherits(.x, c("matrix", "RasterLayer", "Extent"))) {
+  if (!inherits(.x, c("matrix", "RasterLayer", "Extent"))) {
     stop("class(x) is unsupported: only 'RasterLayer', 'Extent' and 'matrix' are supported.")
   }
 
   #### Process coordinates
   if (!inherits(.x, "matrix")) {
-
     ## Get coordinates of raster
-    if (inherits(.x, "Extent")) x <- raster::raster(x,...)
+    if (inherits(.x, "Extent")) x <- raster::raster(x, ...)
     dat <- raster::coordinates(x)
     rownames(dat) <- 1:nrow(dat)
 
     ## If a raster is supplied, drop any NA cells
-    if(inherits(.x, "RasterLayer")) {
+    if (inherits(.x, "RasterLayer")) {
       is_na <- is.na(x)
       id_na <- raster::Which(is_na, cells = TRUE)
-      if(length(id_na) > 0) dat <- dat[-c(id_na), ]
+      if (length(id_na) > 0) dat <- dat[-c(id_na), ]
     }
-
   } else {
     dat <- x
     rownames(dat) <- 1:nrow(dat)
@@ -128,7 +135,7 @@ query_open_topo <- function(x,
 
   #### Define query
   cat_to_console("... Setting up RESTful API request...")
-  if(nrow(dat) > 100) {
+  if (nrow(dat) > 100) {
     warning("More than 100 locations supplied: this may exceed max URI length.")
   }
   base <- "https://api.opentopodata.org/v1/"
@@ -143,7 +150,7 @@ query_open_topo <- function(x,
   httr::warn_for_status(response)
   httr::stop_for_status(response)
   cat_to_console("... Decoding the response...")
-  if(is.null(encoding)) {
+  if (is.null(encoding)) {
     results <- jsonlite::fromJSON(httr::content(response, "text"))
   } else {
     results <- jsonlite::fromJSON(httr::content(response, "text"), encoding = encoding)
@@ -152,7 +159,7 @@ query_open_topo <- function(x,
   results <- results$results
   dat$z <- results$elevation
   no_data <- dat$z %in% -9999
-  if(any(no_data)) {
+  if (any(no_data)) {
     dat$z[which(no_data)] <- NA
   }
 
@@ -174,6 +181,4 @@ query_open_topo <- function(x,
   duration <- difftime(t_end, t_onset, units = "mins")
   cat_to_console(paste0("... flapper::query_open_topo() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
   return(out)
-
 }
-

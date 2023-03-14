@@ -21,7 +21,7 @@ test_that("get_detection_pr() performs properly.", {
   # Define function to check calculated values are correct at every distance
   all_equal_vec <- Vectorize(all.equal)
   # Define example data
-  x  <- 1:100
+  x <- 1:100
   b0 <- 3
   b1 <- -0.5
   f <- stats::plogis
@@ -91,21 +91,21 @@ test_that("get_detection_days() throws expected errors.", {
   # Error for different numbers of individual_id and receiver_id with type = 1L
   expect_error(
     get_detection_days(dat_acoustics,
-                       individual_id = unique(dat_acoustics$individual)[1],
-                       receiver_id = unique(dat_acoustics$receiver_id)[1:2],
-                       type = 1L)
+      individual_id = unique(dat_acoustics$individual)[1],
+      receiver_id = unique(dat_acoustics$receiver_id)[1:2],
+      type = 1L
+    )
   )
 })
 
 #### Check warnings
 test_that("get_detection_days() throws expected warnings.", {
   # Warning that dots are unused
-  expect_warning(get_detection_days(dat_acoustics, ... =  "extra_argument"))
+  expect_warning(get_detection_days(dat_acoustics, ... = "extra_argument"))
 })
 
 #### Check calculations
 test_that("get_detection_days() calculations are correct.", {
-
   #### Define data for calculation checks
   # Define dates
   dat_acoustics$date <- as.Date(dat_acoustics$timestamp)
@@ -125,18 +125,20 @@ test_that("get_detection_days() calculations are correct.", {
   dat$detection_days[dat$receiver_id == rid_2 & dat$individual_id == iid_2] == ans_2
   # Detection days between selected individuals and receiver pairs
   dat <- get_detection_days(dat_acoustics,
-                            individual_id = c(iid_1, iid_2),
-                            receiver_id = c(rid_1, rid_2),
-                            type = 1L)
+    individual_id = c(iid_1, iid_2),
+    receiver_id = c(rid_1, rid_2),
+    type = 1L
+  )
   expect_true(all(dat$individual_id %in% c(iid_1, iid_2)))
   expect_true(all(dat$receiver_id %in% c(rid_1, rid_2)))
   expect_true(dat$detection_days[dat$receiver_id == rid_1 & dat$individual_id == iid_1] == ans_1)
   expect_true(dat$detection_days[dat$receiver_id == rid_2 & dat$individual_id == iid_2] == ans_2)
   # Detection days between selected individual and receiver combinations
   dat <- get_detection_days(dat_acoustics,
-                            individual_id =  c(iid_1, iid_2),
-                            receiver_id = c(rid_1, rid_2),
-                            type = 2L)
+    individual_id = c(iid_1, iid_2),
+    receiver_id = c(rid_1, rid_2),
+    type = 2L
+  )
   expect_true(all(dat$individual_id %in% c(iid_1, iid_2)))
   expect_true(all(dat$receiver_id %in% c(rid_1, rid_2)))
   expect_true(dat$detection_days[dat$receiver_id == rid_1 & dat$individual_id == iid_1] == ans_1)
@@ -144,19 +146,19 @@ test_that("get_detection_days() calculations are correct.", {
   # Detection days for receivers/individuals not in acoustics
   expect_warning(expect_warning(
     get_detection_days(dat_acoustics,
-                       individual_id = c(iid_1, "blah2", "blah3"),
-                       receiver_id = c(rid_1, "blah2")))
-
-  )
+      individual_id = c(iid_1, "blah2", "blah3"),
+      receiver_id = c(rid_1, "blah2")
+    )
+  ))
 
   #### Detection days matched to another dataframe
   dat <- dat_acoustics
   dat$detection_days <- get_detection_days(dat_acoustics,
-                                           match_to = dat,
-                                           type = 1L)
+    match_to = dat,
+    type = 1L
+  )
   expect_true(all(dat$detection_days[dat$receiver_id == rid_1 & dat$individual_id == iid_1] == ans_1))
   expect_true(all(dat$detection_days[dat$receiver_id == rid_2 & dat$individual_id == iid_2] == ans_2))
-
 })
 
 
@@ -170,19 +172,20 @@ test_that("get_detection_clumps() throws expected errors.", {
   expect_error(
     get_detection_clumps(
       data.frame(timestamp = as.POSIXct("2016-01-01"), ID = 1),
-      fct ="id")
+      fct = "id"
+    )
   )
 })
 
 test_that("get_detection_clumps() example calculations are correct.", {
-
   #### Define a hypothetical series of detections
   # ... following function examples.
   eg <-
     data.frame(
       timestamp =
         as.POSIXct(
-          c("2016-01-01", # one week of continuous detections
+          c(
+            "2016-01-01", # one week of continuous detections
             "2016-01-02",
             "2016-01-03",
             "2016-01-04",
@@ -198,37 +201,47 @@ test_that("get_detection_clumps() example calculations are correct.", {
             "2016-03-02",
             "2016-03-03",
             "2016-03-04",
-            "2016-03-05")))
+            "2016-03-05"
+          )
+        )
+    )
 
   #### Example (1): Implement function with default options
   # Check colnames match description
   expect_true(all(colnames(get_detection_clumps(eg)) %in%
-                    c("n_intervals", "n_occasions", "eg_occasions"))
-  )
+    c("n_intervals", "n_occasions", "eg_occasions")))
   # Check calculations
   expect_true(
     dplyr::all_equal(
       get_detection_clumps(eg),
-      data.frame(n_intervals = as.integer(c(1, 2, 5, 7)),
-                 n_occasions = c(1, 2, 1, 1),
-                 eg_occasions = as.POSIXct(c("2016-02-01", "2016-02-03",
-                                             "2016-03-01", "2016-01-01")))
+      data.frame(
+        n_intervals = as.integer(c(1, 2, 5, 7)),
+        n_occasions = c(1, 2, 1, 1),
+        eg_occasions = as.POSIXct(c(
+          "2016-02-01", "2016-02-03",
+          "2016-03-01", "2016-01-01"
+        ))
+      )
     )
   )
 
   #### Example (2): Implement function for multiple individuals
   eg$individual_id <- 1L
-  expect_true(rlang::has_name(get_detection_clumps(eg, fct = "individual_id"),
-                              "individual_id"))
+  expect_true(rlang::has_name(
+    get_detection_clumps(eg, fct = "individual_id"),
+    "individual_id"
+  ))
 
   #### Example (3): Change the time interval
   ## E.g. Use an hourly interval:
   eg$timestamp <- as.POSIXct(eg$timestamp)
   expect_true(
     dplyr::all_equal(
-      data.frame(n_intervals = 1L,
-                 n_occasions = 17,
-                 eg_occasions = as.POSIXct("2016-01-01")),
+      data.frame(
+        n_intervals = 1L,
+        n_occasions = 17,
+        eg_occasions = as.POSIXct("2016-01-01")
+      ),
       get_detection_clumps(eg, interval = "hours")
     )
   )
@@ -236,9 +249,11 @@ test_that("get_detection_clumps() example calculations are correct.", {
   get_detection_clumps(eg, interval = "months")
   expect_true(
     dplyr::all_equal(
-      data.frame(n_intervals = 1L,
-                 n_occasions = 17,
-                 eg_occasions = as.POSIXct("2016-01-01")),
+      data.frame(
+        n_intervals = 1L,
+        n_occasions = 17,
+        eg_occasions = as.POSIXct("2016-01-01")
+      ),
       get_detection_clumps(eg, interval = "hours")
     )
   )
@@ -247,10 +262,14 @@ test_that("get_detection_clumps() example calculations are correct.", {
   expect_true(
     dplyr::all_equal(
       get_detection_clumps(eg, summarise = FALSE),
-      data.frame(n_intervals = as.integer(c(7, 1, 2, 2, 5)),
-                 timestamp = as.POSIXct(c("2016-01-01", "2016-02-01",
-                                          "2016-02-03", "2016-02-15",
-                                          "2016-03-01")))
+      data.frame(
+        n_intervals = as.integer(c(7, 1, 2, 2, 5)),
+        timestamp = as.POSIXct(c(
+          "2016-01-01", "2016-02-01",
+          "2016-02-03", "2016-02-15",
+          "2016-03-01"
+        ))
+      )
     )
   )
 })
@@ -266,14 +285,16 @@ test_that("get_detection_clumps() example calculations are correct.", {
 #### get_residents()
 
 test_that("get_residents works as expected.", {
-
   #### Define example dataframe
   acoustics <-
-    data.frame(timestamp = seq.POSIXt(
-      as.POSIXct("2016-01-01"),
-      as.POSIXct("2017-01-01"), "days"),
+    data.frame(
+      timestamp = seq.POSIXt(
+        as.POSIXct("2016-01-01"),
+        as.POSIXct("2017-01-01"), "days"
+      ),
       ID = "A",
-      random = "A")
+      random = "A"
+    )
 
   #### Check errors
   # Column names
@@ -292,7 +313,8 @@ test_that("get_residents works as expected.", {
   expect_true(rlang::has_name(get_residents(acoustics, keep = "random"), "random"))
   # Check labels
   get_residents(acoustics,
-                resident_labels = c("STR", "LTR"))$resident == "LTR"
+    resident_labels = c("STR", "LTR")
+  )$resident == "LTR"
 
 
 
@@ -300,8 +322,9 @@ test_that("get_residents works as expected.", {
   res <- get_residents(acoustics)
   expect_true(res$time == 366 & res$resident == "L")
   res <- get_residents(acoustics[1:10, , drop = FALSE],
-                       resident_threshold_duration = 365,
-                       resident_labels = "resident")
+    resident_threshold_duration = 365,
+    resident_labels = "resident"
+  )
   expect_true(res$time == 9 & res$resident == "N")
 
   #### Check calculations for multiple individuals
@@ -309,19 +332,25 @@ test_that("get_residents works as expected.", {
   non <-
     data.frame(
       timestamp = as.POSIXct(c("2016-01-01", "2016-02-05")),
-      id = 1)
+      id = 1
+    )
   short <-
     data.frame(
       timestamp = seq.POSIXt(
         as.POSIXct("2016-01-01"),
-        as.POSIXct("2016-05-01"), "hours"),
-      id = 2)
+        as.POSIXct("2016-05-01"), "hours"
+      ),
+      id = 2
+    )
   long <-
     data.frame(
-      timestamp = seq.POSIXt(as.POSIXct("2016-01-01"),
-                             as.POSIXct("2018-01-01"),
-                             "weeks"),
-      id = 3)
+      timestamp = seq.POSIXt(
+        as.POSIXct("2016-01-01"),
+        as.POSIXct("2018-01-01"),
+        "weeks"
+      ),
+      id = 3
+    )
 
   ## Check calculations with default options
   # Check residency categories
@@ -329,7 +358,9 @@ test_that("get_residents works as expected.", {
   expect_true(all(res$resident == c("N", "S", "L")))
   # Check residency categories if individual need to be detected every day
   # ... The individual that is detected weekly is now no longer resident
-  res <- get_residents(rbind(non, short, long), fct = "id",
-                       resident_threshold_gap = 1)
+  res <- get_residents(rbind(non, short, long),
+    fct = "id",
+    resident_threshold_gap = 1
+  )
   expect_true(all(res$resident == c("N", "S", "N")))
 })

@@ -67,57 +67,63 @@ z <- cl_lapply(1:10, function(x) x + 1, cl = 2L)
 z <- cl_lapply(1:10, function(x) x + 1, cl = parallel::makeCluster(2L))
 
 #### Catch mistakes
-z <- cl_lapply(1:10, function(x) x + 1, cl = 2L, varlist =  list())
+z <- cl_lapply(1:10, function(x) x + 1, cl = 2L, varlist = list())
 z <- cl_lapply(1:10, function(x) x + 1, varlist = list())
 
 #### Compare time trials for chunk-wise versus element-wise parallelisation
 
-if(flapper_run_parallel){
+if (flapper_run_parallel) {
+  ## Background
+  # In this simple example, we will sample 'size' cells n times from a raster
+  # The output is a list of cell samples. We compare the time taken to complete
+  # sampling using different approaches.
 
-## Background
-# In this simple example, we will sample 'size' cells n times from a raster
-# The output is a list of cell samples. We compare the time taken to complete
-# sampling using different approaches.
+  ## Define a dataframe of time trial scenarios
+  require(dplyr)
+  dat <- expand.grid(
+    n = 1e4,
+    method = c("socket", "fork"),
+    cores = 2L,
+    use_chunks = c(FALSE, TRUE),
+    time = NA
+  )
 
-## Define a dataframe of time trial scenarios
-require(dplyr)
-dat    <- expand.grid(n = 1e4,
-                      method = c("socket", "fork"),
-                      cores = 2L,
-                      use_chunks = c(FALSE, TRUE),
-                      time = NA)
+  ## Estimate the duration of each scenario
+  dat_by_trial <-
+    lapply(split(dat, seq_len(nrow(dat))), function(d) {
+      if (d$method == "socket") {
+        t1 <- Sys.time()
+        z <- cl_lapply(
+          x = 1:d$n,
+          fun = function(i) {
+            raster::sampleRandom(flapper::dat_gebco, size = 5)
+          },
+          cl = parallel::makeCluster(d$cores),
+          use_chunks = d$use_chunks
+        )
+        t2 <- Sys.time()
+      } else if (d$method == "fork") {
+        t1 <- Sys.time()
+        z <- cl_lapply(
+          x = 1:d$n,
+          fun = function(i) {
+            raster::sampleRandom(flapper::dat_gebco, size = 5)
+          },
+          cl = d$cores,
+          use_chunks = d$use_chunks
+        )
+        t2 <- Sys.time()
+      }
+      d$time <- as.numeric(difftime(t2, t1, "secs"))
+      return(d)
+    })
 
-## Estimate the duration of each scenario
-dat_by_trial <-
-  lapply(split(dat, seq_len(nrow(dat))), function(d){
-    if(d$method == "socket"){
-      t1 <- Sys.time()
-      z  <- cl_lapply(x = 1:d$n,
-                      fun = function(i)
-                        raster::sampleRandom(flapper::dat_gebco, size = 5),
-                      cl = parallel::makeCluster(d$cores),
-                      use_chunks = d$use_chunks)
-      t2 <- Sys.time()
-    } else if(d$method == "fork"){
-      t1 <- Sys.time()
-      z  <- cl_lapply(x = 1:d$n,
-                      fun = function(i)
-                        raster::sampleRandom(flapper::dat_gebco, size = 5),
-                      cl = d$cores,
-                      use_chunks = d$use_chunks)
-      t2 <- Sys.time()
-    }
-    d$time <- as.numeric(difftime(t2, t1, "secs"))
-    return(d)
-  })
-
-## Examine the results
-dat_for_trials <-
-  dat_by_trial \%>\%
-  dplyr::bind_rows() \%>\%
-  dplyr::arrange(.data$n, .data$time) \%>\%
-  print()
-
+  ## Examine the results
+  dat_for_trials <-
+    dat_by_trial \%>\%
+    dplyr::bind_rows() \%>\%
+    dplyr::arrange(.data$n, .data$time) \%>\%
+    print()
 }
 
 }

@@ -57,73 +57,89 @@ bathy <- prettyGraphics::dat_gebco
 coastline <- prettyGraphics::dat_coast_around_oban
 
 #### Example (1) Implement the dcq() algorithm with 25 m bins
-dcq_maps <- dcq(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 25,
-              plot = FALSE)
+dcq_maps <- dcq(
+  archival_ls = archival_ls,
+  bathy = bathy,
+  bin = 25,
+  plot = FALSE
+)
 # The function returns a list of rasters, with one raster
 # ... for each time unit.
 dcq_maps
 
 #### Example (2): Implement the algorithm in parallel:
-dcq_maps <- dcq(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 25,
-              plot = FALSE,
-              cl = parallel::makeCluster(2L))
+dcq_maps <- dcq(
+  archival_ls = archival_ls,
+  bathy = bathy,
+  bin = 25,
+  plot = FALSE,
+  cl = parallel::makeCluster(2L)
+)
 
 #### Example (3): Visualise the function outputs on one page
 # ... using standard options.
 # Examine results with 25 m bin
-dcq_maps <- dcq(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 25,
-              plot = TRUE,
-              one_page = TRUE)
+dcq_maps <- dcq(
+  archival_ls = archival_ls,
+  bathy = bathy,
+  bin = 25,
+  plot = TRUE,
+  one_page = TRUE
+)
 # Examine results with a higher resolution bin
-dcq_maps <- dcq(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 5,
-              plot = TRUE,
-              one_page = TRUE)
+dcq_maps <- dcq(
+  archival_ls = archival_ls,
+  bathy = bathy,
+  bin = 5,
+  plot = TRUE,
+  one_page = TRUE
+)
 
 #### Example (4): Plot customisation options
 # fix zlim to be constant across all plots to enable comparability
-dcq_maps <- dcq(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 5,
-              plot = TRUE,
-              one_page = TRUE,
-              fix_zlim = TRUE)
+dcq_maps <- dcq(
+  archival_ls = archival_ls,
+  bathy = bathy,
+  bin = 5,
+  plot = TRUE,
+  one_page = TRUE,
+  fix_zlim = TRUE
+)
 # fix zlim using custom limits across all plots
-dcq_maps <- dcq(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 5,
-              plot = TRUE,
-              one_page = TRUE,
-              fix_zlim = c(0, 5000))
+dcq_maps <- dcq(
+  archival_ls = archival_ls,
+  bathy = bathy,
+  bin = 5,
+  plot = TRUE,
+  one_page = TRUE,
+  fix_zlim = c(0, 5000)
+)
 # Transform the returned and plotted rasters by supplying a function to the
 # ... transform argument
-dcq_maps <- dcq(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 5,
-              plot = TRUE,
-              one_page = TRUE,
-              transform = sqrt)
+dcq_maps <- dcq(
+  archival_ls = archival_ls,
+  bathy = bathy,
+  bin = 5,
+  plot = TRUE,
+  one_page = TRUE,
+  transform = sqrt
+)
 # Customise the plot further via before_plot, after_plot functions
 # ... and other arguments passed via ... E.g., note the need to include
 # ... add = TRUE because the raster plot is added to the plot of the coastline.
-dcq_maps <- dcq(archival_ls = archival_ls,
-              bathy = bathy,
-              bin = 5,
-              plot = TRUE,
-              one_page = TRUE,
-              transform = sqrt,
-              fix_zlim = FALSE,
-              before_plot = function(x) raster::plot(coastline),
-              after_plot = function(x) raster::lines(coastline),
-              add = TRUE,
-              col = topo.colors(100))
+dcq_maps <- dcq(
+  archival_ls = archival_ls,
+  bathy = bathy,
+  bin = 5,
+  plot = TRUE,
+  one_page = TRUE,
+  transform = sqrt,
+  fix_zlim = FALSE,
+  before_plot = function(x) raster::plot(coastline),
+  after_plot = function(x) raster::lines(coastline),
+  add = TRUE,
+  col = topo.colors(100)
+)
 
 }
 \seealso{

@@ -58,16 +58,20 @@ acoustics_ls <- split(dat_acoustics, factor(dat_acoustics$individual_id))
 
 #### Example (1): Compute detection similarity matrix using default options
 # mat_sim contains the number of observations shared among individuals
-mat_sim <- make_matrix_cooccurence(acoustics_ls = acoustics_ls,
-                           thresh_time = 90,
-                           thresh_dist = 0)
+mat_sim <- make_matrix_cooccurence(
+  acoustics_ls = acoustics_ls,
+  thresh_time = 90,
+  thresh_dist = 0
+)
 prettyGraphics::pretty_mat(mat_sim, col_diag = "dimgrey")
 
 #### Example (2): Return list of outputs
-out_ls <- make_matrix_cooccurence(acoustics_ls = acoustics_ls,
-                          thresh_time = 90,
-                          thresh_dist = 0,
-                          output = 2)
+out_ls <- make_matrix_cooccurence(
+  acoustics_ls = acoustics_ls,
+  thresh_time = 90,
+  thresh_dist = 0,
+  output = 2
+)
 names(out_ls)
 # Examine number of observations for each individual
 prettyGraphics::pretty_mat(out_ls$mat_nobs)
@@ -75,17 +79,21 @@ prettyGraphics::pretty_mat(out_ls$mat_nobs)
 prettyGraphics::pretty_mat(out_ls$mat_pc, col_diag = "dimgrey")
 
 #### Example (3): Turn off messages with verbose = FALSE
-out_ls_non_verb <- make_matrix_cooccurence(acoustics_ls = acoustics_ls,
-                                   thresh_time = 90,
-                                   thresh_dist = 0,
-                                   verbose = FALSE)
+out_ls_non_verb <- make_matrix_cooccurence(
+  acoustics_ls = acoustics_ls,
+  thresh_time = 90,
+  thresh_dist = 0,
+  verbose = FALSE
+)
 
 #### Example (4): Implement algorithm in parallel
-out_ls_pl <- make_matrix_cooccurence(acoustics_ls = acoustics_ls,
-                             thresh_time = 90,
-                             thresh_dist = 0,
-                             cl = parallel::makeCluster(2L),
-                             output = 2)
+out_ls_pl <- make_matrix_cooccurence(
+  acoustics_ls = acoustics_ls,
+  thresh_time = 90,
+  thresh_dist = 0,
+  cl = parallel::makeCluster(2L),
+  output = 2
+)
 names(out_ls_pl)
 
 }

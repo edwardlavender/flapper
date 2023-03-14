@@ -52,13 +52,15 @@ range(mat_by_id[[1]])
 #### Example (2) Construct matrix across all receivers and use set_outside
 dat_moorings$receiver_id <- factor(dat_moorings$receiver_id)
 dat_acoustics$receiver_id <- factor(dat_acoustics$receiver_id,
-                                    levels = levels(dat_moorings$receiver_id))
+  levels = levels(dat_moorings$receiver_id)
+)
 match_index <- match(dat_acoustics$individual_id, dat_ids$individual_id)
 dat_acoustics$tag_start_date <- dat_ids$tag_start_date[match_index]
-dat_acoustics$tag_end_date   <- as.Date("2017-06-02")
+dat_acoustics$tag_end_date <- as.Date("2017-06-02")
 mat_by_id <- make_matrix_detections(dat_acoustics,
-                                    moorings = dat_moorings,
-                                    set_outside = NA)
+  moorings = dat_moorings,
+  set_outside = NA
+)
 summary(mat_by_id)
 
 }
