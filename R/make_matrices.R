@@ -18,7 +18,7 @@
 #' @examples
 #' dat_ids$tag_end_date <- as.Date("2017-06-02")
 #' mat_hours <- make_matrix_ids(dat_ids, delta_t = "hours")
-#' mat_days  <- make_matrix_ids(dat_ids, delta_t = "days")
+#' mat_days <- make_matrix_ids(dat_ids, delta_t = "days")
 #' utils::str(mat_hours)
 #' utils::str(mat_days)
 #' @author Edward Lavender
@@ -31,23 +31,25 @@ make_matrix_ids <- function(ids,
                             delta_t = "120 mins",
                             as_POSIXct = as.POSIXct,
                             set_names = TRUE) {
-  check_names(input = ids, req = c("individual_id", "tag_start_date", "tag_end_date"),
-              extract_names = colnames, type = all)
-  if(is.null(start)) start <- min(ids$tag_start_date, na.rm = TRUE)
-  if(is.null(end)) end <- max(ids$tag_end_date, na.rm = TRUE)
-  if(!is.null(as_POSIXct)) {
-    if(!inherits(ids$tag_start_date, "POSIXct")) ids$tag_start_date <- as_POSIXct(ids$tag_start_date)
-    if(!inherits(ids$tag_end_date, "POSIXct")) ids$tag_end_date <- as_POSIXct(ids$tag_end_date)
-    if(!inherits(start, "POSIXct")) start <- as_POSIXct(start)
-    if(!inherits(end, "POSIXct")) end <- as_POSIXct(end)
+  check_names(
+    input = ids, req = c("individual_id", "tag_start_date", "tag_end_date"),
+    extract_names = colnames, type = all
+  )
+  if (is.null(start)) start <- min(ids$tag_start_date, na.rm = TRUE)
+  if (is.null(end)) end <- max(ids$tag_end_date, na.rm = TRUE)
+  if (!is.null(as_POSIXct)) {
+    if (!inherits(ids$tag_start_date, "POSIXct")) ids$tag_start_date <- as_POSIXct(ids$tag_start_date)
+    if (!inherits(ids$tag_end_date, "POSIXct")) ids$tag_end_date <- as_POSIXct(ids$tag_end_date)
+    if (!inherits(start, "POSIXct")) start <- as_POSIXct(start)
+    if (!inherits(end, "POSIXct")) end <- as_POSIXct(end)
   }
   bin <- seq.POSIXt(start, end, delta_t)
   ids$interval <- lubridate::interval(ids$tag_start_date, ids$tag_end_date)
   mat <- matrix(NA, nrow = length(bin), ncol = length(unique(ids$individual_id)))
-  for(j in 1:ncol(mat)) {
+  for (j in 1:ncol(mat)) {
     mat[, j] <- (bin %within% ids$interval[j]) + 0
   }
-  if(set_names) {
+  if (set_names) {
     rownames(mat) <- as.character(bin)
     colnames(mat) <- as.character(ids$individual_id)
   }
@@ -78,18 +80,23 @@ make_matrix_ids <- function(ids,
 #'
 #' ## Define some example 'moorings' data
 #' # ... with receiver IDs and deployment times
-#' moorings <- data.frame(receiver_id = c(1, 2, 3, 4, 5),
-#'                        receiver_start_date = as.Date(c("2016-01-01",
-#'                                                        "2016-01-02",
-#'                                                        "2016-01-03",
-#'                                                        "2016-01-04",
-#'                                                        "2016-01-05")),
-#'                        receiver_end_date = as.Date(c("2016-01-06",
-#'                                                      "2016-01-07",
-#'                                                      "2016-01-08",
-#'                                                      "2016-01-09",
-#'                                                      "2016-01-09"))
-#'                        )
+#' moorings <- data.frame(
+#'   receiver_id = c(1, 2, 3, 4, 5),
+#'   receiver_start_date = as.Date(c(
+#'     "2016-01-01",
+#'     "2016-01-02",
+#'     "2016-01-03",
+#'     "2016-01-04",
+#'     "2016-01-05"
+#'   )),
+#'   receiver_end_date = as.Date(c(
+#'     "2016-01-06",
+#'     "2016-01-07",
+#'     "2016-01-08",
+#'     "2016-01-09",
+#'     "2016-01-09"
+#'   ))
+#' )
 #'
 #' ## Define some example 'servicing' data
 #' # ... with receiver IDs and servicing times
@@ -97,14 +104,19 @@ make_matrix_ids <- function(ids,
 #' # ... ... from 2016-01-02--3 and 2016-01-04--5
 #' # ... and receiver 5 was serviced
 #' # ... ... on 2016-01-08.
-#' services <- data.frame(receiver_id = c(1, 1, 5),
-#'                        service_start_date = as.Date(c("2016-01-02",
-#'                                                       "2016-01-04",
-#'                                                       "2016-01-08")),
-#'                        service_end_date = as.Date(c("2016-01-03",
-#'                                                     "2016-01-05",
-#'                                                     "2016-01-08"))
-#'                        )
+#' services <- data.frame(
+#'   receiver_id = c(1, 1, 5),
+#'   service_start_date = as.Date(c(
+#'     "2016-01-02",
+#'     "2016-01-04",
+#'     "2016-01-08"
+#'   )),
+#'   service_end_date = as.Date(c(
+#'     "2016-01-03",
+#'     "2016-01-05",
+#'     "2016-01-08"
+#'   ))
+#' )
 #'
 #' ## Get daily receiver status (0, 1) matrix
 #' make_matrix_receivers(moorings, delta_t = "days", as_POSIXct = NULL)
@@ -115,7 +127,7 @@ make_matrix_ids <- function(ids,
 #'
 #' #### Example (2): Illustration using actual data
 #' # ... for different time windows
-#' mat_days  <- make_matrix_receivers(dat_moorings, delta_t = "days", as_POSIXct = NULL)
+#' mat_days <- make_matrix_receivers(dat_moorings, delta_t = "days", as_POSIXct = NULL)
 #' mat_hours <- make_matrix_receivers(dat_moorings, delta_t = "hours")
 #' utils::str(mat_days)
 #' utils::str(mat_hours)
@@ -129,30 +141,33 @@ make_matrix_receivers <- function(moorings,
                                   end = NULL,
                                   delta_t = "120 mins",
                                   as_POSIXct = as.POSIXct,
-                                  set_names = TRUE){
-
+                                  set_names = TRUE) {
   #### Check inputs
-  check_names(input = moorings, req = c("receiver_id", "receiver_start_date", "receiver_end_date"),
-              extract_names = colnames, type = all)
-  if(!is.null(services)){
-    check_names(input = services, req = c("receiver_id", "service_start_date", "service_end_date"),
-                extract_names = colnames, type = all)
-    if(!all(unique(services$receiver_id) %in% unique(moorings$receiver_id))){
+  check_names(
+    input = moorings, req = c("receiver_id", "receiver_start_date", "receiver_end_date"),
+    extract_names = colnames, type = all
+  )
+  if (!is.null(services)) {
+    check_names(
+      input = services, req = c("receiver_id", "service_start_date", "service_end_date"),
+      extract_names = colnames, type = all
+    )
+    if (!all(unique(services$receiver_id) %in% unique(moorings$receiver_id))) {
       message("Not all receivers in services$receiver_id are in moorings$receiver_id.")
     }
   }
 
   #### Process dates, if necessary
-  if(is.null(start)) start <- min(moorings$receiver_start_date, na.rm = TRUE)
-  if(is.null(end)) end <- max(moorings$receiver_end_date, na.rm = TRUE)
-  if(!is.null(as_POSIXct)) {
-    if(!inherits(moorings$receiver_start_date, "POSIXct")) moorings$receiver_start_date <- as_POSIXct(moorings$receiver_start_date)
-    if(!inherits(moorings$receiver_end_date, "POSIXct")) moorings$receiver_end_date <- as_POSIXct(moorings$receiver_end_date)
-    if(!inherits(start, "POSIXct")) start <- as_POSIXct(start)
-    if(!inherits(end, "POSIXct")) end <- as_POSIXct(end)
-    if(!is.null(services)){
-      if(!inherits(services$service_start_date, "POSIXct")) services$service_start_date <- as_POSIXct(services$service_start_date)
-      if(!inherits(services$service_end_date, "POSIXct")) services$service_end_date <- as_POSIXct(services$service_end_date)
+  if (is.null(start)) start <- min(moorings$receiver_start_date, na.rm = TRUE)
+  if (is.null(end)) end <- max(moorings$receiver_end_date, na.rm = TRUE)
+  if (!is.null(as_POSIXct)) {
+    if (!inherits(moorings$receiver_start_date, "POSIXct")) moorings$receiver_start_date <- as_POSIXct(moorings$receiver_start_date)
+    if (!inherits(moorings$receiver_end_date, "POSIXct")) moorings$receiver_end_date <- as_POSIXct(moorings$receiver_end_date)
+    if (!inherits(start, "POSIXct")) start <- as_POSIXct(start)
+    if (!inherits(end, "POSIXct")) end <- as_POSIXct(end)
+    if (!is.null(services)) {
+      if (!inherits(services$service_start_date, "POSIXct")) services$service_start_date <- as_POSIXct(services$service_start_date)
+      if (!inherits(services$service_end_date, "POSIXct")) services$service_end_date <- as_POSIXct(services$service_end_date)
     }
   }
 
@@ -162,11 +177,11 @@ make_matrix_receivers <- function(moorings,
   # Define intervals of moorings deployment
   moorings$interval <- lubridate::interval(moorings$receiver_start_date, moorings$receiver_end_date)
   # Define a corresponding list, in the same order as receivers in moorings, with servicing intervals
-  if(!is.null(services)) {
+  if (!is.null(services)) {
     services$interval <- lubridate::interval(services$service_start_date, services$service_end_date)
-    services_ls <- lapply(split(moorings, 1:nrow(moorings)), function(d){
+    services_ls <- lapply(split(moorings, 1:nrow(moorings)), function(d) {
       out <- NULL
-      if(d$receiver_id %in% services$receiver_id){
+      if (d$receiver_id %in% services$receiver_id) {
         out <- services[which(services$receiver_id %in% d$receiver_id), ]
       }
       return(out)
@@ -178,21 +193,21 @@ make_matrix_receivers <- function(moorings,
   mat <- matrix(NA, nrow = length(bin), ncol = length(unique(moorings$receiver_id)))
   attr(mat, "bins") <- bin
   # Fill matrix
-  for(j in 1:ncol(mat)) {
+  for (j in 1:ncol(mat)) {
     # Fill matrix with 0,1 according to the overlap between bins and the deployment interval
     mat[, j] <- (bin %within% moorings$interval[j]) + 0
     # Post-hoc adjustment to suppress any time steps (bins) during this interval when receivers were being serviced)
-    if(!is.null(services)){
-      if(!is.null(services_ls[[j]])){
+    if (!is.null(services)) {
+      if (!is.null(services_ls[[j]])) {
         services_for_j <- services_ls[[j]]
-        for(k in 1:nrow(services_for_j)){
+        for (k in 1:nrow(services_for_j)) {
           mat[(bin %within% services_for_j$interval[k]), j] <- 0
         }
       }
     }
   }
   # Define matrix names
-  if(set_names) {
+  if (set_names) {
     rownames(mat) <- as.character(bin)
     colnames(mat) <- as.character(moorings$receiver_id)
   }
@@ -231,13 +246,15 @@ make_matrix_receivers <- function(moorings,
 #' #### Example (2) Construct matrix across all receivers and use set_outside
 #' dat_moorings$receiver_id <- factor(dat_moorings$receiver_id)
 #' dat_acoustics$receiver_id <- factor(dat_acoustics$receiver_id,
-#'                                     levels = levels(dat_moorings$receiver_id))
+#'   levels = levels(dat_moorings$receiver_id)
+#' )
 #' match_index <- match(dat_acoustics$individual_id, dat_ids$individual_id)
 #' dat_acoustics$tag_start_date <- dat_ids$tag_start_date[match_index]
-#' dat_acoustics$tag_end_date   <- as.Date("2017-06-02")
+#' dat_acoustics$tag_end_date <- as.Date("2017-06-02")
 #' mat_by_id <- make_matrix_detections(dat_acoustics,
-#'                                     moorings = dat_moorings,
-#'                                     set_outside = NA)
+#'   moorings = dat_moorings,
+#'   set_outside = NA
+#' )
 #' summary(mat_by_id)
 #'
 #' @author Edward Lavender
@@ -252,10 +269,9 @@ make_matrix_detections <- function(acoustics,
                                    as_POSIXct = as.POSIXct,
                                    set_names = TRUE,
                                    verbose = TRUE) {
-
   #### Initiate function
   t_onset <- Sys.time()
-  cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+  cat_to_console <- function(..., show = verbose) if (show) cat(paste(..., "\n"))
   cat_to_console(paste0("flapper::make_matrix_detections() called (@ ", t_onset, ")..."))
 
   #### Checks
@@ -263,42 +279,58 @@ make_matrix_detections <- function(acoustics,
   by_id <- "individual_id"
   check_names(input = acoustics, req = c(by_id, "timestamp", "receiver_id"))
   check_class(input = acoustics$timestamp, to_class = "POSIXct", type = "stop")
-  acoustics$receiver_id <- check_class(input = acoustics$receiver_id, to_class = "factor",
-                                       type = "warning", coerce_input = factor)
+  acoustics$receiver_id <- check_class(
+    input = acoustics$receiver_id, to_class = "factor",
+    type = "warning", coerce_input = factor
+  )
 
-  if(is.null(start)) {
+  if (is.null(start)) {
     start <- min(acoustics$timestamp, na.rm = TRUE)
   } else {
-    start <- check_class(input = start, to_class = "POSIXct",
-                         type = "warning", coerce_input = function(x) as_POSIXct(x))
+    start <- check_class(
+      input = start, to_class = "POSIXct",
+      type = "warning", coerce_input = function(x) as_POSIXct(x)
+    )
   }
-  if(is.null(end)) {
+  if (is.null(end)) {
     end <- max(acoustics$timestamp, na.rm = TRUE)
   } else {
-    end <- check_class(input = end, to_class = "POSIXct",
-                         type = "warning", coerce_input = function(x) as_POSIXct(x))
+    end <- check_class(
+      input = end, to_class = "POSIXct",
+      type = "warning", coerce_input = function(x) as_POSIXct(x)
+    )
   }
-  if(!is.null(set_outside)) {
+  if (!is.null(set_outside)) {
     check_names(input = acoustics, req = c("tag_start_date", "tag_end_date"))
-    acoustics$tag_start_date <- check_class(input = acoustics$tag_start_date, to_class = "POSIXct",
-                                            type = "warning", coerce_input = function(x) as_POSIXct(x))
-    acoustics$tag_end_date <- check_class(input = acoustics$tag_end_date, to_class = "POSIXct",
-                                          type = "warning", coerce_input = function(x) as_POSIXct(x))
+    acoustics$tag_start_date <- check_class(
+      input = acoustics$tag_start_date, to_class = "POSIXct",
+      type = "warning", coerce_input = function(x) as_POSIXct(x)
+    )
+    acoustics$tag_end_date <- check_class(
+      input = acoustics$tag_end_date, to_class = "POSIXct",
+      type = "warning", coerce_input = function(x) as_POSIXct(x)
+    )
     check_names(input = moorings, req = c("receiver_id", "receiver_start_date", "receiver_end_date"))
-    moorings$receiver_id <- check_class(input = moorings$receiver_id, to_class = "factor",
-                                        type = "warning", coerce_input = factor) # needed
+    moorings$receiver_id <- check_class(
+      input = moorings$receiver_id, to_class = "factor",
+      type = "warning", coerce_input = factor
+    ) # needed
     moorings <- moorings[order(moorings$receiver_id), ]
-    moorings$receiver_start_date <- check_class(input = moorings$receiver_start_date, to_class = "POSIXct",
-                                                type = "warning", coerce_input = function(x) as_POSIXct(x))
-    moorings$receiver_end_date <- check_class(input = moorings$receiver_end_date, to_class = "POSIXct",
-                                              type = "warning", coerce_input = function(x) as_POSIXct(x))
+    moorings$receiver_start_date <- check_class(
+      input = moorings$receiver_start_date, to_class = "POSIXct",
+      type = "warning", coerce_input = function(x) as_POSIXct(x)
+    )
+    moorings$receiver_end_date <- check_class(
+      input = moorings$receiver_end_date, to_class = "POSIXct",
+      type = "warning", coerce_input = function(x) as_POSIXct(x)
+    )
   }
 
   #### Define bins for which to determine detections
   cat_to_console("... Defining time bins given 'delta_t'...")
 
   bin <- seq.POSIXt(start, end, delta_t)
-  if(length(bin) == 1){
+  if (length(bin) == 1) {
     acoustics$bin <- bin
   } else {
     acoustics$bin <- cut(acoustics$timestamp, bin)
@@ -306,16 +338,16 @@ make_matrix_detections <- function(acoustics,
   acoustics$bin <- factor(acoustics$bin, levels = levels(factor(bin)))
 
   #### Determine receiver activity in each bin
-  if(!is.null(set_outside)) {
+  if (!is.null(set_outside)) {
     cat_to_console("... Making receiver matrix...")
-    if(!all(moorings$receiver_id %in% levels(acoustics$receiver_id))) {
+    if (!all(moorings$receiver_id %in% levels(acoustics$receiver_id))) {
       warning("Not all receivers in moorings$receiver_id are included within levels(acoustics$receiver_id).")
       moorings <- moorings[which(moorings$receiver_id %in% levels(acoustics$receiver_id)), ]
     }
-    if(!all(levels(acoustics$receiver_id %in% moorings$receiver_id))) {
+    if (!all(levels(acoustics$receiver_id %in% moorings$receiver_id))) {
       stop("Not all receivers in levels(acoustics$receiver_id) are in moorings$receiver_id")
     }
-    if(any(duplicated(moorings$receiver_id))) {
+    if (any(duplicated(moorings$receiver_id))) {
       warning("Duplicated receiver IDs in moorings will be dropped.")
       moorings <- moorings$receiver_id[!duplicated(moorings$receiver_id), ]
     }
@@ -323,7 +355,7 @@ make_matrix_detections <- function(acoustics,
     moorings <- moorings[moorings$receiver_id, ]
     moorings$interval <- lubridate::interval(moorings$receiver_start_date, moorings$receiver_end_date)
     receiver_mat <- matrix(NA, nrow = length(bin), ncol = length(moorings$receiver_id))
-    for(j in 1:ncol(receiver_mat)) {
+    for (j in 1:ncol(receiver_mat)) {
       receiver_mat[, j] <- !(bin %within% moorings$interval[j])
     }
     outside_receiver_int <- is.na(receiver_mat)
@@ -333,20 +365,20 @@ make_matrix_detections <- function(acoustics,
   cat_to_console("... Making detection matrix...")
   # Define a list of outcomes for each individual
   acoustics_ls <- split(acoustics, acoustics[, by_id])
-  det_ls <- pbapply::pblapply(acoustics_ls, function(d){
+  det_ls <- pbapply::pblapply(acoustics_ls, function(d) {
     # Define detection matrix (timestamps x receivers)
     detection <- table(d$bin, d$receiver_id)
-    if(!is.null(simplify)) detection <- simplify(detection)
+    if (!is.null(simplify)) detection <- simplify(detection)
     # Process detection matrix
-    if(!is.null(set_outside)) {
+    if (!is.null(set_outside)) {
       # Determine any intervals outside of the individual's deployment time and force NA
       id_int <- lubridate::interval(d$tag_start_date[1], d$tag_end_date[1])
       outside_id_int <- !(bin %within% id_int)
-      if(any(outside_id_int)) detection[which(outside_id_int), ] <- set_outside
+      if (any(outside_id_int)) detection[which(outside_id_int), ] <- set_outside
       # Set bins outside of receivers' deployment time to NA
-      if(any(outside_receiver_int)) detection[outside_receiver_int] <- set_outside
+      if (any(outside_receiver_int)) detection[outside_receiver_int] <- set_outside
     }
-    if(set_names) {
+    if (set_names) {
       rownames(detection) <- as.character(bin)
       colnames(detection) <- levels(acoustics$receiver_id)
     }
@@ -355,7 +387,7 @@ make_matrix_detections <- function(acoustics,
 
   #### Return outputs
   out <- det_ls
-  if(length(out) == 1) out <- out[[1]]
+  if (length(out) == 1) out <- out[[1]]
   t_end <- Sys.time()
   duration <- difftime(t_end, t_onset, units = "mins")
   cat_to_console(paste0("... flapper::make_matrix_detections() call completed (@ ", t_end, ") after ~", round(duration, digits = 2), " minutes."))
@@ -384,7 +416,7 @@ make_matrix_detections <- function(acoustics,
 #' \subsection{Implications}{
 #' Similarities and differences can take different forms with differing ecological implications. For example, for individuals that are frequently detected in similar areas, detections may indicate (a) prolonged associations among individuals, if detections are usually closely associated in time and space (for example, due to parent-offspring relationships, group-living and/or mating); or (b) avoidance and/or territorial-like behaviour if detections, while close in space, are usually at different receivers and/or disjointed in time. Likewise, detection similarities among individuals that are rarely detected, or usually detected at disparate receivers, may reflect important interactions among those individuals at particular times (e.g. mating).}
 #'
-#'\subsection{Methods}{
+#' \subsection{Methods}{
 #' To explore similarities and differences in patterns of space use, visualisation of detection histories with abacus plots and maps is beneficial. However, with many individuals and large receiver arrays, quantification of the similarities in detections over time and space is challenging. To this end, \code{\link[flapper]{make_matrix_cooccurence}} computes a similarity matrix across all individuals, defining the number (or percentage) of detections for each individual that are nearby in time, or space, to detections for each other individual.}
 #'
 #' \subsection{Assumptions}{
@@ -404,16 +436,20 @@ make_matrix_detections <- function(acoustics,
 #'
 #' #### Example (1): Compute detection similarity matrix using default options
 #' # mat_sim contains the number of observations shared among individuals
-#' mat_sim <- make_matrix_cooccurence(acoustics_ls = acoustics_ls,
-#'                            thresh_time = 90,
-#'                            thresh_dist = 0)
+#' mat_sim <- make_matrix_cooccurence(
+#'   acoustics_ls = acoustics_ls,
+#'   thresh_time = 90,
+#'   thresh_dist = 0
+#' )
 #' prettyGraphics::pretty_mat(mat_sim, col_diag = "dimgrey")
 #'
 #' #### Example (2): Return list of outputs
-#' out_ls <- make_matrix_cooccurence(acoustics_ls = acoustics_ls,
-#'                           thresh_time = 90,
-#'                           thresh_dist = 0,
-#'                           output = 2)
+#' out_ls <- make_matrix_cooccurence(
+#'   acoustics_ls = acoustics_ls,
+#'   thresh_time = 90,
+#'   thresh_dist = 0,
+#'   output = 2
+#' )
 #' names(out_ls)
 #' # Examine number of observations for each individual
 #' prettyGraphics::pretty_mat(out_ls$mat_nobs)
@@ -421,17 +457,21 @@ make_matrix_detections <- function(acoustics,
 #' prettyGraphics::pretty_mat(out_ls$mat_pc, col_diag = "dimgrey")
 #'
 #' #### Example (3): Turn off messages with verbose = FALSE
-#' out_ls_non_verb <- make_matrix_cooccurence(acoustics_ls = acoustics_ls,
-#'                                    thresh_time = 90,
-#'                                    thresh_dist = 0,
-#'                                    verbose = FALSE)
+#' out_ls_non_verb <- make_matrix_cooccurence(
+#'   acoustics_ls = acoustics_ls,
+#'   thresh_time = 90,
+#'   thresh_dist = 0,
+#'   verbose = FALSE
+#' )
 #'
 #' #### Example (4): Implement algorithm in parallel
-#' out_ls_pl <- make_matrix_cooccurence(acoustics_ls = acoustics_ls,
-#'                              thresh_time = 90,
-#'                              thresh_dist = 0,
-#'                              cl = parallel::makeCluster(2L),
-#'                              output = 2)
+#' out_ls_pl <- make_matrix_cooccurence(
+#'   acoustics_ls = acoustics_ls,
+#'   thresh_time = 90,
+#'   thresh_dist = 0,
+#'   cl = parallel::makeCluster(2L),
+#'   output = 2
+#' )
 #' names(out_ls_pl)
 #'
 #' @author Edward Lavender
@@ -444,14 +484,12 @@ make_matrix_cooccurence <-
            cl = NULL,
            varlist = NULL,
            output = 1,
-           verbose = TRUE
-  ){
-
+           verbose = TRUE) {
     #### Initial checks
     # Check that acoustics dataframes contains required columns
-    mapply(acoustics_ls, 1:length(acoustics_ls), FUN = function(acoustics, i){
-      if(!is.null(acoustics)){
-        if(any(!(c("individual_id", "timestamp", "receiver_long", "receiver_lat") %in% colnames(acoustics)))){
+    mapply(acoustics_ls, 1:length(acoustics_ls), FUN = function(acoustics, i) {
+      if (!is.null(acoustics)) {
+        if (any(!(c("individual_id", "timestamp", "receiver_long", "receiver_lat") %in% colnames(acoustics)))) {
           stop(paste0("acoustic_ls[[", i, "]] does not contain all required column names."))
         }
       }
@@ -459,134 +497,146 @@ make_matrix_cooccurence <-
 
     #### Set up
     # Check that acoustics_ls is a factor
-    first_non_NULL <- min(which(sapply(acoustics_ls, function(acoustics) return(!is.null(acoustics)))))
-    if(!inherits(acoustics_ls[[first_non_NULL]]$individual_id, "factor")) stop("acoustics_ls dataframe must contain individual_id column that is a factor.")
+    first_non_NULL <- min(which(sapply(acoustics_ls, function(acoustics) {
+      return(!is.null(acoustics))
+    })))
+    if (!inherits(acoustics_ls[[first_non_NULL]]$individual_id, "factor")) stop("acoustics_ls dataframe must contain individual_id column that is a factor.")
     # Define factor levels (i.e. the names of individuals )
     id_names <- levels(acoustics_ls[[first_non_NULL]]$individual_id)
     # id_names <- as.character(sapply(acoustics_ls, function(acoustics) return(acoustics$individual_id[1])))
     nid <- length(id_names)
     # Check that there is one element in acoustics_ls for every individual
-    if(length(acoustics_ls) != nid) stop("'acoustics_ls' needs one element for every individual individual_id level. Add NULL elements to 'acoustics_ls' for remaining individuals.")
+    if (length(acoustics_ls) != nid) stop("'acoustics_ls' needs one element for every individual individual_id level. Add NULL elements to 'acoustics_ls' for remaining individuals.")
     # Create a blank similarity matrix which we'll fill in
     mat_sim <- matrix(NA, nrow = nid, ncol = nid, dimnames = list(id_names, id_names))
 
     #### Loop over all combinations of individuals, pair time series and identify
     # ... nearby observations in time and space
-    lout <- cl_lapply(acoustics_ls, cl = cl, varlist = varlist, fun = function(acc1){
+    lout <- cl_lapply(acoustics_ls, cl = cl, varlist = varlist, fun = function(acc1) {
+      #### Testing:
+      # acc1 = acoustics_ls[[1]]; acc2 = acoustics_ls[[2]];
+      # acc1 = acoustics_ls[[2]]; acc2 = acoustics_ls[[1]];
 
-        #### Testing:
-        # acc1 = acoustics_ls[[1]]; acc2 = acoustics_ls[[2]];
-        # acc1 = acoustics_ls[[2]]; acc2 = acoustics_ls[[1]];
+      #### For each individual, loop over each other individual...
+      lint <-
+        lapply(acoustics_ls, function(acc2) {
+          #### Ignore NULL/empty elements
+          if (any(is.null(nrow(acc1)), is.null(nrow(acc2)), nrow(acc1) == 0, nrow(acc2) == 0)) {
+            return(NULL)
+          }
 
-        #### For each individual, loop over each other individual...
-        lint <-
-          lapply(acoustics_ls, function(acc2){
-
-            #### Ignore NULL/empty elements
-            if(any(is.null(nrow(acc1)), is.null(nrow(acc2)), nrow(acc1) == 0, nrow(acc2) == 0)) return(NULL)
-
-            if(acc1$individual_id[1] != acc2$individual_id[1]){
-
-              #### Print individual
-              if(verbose){
-                cat("\n===================================================================================\n")
-                cat(paste("Individual (", as.character(acc1$individual_id[1]),
-                          ") and individual (", as.character(acc2$individual_id[1]), ").\n"))
-              }
-
-              #### Match time series based on closest observations in time using pair_ts()
-              if(verbose) cat("Matching detection time series...\n")
-              # Remove any observations from the second individual more than some limit outside of the time series of the first individual
-              # ... and vice versa (for speed when matching).
-              acc2 <- acc2[acc2$timestamp >= (min(acc1$timestamp) - thresh_time*60*2) &
-                             acc2$timestamp <= (max(acc1$timestamp) + thresh_time*60*2), ]
-              if(nrow(acc2) == 0) return(NULL)
-              acc1 <- acc1[acc1$timestamp >= (min(acc2$timestamp) - thresh_time*60*2) &
-                             acc1$timestamp <= (max(acc2$timestamp) + thresh_time*60*2), ]
-              if(nrow(acc1) == 0) return(NULL)
-
-              # Check for duplicated time stamps in each individual's dataframe, and adjust these
-              # ... by a small fraction prior to matching, so that all are included. Unless there are 100,000s
-              # ... of duplicate time stamps, this approach does not produce any duplicated observations.
-              dup1 <- duplicated(acc1$timestamp)
-              dup2 <- duplicated(acc2$timestamp)
-              adj <- (thresh_time*60)/4
-              if(any(dup1)){
-                pos_dups1 <- which(dup1)
-                lpd1 <- length(pos_dups1)
-                adj_dups1 <- stats::runif(lpd1, -adj, adj)
-                acc1$timestamp[pos_dups1] <- acc1$timestamp[pos_dups1] + adj_dups1
-                if(any(duplicated(acc1$timestamp))) warning(paste("Duplicate time stamps in, ", as.character(acc1$individual_id[1]), "element in acoustic_ls."))
-              }
-              if(any(dup2)){
-                pos_dups2 <- which(dup2)
-                lpd2 <- length(pos_dups2)
-                adj_dups2 <- stats::runif(lpd2, -adj, adj)
-                acc2$timestamp[pos_dups2] <- acc2$timestamp[pos_dups2] + adj_dups2
-                if(any(duplicated(acc2$timestamp))) warning(paste("Duplicate time stamps in, ", as.character(acc2$individual_id[1]), "element in acoustic_ls."))
-              }
-              # Match time series, readjusting any adjusted time stamps back to their original values
-              # ... before these are added to the dataframe.
-              acc1$pos_in_acc2 <- Tools4ETS::match_ts_nearest(acc1$timestamp, acc2$timestamp)
-              if(any(dup1)) acc1$timestamp[pos_dups1] <- acc1$timestamp[pos_dups1] - adj_dups1
-              if(any(dup2)) acc2$timestamp[pos_dups2] <- acc2$timestamp[pos_dups2] - adj_dups2
-              acc1$timestamp_acc2 <- acc2$timestamp[acc1$pos_in_acc2]
-
-              #### Exclude any time stamps more than time stamp beyond each other (could be 0 mins)
-              # Implement this now, before a threshold based on distance, below, for speed.
-              if(verbose) cat("Processing time series by theshold time difference...\n")
-              acc1$difftime_abs <- abs(difftime(acc1$timestamp, acc1$timestamp_acc2, units = "mins"))
-              acc1 <- acc1[acc1$difftime_abs <= thresh_time, ]
-              if(nrow(acc1) == 0) return(NULL)
-
-              #### Distances between pairs of receivers
-              if(verbose) cat("Computing differences between pairs of receivers...\n")
-              # Add receivers
-              acc1$receiver_lat_acc2 <- acc2$receiver_lat[acc1$pos_in_acc2]
-              acc1$receiver_long_acc2 <- acc2$receiver_long[acc1$pos_in_acc2]
-              # Compute distances
-              acc1$dist_btw_rec <- geosphere::distGeo(acc1[, c("receiver_long", "receiver_lat")],
-                                                      acc1[, c("receiver_long_acc2", "receiver_lat_acc2")])
-
-              #### Exclude any receivers more than some threshold distance beyond each other (could be 0 m):
-              if(verbose) cat("Processing time series by threshold distance...\n")
-              acc1 <- acc1[acc1$dist_btw_rec <= thresh_dist, ]
-              if(nrow(acc1) == 0) return(NULL) else return(acc1)
-
+          if (acc1$individual_id[1] != acc2$individual_id[1]) {
+            #### Print individual
+            if (verbose) {
+              cat("\n===================================================================================\n")
+              cat(paste(
+                "Individual (", as.character(acc1$individual_id[1]),
+                ") and individual (", as.character(acc2$individual_id[1]), ").\n"
+              ))
             }
-          })
 
-        return(lint)
+            #### Match time series based on closest observations in time using pair_ts()
+            if (verbose) cat("Matching detection time series...\n")
+            # Remove any observations from the second individual more than some limit outside of the time series of the first individual
+            # ... and vice versa (for speed when matching).
+            acc2 <- acc2[acc2$timestamp >= (min(acc1$timestamp) - thresh_time * 60 * 2) &
+              acc2$timestamp <= (max(acc1$timestamp) + thresh_time * 60 * 2), ]
+            if (nrow(acc2) == 0) {
+              return(NULL)
+            }
+            acc1 <- acc1[acc1$timestamp >= (min(acc2$timestamp) - thresh_time * 60 * 2) &
+              acc1$timestamp <= (max(acc2$timestamp) + thresh_time * 60 * 2), ]
+            if (nrow(acc1) == 0) {
+              return(NULL)
+            }
 
-      })
+            # Check for duplicated time stamps in each individual's dataframe, and adjust these
+            # ... by a small fraction prior to matching, so that all are included. Unless there are 100,000s
+            # ... of duplicate time stamps, this approach does not produce any duplicated observations.
+            dup1 <- duplicated(acc1$timestamp)
+            dup2 <- duplicated(acc2$timestamp)
+            adj <- (thresh_time * 60) / 4
+            if (any(dup1)) {
+              pos_dups1 <- which(dup1)
+              lpd1 <- length(pos_dups1)
+              adj_dups1 <- stats::runif(lpd1, -adj, adj)
+              acc1$timestamp[pos_dups1] <- acc1$timestamp[pos_dups1] + adj_dups1
+              if (any(duplicated(acc1$timestamp))) warning(paste("Duplicate time stamps in, ", as.character(acc1$individual_id[1]), "element in acoustic_ls."))
+            }
+            if (any(dup2)) {
+              pos_dups2 <- which(dup2)
+              lpd2 <- length(pos_dups2)
+              adj_dups2 <- stats::runif(lpd2, -adj, adj)
+              acc2$timestamp[pos_dups2] <- acc2$timestamp[pos_dups2] + adj_dups2
+              if (any(duplicated(acc2$timestamp))) warning(paste("Duplicate time stamps in, ", as.character(acc2$individual_id[1]), "element in acoustic_ls."))
+            }
+            # Match time series, readjusting any adjusted time stamps back to their original values
+            # ... before these are added to the dataframe.
+            acc1$pos_in_acc2 <- Tools4ETS::match_ts_nearest(acc1$timestamp, acc2$timestamp)
+            if (any(dup1)) acc1$timestamp[pos_dups1] <- acc1$timestamp[pos_dups1] - adj_dups1
+            if (any(dup2)) acc2$timestamp[pos_dups2] <- acc2$timestamp[pos_dups2] - adj_dups2
+            acc1$timestamp_acc2 <- acc2$timestamp[acc1$pos_in_acc2]
+
+            #### Exclude any time stamps more than time stamp beyond each other (could be 0 mins)
+            # Implement this now, before a threshold based on distance, below, for speed.
+            if (verbose) cat("Processing time series by theshold time difference...\n")
+            acc1$difftime_abs <- abs(difftime(acc1$timestamp, acc1$timestamp_acc2, units = "mins"))
+            acc1 <- acc1[acc1$difftime_abs <= thresh_time, ]
+            if (nrow(acc1) == 0) {
+              return(NULL)
+            }
+
+            #### Distances between pairs of receivers
+            if (verbose) cat("Computing differences between pairs of receivers...\n")
+            # Add receivers
+            acc1$receiver_lat_acc2 <- acc2$receiver_lat[acc1$pos_in_acc2]
+            acc1$receiver_long_acc2 <- acc2$receiver_long[acc1$pos_in_acc2]
+            # Compute distances
+            acc1$dist_btw_rec <- geosphere::distGeo(
+              acc1[, c("receiver_long", "receiver_lat")],
+              acc1[, c("receiver_long_acc2", "receiver_lat_acc2")]
+            )
+
+            #### Exclude any receivers more than some threshold distance beyond each other (could be 0 m):
+            if (verbose) cat("Processing time series by threshold distance...\n")
+            acc1 <- acc1[acc1$dist_btw_rec <= thresh_dist, ]
+            if (nrow(acc1) == 0) {
+              return(NULL)
+            } else {
+              return(acc1)
+            }
+          }
+        })
+
+      return(lint)
+    })
 
     #### Populate similarity matrix
-    for(i in 1:nid){
-      for(j in 1:nid){
-        if(i != j){
+    for (i in 1:nid) {
+      for (j in 1:nid) {
+        if (i != j) {
           d <- lout[[i]][[j]]
-          if(!is.null(d)) mat_sim[i, j] <- nrow(d) else mat_sim[i, j] <- 0
+          if (!is.null(d)) mat_sim[i, j] <- nrow(d) else mat_sim[i, j] <- 0
         }
       }
     }
 
     #### Matrix based on % similarity
     mat_nobs <- mat_sim[]
-    for(i in 1:nrow(mat_nobs)){
-      if(!is.null(acoustics_ls[[i]])) mat_nobs[i, ] <- nrow(acoustics_ls[[i]]) else mat_nobs[i, ] <- 0
+    for (i in 1:nrow(mat_nobs)) {
+      if (!is.null(acoustics_ls[[i]])) mat_nobs[i, ] <- nrow(acoustics_ls[[i]]) else mat_nobs[i, ] <- 0
     }
-    mat_pc <- (mat_sim/mat_nobs)*100
+    mat_pc <- (mat_sim / mat_nobs) * 100
 
     #### Return outputs
-    if(!(output %in% 1:2)){
+    if (!(output %in% 1:2)) {
       warning(paste("'output ", output, " not supported; defaulting to output = 1."))
       output <- 1
     }
-    if(output == 1) {
+    if (output == 1) {
       out <- mat_sim
-    } else if(output == 2) {
+    } else if (output == 2) {
       out <- list(mat_sim = mat_sim, mat_nobs = mat_nobs, mat_pc = mat_pc, dat = lout)
     }
     return(out)
-
   }

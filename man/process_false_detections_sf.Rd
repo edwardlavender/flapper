@@ -34,11 +34,11 @@ dat_acoustics_with_false_det <-
 pos_false <- (nrow(dat_acoustics_with_false_det) - 2):nrow(dat_acoustics_with_false_det)
 # Add an isolated detection accompanied by a detection at a nearby receiver
 dat_acoustics_with_false_det$timestamp[pos_false[1:2]] <-
-  dat_acoustics_with_false_det$timestamp[pos_false[1:2]] + 60*60*60
+  dat_acoustics_with_false_det$timestamp[pos_false[1:2]] + 60 * 60 * 60
 dat_acoustics_with_false_det$receiver_id[pos_false[2]] <- 33
 # Add an isolated detection not accompanied by a detection at a nearby receiver
 dat_acoustics_with_false_det$timestamp[pos_false[3]] <-
-  dat_acoustics_with_false_det$timestamp[pos_false[3]] + 60*60*60*2
+  dat_acoustics_with_false_det$timestamp[pos_false[3]] + 60 * 60 * 60 * 2
 
 #### Define necessary columns to compute false detections using glatos::false_detections()
 dat_acoustics_with_false_det$detection_timestamp_utc <-
@@ -48,10 +48,12 @@ dat_acoustics_with_false_det$transmitter_codespace <-
 dat_acoustics_with_false_det$transmitter_id <-
   substr(dat_acoustics_with_false_det$transmitter_id, 10, 13)
 dat_acoustics_with_false_det$receiver_sn <- dat_acoustics_with_false_det$receiver_id
-det <- dat_acoustics_with_false_det[, c("detection_timestamp_utc",
-                                        "transmitter_codespace",
-                                        "transmitter_id",
-                                        "receiver_sn")]
+det <- dat_acoustics_with_false_det[, c(
+  "detection_timestamp_utc",
+  "transmitter_codespace",
+  "transmitter_id",
+  "receiver_sn"
+)]
 
 #### Compute false detections
 # 3 false detections returned, as expected:
@@ -65,14 +67,14 @@ dist_btw_receivers_km <-
 # Implement spatial filter.
 # Note the function returns a vector, unlike glatos::false_detections():
 det$passed_filter_sf <- process_false_detections_sf(det,
-                                            tf = 3600,
-                                            sf = 0.5,
-                                            dist_btw_receivers = dist_btw_receivers_km)
+  tf = 3600,
+  sf = 0.5,
+  dist_btw_receivers = dist_btw_receivers_km
+)
 # Only the last observation failed the spatial filter, as expected:
 tail(det$passed_filter_sf)
 # Additional information is available from the attributes dataframe:
 tail(attr(det$passed_filter_sf, "details"))
-
 
 }
 \author{

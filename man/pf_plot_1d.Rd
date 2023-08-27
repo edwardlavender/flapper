@@ -42,7 +42,7 @@ Observed and reconstructed depth time series can differ due to measurement error
 \examples{
 #### Implement pf() algorithm
 # Here, we use pre-defined outputs for speed
-paths    <- dat_dcpf_paths
+paths <- dat_dcpf_paths
 archival <- dat_dc$args$archival
 
 #### Example (1): The default implementation
@@ -54,7 +54,7 @@ pf_plot_1d(paths, archival, type = "l")
 pf_plot_1d(paths, archival, add_lines = list(col = "red", lwd = 0.5))
 
 #### Example (3): Plot individual comparisons
-if(interactive()){
+if (interactive()) {
   pp <- graphics::par(mfrow = c(3, 4))
   pf_plot_1d(paths, depth, prompt = TRUE)
   graphics::par(pp)

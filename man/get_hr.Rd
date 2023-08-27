@@ -53,16 +53,18 @@ These functions are simple wrappers for \code{\link[spatialEco]{raster.vol}}. Th
 # We will use particles sampled by a particle filtering algorithm
 # ... to create a UD:
 particles <- pf_simplify(dat_dcpf_histories,
-                         summarise_pr = max,
-                         return = "archive")
+  summarise_pr = max,
+  return = "archive"
+)
 # Define grids for UD estimation
-map       <- dat_dcpf_histories$args$bathy
-habitat   <- kud_habitat(map, plot = FALSE)
+map <- dat_dcpf_histories$args$bathy
+habitat <- kud_habitat(map, plot = FALSE)
 # Define UD as a raster
-ud        <- pf_kud_2(particles,
-                      bathy = map, grid = habitat,
-                      estimate_ud = kud_around_coastline,
-                      plot = FALSE)
+ud <- pf_kud_2(particles,
+  bathy = map, grid = habitat,
+  estimate_ud = kud_around_coastline,
+  plot = FALSE
+)
 
 #### Plot UD and home range estimators
 pp <- par(mfrow = c(2, 2))

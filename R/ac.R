@@ -51,12 +51,13 @@
 #' #### Example (1) Implement AC algorithm with default arguments
 #' # This implements the algorithm on a single core, printing messages
 #' # ... to the console to monitor function progress.
-#' out_ac <- ac(acoustics = acc,
-#'              step = 120,
-#'              bathy = dat_gebco,
-#'              detection_containers = dat_containers,
-#'              mobility = 200
-#'              )
+#' out_ac <- ac(
+#'   acoustics = acc,
+#'   step = 120,
+#'   bathy = dat_gebco,
+#'   detection_containers = dat_containers,
+#'   mobility = 200
+#' )
 #'
 #' #### Subsequent examples follow the implementation given in acdc().
 #'
@@ -81,58 +82,60 @@ ac <- function(acoustics,
                progress = 1L,
                split = NULL,
                cl = NULL,
-               varlist = NULL){
+               varlist = NULL) {
   # Initiate function
   t_onset <- Sys.time()
   message(paste0("flapper::ac() called (@ ", t_onset, ")..."))
   # Check for missing inputs
-  for(arg in c(acoustics, step, bathy, detection_containers, mobility)) 1L
+  for (arg in c(acoustics, step, bathy, detection_containers, mobility)) 1L
   # Pass inputs to .acs_pl()
-    out <-
-      .acs_pl(
-        acoustics = acoustics,
-        archival = NULL,
-        step = step,
-        plot_ts = plot_ts,
-        bathy = bathy,
-        detection_containers = detection_containers,
-        detection_kernels = detection_kernels,
-        detection_kernels_overlap = detection_kernels_overlap,
-        detection_time_window = detection_time_window,
-        mobility = mobility,
-        calc_depth_error = NULL,
-        normalise = normalise,
-        save_record_spatial = save_record_spatial,
-        write_record_spatial_for_pf = write_record_spatial_for_pf,
-        verbose = verbose,
-        con = con,
-        progress = progress,
-        split = split,
-        cl = cl,
-        varlist = varlist
-        )
-    if(save_args){
-      out$args <- list(acoustics = acoustics,
-                       step = step,
-                       bathy = bathy,
-                       plot_ts = plot_ts,
-                       detection_containers = detection_containers,
-                       detection_kernels = detection_kernels,
-                       detection_kernels_overlap = detection_kernels_overlap,
-                       detection_time_window = detection_time_window,
-                       mobility = mobility,
-                       normalise = normalise,
-                       save_record_spatial = save_record_spatial,
-                       write_record_spatial_for_pf = write_record_spatial_for_pf,
-                       save_args = save_args,
-                       verbose = verbose,
-                       con = con,
-                       progress = progress,
-                       split = split,
-                       cl = cl,
-                       varlist = varlist)
-    }
-    t_end <- Sys.time()
-    message(paste0("flapper::ac() finished (@ ", t_end, ")..."))
-    return(out)
+  out <-
+    .acs_pl(
+      acoustics = acoustics,
+      archival = NULL,
+      step = step,
+      plot_ts = plot_ts,
+      bathy = bathy,
+      detection_containers = detection_containers,
+      detection_kernels = detection_kernels,
+      detection_kernels_overlap = detection_kernels_overlap,
+      detection_time_window = detection_time_window,
+      mobility = mobility,
+      calc_depth_error = NULL,
+      normalise = normalise,
+      save_record_spatial = save_record_spatial,
+      write_record_spatial_for_pf = write_record_spatial_for_pf,
+      verbose = verbose,
+      con = con,
+      progress = progress,
+      split = split,
+      cl = cl,
+      varlist = varlist
+    )
+  if (save_args) {
+    out$args <- list(
+      acoustics = acoustics,
+      step = step,
+      bathy = bathy,
+      plot_ts = plot_ts,
+      detection_containers = detection_containers,
+      detection_kernels = detection_kernels,
+      detection_kernels_overlap = detection_kernels_overlap,
+      detection_time_window = detection_time_window,
+      mobility = mobility,
+      normalise = normalise,
+      save_record_spatial = save_record_spatial,
+      write_record_spatial_for_pf = write_record_spatial_for_pf,
+      save_args = save_args,
+      verbose = verbose,
+      con = con,
+      progress = progress,
+      split = split,
+      cl = cl,
+      varlist = varlist
+    )
   }
+  t_end <- Sys.time()
+  message(paste0("flapper::ac() finished (@ ", t_end, ")..."))
+  return(out)
+}

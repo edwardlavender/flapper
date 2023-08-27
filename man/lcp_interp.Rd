@@ -48,31 +48,37 @@ This function can also be useful for visualising movement paths (e.g., via \code
 # ... reconstructed by the DCPF algorithm (dc() & pf()), using the
 # ... example dat_dcpf_* datasets. We extract the paths
 # ... and the surface over which movement occurred from this object:
-paths   <- dat_dcpf_paths
+paths <- dat_dcpf_paths
 surface <- dat_dcpf_histories$args$bathy
 
 #### Example (1): Implement lcp_interp() for an example path
 # ... with calc_distance = FALSE
 # Implement approach
 paths_1 <- paths[paths$path_id == 1, ]
-paths_interp_1 <- lcp_interp(paths = paths_1,
-                             surface = surface,
-                             calc_distance = FALSE)
+paths_interp_1 <- lcp_interp(
+  paths = paths_1,
+  surface = surface,
+  calc_distance = FALSE
+)
 # With calc_distance = FALSE, we get a dataframe with sequential locations
 utils::head(paths_interp_1)
 
 #### Example (2): Keep the original columns in 'paths'
 # ... via keep_cols = TRUE
-paths_interp_2 <- lcp_interp(paths = paths_1,
-                             surface = surface,
-                             calc_distance = FALSE,
-                             keep_cols = TRUE)
+paths_interp_2 <- lcp_interp(
+  paths = paths_1,
+  surface = surface,
+  calc_distance = FALSE,
+  keep_cols = TRUE
+)
 utils::head(paths_interp_2)
 
 #### Example (3): Calculate shortest distances along each path
 # ... via calc_distance = TRUE (the default)
-paths_interp_3 <- lcp_interp(paths = paths_1,
-                             surface = surface)
+paths_interp_3 <- lcp_interp(
+  paths = paths_1,
+  surface = surface
+)
 # A named list is returned
 names(paths_interp_3)
 # The 'dist_lcp' element is as inputted but with a 'dist' column that defines

@@ -70,34 +70,39 @@ For each time step, the function plots the probability surface, the receiver(s) 
 id <- 25
 acc <- dat_acoustics[dat_acoustics$individual_id == id, ]
 acc$timestamp <- lubridate::round_date(acc$timestamp, "2 mins")
-acc$key       <- paste0(acc$timestamp, "-", acc$receiver_id)
-acc           <- acc[!duplicated(acc$key), ][1:20, ]
+acc$key <- paste0(acc$timestamp, "-", acc$receiver_id)
+acc <- acc[!duplicated(acc$key), ][1:20, ]
 
 ## Define receiver locations ('moorings' SPDF) and activity status matrix
 # Receiver locations
 proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-                        proj_wgs84)
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+xy <- sp::SpatialPoints(
+  dat_moorings[, c("receiver_long", "receiver_lat")],
+  proj_wgs84
+)
 xy <- sp::spTransform(xy, proj_utm)
 moorings <- sp::SpatialPointsDataFrame(xy, data = dat_moorings)
 # Daily activity status matrix
 as_POSIXct <- function(x) as.POSIXct(paste0(x, "00:00:00"), tz = "UTC")
 moorings_mat <- make_matrix_receivers(dat_moorings,
-                                      delta_t = "days",
-                                      as_POSIXct = as_POSIXct)
+  delta_t = "days",
+  as_POSIXct = as_POSIXct
+)
 
 ## Prepare grid
 # We will use a regular, relatively high resolution grid,
 # focused on a small area around the receivers at which the ID was detected
 grid <- raster::raster(raster::extent(dat_gebco),
-                       res = c(25, 25),
-                       crs = raster::crs(dat_gebco))
+  res = c(25, 25),
+  crs = raster::crs(dat_gebco)
+)
 grid <- raster::resample(dat_gebco, grid)
 ext <-
   raster::extent(
     rgeos::gBuffer(moorings[moorings$receiver_id \%in\% acc$receiver_id, ],
-                   width = 10000)
+      width = 10000
+    )
   )
 grid <- raster::crop(grid, ext)
 grid <- raster::trim(grid)
@@ -106,73 +111,82 @@ raster::plot(grid)
 ## Define detection containers/probability kernels
 # Define detection containers
 moorings <- raster::crop(moorings, grid)
-dat_container <- acs_setup_containers(xy = moorings,
-                                    detection_range = 425,
-                                    coastline = dat_coast,
-                                    boundaries = ext,
-                                    plot = TRUE,
-                                    resolution = 10,
-                                    verbose = TRUE)
+dat_container <- acs_setup_containers(
+  xy = moorings,
+  detection_range = 425,
+  coastline = dat_coast,
+  boundaries = ext,
+  plot = TRUE,
+  resolution = 10,
+  verbose = TRUE
+)
 # Define detection container overlaps
-containers_spdf      <- do.call(raster::bind, plyr::compact(dat_containers))
+containers_spdf <- do.call(raster::bind, plyr::compact(dat_containers))
 containers_spdf@data <- dat_moorings
 dat_containers_overlaps <-
-  get_detection_containers_overlap(containers = containers_spdf,
-                                  services = NULL)
+  get_detection_containers_overlap(
+    containers = containers_spdf,
+    services = NULL
+  )
 # Define detection probability kernels
 calc_dpr <-
-  function(x){
+  function(x) {
     ifelse(x <= 425, stats::plogis(2.5 + -0.02 * x), 0)
   }
-dat_kernels <- acs_setup_detection_kernels(xy = moorings,
-                                           services = NULL,
-                                           containers = dat_containers,
-                                           overlaps = dat_containers_overlaps,
-                                           calc_detection_pr = calc_dpr,
-                                           bathy = grid)
+dat_kernels <- acs_setup_detection_kernels(
+  xy = moorings,
+  services = NULL,
+  containers = dat_containers,
+  overlaps = dat_containers_overlaps,
+  calc_detection_pr = calc_dpr,
+  bathy = grid
+)
 
 ## Implement AC algorithm
-out_ac <- ac(acoustics = acc,
-             step = 120,
-             bathy = grid,
-             detection_containers = dat_containers,
-             detection_kernels = dat_kernels,
-             detection_kernels_overlap = dat_containers_overlaps,
-             mobility = 200,
-             save_record_spatial = NULL
-             )
+out_ac <- ac(
+  acoustics = acc,
+  step = 120,
+  bathy = grid,
+  detection_containers = dat_containers,
+  detection_kernels = dat_kernels,
+  detection_kernels_overlap = dat_containers_overlaps,
+  mobility = 200,
+  save_record_spatial = NULL
+)
 
 ## Simplify outputs
 record <- acdc_simplify(out_ac)
 
 #### Example (1): Implement the function with default arguments
-if(interactive()){
+if (interactive()) {
   acdc_plot_trace(record, 1:10, moorings, moorings_mat)
 }
 
 #### Example (2): Customise plot via add_* arguments and ...
-if(interactive()){
+if (interactive()) {
   acdc_plot_trace(record, 1:10, moorings, moorings_mat,
-                  add_raster =
-                    list(plot_method = raster::plot, legend = FALSE),
-                  add_coastline =
-                    list(x = dat_coast, col = scales::alpha("dimgrey", 0.5)),
-                  xlim = c(699000, 711000),
-                  ylim = c(6250000, 6269500))
+    add_raster =
+      list(plot_method = raster::plot, legend = FALSE),
+    add_coastline =
+      list(x = dat_coast, col = scales::alpha("dimgrey", 0.5)),
+    xlim = c(699000, 711000),
+    ylim = c(6250000, 6269500)
+  )
 }
 
 #### Example (3): Save plots to file via the png_param argument
 con <- paste0(tempdir(), "/acdc_trace/")
-if(!dir.exists(con)) dir.create(con)
+if (!dir.exists(con)) dir.create(con)
 acdc_plot_trace(record, 1:10, moorings, moorings_mat,
-                add_raster =
-                  list(plot_method = raster::plot, legend = FALSE),
-                add_coastline =
-                  list(x = dat_coast, col = scales::alpha("dimgrey", 0.5)),
-                xlim = c(699000, 711000),
-                ylim = c(6250000, 6269500),
-                png_param = list(filename = con),
-                prompt = FALSE)
+  add_raster =
+    list(plot_method = raster::plot, legend = FALSE),
+  add_coastline =
+    list(x = dat_coast, col = scales::alpha("dimgrey", 0.5)),
+  xlim = c(699000, 711000),
+  ylim = c(6250000, 6269500),
+  png_param = list(filename = con),
+  prompt = FALSE
+)
 list.files(con)
 
 }

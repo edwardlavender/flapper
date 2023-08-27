@@ -45,9 +45,10 @@ For computational efficiency, it may be necessary to aggregate (and renormalise)
 }
 \examples{
 #### Define POU map for examples
-out_dcpf_s   <- pf_simplify(dat_dcpf_histories,
-                            summarise_pr = TRUE,
-                            return = "archive")
+out_dcpf_s <- pf_simplify(dat_dcpf_histories,
+  summarise_pr = TRUE,
+  return = "archive"
+)
 out_dcpf_pou <- pf_plot_map(out_dcpf_s, dat_dcpf_histories$args$bathy)
 
 #### Example (1): Implement function using default options
@@ -57,23 +58,29 @@ pf_kud(xpf = out_dcpf_pou, grid = 10)
 pf_kud(xpf = out_dcpf_pou, sample_size = 100, grid = 10)
 
 #### Example (3): Implement time trials
-if(interactive()){
+if (interactive()) {
   # Implement time trials for specified numbers of cells
-  pf_kud(xpf = out_dcpf_pou,
-         sample_size = 100,
-         grid = 60,
-         trial_cells = list(10, 100, 1000, 10000))
+  pf_kud(
+    xpf = out_dcpf_pou,
+    sample_size = 100,
+    grid = 60,
+    trial_cells = list(10, 100, 1000, 10000)
+  )
   # Implement time trials for specified grids
-  pf_kud(xpf = out_dcpf_pou,
-         sample_size = 100,
-         grid = 180,
-         trial_grids = list(60, 120, 180))
+  pf_kud(
+    xpf = out_dcpf_pou,
+    sample_size = 100,
+    grid = 180,
+    trial_grids = list(60, 120, 180)
+  )
   # Implement time trials for specified numbers of cells and grids
-  pf_kud(xpf = out_dcpf_pou,
-         sample_size = 100,
-         grid = 10,
-         trial_cells = list(10, 100, 1000, 10000),
-         trial_grids = list(10, 30, 60))
+  pf_kud(
+    xpf = out_dcpf_pou,
+    sample_size = 100,
+    grid = 10,
+    trial_cells = list(10, 100, 1000, 10000),
+    trial_grids = list(10, 30, 60)
+  )
 }
 
 #### Example (4): Force alignment between POU scores and grids for speed
@@ -81,7 +88,7 @@ if(interactive()){
 out_dcpf_pou_agg <-
   raster::aggregate(out_dcpf_pou, fact = 2)
 out_dcpf_pou_agg <-
-  out_dcpf_pou_agg/raster::cellStats(out_dcpf_pou_agg, "sum")
+  out_dcpf_pou_agg / raster::cellStats(out_dcpf_pou_agg, "sum")
 grid <- raster::res(out_dcpf_pou_agg)[1]
 pf_kud(out_dcpf_pou_agg, grid = grid)
 # Example with SpatialPixels grid

@@ -36,14 +36,14 @@ The function implements the following checks:
 ## All data have previously passed false detection filters (see glatos::false_detections())
 dat_acoustics$passed_filter <- 1
 ## Times should be in POSIXct format
-dat_moorings$receiver_start_date <-  as.POSIXct(dat_moorings$receiver_start_date)
+dat_moorings$receiver_start_date <- as.POSIXct(dat_moorings$receiver_start_date)
 lubridate::tz(dat_moorings$receiver_start_date) <- "UTC"
-dat_moorings$receiver_end_date   <-  as.POSIXct(dat_moorings$receiver_end_date)
+dat_moorings$receiver_end_date <- as.POSIXct(dat_moorings$receiver_end_date)
 lubridate::tz(dat_moorings$receiver_end_date) <- "UTC"
 dat_ids$tag_start_date <- as.POSIXct(dat_ids$tag_start_date)
 lubridate::tz(dat_ids$tag_start_date) <- "UTC"
 ## tag_end_date column needed in dat_ids
-dat_ids$tag_end_date   <- as.POSIXct("2020-01-01", tz = "UTC")
+dat_ids$tag_end_date <- as.POSIXct("2020-01-01", tz = "UTC")
 
 #### Implement process_quality_check() on processed data as a final check for any issues
 process_quality_check(dat_acoustics, dat_moorings, dat_ids)
@@ -51,8 +51,8 @@ process_quality_check(dat_acoustics, dat_moorings, dat_ids)
 #### Add erroneous data to acoustics for demonstrating process_quality_check()
 ## Define a convenience function to add erroneous data to
 # ... acoustics to demonstrate process_quality_check()
-add_erroneous_row <- function(acoustics, row = nrow(acoustics), col, val){
-  tmp_ls <- lapply(val, function(v){
+add_erroneous_row <- function(acoustics, row = nrow(acoustics), col, val) {
+  tmp_ls <- lapply(val, function(v) {
     tmp <- acoustics[row, ]
     tmp[1, col] <- v
     return(tmp)
@@ -64,20 +64,24 @@ add_erroneous_row <- function(acoustics, row = nrow(acoustics), col, val){
 ## Add erroneous receiver ids
 nrw <- nrow(dat_acoustics)
 acoustics_wth_errors <- add_erroneous_row(dat_acoustics,
-                                          row = nrw,
-                                          col = "receiver_id",
-                                          val = c(100, 200, 300))
+  row = nrw,
+  col = "receiver_id",
+  val = c(100, 200, 300)
+)
 ## Add erroneous time stamps (outside receiver/individual id deployment periods )
 acoustics_wth_errors <- add_erroneous_row(acoustics_wth_errors,
-                                         row = nrw,
-                                          col = "timestamp",
-                                          val = as.POSIXct(c("2019-01-01", "2019-03-01"),
-                                                           tz = "UTC"))
+  row = nrw,
+  col = "timestamp",
+  val = as.POSIXct(c("2019-01-01", "2019-03-01"),
+    tz = "UTC"
+  )
+)
 ## Add erroneous individual ids
 acoustics_wth_errors <- add_erroneous_row(acoustics_wth_errors,
-                                          row = nrw,
-                                          col = "individual_id",
-                                          val = c(100, 200, 300))
+  row = nrw,
+  col = "individual_id",
+  val = c(100, 200, 300)
+)
 ## Examine erroneous data:
 utils::tail(acoustics_wth_errors, 10)
 

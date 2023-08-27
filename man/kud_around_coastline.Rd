@@ -42,20 +42,23 @@ sea <- raster::crop(sea, update_extent(raster::extent(sea), x_shift = -2500))
 prettyGraphics::pretty_map(add_polys = list(x = sea, col = "skyblue"))
 # Simulate path
 n <- 1000
-path_ls <- sim_path_sa(n = n,
-                       area = sea,
-                       sim_step = function(...) stats::rgamma(1, shape = 20, scale = 20),
-                       seed = 1,
-                       plot = FALSE
-                       )
+path_ls <- sim_path_sa(
+  n = n,
+  area = sea,
+  sim_step = function(...) stats::rgamma(1, shape = 20, scale = 20),
+  seed = 1,
+  plot = FALSE
+)
 prettyGraphics::add_sp_path(path_ls$xy_mat,
-                            col = viridis::viridis(n),
-                            length = 0.02)
+  col = viridis::viridis(n),
+  length = 0.02
+)
 ## (2) Define path as a SpatialPointsDataFrame (SpatialPoints is not allowed)
 path <- sp::SpatialPointsDataFrame(
   path_ls$xy_mat,
   data = data.frame(ID = factor(rep(1, nrow(path_ls$xy_mat)))),
-                    proj4string = raster::crs(dat_coast))
+  proj4string = raster::crs(dat_coast)
+)
 ## (3) Define grid over which to implement estimation
 # ... The grid needs to be sufficiently small to capture the coastline
 # ... reasonably while being large enough to enable calculation
@@ -86,20 +89,26 @@ ud_pro[[1]]@h
 ud_raw_r <- raster::raster(ud_raw[[1]])
 ud_pro_r <- raster::raster(ud_pro[[1]])
 pp <- graphics::par(mfrow = c(1, 2))
-prettyGraphics::pretty_map(add_rasters = list(x = ud_raw_r),
-                           add_polys = list(x = dat_coast),
-                           add_paths = list(x = path,
-                                            col = viridis::viridis(n),
-                                            lwd = 0.25,
-                                            length = 0.02)
-                           )
-prettyGraphics::pretty_map(add_rasters = list(x = ud_pro_r),
-                           add_polys = list(x = dat_coast),
-                           add_paths = list(x = path,
-                                            col = viridis::viridis(n),
-                                            lwd = 0.25,
-                                            length = 0.02)
-                           )
+prettyGraphics::pretty_map(
+  add_rasters = list(x = ud_raw_r),
+  add_polys = list(x = dat_coast),
+  add_paths = list(
+    x = path,
+    col = viridis::viridis(n),
+    lwd = 0.25,
+    length = 0.02
+  )
+)
+prettyGraphics::pretty_map(
+  add_rasters = list(x = ud_pro_r),
+  add_polys = list(x = dat_coast),
+  add_paths = list(
+    x = path,
+    col = viridis::viridis(n),
+    lwd = 0.25,
+    length = 0.02
+  )
+)
 graphics::par(pp)
 
 #### Further analysis can be implemented as usual
@@ -120,26 +129,40 @@ vol_raw_r[vol_raw_r[] > 95] <- NA
 vol_pro_r[vol_pro_r[] > 95] <- NA
 # Plot
 pp <- graphics::par(mfrow = c(1, 2))
-prettyGraphics::pretty_map(add_rasters = list(x = vol_raw_r),
-                           add_polys = list(list(x = dat_coast),
-                                            list(x = ver_raw,
-                                                 border = "blue",
-                                                 lwd = 2)),
-                           add_paths = list(x = path,
-                                            col = viridis::viridis(n),
-                                            lwd = 0.25,
-                                            length = 0.02)
-                           )
-prettyGraphics::pretty_map(add_rasters = list(x = vol_pro_r),
-                           add_polys = list(list(x = dat_coast),
-                                            list(x = ver_pro,
-                                                 border = "blue",
-                                                 lwd = 2)),
-                           add_paths = list(x = path,
-                                            col = viridis::viridis(n),
-                                            lwd = 0.25,
-                                            length = 0.02)
-                           )
+prettyGraphics::pretty_map(
+  add_rasters = list(x = vol_raw_r),
+  add_polys = list(
+    list(x = dat_coast),
+    list(
+      x = ver_raw,
+      border = "blue",
+      lwd = 2
+    )
+  ),
+  add_paths = list(
+    x = path,
+    col = viridis::viridis(n),
+    lwd = 0.25,
+    length = 0.02
+  )
+)
+prettyGraphics::pretty_map(
+  add_rasters = list(x = vol_pro_r),
+  add_polys = list(
+    list(x = dat_coast),
+    list(
+      x = ver_pro,
+      border = "blue",
+      lwd = 2
+    )
+  ),
+  add_paths = list(
+    x = path,
+    col = viridis::viridis(n),
+    lwd = 0.25,
+    length = 0.02
+  )
+)
 graphics::par(pp)
 
 }

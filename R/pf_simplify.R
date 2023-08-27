@@ -40,7 +40,7 @@
 #' summary(dat_dcpf_histories)
 #'
 #' #### Example (1): The default implementation
-#' paths_1   <- pf_simplify(dat_dcpf_histories)
+#' paths_1 <- pf_simplify(dat_dcpf_histories)
 #'
 #' ## Demonstration that the distance and probabilities calculations are correct
 #' # The simple method below works if three conditions are met:
@@ -52,19 +52,23 @@
 #' paths_1 <-
 #'   paths_1 %>%
 #'   dplyr::group_by(.data$path_id) %>%
-#'   dplyr::mutate(cell_xp = dplyr::lag(.data$cell_x),
-#'                 cell_yp = dplyr::lag(.data$cell_y),
-#'                 cell_dist_chk = sqrt((.data$cell_xp - .data$cell_x)^2 +
-#'                                        (.data$cell_yp - .data$cell_y)^2),
-#'                 cell_pr_chk = dat_dcpf_histories$args$calc_movement_pr(.data$cell_dist_chk),
-#'                 dist_equal = .data$cell_dist_chk == .data$cell_dist_chk,
-#'                 pr_equal = .data$cell_pr == .data$cell_pr_chk) %>%
+#'   dplyr::mutate(
+#'     cell_xp = dplyr::lag(.data$cell_x),
+#'     cell_yp = dplyr::lag(.data$cell_y),
+#'     cell_dist_chk = sqrt((.data$cell_xp - .data$cell_x)^2 +
+#'       (.data$cell_yp - .data$cell_y)^2),
+#'     cell_pr_chk = dat_dcpf_histories$args$calc_movement_pr(.data$cell_dist_chk),
+#'     dist_equal = .data$cell_dist_chk == .data$cell_dist_chk,
+#'     pr_equal = .data$cell_pr == .data$cell_pr_chk
+#'   ) %>%
 #'   data.frame()
 #' utils::head(paths_1)
 #'
 #' ## Demonstration that the depths of sampled cells are correct
-#' paths_1$cell_z_chk <- raster::extract(dat_dcpf_histories$args$bathy,
-#'                                       paths_1$cell_id)
+#' paths_1$cell_z_chk <- raster::extract(
+#'   dat_dcpf_histories$args$bathy,
+#'   paths_1$cell_id
+#' )
 #' all.equal(paths_1$cell_z, paths_1$cell_z_chk)
 #'
 #' ## Compare depth time series
@@ -77,7 +81,8 @@
 #' pf_loglik(paths_1)
 #' # 2-d visualisation
 #' pf_plot_2d(paths_1, dat_dcpf_histories$args$bathy,
-#'            add_paths = list(length = 0.05))
+#'   add_paths = list(length = 0.05)
+#' )
 #' # 3-d visualisation
 #' pf_plot_3d(paths_1, dat_dcpf_histories$args$bathy)
 #'
@@ -99,13 +104,14 @@
 #' system.time(
 #'   invisible(utils::capture.output(
 #'     pf_simplify(out_dcpf_2, calc_distance = "lcp")
-#'     ))
-#'   )
+#'   ))
+#' )
 #'
 #' ## Demonstrate the LCP calculations are correct
 #' paths_2_lcps <- lcp_interp(paths_2,
-#'                             out_dcpf_2$args$bathy,
-#'                             calc_distance = TRUE)
+#'   out_dcpf_2$args$bathy,
+#'   calc_distance = TRUE
+#' )
 #' head(cbind(paths_2$dist, paths_2_lcps$dist_lcp$dist))
 #'
 #' ## Trial options for increasing speed of shortest-distance calculations
@@ -120,8 +126,9 @@
 #' system.time(
 #'   invisible(utils::capture.output(
 #'     pf_simplify(out_dcpf_2,
-#'                 calc_distance = "lcp",
-#'                 calc_distance_graph = graph)
+#'       calc_distance = "lcp",
+#'       calc_distance_graph = graph
+#'     )
 #'   ))
 #' )
 #' # Speed up shortest-distance calculations via (b) the lower Euclid dist limit
@@ -131,9 +138,10 @@
 #' system.time(
 #'   invisible(utils::capture.output(
 #'     pf_simplify(out_dcpf_2,
-#'                 calc_distance = "lcp",
-#'                 calc_distance_graph = graph,
-#'                 calc_distance_limit = 100)
+#'       calc_distance = "lcp",
+#'       calc_distance_graph = graph,
+#'       calc_distance_limit = 100
+#'     )
 #'   ))
 #' )
 #' # Speed up shortest-distance calculations via (c) the barrier
@@ -143,10 +151,11 @@
 #' system.time(
 #'   invisible(utils::capture.output(
 #'     pf_simplify(out_dcpf_2,
-#'                 calc_distance = "lcp",
-#'                 calc_distance_graph = graph,
-#'                 calc_distance_limit = 100,
-#'                 calc_distance_barrier = coastline)
+#'       calc_distance = "lcp",
+#'       calc_distance_graph = graph,
+#'       calc_distance_limit = 100,
+#'       calc_distance_barrier = coastline
+#'     )
 #'   ))
 #' )
 #' # Speed up calculations via (d) mobility limits
@@ -158,11 +167,12 @@
 #' system.time(
 #'   invisible(utils::capture.output(
 #'     pf_simplify(out_dcpf_2,
-#'                 calc_distance = "lcp",
-#'                 calc_distance_graph = graph,
-#'                 calc_distance_limit = 100,
-#'                 mobility = 200,
-#'                 mobility_from_origin = 200)
+#'       calc_distance = "lcp",
+#'       calc_distance_graph = graph,
+#'       calc_distance_limit = 100,
+#'       mobility = 200,
+#'       mobility_from_origin = 200
+#'     )
 #'   ))
 #' )
 #' # Speed up calculations via (e) parallelisation
@@ -185,14 +195,17 @@
 #' # Again, this doesn't make a difference here, but it can when there are
 #' # ... more particles.
 #' paths_4a <- pf_simplify(dat_dcpf_histories,
-#'                           max_n_copies = 5,
-#'                           max_n_copies_sampler = "random")
+#'   max_n_copies = 5,
+#'   max_n_copies_sampler = "random"
+#' )
 #' paths_4b <- pf_simplify(dat_dcpf_histories,
-#'                           max_n_copies = 5,
-#'                           max_n_copies_sampler = "weighted")
+#'   max_n_copies = 5,
+#'   max_n_copies_sampler = "weighted"
+#' )
 #' paths_4c <- pf_simplify(dat_dcpf_histories,
-#'                           max_n_copies = 5,
-#'                           max_n_copies_sampler = "max")
+#'   max_n_copies = 5,
+#'   max_n_copies_sampler = "max"
+#' )
 #' # Compare retained paths
 #' pf_loglik(paths_3a)
 #' pf_loglik(paths_3b)
@@ -213,9 +226,13 @@
 #' # ... with the coordinates re-defined on bathy:
 #' paths_5a <- pf_simplify(dat_dcpf_histories)
 #' paths_5a[1, c("cell_x", "cell_y")]
-#' raster::xyFromCell(dat_dcpf_histories$args$bathy,
-#'                    raster::cellFromXY(dat_dcpf_histories$args$bathy,
-#'                                       dat_dcpf_histories$args$origin))
+#' raster::xyFromCell(
+#'   dat_dcpf_histories$args$bathy,
+#'   raster::cellFromXY(
+#'     dat_dcpf_histories$args$bathy,
+#'     dat_dcpf_histories$args$origin
+#'   )
+#' )
 #' head(paths_5a)
 #' # If specified, the origin is dropped with add_origin = FALSE
 #' paths_5b <- pf_simplify(dat_dcpf_histories, add_origin = FALSE)
@@ -242,15 +259,17 @@
 #' # Now, there is only one (the most likely) record of sampled cells
 #' # ... at each time step.
 #' out_dcpf_6c <- pf_simplify(out_dcpf_6b,
-#'                            summarise_pr = TRUE,
-#'                            return = "archive")
+#'   summarise_pr = TRUE,
+#'   return = "archive"
+#' )
 #' head(out_dcpf_6c$history[[1]])
 #' table(duplicated(out_dcpf_6c$history[[1]]$id_current))
 #' ## Make movement paths
 #' # Again, we use out_dcpf_6b to skip distance calculations.
 #' out_dcpf_6d <- pf_simplify(out_dcpf_6b,
-#'                            max_n_copies = 2L,
-#'                            return = "path")
+#'   max_n_copies = 2L,
+#'   return = "path"
+#' )
 #' ## Compare resultant maps
 #' # The map for all particles is influenced by particles that were 'dead ends',
 #' # ... which isn't ideal for a map of space use.
@@ -264,23 +283,27 @@
 #' # ... for a sample of sampled particles.
 #' pp <- par(mfrow = c(2, 2), oma = c(2, 2, 2, 2), mar = c(2, 4, 2, 4))
 #' paa <- list(side = 1:4, axis = list(labels = FALSE))
-#' transform = NULL
+#' transform <- NULL
 #' m_1 <- pf_plot_map(out_dcpf_6a, dcpf_args$bathy,
-#'                    transform = transform,
-#'                    pretty_axis_args = paa, main = "all samples")
+#'   transform = transform,
+#'   pretty_axis_args = paa, main = "all samples"
+#' )
 #' m_2 <- pf_plot_map(out_dcpf_6b, dcpf_args$bathy,
-#'                    transform = transform,
-#'                    pretty_axis_args = paa, main = "connected samples")
+#'   transform = transform,
+#'   pretty_axis_args = paa, main = "connected samples"
+#' )
 #' m_3 <- pf_plot_map(out_dcpf_6c, dcpf_args$bathy,
-#'                    transform = transform,
-#'                    pretty_axis_args = paa, main = "unique, connected samples")
+#'   transform = transform,
+#'   pretty_axis_args = paa, main = "unique, connected samples"
+#' )
 #' m_4 <- pf_plot_map(out_dcpf_6d, dcpf_args$bathy,
-#'                    transform = transform,
-#'                    pretty_axis_args = paa, main = "paths")
+#'   transform = transform,
+#'   pretty_axis_args = paa, main = "paths"
+#' )
 #' par(pp)
 #' # Note that all locations in reconstructed paths are derived from PF samples
 #' all(out_dcpf_6d$cell_id[out_dcpf_6d$timestep != 0] %in%
-#'       do.call(rbind, out_dcpf_6c$history)$id_current)
+#'   do.call(rbind, out_dcpf_6c$history)$id_current)
 #' # But the paths only contain a subset of sampled particles
 #' h_6a <- lapply(out_dcpf_6a$history, function(elm) elm[, "id_current"])
 #' table(unique(unlist(h_6a)) %in% out_dcpf_6d$cell_id[out_dcpf_6d$timestep != 0])
@@ -313,85 +336,91 @@ pf_simplify <- function(archive,
                         max_n_copies_sampler = c("random", "weighted", "max"),
                         max_n_paths = 100L,
                         add_origin = TRUE,
-                        verbose = TRUE){
-
-
+                        verbose = TRUE) {
   ########################################
   #### Function set up
 
   #### Set up
-  cat_to_console <- function(..., show = verbose){
-    if(show) cat(paste(..., "\n"))
+  cat_to_console <- function(..., show = verbose) {
+    if (show) cat(paste(..., "\n"))
   }
   t_onset <- Sys.time()
   cat_to_console(paste0("flapper::pf_simplify() called (@ ", t_onset, ")..."))
-  if(!inherits(archive, "pf_archive")) stop("'archive' must be a 'pf_archive-class' object.", call. = FALSE)
+  if (!inherits(archive, "pf_archive")) stop("'archive' must be a 'pf_archive-class' object.", call. = FALSE)
   history <- archive$history
-  if(is.null(bathy)) bathy <- archive$args$bathy
-  if(is.null(bathy)) stop("'bathy' must be supplied via 'bathy' or 'archive$args$bathy' for this function.", call. = FALSE)
+  if (is.null(bathy)) bathy <- archive$args$bathy
+  if (is.null(bathy)) stop("'bathy' must be supplied via 'bathy' or 'archive$args$bathy' for this function.", call. = FALSE)
   bathy_xy <- raster::coordinates(bathy)
-  layers   <- archive$args$record
+  layers <- archive$args$record
   layers_1 <- layers[[1]]
   read_layers <- FALSE
-  if(inherits(layers_1, "character")){
+  if (inherits(layers_1, "character")) {
     read_layers <- TRUE
-    if(!file.exists(layers_1)) stop(paste0("archive$args$record[[1]] ('", layers_1, "') does not exist."), call. = FALSE)
-    layers_1    <- raster::raster(layers_1)
+    if (!file.exists(layers_1)) stop(paste0("archive$args$record[[1]] ('", layers_1, "') does not exist."), call. = FALSE)
+    layers_1 <- raster::raster(layers_1)
   }
-  raster_comparison <- tryCatch(raster::compareRaster(layers_1, bathy), error = function(e) return(e))
-  if(inherits(raster_comparison, "error")){
+  raster_comparison <- tryCatch(raster::compareRaster(layers_1, bathy), error = function(e) {
+    return(e)
+  })
+  if (inherits(raster_comparison, "error")) {
     warning("archive$args$record[[1]] and 'bathy' have different properties.",
-            immediate. = TRUE, call. = FALSE)
+      immediate. = TRUE, call. = FALSE
+    )
     stop(raster_comparison, call. = FALSE)
   }
-  data     <- archive$args$data
-  origin   <- archive$args$origin
-  if(!is.null(origin)) {
+  data <- archive$args$data
+  origin <- archive$args$origin
+  if (!is.null(origin)) {
     origin_cell_id <- raster::cellFromXY(bathy, origin)
-    origin         <- bathy_xy[origin_cell_id, , drop = FALSE]
+    origin <- bathy_xy[origin_cell_id, , drop = FALSE]
   }
-  if(is.null(calc_distance)) calc_distance <- archive$args$calc_distance
+  if (is.null(calc_distance)) calc_distance <- archive$args$calc_distance
   calc_distance <- match.arg(calc_distance, c("euclid", "lcp"))
-  if(!is.null(calc_distance_lcp_fast) & !inherits(calc_distance_lcp_fast, "function")){
+  if (!is.null(calc_distance_lcp_fast) & !inherits(calc_distance_lcp_fast, "function")) {
     stop("'calc_distance_lcp_fast' expects NULL or a function.", call. = FALSE)
   }
-  if(calc_distance == "lcp"){
-    if(!is.null(calc_distance_barrier)) {
+  if (calc_distance == "lcp") {
+    if (!is.null(calc_distance_barrier)) {
       check_crs(bathy, calc_distance_barrier, calc_distance_barrier_grid)
-    } else{
-      if(!is.null(calc_distance_barrier_limit) | !is.null(calc_distance_barrier_grid)){
+    } else {
+      if (!is.null(calc_distance_barrier_limit) | !is.null(calc_distance_barrier_grid)) {
         calc_distance_barrier_limit <- calc_distance_barrier_grid <- NULL
         warning("'calc_distance_barrier' is NULL; other 'calc_distance_barrier_*' arguments are ignored.",
-                immediate. = TRUE, call. = FALSE)
+          immediate. = TRUE, call. = FALSE
+        )
       }
     }
-    if(!inherits(calc_distance_lcp_fast, "function")){
-      if(!is.null(calc_distance_limit) & !is.null(calc_distance_barrier_limit)){
-        if(calc_distance_barrier_limit >= calc_distance_limit){
+    if (!inherits(calc_distance_lcp_fast, "function")) {
+      if (!is.null(calc_distance_limit) & !is.null(calc_distance_barrier_limit)) {
+        if (calc_distance_barrier_limit >= calc_distance_limit) {
           calc_distance_barrier_limit <- NULL
           warning("'calc_distance_barrier_limit' >= 'calc_distance_limit': 'calc_distance_barrier_limit' ignored.",
-                  immediate. = TRUE, call. = FALSE)
+            immediate. = TRUE, call. = FALSE
+          )
         }
       }
-      if(calc_distance_restrict & is.null(calc_distance_limit) & is.null(calc_distance_barrier)){
+      if (calc_distance_restrict & is.null(calc_distance_limit) & is.null(calc_distance_barrier)) {
         warning("'calc_distance_restrict' is only implemented if 'calc_distance_limit' and/or 'calc_distance_barrier' are supplied.", immediate. = TRUE, call. = FALSE)
         calc_distance_restrict <- FALSE
       }
     } else {
-      if(!all(is.null(c(calc_distance_graph, calc_distance_limit))) | calc_distance_restrict){
+      if (!all(is.null(c(calc_distance_graph, calc_distance_limit))) | calc_distance_restrict) {
         calc_distance_graph <- calc_distance_limit <- NULL
         calc_distance_restrict <- FALSE
         warning("'calc_distance_graph', 'calc_distance_limit' and/or 'calc_distance_restrict' arguments are ignored with 'calc_distance_lcp_fast'.",
-                immediate. = TRUE, call. = FALSE)
+          immediate. = TRUE, call. = FALSE
+        )
       }
     }
   } else {
-    if(!all(is.null(c(calc_distance_lcp_fast,
-                      calc_distance_graph,
-                      calc_distance_limit,
-                      calc_distance_barrier,
-                      calc_distance_barrier_limit,
-                      calc_distance_barrier_grid))) | calc_distance_restrict){
+    if (!all(is.null(c(
+      calc_distance_lcp_fast,
+      calc_distance_graph,
+      calc_distance_limit,
+      calc_distance_barrier,
+      calc_distance_barrier_limit,
+      calc_distance_barrier_grid
+    ))) | calc_distance_restrict) {
       calc_distance_lcp_fast <-
         calc_distance_graph <-
         calc_distance_limit <-
@@ -400,22 +429,25 @@ pf_simplify <- function(archive,
         calc_distance_barrier_grid <- NULL
       calc_distance_restrict <- FALSE
       warning("All other calc_distance_* arguments are ignored for calc_distance = 'euclid'.",
-              immediate. = TRUE, call. = FALSE)
+        immediate. = TRUE, call. = FALSE
+      )
     }
   }
   calc_movement_pr_from_origin <- archive$args$calc_movement_pr_from_origin
-  calc_movement_pr             <- archive$args$calc_movement_pr
-  if(is.null(mobility)) mobility <- archive$args$mobility
-  if(is.null(mobility_from_origin)) mobility_from_origin <- archive$args$mobility_from_origin
-  if(is.null(mobility) | is.null(mobility_from_origin))
+  calc_movement_pr <- archive$args$calc_movement_pr
+  if (is.null(mobility)) mobility <- archive$args$mobility
+  if (is.null(mobility_from_origin)) mobility_from_origin <- archive$args$mobility_from_origin
+  if (is.null(mobility) | is.null(mobility_from_origin)) {
     message("'mobility' and/or 'mobility_from_origin' taken as NULL.")
-  if(!is.null(calc_distance_barrier_grid) & (is.null(mobility_from_origin) | is.null(mobility)))
+  }
+  if (!is.null(calc_distance_barrier_grid) & (is.null(mobility_from_origin) | is.null(mobility))) {
     stop("'mobility_from_origin' and 'mobility' are required if 'calc_distance_barrier_grid' is specified.", call. = FALSE)
-  if(!is.null(write_history)){
+  }
+  if (!is.null(write_history)) {
     check_named_list(input = write_history)
     check_names(input = write_history, req = "file")
-    write_history$file  <- check_dir(input = write_history$file, check_slash = TRUE)
-    write_history_dir   <- write_history$file
+    write_history$file <- check_dir(input = write_history$file, check_slash = TRUE)
+    write_history_dir <- write_history$file
     write_history_dir_1 <- paste0(write_history_dir, "1/")
     write_history_dir_2 <- paste0(write_history_dir, "2/")
     dir.create(write_history_dir_1)
@@ -424,23 +456,27 @@ pf_simplify <- function(archive,
     # ... because all files are read from these directories later
     # ... which can lead to lists of the wrong length/contents if they
     # ... are already populated (e.g., with testing files).
-    if(length(list.files(write_history_dir_1)) != 0L)
+    if (length(list.files(write_history_dir_1)) != 0L) {
       stop(paste0("'", write_history_dir_1, "' is not empty."), call. = FALSE)
-    if(length(list.files(write_history_dir_2)) != 0L)
+    }
+    if (length(list.files(write_history_dir_2)) != 0L) {
       stop(paste0("'", write_history_dir_2, "' is not empty."), call. = FALSE)
+    }
   }
   # Match samplers
   max_n_particles_sampler <- match.arg(max_n_particles_sampler)
-  max_n_copies_sampler    <- match.arg(max_n_copies_sampler)
+  max_n_copies_sampler <- match.arg(max_n_copies_sampler)
   # Check cluster
-  if(!is.null(cl) && use_all_cores){
+  if (!is.null(cl) && use_all_cores) {
     warning("Both 'cl' and 'use_all_cores' supplied: 'use_all_cores' ignored.",
-            immediate. = TRUE, call. = FALSE)
+      immediate. = TRUE, call. = FALSE
+    )
     use_all_cores <- FALSE
   }
-  if(use_all_cores && calc_distance != "lcp") {
+  if (use_all_cores && calc_distance != "lcp") {
     warning("'use_all_cores' ignored: calc_distance != 'lcp'.",
-            immediate. = TRUE, call. = FALSE)
+      immediate. = TRUE, call. = FALSE
+    )
     use_all_cores <- FALSE
   }
   # Match return
@@ -450,14 +486,16 @@ pf_simplify <- function(archive,
   ########################################
   #### Thin particle samples
 
-  if(!is.null(max_n_particles)){
-    history <- pbapply::pblapply(history, function(history_for_t){
-      if(max_n_particles_sampler == "random"){
+  if (!is.null(max_n_particles)) {
+    history <- pbapply::pblapply(history, function(history_for_t) {
+      if (max_n_particles_sampler == "random") {
         history_for_t <- history_for_t %>% dplyr::slice_sample(n = max_n_particles, replace = TRUE)
-      } else if(max_n_particles_sampler == "weighted"){
+      } else if (max_n_particles_sampler == "weighted") {
         history_for_t <- history_for_t %>% dplyr::slice_sample(n = max_n_particles, weight_by = .data$pr_current, replace = TRUE)
-      } else if(max_n_particles_sampler == "max"){
-        history_for_t <- history_for_t %>% dplyr::arrange(.data$pr_current) %>% dplyr::slice(1:max_n_particles)
+      } else if (max_n_particles_sampler == "max") {
+        history_for_t <- history_for_t %>%
+          dplyr::arrange(.data$pr_current) %>%
+          dplyr::slice(1:max_n_particles)
       }
       return(history_for_t)
     })
@@ -471,20 +509,19 @@ pf_simplify <- function(archive,
   # But it may not be necessary if pf_simplify() has previously been called with return = 'archive',
   # ... in which case this step has already been done and we can skip distance calculations.
 
-  if(!rlang::has_name(history[[1]], "dist_current")){
-
+  if (!rlang::has_name(history[[1]], "dist_current")) {
     ## Implement setup for LCP distance calculations, if necessary.
     cat_to_console(paste0("... Getting pairwise cell movements based on calc_distance = '", calc_distance, "'..."))
-    if(calc_distance == "lcp" & !inherits(calc_distance_lcp_fast, "function")){
+    if (calc_distance == "lcp" & !inherits(calc_distance_lcp_fast, "function")) {
       cat_to_console("... Setting up LCP calculations...")
-      if(!all.equal(raster::res(bathy)[1], raster::res(bathy)[2])){
+      if (!all.equal(raster::res(bathy)[1], raster::res(bathy)[2])) {
         stop("raster::res(bathy)[1] must equal raster::res(bathy)[2] for calc_distance = 'lcp'.", call. = FALSE)
       }
-      if(is.null(calc_distance_graph)) calc_distance_graph <- archive$args$calc_distance_graph
-      if(is.null(calc_distance_graph)){
+      if (is.null(calc_distance_graph)) calc_distance_graph <- archive$args$calc_distance_graph
+      if (is.null(calc_distance_graph)) {
         cat_to_console("... ... Setting up cost-surface for calc_distance = 'lcp'...")
         costs <- lcp_costs(bathy, verbose = verbose)
-        cost  <- costs$dist_total
+        cost <- costs$dist_total
         calc_distance_graph <- lcp_graph_surface(surface = bathy, cost = cost, verbose = verbose)
       }
     }
@@ -492,13 +529,14 @@ pf_simplify <- function(archive,
     #### Calculate distances and probabilities between cell pairs
     # ... (1) Method for pf outputs derived via calc_distance_euclid_fast
     cat_to_console("... ... Stepping through time steps to join coordinate pairs...")
-    if(archive$args$calc_distance == "euclid" & archive$args$calc_distance_euclid_fast){
-
+    if (archive$args$calc_distance == "euclid" & archive$args$calc_distance_euclid_fast) {
       #### Add element to history for movement from time 0 to time 1
-      if(!is.null(origin)){
-        origin_dat <- data.frame(id_current = origin_cell_id,
-                                 pr_current = 1,
-                                 timestep = 0)
+      if (!is.null(origin)) {
+        origin_dat <- data.frame(
+          id_current = origin_cell_id,
+          pr_current = 1,
+          timestep = 0
+        )
         history <- append(list(origin_dat), history)
       } else {
         history <- append(history[1], history)
@@ -508,21 +546,20 @@ pf_simplify <- function(archive,
 
       #### Re-define history with cell pairs
       # Define cluster/chunks
-      if(is.null(cl))
+      if (is.null(cl)) {
         chunks <- 1L
-      else
-        if(inherits(cl, "cluster")) chunks <- length(cl) else chunks <- cl
+      } else if (inherits(cl, "cluster")) chunks <- length(cl) else chunks <- cl
       t_vec <- 2:length(history)
       t_ind_by_chunk <- parallel::splitIndices(length(t_vec), chunks)
       cl_export(cl, varlist)
-      history_by_chunk <- pbapply::pblapply(t_ind_by_chunk, cl = cl, function(t_ind_for_chunk){
+      history_by_chunk <- pbapply::pblapply(t_ind_by_chunk, cl = cl, function(t_ind_for_chunk) {
         ## Define time step indices for chunk
         t_vec_for_chunk <- t_vec[t_ind_for_chunk]
-        history_for_chunk <- lapply(t_vec_for_chunk, function(t){
+        history_for_chunk <- lapply(t_vec_for_chunk, function(t) {
           ## Get full suite of allowed cells from current time step
           # (This is combined with movement probabilities to generate adjusted location probabilities below.)
           layers_2 <- layers[[t]]
-          if(read_layers) layers_2 <- raster::raster(layers_2)
+          if (read_layers) layers_2 <- raster::raster(layers_2)
 
           ## Get retained cells from the previous and current step and coordinates
           tms <- history[[t - 1]]$timestep[1] + 1
@@ -537,41 +574,46 @@ pf_simplify <- function(archive,
           # ... exceed mobility_from_origin or mobility. We will then proceed to calculate LCPs for the remaining
           # ... combinations (if necessary), because this is a slower step.
 
-          if((t - 1) == 1 & is.null(origin)){
-            tmp <- data.frame(timestep = tms,
-                              id_previous = NA,
-                              id_current = z2_id_current_unq,
-                              dist_current = 0,
-                              pr_current = 1
+          if ((t - 1) == 1 & is.null(origin)) {
+            tmp <- data.frame(
+              timestep = tms,
+              id_previous = NA,
+              id_current = z2_id_current_unq,
+              dist_current = 0,
+              pr_current = 1
             )
-
           } else {
             # Calculate Euclidean distances (using internal raster function for speed)
             # ... This returns a matrix where the first arg forms the rows
             # ... and the second arg forms the columns.
-            dist_btw_cells <- .planedist2(bathy_xy[z1_id_current_unq, , drop = FALSE],
-                                          bathy_xy[z2_id_current_unq, , drop = FALSE])
+            dist_btw_cells <- .planedist2(
+              bathy_xy[z1_id_current_unq, , drop = FALSE],
+              bathy_xy[z2_id_current_unq, , drop = FALSE]
+            )
             # rownames(dist_btw_cells) <- z1_id_current_unq
             # colnames(dist_btw_cells) <- z2_id_current_unq
             # Extract distances into dataframe
             # ... Note that the matrix is non symmetrical (so we need to extract all distances).
-            tmp <- data.frame(timestep     = tms,
-                              id_previous  = z1_id_current_unq[as.vector(row(dist_btw_cells))],
-                              id_current   = z2_id_current_unq[as.vector(col(dist_btw_cells))],
-                              dist_current = as.vector(dist_btw_cells)
+            tmp <- data.frame(
+              timestep = tms,
+              id_previous = z1_id_current_unq[as.vector(row(dist_btw_cells))],
+              id_current = z2_id_current_unq[as.vector(col(dist_btw_cells))],
+              dist_current = as.vector(dist_btw_cells)
             )
             # Adjust distances according to mobility_from_origin or mobility
-            if((t - 1) == 1)  mob <- mobility_from_origin else mob <- mobility
-            if(!is.null(mob)) tmp <- tmp %>% dplyr::filter(.data$dist_current <= mob)
+            if ((t - 1) == 1) mob <- mobility_from_origin else mob <- mobility
+            if (!is.null(mob)) tmp <- tmp %>% dplyr::filter(.data$dist_current <= mob)
 
             # Calculate LCPs (if specified)
-            if(calc_distance == "lcp"){
+            if (calc_distance == "lcp") {
               calc_distance_lcp <- TRUE
 
               # ... Identify segments that exceed the lower distance limit
-              if(!is.null(calc_distance_limit)) {
+              if (!is.null(calc_distance_limit)) {
                 index_in_limit <- which(tmp$dist_current > calc_distance_limit)
-              } else index_in_limit <- integer(0)
+              } else {
+                index_in_limit <- integer(0)
+              }
 
               # ... Identify segments that cross a barrier
               # ... ... This step can be slow for large numbers of paths,
@@ -579,43 +621,44 @@ pf_simplify <- function(archive,
               # ... ... (a) were not flagged by the check above (if applicable), and/or
               # ... ... (b) meet the barrier distance threshold (if applicable)
               index_in_barrier <- integer(0)
-              if(!is.null(calc_distance_barrier)){
-                if(length(index_in_limit) > 0L){
-                  if(!is.null(calc_distance_barrier_limit)){
+              if (!is.null(calc_distance_barrier)) {
+                if (length(index_in_limit) > 0L) {
+                  if (!is.null(calc_distance_barrier_limit)) {
                     index_for_barrier <- which(tmp$dist_current > calc_distance_barrier_limit &
-                                                 tmp$dist_current <= calc_distance_limit)
-
+                      tmp$dist_current <= calc_distance_limit)
                   } else {
                     index_for_barrier <- seq_len(nrow(tmp))
                     index_for_barrier <- index_for_barrier[!(index_for_barrier %in% index_in_limit)]
                   }
                 } else {
-                  if(!is.null(calc_distance_barrier_limit)){
+                  if (!is.null(calc_distance_barrier_limit)) {
                     index_for_barrier <- which(tmp$dist_current > calc_distance_barrier_limit)
                   } else {
                     index_for_barrier <- seq_len(nrow(tmp))
                   }
                 }
-                if(length(index_for_barrier) > 0L){
+                if (length(index_for_barrier) > 0L) {
                   index_in_barrier <-
-                    which(segments_cross_barrier(start = bathy_xy[tmp$id_previous[index_for_barrier], , drop = FALSE],
-                                                 end = bathy_xy[tmp$id_current[index_for_barrier], , drop = FALSE],
-                                                 barrier = calc_distance_barrier,
-                                                 distance = calc_distance_barrier_grid,
-                                                 mobility = mob))
+                    which(segments_cross_barrier(
+                      start = bathy_xy[tmp$id_previous[index_for_barrier], , drop = FALSE],
+                      end = bathy_xy[tmp$id_current[index_for_barrier], , drop = FALSE],
+                      barrier = calc_distance_barrier,
+                      distance = calc_distance_barrier_grid,
+                      mobility = mob
+                    ))
                   index_in_barrier <- index_for_barrier[index_in_barrier]
                 }
               }
               # ... Define index of segments for LCP calculations
               index_in_cond <- c(index_in_limit, index_in_barrier)
-              if(length(index_in_cond) > 0L) index_in_cond <- unique(index_in_cond)
+              if (length(index_in_cond) > 0L) index_in_cond <- unique(index_in_cond)
               # ... Drop elements for which the previous and current cells are
               # ... ... already represented in 'tmp' with valid paths (that passed the checks above)
-              if(calc_distance_restrict){
-                if(length(index_in_cond) > 0L){
-                  tmp$recalc                <- FALSE
+              if (calc_distance_restrict) {
+                if (length(index_in_cond) > 0L) {
+                  tmp$recalc <- FALSE
                   tmp$recalc[index_in_cond] <- TRUE
-                  index_out_cond            <- !tmp$recalc
+                  index_out_cond <- !tmp$recalc
                   # This indexing approach is faster than filtering and Rcpp pf_contains()
                   # Referring to all cells is also much faster than unique(tmp$id_previous[index_out_cond]))
                   tmp$recalc[index_in_cond][
@@ -626,55 +669,71 @@ pf_simplify <- function(archive,
                 }
               }
               # ... Implement LCP calculations across selected or all segments as required
-              if(inherits(calc_distance_lcp_fast, "function")){
-                tmp$barrier                   <- 0L
+              if (inherits(calc_distance_lcp_fast, "function")) {
+                tmp$barrier <- 0L
                 tmp$barrier[index_in_barrier] <- 1L
                 tmp$dist_current <- calc_distance_lcp_fast(tmp$dist_current, tmp$barrier)
               } else {
-                if(!is.null(calc_distance_limit) | !is.null(calc_distance_barrier) | calc_distance_restrict){
-                  if(length(index_in_cond) == 0L) calc_distance_lcp <- FALSE
+                if (!is.null(calc_distance_limit) | !is.null(calc_distance_barrier) | calc_distance_restrict) {
+                  if (length(index_in_cond) == 0L) calc_distance_lcp <- FALSE
                 }
-                if(calc_distance_lcp){
-                  if(length(index_in_cond) > 0L){
+                if (calc_distance_lcp) {
+                  if (length(index_in_cond) > 0L) {
                     tmp$dist_current[index_in_cond] <-
-                      cppRouting::get_distance_pair(Graph = calc_distance_graph,
-                                                    from = tmp$id_previous[index_in_cond],
-                                                    to = tmp$id_current[index_in_cond],
-                                                    algorithm = calc_distance_algorithm,
-                                                    constant = calc_distance_constant,
-                                                    allcores = use_all_cores)
+                      cppRouting::get_distance_pair(
+                        Graph = calc_distance_graph,
+                        from = tmp$id_previous[index_in_cond],
+                        to = tmp$id_current[index_in_cond],
+                        algorithm = calc_distance_algorithm,
+                        constant = calc_distance_constant,
+                        allcores = use_all_cores
+                      )
                   } else {
                     tmp$dist_current <-
-                      cppRouting::get_distance_pair(Graph = calc_distance_graph,
-                                                    from = tmp$id_previous,
-                                                    to = tmp$id_current,
-                                                    algorithm = calc_distance_algorithm,
-                                                    constant = calc_distance_constant,
-                                                    allcores = use_all_cores)
+                      cppRouting::get_distance_pair(
+                        Graph = calc_distance_graph,
+                        from = tmp$id_previous,
+                        to = tmp$id_current,
+                        algorithm = calc_distance_algorithm,
+                        constant = calc_distance_constant,
+                        allcores = use_all_cores
+                      )
                   }
                 }
               }
 
 
               # Repeat filtration based on mobility_from_origin or mobility (copied from above)
-              if(!is.null(mob)) tmp <- tmp %>% dplyr::filter(.data$dist_current <= mob)
+              if (!is.null(mob)) tmp <- tmp %>% dplyr::filter(.data$dist_current <= mob)
 
               # Check there are remaining cells
               # ... If Euclidean distances have been used for sampling
               # ... it is not guaranteed that any particles will meet mobility_from_origin/mobility
               # ... criteria under if Euclidean distances used for sampling and LCPs used here
-              if((t - 1) == 1){
-                if(!is.null(mobility_from_origin))
-                  if(nrow(tmp) == 0)
-                    stop(paste0("No possible pairwise connections at time = ", t,
-                                " under shortest distances given 'mobility_from_origin'."),
-                         call. = FALSE)
+              if ((t - 1) == 1) {
+                if (!is.null(mobility_from_origin)) {
+                  if (nrow(tmp) == 0) {
+                    stop(
+                      paste0(
+                        "No possible pairwise connections at time = ", t,
+                        " under shortest distances given 'mobility_from_origin'."
+                      ),
+                      call. = FALSE
+                    )
+                  }
+                }
               } else {
-                if(!is.null(mobility))
-                  if(nrow(tmp) == 0)
-                    stop(paste0("No possible pairwise connections at time = ", t,
-                                " under shortest distances given 'mobility'."),
-                         call. = FALSE)
+                if (!is.null(mobility)) {
+                  if (nrow(tmp) == 0) {
+                    stop(
+                      paste0(
+                        "No possible pairwise connections at time = ", t,
+                        " under shortest distances given 'mobility'."
+                      ),
+                      call. = FALSE
+                    )
+                  }
+                }
               }
             }
 
@@ -687,17 +746,19 @@ pf_simplify <- function(archive,
             # ... ... (a) distances (and any other parameters in archival)
             # ... ... (b) intrinsic probabilities associated with cells (e.g., due to detection pr)
             # (a) Get probabilities based on movement
-            if((t - 1) == 1){
-              if(!is.null(mobility_from_origin))
-                tmp$pr_current <- calc_movement_pr_from_origin(tmp$dist_current, data[t-1, ])
-              else tmp$pr_current <- 1L
+            if ((t - 1) == 1) {
+              if (!is.null(mobility_from_origin)) {
+                tmp$pr_current <- calc_movement_pr_from_origin(tmp$dist_current, data[t - 1, ])
+              } else {
+                tmp$pr_current <- 1L
+              }
             } else {
-              tmp$pr_current   <- calc_movement_pr(tmp$dist_current, data[t-1, ])
+              tmp$pr_current <- calc_movement_pr(tmp$dist_current, data[t - 1, ])
             }
 
             # (b) Combine with 'intrinsic' probabilities in each cell
             tmp$pr_current_intrinsic <- raster::extract(layers_2, tmp$id_current)
-            tmp$pr_current           <- tmp$pr_current * tmp$pr_current_intrinsic
+            tmp$pr_current <- tmp$pr_current * tmp$pr_current_intrinsic
             tmp$pr_current_intrinsic <- NULL
           }
 
@@ -705,78 +766,84 @@ pf_simplify <- function(archive,
           tmp <- tmp %>% dplyr::filter(.data$pr_current > 0)
 
           ## Write dataframe to file (minimise memory requirements) or return
-          if(!is.null(write_history)){
+          if (!is.null(write_history)) {
             write_history$object <- tmp
-            write_history$file   <- paste0(write_history_dir_1, "pf_", t, ".rds")
+            write_history$file <- paste0(write_history_dir_1, "pf_", t, ".rds")
             do.call(saveRDS, write_history)
             return(NULL)
-          } else return(tmp)
+          } else {
+            return(tmp)
+          }
         })
         return(history_for_chunk)
       })
-      if(return == "path") cl_stop(cl)
+      if (return == "path") cl_stop(cl)
       history <- purrr::flatten(history_by_chunk)
 
       # ... (2) Method for pf outputs not derived via calc_distance_euclid_fast
     } else {
-
       #### write_history is not currently implemented for this option
-      if(!is.null(write_history))
+      if (!is.null(write_history)) {
         warning("write_history is not currently implemented for pf_archive objects not derived via the 'fast Euclidean distances' method.",
-                immediate. = TRUE, call. = FALSE)
+          immediate. = TRUE, call. = FALSE
+        )
+      }
       write_history <- NULL
 
       #### Add origin to history, if necessary
-      if(!is.null(origin)){
-        history[[1]]$timestep      <- 0
-        history[[1]]$id_previous   <- origin_cell_id
-        history[[1]]$pr_previous   <- 1
+      if (!is.null(origin)) {
+        history[[1]]$timestep <- 0
+        history[[1]]$id_previous <- origin_cell_id
+        history[[1]]$pr_previous <- 1
       }
 
       #### Update history with distances and probabilities of movement between connected cells
       cl_export(cl, varlist)
-      history <- pbapply::pblapply(1:length(history), cl = cl, function(t){
-
+      history <- pbapply::pblapply(1:length(history), cl = cl, function(t) {
         #### Get full suite of allowed cells from current time step
         layers_2 <- layers[[t]]
-        if(read_layers) layers_2 <- raster::raster(layers_2)
+        if (read_layers) layers_2 <- raster::raster(layers_2)
 
         #### Get history for time t
         d <- history[[t]]
         d$timestep <- t
 
         #### Calculate distances between connected cells
-        if(!rlang::has_name(d, "id_previous")){
+        if (!rlang::has_name(d, "id_previous")) {
           d$dist_current <- NA
-          d$pr_current   <- 1
+          d$pr_current <- 1
         } else {
-          d[, c("id_previous_x", "id_previous_y")]  <- raster::xyFromCell(layers_2, d$id_previous)
-          d[, c("id_current_x", "id_current_y")]    <- raster::xyFromCell(layers_2, d$id_current)
-          if(calc_distance == "euclid"){
+          d[, c("id_previous_x", "id_previous_y")] <- raster::xyFromCell(layers_2, d$id_previous)
+          d[, c("id_current_x", "id_current_y")] <- raster::xyFromCell(layers_2, d$id_current)
+          if (calc_distance == "euclid") {
             d$dist_current <-
               raster::pointDistance(d[, c("id_previous_x", "id_previous_y")],
-                                    d[, c("id_current_x", "id_current_y")], lonlat = FALSE)
-          } else if(calc_distance == "lcp"){
+                d[, c("id_current_x", "id_current_y")],
+                lonlat = FALSE
+              )
+          } else if (calc_distance == "lcp") {
             # Calculate LCPs
-            d$dist_current <- cppRouting::get_distance_pair(Graph = calc_distance_graph,
-                                                            from = d$id_previous,
-                                                            to = d$id_current,
-                                                            algorithm = calc_distance_algorithm,
-                                                            constant = calc_distance_constant,
-                                                            allcores = use_all_cores)
+            d$dist_current <- cppRouting::get_distance_pair(
+              Graph = calc_distance_graph,
+              from = d$id_previous,
+              to = d$id_current,
+              algorithm = calc_distance_algorithm,
+              constant = calc_distance_constant,
+              allcores = use_all_cores
+            )
             # Filter movements that exceed mobility_from_origin/mobility
-            if(t == 1) {
-              if(!is.null(mobility_from_origin)) d <- d %>% dplyr::filter(.data$dist_current <= mobility_from_origin)
+            if (t == 1) {
+              if (!is.null(mobility_from_origin)) d <- d %>% dplyr::filter(.data$dist_current <= mobility_from_origin)
             } else {
-              if(!is.null(mobility)) d <- d %>% dplyr::filter(.data$dist_current <= mobility)
+              if (!is.null(mobility)) d <- d %>% dplyr::filter(.data$dist_current <= mobility)
             }
           }
         }
 
         #### Re-calculate probabilities associated with movement into cells
         ## Get movement probabilities from distances between connected cells
-        if(t == 1){
-          if(is.null(origin)){
+        if (t == 1) {
+          if (is.null(origin)) {
             d$pr_current <- 1
           } else {
             d$pr_current <- calc_movement_pr_from_origin(d$dist_current, data[1, ])
@@ -790,7 +857,7 @@ pf_simplify <- function(archive,
         d <- d %>% dplyr::filter(.data$pr_current > 0)
         return(d)
       })
-      if(return == "path") cl_stop(cl)
+      if (return == "path") cl_stop(cl)
     }
 
 
@@ -799,42 +866,48 @@ pf_simplify <- function(archive,
 
     #### Select the subset of cells at each time step that are connected to past positions
     cat_to_console("... ... Identifying connected cells...")
-    if(!is.null(write_history)) {
+    if (!is.null(write_history)) {
       history_files <- pf_access_history_files(write_history_dir_1)
       history_files <- history <- lapply(history_files, function(x) x)
     }
     len_history <- length(history)
-    if(!is.null(write_history)) history[[len_history]] <- readRDS(history_files[[len_history]])
-    if(len_history > 5) pb <- pbapply::startpb(min = 2, max = len_history - 2)
-    for(t in len_history:2){
+    if (!is.null(write_history)) history[[len_history]] <- readRDS(history_files[[len_history]])
+    if (len_history > 5) pb <- pbapply::startpb(min = 2, max = len_history - 2)
+    for (t in len_history:2) {
       # t = len_history
-      if(!is.null(write_history)) history[[t - 1]] <- readRDS(history_files[[t - 1]])
+      if (!is.null(write_history)) history[[t - 1]] <- readRDS(history_files[[t - 1]])
       history[[t - 1]] <-
         history[[t - 1]] %>%
         dplyr::filter(.data$id_current %in% history[[t]]$id_previous)
-      if(nrow(history[[t - 1]]) == 0) stop(paste0("There are no connected cells at time = ", t-1,
-                                                  " (given cells at time = ", t, ")."),
-                                           call. = FALSE)
-      if(!is.null(write_history)) {
+      if (nrow(history[[t - 1]]) == 0) {
+        stop(
+          paste0(
+            "There are no connected cells at time = ", t - 1,
+            " (given cells at time = ", t, ")."
+          ),
+          call. = FALSE
+        )
+      }
+      if (!is.null(write_history)) {
         write_history$object <- history[[t - 1]]
-        write_history$file   <- paste0(write_history_dir_2, "pf_", t-1, ".rds")
+        write_history$file <- paste0(write_history_dir_2, "pf_", t - 1, ".rds")
         do.call(saveRDS, write_history)
         history[[t + 1]] <- NA
       }
-      if(len_history > 5) pbapply::setpb(pb, len_history - t)
+      if (len_history > 5) pbapply::setpb(pb, len_history - t)
     }
-    if(len_history > 5) pbapply::closepb(pb)
-
+    if (len_history > 5) pbapply::closepb(pb)
   } else {
-    if(!is.null(write_history)){
+    if (!is.null(write_history)) {
       warning("'write_history' is not currently implemented for this option.",
-              immediate. = TRUE, call. = FALSE)
+        immediate. = TRUE, call. = FALSE
+      )
       write_history <- NULL
     }
   }
 
   #### List updated history files for processing (for return = 'archive' or 'path')
-  if(!is.null(write_history)) {
+  if (!is.null(write_history)) {
     history_files <- pf_access_history_files(write_history_dir_2)
     history_files <- history <- lapply(history_files, function(x) x)
   }
@@ -843,62 +916,68 @@ pf_simplify <- function(archive,
   ########################################
   #### Process selected particles (if specified)
 
-  if(return == "archive"){
+  if (return == "archive") {
     cat_to_console("... ... Processing connected cells for return = 'archive'...")
-    if(is.null(cl)) {
+    if (is.null(cl)) {
       chunks <- 1L
     } else {
-      if(inherits(cl, "cluster")) chunks <- length(cl) else chunks <- cl
+      if (inherits(cl, "cluster")) chunks <- length(cl) else chunks <- cl
     }
     t_vec <- seq_len(length(history))
     t_ind_by_chunk <- parallel::splitIndices(length(t_vec), chunks)
-    history_by_chunk <- pbapply::pblapply(t_ind_by_chunk, cl = cl, function(t_ind_for_chunk){
+    history_by_chunk <- pbapply::pblapply(t_ind_by_chunk, cl = cl, function(t_ind_for_chunk) {
       t_vec_for_chunk <- t_vec[t_ind_for_chunk]
       history_for_chunk <-
-        lapply(t_vec_for_chunk, function(t){
+        lapply(t_vec_for_chunk, function(t) {
           history_for_t <- history[[t]]
-          if(!is.null(write_history)) history_for_t <- readRDS(history_for_t)
+          if (!is.null(write_history)) history_for_t <- readRDS(history_for_t)
           history_for_t <-
             history_for_t %>%
             dplyr::group_by(.data$id_current) %>%
             dplyr::arrange(.data$id_current, dplyr::desc(.data$pr_current))
-          if(!is.null(summarise_pr)){
-            if(inherits(summarise_pr, "function")){
+          if (!is.null(summarise_pr)) {
+            if (inherits(summarise_pr, "function")) {
               history_for_t <-
                 history_for_t %>%
                 dplyr::mutate(pr_current = summarise_pr(.data$pr_current)) %>%
                 dplyr::slice(1L)
-            } else if(inherits(summarise_pr, "logical")){
-              if(summarise_pr){
+            } else if (inherits(summarise_pr, "logical")) {
+              if (summarise_pr) {
                 denom <- sum(history_for_t$pr_current)
                 history_for_t <-
                   history_for_t %>%
-                  dplyr::mutate(pr_current = .data$pr_current/denom) %>%
+                  dplyr::mutate(pr_current = .data$pr_current / denom) %>%
                   dplyr::mutate(pr_current = sum(.data$pr_current)) %>%
                   dplyr::ungroup() %>%
                   dplyr::group_by(.data$id_current) %>%
                   dplyr::slice(1L)
               }
-            } else stop("Implementation of 'summarise_pr' unrecognised: only functions or logical inputs are allowed.",
-                        call. = FALSE)
+            } else {
+              stop("Implementation of 'summarise_pr' unrecognised: only functions or logical inputs are allowed.",
+                call. = FALSE
+              )
+            }
           }
           history_for_t <-
             history_for_t %>%
             dplyr::ungroup() %>%
             data.frame()
-          history_for_t[, colnames(history_for_t)[colnames(history_for_t) %in% c("id_previous", "pr_previous",
-                                                                                 "id_current", "pr_current",
-                                                                                 "timestep",
-                                                                                 "dist_current")]]
+          history_for_t[, colnames(history_for_t)[colnames(history_for_t) %in% c(
+            "id_previous", "pr_previous",
+            "id_current", "pr_current",
+            "timestep",
+            "dist_current"
+          )]]
           return(history_for_t)
         })
       return(history_for_chunk)
     })
     cl_stop(cl)
     history <- purrr::flatten(history_by_chunk)
-    archive_for_connected_cells <- list(history = history,
-                                        method = "pf_simplify",
-                                        args = archive$args
+    archive_for_connected_cells <- list(
+      history = history,
+      method = "pf_simplify",
+      args = archive$args
     )
     class(archive_for_connected_cells) <- c(class(archive_for_connected_cells), "pf_archive")
     out <- archive_for_connected_cells
@@ -906,54 +985,54 @@ pf_simplify <- function(archive,
 
     ########################################
     #### Assemble and format paths (if specified)
-
-  } else if(return == "path"){
-
+  } else if (return == "path") {
     #### Assemble paths
     cat_to_console("... Assembling paths...")
     path <- list()
-    if(!is.null(write_history)) history[[1]] <- readRDS(history_files[[1]])
+    if (!is.null(write_history)) history[[1]] <- readRDS(history_files[[1]])
     path[[1]] <- history[[1]]
     path[[1]]$id_1 <- path[[1]]$id_current
     path[[1]]$pr_1 <- path[[1]]$pr_current
     path[[1]]$dist_1 <- path[[1]]$dist_current
     path[[1]] <- path[[1]][, c("id_1", "pr_1", "dist_1", "id_current")]
     pb <- pbapply::startpb(min = 2, max = length(history) - 1)
-    for(t in 1:(length(history) - 1)){
-      if(!is.null(write_history)) history[[t + 1]] <- readRDS(history_files[[t + 1]])
+    for (t in 1:(length(history) - 1)) {
+      if (!is.null(write_history)) history[[t + 1]] <- readRDS(history_files[[t + 1]])
       history_for_pair <- dplyr::inner_join(path[[t]], history[[t + 1]], by = c("id_current" = "id_previous"))
       history_for_pair <- dplyr::distinct(history_for_pair)
-      if(!is.null(max_n_copies)){
+      if (!is.null(max_n_copies)) {
         history_for_pair <-
           history_for_pair %>%
           dplyr::group_by(.data$id_current.y) %>%
           dplyr::arrange(dplyr::desc(.data$pr_current))
-        if(max_n_copies_sampler == "random"){
+        if (max_n_copies_sampler == "random") {
           history_for_pair <- history_for_pair %>% dplyr::slice_sample(n = max_n_copies, replace = TRUE)
-        } else if(max_n_copies_sampler == "weighted"){
+        } else if (max_n_copies_sampler == "weighted") {
           history_for_pair <- history_for_pair %>% dplyr::slice_sample(n = max_n_copies, weight_by = .data$pr_current, replace = TRUE)
-        } else if(max_n_copies_sampler == "max"){
+        } else if (max_n_copies_sampler == "max") {
           history_for_pair <- history_for_pair %>% dplyr::slice(1:max_n_copies)
         }
       }
-      if(!is.null(max_n_paths)){
-        if(nrow(history_for_pair) > max_n_paths){
+      if (!is.null(max_n_paths)) {
+        if (nrow(history_for_pair) > max_n_paths) {
           history_for_pair <- history_for_pair %>% dplyr::slice_sample(n = max_n_paths, replace = TRUE)
         }
       }
-      history_for_pair[, paste0("id_", t+1)]  <- history_for_pair$id_current.y
-      history_for_pair[, paste0("pr_", t+1)]  <- history_for_pair$pr_current
-      history_for_pair[, paste0("dist_", t+1)]  <- history_for_pair$dist_current
+      history_for_pair[, paste0("id_", t + 1)] <- history_for_pair$id_current.y
+      history_for_pair[, paste0("pr_", t + 1)] <- history_for_pair$pr_current
+      history_for_pair[, paste0("dist_", t + 1)] <- history_for_pair$dist_current
       history_for_pair[, "id_current"] <- history_for_pair$id_current.y
-      keep <- c(colnames(path[[t]])[!(colnames(path[[t]]) %in% c("id_current", "dist"))],
-                paste0("id_", t+1), paste0("pr_", t+1), paste0("dist_", t+1),
-                "id_current")
+      keep <- c(
+        colnames(path[[t]])[!(colnames(path[[t]]) %in% c("id_current", "dist"))],
+        paste0("id_", t + 1), paste0("pr_", t + 1), paste0("dist_", t + 1),
+        "id_current"
+      )
       history_for_pair <- history_for_pair[, keep]
-      path[[t+1]] <- history_for_pair
-      if(!is.null(write_history)){
-        if(t > 2){
-          path[[t-2]]    <- NA
-          history[[t-2]] <- NA
+      path[[t + 1]] <- history_for_pair
+      if (!is.null(write_history)) {
+        if (t > 2) {
+          path[[t - 2]] <- NA
+          history[[t - 2]] <- NA
         }
       }
       pbapply::setpb(pb, t)
@@ -966,23 +1045,26 @@ pf_simplify <- function(archive,
     #### Reformat paths
     # Reformat paths into a list of dataframes, one for each path, containing the path id, cell id and cell pr
     cat_to_console("... Formatting paths...")
-    path_ls <- pbapply::pblapply(1:nrow(paths), function(i){
+    path_ls <- pbapply::pblapply(1:nrow(paths), function(i) {
       d <- paths[i, ]
       # colnames(d)[seq(1, ncol(d), by = 3)]
       # colnames(d)[seq(2, ncol(d), by = 3)]
       # colnames(d)[seq(3, ncol(d), by = 3)]
-      dat_for_path <- data.frame(path_id = i,
-                                 timestep = 1:(ncol(d)/3),
-                                 cell_id = as.integer(d[seq(1, ncol(d), by = 3)]),
-                                 cell_pr = as.numeric(d[seq(2, ncol(d), by = 3)]),
-                                 dist = as.numeric(d[seq(3, ncol(d), by = 3)])
+      dat_for_path <- data.frame(
+        path_id = i,
+        timestep = 1:(ncol(d) / 3),
+        cell_id = as.integer(d[seq(1, ncol(d), by = 3)]),
+        cell_pr = as.numeric(d[seq(2, ncol(d), by = 3)]),
+        dist = as.numeric(d[seq(3, ncol(d), by = 3)])
       )
-      if(!is.null(origin) & add_origin){
-        d_origin <- data.frame(path_id = i,
-                               timestep = 0,
-                               cell_id = origin_cell_id,
-                               cell_pr = 1,
-                               dist = NA)
+      if (!is.null(origin) & add_origin) {
+        d_origin <- data.frame(
+          path_id = i,
+          timestep = 0,
+          cell_id = origin_cell_id,
+          cell_pr = 1,
+          dist = NA
+        )
         dat_for_path <- rbind(d_origin, dat_for_path)
       }
       return(dat_for_path)
@@ -992,13 +1074,15 @@ pf_simplify <- function(archive,
     cat_to_console("... Adding cell coordinates and depths...")
     path_df <- do.call(rbind, path_ls)
     path_df[, c("cell_x", "cell_y")] <- raster::xyFromCell(layers_1, path_df$cell_id)
-    if(!is.null(origin) & add_origin){
+    if (!is.null(origin) & add_origin) {
       path_df[path_df$timestep == 0, "cell_x"] <- origin[1]
       path_df[path_df$timestep == 0, "cell_y"] <- origin[2]
     }
-    if(!is.null(bathy)) {
+    if (!is.null(bathy)) {
       path_df[, "cell_z"] <- raster::extract(bathy, path_df[, c("cell_x", "cell_y")])
-    } else path_df[, "cell_z"] <- NA
+    } else {
+      path_df[, "cell_z"] <- NA
+    }
     path_df <- path_df[, c("path_id", "timestep", "cell_id", "cell_x", "cell_y", "cell_z", "cell_pr", "dist")]
     class(path_df) <- c(class(path_df), "pf_path")
     out <- path_df

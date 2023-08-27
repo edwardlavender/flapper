@@ -56,25 +56,29 @@ For coupled simulation--analysis workflows (such as \code{\link[flapper]{sim_arr
 \examples{
 #### Example (1): Simulate an array using default parameters
 # ... And force reproducible simulations by defining the seed
-array <- sim_array(boundaries = raster::extent(-10, 10, -10, 10),
-                   seed = 1)
+array <- sim_array(
+  boundaries = raster::extent(-10, 10, -10, 10),
+  seed = 1
+)
 
 #### Example (2): Simulate coastline and customise plot
 # ... via add_land and add_sea
-array <- sim_array(boundaries = raster::extent(-10, 10, -10, 10),
-                   coastline = "simple_random",
-                   add_land = list(col = "darkgreen"),
-                   add_sea = list(col = scales::alpha("skyblue", 0.2)),
-                   seed = 1
-                   )
+array <- sim_array(
+  boundaries = raster::extent(-10, 10, -10, 10),
+  coastline = "simple_random",
+  add_land = list(col = "darkgreen"),
+  add_sea = list(col = scales::alpha("skyblue", 0.2)),
+  seed = 1
+)
 
 #### Example (3): Add custom coastline
-array <- sim_array(boundaries = raster::extent(dat_coast),
-                   coastline = dat_coast,
-                   add_land = list(col = "darkgreen"),
-                   add_sea = list(col = scales::alpha("skyblue", 0.2)),
-                   seed = 1
-                   )
+array <- sim_array(
+  boundaries = raster::extent(dat_coast),
+  coastline = dat_coast,
+  add_land = list(col = "darkgreen"),
+  add_sea = list(col = scales::alpha("skyblue", 0.2)),
+  seed = 1
+)
 
 #### Example (4): Change the number of receivers
 array <- sim_array(n_receivers = 5)
@@ -90,30 +94,37 @@ array <- sim_array(n_receivers = 25, arrangement = "nonaligned")
 array <- sim_array(n_receivers = 25, arrangement = "hexagonal")
 ## Force arrangements around coastline
 # Simulated island
-array <- sim_array(n_receivers = 25,
-                   coastline = "simple_random",
-                   arrangement = "regular",
-                   add_land = list())
+array <- sim_array(
+  n_receivers = 25,
+  coastline = "simple_random",
+  arrangement = "regular",
+  add_land = list()
+)
 # Real coastline
-array <- sim_array(boundaries = raster::extent(dat_coast),
-                   n_receivers = 25,
-                   coastline = dat_coast,
-                   arrangement = "regular",
-                   add_land = list())
+array <- sim_array(
+  boundaries = raster::extent(dat_coast),
+  n_receivers = 25,
+  coastline = dat_coast,
+  arrangement = "regular",
+  add_land = list()
+)
 ## Incorporate custom arrangements
 # Define receiver locations as a SpatialPoints object with a UTM CRS
 # ... to match other spatial datasets
 proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-                        proj_wgs84)
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+xy <- sp::SpatialPoints(
+  dat_moorings[, c("receiver_long", "receiver_lat")],
+  proj_wgs84
+)
 xy <- sp::spTransform(xy, proj_utm)
 # Make array
-array <- sim_array(boundaries = raster::extent(dat_coast),
-                   coastline = dat_coast,
-                   arrangement = xy,
-                   add_land = list()
-                   )
+array <- sim_array(
+  boundaries = raster::extent(dat_coast),
+  coastline = dat_coast,
+  arrangement = xy,
+  add_land = list()
+)
 
 }
 \seealso{

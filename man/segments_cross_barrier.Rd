@@ -54,18 +54,26 @@ barrier <- sf::st_as_sf(dat_coast)
 #### Example (1): Implement function using barrier only
 
 ## Define example starting and ending locations
-start <- matrix(c(701854.9, 6260399,
-                  709202.5, 6258892), ncol = 2, byrow = TRUE)
-end <- matrix(c(706753.3, 6264261,
-                709673.5, 6257102), ncol = 2, byrow = TRUE)
+start <- matrix(c(
+  701854.9, 6260399,
+  709202.5, 6258892
+), ncol = 2, byrow = TRUE)
+end <- matrix(c(
+  706753.3, 6264261,
+  709673.5, 6257102
+), ncol = 2, byrow = TRUE)
 
 ## Visualise segments
 # ... The first segment crosses the coastline (our barrier)
 # ... The second segment does not cross the coastline (our barrier)
-graphics::arrows(x0 = start[1, 1], y0 = start[1, 2],
-                 x1 = end[1, 1], y1 = end[1, 2])
-graphics::arrows(x0 = start[2, 1], y0 = start[2, 2],
-                 x1 = end[2, 1], y1 = end[2, 2])
+graphics::arrows(
+  x0 = start[1, 1], y0 = start[1, 2],
+  x1 = end[1, 1], y1 = end[1, 2]
+)
+graphics::arrows(
+  x0 = start[2, 1], y0 = start[2, 2],
+  x1 = end[2, 1], y1 = end[2, 2]
+)
 
 ## Implement function
 segments_cross_barrier(start, end, barrier = barrier)
@@ -77,25 +85,29 @@ dat_dist <- raster::rasterize(dat_coast, dat_gebco)
 dat_dist <- raster::distance(dat_dist)
 
 ## Implement function for a specified mobility parameter
-segments_cross_barrier(start, end, barrier = barrier,
-                       distance = dat_dist, mobility = 500)
+segments_cross_barrier(start, end,
+  barrier = barrier,
+  distance = dat_dist, mobility = 500
+)
 
 #### Example (3): With many locations, supplying distance improves speed
 
 ## Sample a large number of random starting/ending locations
 start <- raster::sampleRandom(dat_gebco, size = 3000, xy = TRUE)[, 1:2]
-end   <- raster::sampleRandom(dat_gebco, size = 3000, xy = TRUE)[, 1:2]
+end <- raster::sampleRandom(dat_gebco, size = 3000, xy = TRUE)[, 1:2]
 
 ## Compare the duration of the function without/with distance included
 # The first method without distance is much slower than the second method
 # (~0.714 s versus 0.131 s for 3000 locations)
 system.time(
   int_1 <- segments_cross_barrier(start, end, barrier = barrier)
-  )
+)
 system.time(
-  int_2 <- segments_cross_barrier(start, end, barrier = barrier,
-                                  distance = dat_dist, mobility = 500)
+  int_2 <- segments_cross_barrier(start, end,
+    barrier = barrier,
+    distance = dat_dist, mobility = 500
   )
+)
 
 ## The two approaches return identical solutions:
 identical(int_1, int_2)

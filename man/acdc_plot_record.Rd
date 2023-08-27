@@ -79,79 +79,88 @@ dat_acdc <- acdc_simplify(dat_acdc)
 acdc_plot_record(record = dat_acdc)
 
 #### Example (2): Define the number of plots to be produced and control the plotting window
-acdc_plot_record(record = dat_acdc,
-                 plot = 1:2,
-                 par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)))
+acdc_plot_record(
+  record = dat_acdc,
+  plot = 1:2,
+  par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8))
+)
 
 #### Example (3): Add and customise spatial information via add_* args
 ## Define a SpatialPoints object of receiver locations
 proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 rsp <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 rsp <- sp::spTransform(rsp, proj_utm)
 ## Plot with receiver locations and coastline, customise the containers and the raster
-acdc_plot_record(record = dat_acdc,
-                 add_coastline = list(x = dat_coast, col = "darkgreen"),
-                 add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-                 add_containers = list(col = "red"),
-                 add_raster = list(col = rev(topo.colors(100)))
-                 )
+acdc_plot_record(
+  record = dat_acdc,
+  add_coastline = list(x = dat_coast, col = "darkgreen"),
+  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
+  add_containers = list(col = "red"),
+  add_raster = list(col = rev(topo.colors(100)))
+)
 
 #### Example (4): Control axis properties
 # ... via smallplot argument for raster, pretty_axis_args, xlim, ylim and fix_zlim
 # ... set crop_spatial = TRUE to crop spatial data within adjusted limits
-acdc_plot_record(record = dat_acdc,
-                 add_coastline = list(x = dat_coast, col = "darkgreen"),
-                 add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-                 add_containers = list(col = "red"),
-                 add_raster = list(smallplot= c(0.85, 0.9, 0.25, 0.75)),
-                 crop_spatial = TRUE,
-                 pretty_axis_args = list(side = 1:4,
-                                         control_sci_notation =
-                                           list(magnitude = 16L, digits = 0)),
-                 xlim = raster::extent(dat_coast)[1:2],
-                 ylim = raster::extent(dat_coast)[3:4],
-                 fix_zlim = c(0, 1)
-                 )
+acdc_plot_record(
+  record = dat_acdc,
+  add_coastline = list(x = dat_coast, col = "darkgreen"),
+  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
+  add_containers = list(col = "red"),
+  add_raster = list(smallplot = c(0.85, 0.9, 0.25, 0.75)),
+  crop_spatial = TRUE,
+  pretty_axis_args = list(
+    side = 1:4,
+    control_sci_notation =
+      list(magnitude = 16L, digits = 0)
+  ),
+  xlim = raster::extent(dat_coast)[1:2],
+  ylim = raster::extent(dat_coast)[3:4],
+  fix_zlim = c(0, 1)
+)
 
 #### Example (5): Modify each plot after it is produced via add_additional
 # Specify a function to add titles to a plot
-add_titles <- function(){
+add_titles <- function() {
   mtext(side = 1, "x (UTM)", line = 2)
   mtext(side = 2, "y (UTM)", line = -8)
 }
 # Make plots with added titles
-acdc_plot_record(record = dat_acdc,
-                 plot = 1:2,
-                 par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)),
-                 add_coastline = list(x = dat_coast, col = "darkgreen"),
-                 add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-                 add_containers = list(col = "red"),
-                 add_raster = list(),
-                 crop_spatial = TRUE,
-                 xlim = raster::extent(dat_coast)[1:2],
-                 ylim = raster::extent(dat_coast)[3:4],
-                 add_additional = add_titles
-                 )
+acdc_plot_record(
+  record = dat_acdc,
+  plot = 1:2,
+  par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)),
+  add_coastline = list(x = dat_coast, col = "darkgreen"),
+  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
+  add_containers = list(col = "red"),
+  add_raster = list(),
+  crop_spatial = TRUE,
+  xlim = raster::extent(dat_coast)[1:2],
+  ylim = raster::extent(dat_coast)[3:4],
+  add_additional = add_titles
+)
 
 #### Example (6) Save plots via png_param
 list.files(tempdir())
-acdc_plot_record(record = dat_acdc,
-                 plot = 1:2,
-                 png_param = list(filename = tempdir())
-                 )
+acdc_plot_record(
+  record = dat_acdc,
+  plot = 1:2,
+  png_param = list(filename = tempdir())
+)
 list.files(tempdir())
 
 #### Example (7) To plot the overall map, you can also just use a
 # ... a raster plotting function like prettyGraphics::pretty_map()
 ext <- update_extent(raster::extent(dat_coast), -1000)
-prettyGraphics::pretty_map(x = ext,
-                           add_rasters = list(x = dat_acdc$map),
-                           add_points = list(x = rsp, pch = "*", col = "red"),
-                           add_polys = list(x = dat_coast, col = "lightgreen"),
-                           crop_spatial = TRUE,
-                           xlab = "Easting", ylab = "Northing"
-                           )
+prettyGraphics::pretty_map(
+  x = ext,
+  add_rasters = list(x = dat_acdc$map),
+  add_points = list(x = rsp, pch = "*", col = "red"),
+  add_polys = list(x = dat_coast, col = "lightgreen"),
+  crop_spatial = TRUE,
+  xlab = "Easting", ylab = "Northing"
+)
 
 }
 \seealso{

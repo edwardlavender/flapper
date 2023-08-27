@@ -81,13 +81,19 @@ summary(dc_summary)
 acdc_plot_record(dc_summary)
 ## Examine overall map via a raster* plotting function
 # Each cell shows expected proportion of time steps spent in each cell
-prettyGraphics::pretty_map(add_rasters = list(x = dc_summary$map),
-                           add_polys = list(x = dat_coast))
+prettyGraphics::pretty_map(
+  add_rasters = list(x = dc_summary$map),
+  add_polys = list(x = dat_coast)
+)
 # Convert counts on map to percentages
-prettyGraphics::pretty_map(add_rasters =
-                             list(x = dc_summary$map/nrow(depth) * 100,
-                                  zlim = c(0, 100)),
-                           add_polys = list(x = dat_coast))
+prettyGraphics::pretty_map(
+  add_rasters =
+    list(
+      x = dc_summary$map / nrow(depth) * 100,
+      zlim = c(0, 100)
+    ),
+  add_polys = list(x = dat_coast)
+)
 # Check for occasions when the individual's depth was not consistent
 # ... with the depth data for the area and the depth error e.g., possibly
 # ... due to movement beyond this area:
@@ -98,19 +104,21 @@ any(do.call(rbind, lapply(dc_summary$record, function(elm) elm$dat))$availabilit
 # ... tag error
 # ... tidal range
 # ... a depth-dependent bathymetry error
-cde <- function(depth){
-  e <- 4.77 + 2.5 + sqrt(0.5 ^2 + (0.013 * depth)^2)
+cde <- function(depth) {
+  e <- 4.77 + 2.5 + sqrt(0.5^2 + (0.013 * depth)^2)
   e <- matrix(c(-e, e), nrow = 2)
   return(e)
-  }
+}
 # Vectorise function over depths (essential)
 cde <- Vectorize(cde)
 ## Implement algorithm with  depth-dependent error
 out_dc <- dc(archival = depth, bathy = dat_gebco, calc_depth_error = cde)
 
 #### Example (3): Write timestep-specific maps of allowed positions to file
-out_dc <- dc(archival = depth, bathy = dat_gebco,
-             write_record_spatial_for_pf = list(filename = tempdir()))
+out_dc <- dc(
+  archival = depth, bathy = dat_gebco,
+  write_record_spatial_for_pf = list(filename = tempdir())
+)
 list.files(tempdir())
 
 #### Example (4): Implement the algorithm in parallel
@@ -119,42 +127,50 @@ list.files(tempdir())
 at1 <- Sys.time()
 cl <- parallel::makeCluster(2L)
 parallel::clusterEvalQ(cl = cl, library(raster))
-out_dc <- dc(archival = depth,
-             bathy = dat_gebco,
-             plot_ts = FALSE,
-             split = 1,
-             cl = cl)
+out_dc <- dc(
+  archival = depth,
+  bathy = dat_gebco,
+  plot_ts = FALSE,
+  split = 1,
+  cl = cl
+)
 at2 <- Sys.time()
 # Approach (2)
 bt1 <- Sys.time()
 cl <- parallel::makeCluster(2L)
 parallel::clusterEvalQ(cl = cl, library(raster))
-out_dc <- dc(archival = depth,
-             bathy = dat_gebco,
-             plot_ts = FALSE,
-             split = 5,
-             cl = cl)
+out_dc <- dc(
+  archival = depth,
+  bathy = dat_gebco,
+  plot_ts = FALSE,
+  split = 5,
+  cl = cl
+)
 bt2 <- Sys.time()
 # Compare timings
 difftime(at2, at1)
 difftime(bt2, bt1)
 
 #### Example (5): Write messages to file via con
-out_dc <- dc(archival = depth, bathy = dat_gebco,
-             con = paste0(tempdir(), "/dc_log.txt"))
+out_dc <- dc(
+  archival = depth, bathy = dat_gebco,
+  con = paste0(tempdir(), "/dc_log.txt")
+)
 readLines(paste0(tempdir(), "/dc_log.txt"))
 
 #### Example (6) Compare an automated vs. manual implementation of DC
 
 ## (A) Compare step-wise results for randomly select time steps
 # Implement algorithm (using default calc_depth_error)
-out_dc <- dc(archival = depth,
-             bathy = dat_gebco,
-             save_record_spatial = NULL)
+out_dc <- dc(
+  archival = depth,
+  bathy = dat_gebco,
+  save_record_spatial = NULL
+)
 # Compare results for randomly selected time steps to manual implementation
 # ... with the same simple calc_depth_error model
 pp <- graphics::par(mfrow = c(5, 2))
-for(i in sample(1:nrow(depth), 5)){
+for (i in sample(1:nrow(depth), 5)) {
   # Extract map created via dc()
   raster::plot(out_dc$archive[[1]]$record[[i]]$spatial[[1]]$map_timestep)
   # Compare to manual creation of map
@@ -164,15 +180,17 @@ graphics::par(pp)
 
 ## (B) Compare the chunk-wise results and manual implementation
 # Implement algorithm chunk-wise
-out_dc <- dc(archival = depth,
-             bathy = dat_gebco,
-             save_record_spatial = NULL,
-             split = 10L)
+out_dc <- dc(
+  archival = depth,
+  bathy = dat_gebco,
+  save_record_spatial = NULL,
+  split = 10L
+)
 # Get overall map via acdc_simplify()
 map_1 <- acdc_simplify(out_dc, type = "dc", mask = dat_gebco)$map
 # Get overall map via a simple custom approach
 map_2 <- raster::setValues(dat_gebco, 0)
-for(i in 1:nrow(depth)){
+for (i in 1:nrow(depth)) {
   map_2 <- map_2 + (dat_gebco >= depth$depth[i] - 2.5 & dat_gebco <= depth$depth[i] + 2.5)
 }
 map_2 <- raster::mask(map_2, dat_gebco)

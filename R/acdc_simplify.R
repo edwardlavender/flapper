@@ -21,12 +21,11 @@ acdc_simplify <- function(archive,
                           mask = NULL,
                           normalise = TRUE,
                           keep_chunks = FALSE) {
-
   #### Checks
-  if(!(inherits(archive, "acdc_archive") | !inherits(archive, "acdc_record"))){
+  if (!(inherits(archive, "acdc_archive") | !inherits(archive, "acdc_record"))) {
     stop("Object of class 'acdc_archive' expected.")
   }
-  if(inherits(archive, "acdc_record")) {
+  if (inherits(archive, "acdc_record")) {
     message("class(archive) == 'acdc_record': 'archive' returned unchanged.")
     return(archive)
   }
@@ -37,46 +36,44 @@ acdc_simplify <- function(archive,
   out <- list(map = NULL, record = NULL, time = archive$time, args = archive$args, chunks = NULL, simplify = TRUE)
 
   #### Keep chunk-specific information (unchanged), if requested
-  if(keep_chunks) out$chunks <- archive$archive
+  if (keep_chunks) out$chunks <- archive$archive
 
   #### Simplify extract outputs the algorithm has only been implemented for a single chunk
-  if(length(archive$archive) == 1){
-
-    out$map    <- archive$archive[[1]]$map
+  if (length(archive$archive) == 1) {
+    out$map <- archive$archive[[1]]$map
     out$record <- archive$archive[[1]]$record
 
     #### Otherwise aggregate information across chunks
-  } else{
-
+  } else {
     #### Get a list of the cumulative maps from each chunk (to be summed below)
     maps <- lapply(archive$archive, function(chunk) chunk$map)
 
     #### Process spatial elements so that 'map_cumulative' elements are carried forward (summed) across chunks, if necessary
     try_update_spatial <- TRUE
-    if(!raster::inMemory(maps[[1]])){
-      if(!file.exists(maps[[1]]@file@name)) try_update_spatial <- FALSE
+    if (!raster::inMemory(maps[[1]])) {
+      if (!file.exists(maps[[1]]@file@name)) try_update_spatial <- FALSE
     }
-    if(!is.null(archive$args)){
-      if(isTRUE(archive$args$save_record_spatial == 0)) try_update_spatial <- FALSE
+    if (!is.null(archive$args)) {
+      if (isTRUE(archive$args$save_record_spatial == 0)) try_update_spatial <- FALSE
     }
-    if(try_update_spatial){
+    if (try_update_spatial) {
       archive$archive <-
-        lapply(1:length(archive$archive), function(chunk_id){
+        lapply(1:length(archive$archive), function(chunk_id) {
           # chunk_id <- 2
           folder <- archive$archive[[chunk_id]]
-          if(chunk_id > 1){
-            if(chunk_id == 2){
+          if (chunk_id > 1) {
+            if (chunk_id == 2) {
               maps_for_previous_chunks <- maps[[1]]
-            } else{
-              maps_for_previous_chunks <- maps[1:(chunk_id-1)]
+            } else {
+              maps_for_previous_chunks <- maps[1:(chunk_id - 1)]
               maps_for_previous_chunks <- raster::brick(maps_for_previous_chunks)
               maps_for_previous_chunks <- raster::calc(maps_for_previous_chunks, sum, na.rm = TRUE)
             }
             folder$record <-
-              lapply(folder$record, function(record_elm){
+              lapply(folder$record, function(record_elm) {
                 record_elm$spatial <-
-                  lapply(record_elm$spatial, function(spatial_elm){
-                    if(rlang::has_name(spatial_elm, "map_cumulative")){
+                  lapply(record_elm$spatial, function(spatial_elm) {
+                    if (rlang::has_name(spatial_elm, "map_cumulative")) {
                       spatial_elm$map_cumulative <- sum(spatial_elm$map_cumulative, maps_for_previous_chunks, na.rm = TRUE)
                     }
                     return(spatial_elm)
@@ -92,12 +89,11 @@ acdc_simplify <- function(archive,
     out$record <- lapply(archive$archive, function(chunk) chunk$record)
 
     #### Process record time stamps, if necessary
-    if(type == "acs"){
-
+    if (type == "acs") {
       ## Define a dataframe to adjust the time stamps recorded for each chunks
       # For chunks 2:n_chunks, we will add the time stamps reached by the previous chunk
       # ... up to the current chunk
-      adjust_timestep <- lapply(out$record, function(chunk_record){
+      adjust_timestep <- lapply(out$record, function(chunk_record) {
         # chunk_record <- out$record[[1]]
         dat <- chunk_record[[length(chunk_record)]]$dat
         adjustment <- dat[nrow(dat), c("timestep_cumulative", "timestep_detection")]
@@ -109,12 +105,12 @@ acdc_simplify <- function(archive,
       ## Adjust time stamps and add the chunk to the dataframe for each time stamp
       out$record <- lapply(1:length(out$record), function(i) {
         chunk_record <- out$record[[i]]
-        if(i == 1) {
+        if (i == 1) {
           adjustment <- data.frame(timestep_cumulative = 0, timestep_detection = 0)
-        } else{
-          adjustment <- adjust_timestep[i-1, ]
+        } else {
+          adjustment <- adjust_timestep[i - 1, ]
         }
-        chunk_record <- lapply(chunk_record, function(t){
+        chunk_record <- lapply(chunk_record, function(t) {
           t$dat$timestep_cumulative <- t$dat$timestep_cumulative + adjustment$timestep_cumulative
           t$dat$timestep_detection <- t$dat$timestep_detection + adjustment$timestep_detection
           t$dat$chunk <- i
@@ -125,27 +121,25 @@ acdc_simplify <- function(archive,
     }
 
     #### Sum chunk-specific maps across chunks
-    if(raster::inMemory(maps[[1]]) | file.exists(maps[[1]]@file@name)){
+    if (raster::inMemory(maps[[1]]) | file.exists(maps[[1]]@file@name)) {
       out$map <- raster::brick(maps)
       out$map <- raster::calc(out$map, sum, na.rm = TRUE)
     }
 
     #### Flatten record list across chunks
     out$record <- purrr::flatten(out$record)
-
   }
 
   #### Mask and normalise the final map
-  if(!is.null(out$map)){
-    if(raster::inMemory(out$map) | file.exists(out$map@file@name)){
-      if(!is.null(mask)) out$map <- raster::mask(out$map, mask)
-      if(normalise) out$map <- out$map/raster::cellStats(out$map, "sum")
+  if (!is.null(out$map)) {
+    if (raster::inMemory(out$map) | file.exists(out$map@file@name)) {
+      if (!is.null(mask)) out$map <- raster::mask(out$map, mask)
+      if (normalise) out$map <- out$map / raster::cellStats(out$map, "sum")
     }
   }
-  if(is.null(out$map)) warning("out$map could not be processed.", call. = FALSE, immediate. = TRUE)
+  if (is.null(out$map)) warning("out$map could not be processed.", call. = FALSE, immediate. = TRUE)
 
   #### Return outputs
   class(out) <- c(class(out), "acdc_record")
   return(out)
-
 }

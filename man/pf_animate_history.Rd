@@ -53,23 +53,33 @@ This function requires the \code{\link[animation]{animation}} package.
 \examples{
 #### Example (1): Create a zoomed-in animation
 pf_animate_history(
-  expr_param = list(archive = dat_dcpf_histories,
-                    add_particles = list(cex = 2.5, pch = 21,
-                                         col = "black", bg = "black"),
-                    prompt = FALSE),
+  expr_param = list(
+    archive = dat_dcpf_histories,
+    add_particles = list(
+      cex = 2.5, pch = 21,
+      col = "black", bg = "black"
+    ),
+    prompt = FALSE
+  ),
   dir = tempdir(),
-  interval = 0.25)
+  interval = 0.25
+)
 
 #### Example (2): Create a wider scale animation
 boundaries <- raster::extent(dat_coast)
 pf_animate_history(
-  expr_param = list(archive = dat_dcpf_histories,
-                    add_particles = list(cex = 0.5, pch = 21,
-                                          col = "black", bg = "black"),
-                    add_polys = list(x = dat_coast, col = "brown"),
-                    xlim = boundaries[1:2], ylim = boundaries[3:4],
-                    prompt = FALSE),
-  dir = tempdir())
+  expr_param = list(
+    archive = dat_dcpf_histories,
+    add_particles = list(
+      cex = 0.5, pch = 21,
+      col = "black", bg = "black"
+    ),
+    add_polys = list(x = dat_coast, col = "brown"),
+    xlim = boundaries[1:2], ylim = boundaries[3:4],
+    prompt = FALSE
+  ),
+  dir = tempdir()
+)
 
 }
 \author{

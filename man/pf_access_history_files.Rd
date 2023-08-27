@@ -38,7 +38,7 @@ dir.create(root)
 # ... For speed, we will implement the algorithm using pre-defined data
 pf_args <- dat_dcpf_histories$args
 pf_args$calc_distance_euclid_fast <- TRUE
-pf_args$write_history             <- list(file = root)
+pf_args$write_history <- list(file = root)
 do.call(pf, pf_args)
 # List the files
 files <- pf_access_history_files(root)

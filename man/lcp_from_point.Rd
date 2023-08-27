@@ -46,17 +46,17 @@ This function implements routines provided via \code{\link[flapper]{flapper}} an
 }
 \examples{
 #### Step (1): Define example origin
-proj     <- sp::CRS(SRS_string = "EPSG:4326")
+proj <- sp::CRS(SRS_string = "EPSG:4326")
 proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
-origin   <- matrix(c(-5.616, 56.388), ncol = 2)
-origin   <- sp::SpatialPoints(origin, proj)
-origin   <- sp::spTransform(origin, proj_utm)
+origin <- matrix(c(-5.616, 56.388), ncol = 2)
+origin <- sp::SpatialPoints(origin, proj)
+origin <- sp::spTransform(origin, proj_utm)
 
 #### Step (2): Select and process surface
 # We will focus on an area within the dat_gebco bathymetry raster
 boundaries <- raster::extent(707884.6, 709884.6, 6253404, 6255404)
-blank      <- raster::raster(boundaries, res = c(5, 5))
-r          <- raster::resample(dat_gebco, blank)
+blank <- raster::raster(boundaries, res = c(5, 5))
+r <- raster::resample(dat_gebco, blank)
 
 #### Example (1): Implement function using default options
 lcp_dist <- lcp_from_point(origin = origin, surface = r)
@@ -70,41 +70,45 @@ raster::plot(raster::distanceFromPoints(r, origin))
 raster::plot(lcp_dist)
 par(pp)
 
-if(flapper_run_slow){
+if (flapper_run_slow) {
+  #### Example (2): Implement function across specific destinations
+  ## Supply destination cell coordinates/IDs directly
+  # E.g., consider distances to cells shallower than 125 m
+  destination_cells <- raster::Which(r < 125, cells = TRUE, na.rm = TRUE)
+  lcp_dist <- lcp_from_point(
+    origin = origin,
+    surface = r,
+    destination = destination_cells
+  )
+  raster::plot(lcp_dist)
+  ## Use a function instead to consider distances to cells shallower than 125 m
+  filter_destination_cells <- function(x) x < 125
+  lcp_dist <- lcp_from_point(
+    origin = origin,
+    surface = r,
+    destination = filter_destination_cells
+  )
+  raster::plot(lcp_dist)
 
-#### Example (2): Implement function across specific destinations
-## Supply destination cell coordinates/IDs directly
-# E.g., consider distances to cells shallower than 125 m
-destination_cells <- raster::Which(r < 125, cells = TRUE, na.rm = TRUE)
-lcp_dist <- lcp_from_point(origin = origin,
-                           surface = r,
-                           destination = destination_cells)
-raster::plot(lcp_dist)
-## Use a function instead to consider distances to cells shallower than 125 m
-filter_destination_cells <- function(x) x < 125
-lcp_dist <- lcp_from_point(origin = origin,
-                           surface = r,
-                           destination = filter_destination_cells)
-raster::plot(lcp_dist)
+  #### Example (3): Define cost surfaces for LCP calculations outside of function
+  # This can be implemented internally, but we compute it here via lcp_costs().
+  # Note this imposes restrictions on the nature of the surface, such as equal
+  # ... resolution, which we have forced above.
+  costs <- lcp_costs(r)
+  cost <- costs$dist_total
+  lcp_dist <- lcp_from_point(
+    origin = origin,
+    surface = r,
+    destination = filter_destination_cells,
+    cost = cost
+  )
 
-#### Example (3): Define cost surfaces for LCP calculations outside of function
-# This can be implemented internally, but we compute it here via lcp_costs().
-# Note this imposes restrictions on the nature of the surface, such as equal
-# ... resolution, which we have forced above.
-costs <- lcp_costs(r)
-cost  <- costs$dist_total
-lcp_dist <- lcp_from_point(origin = origin,
-                           surface = r,
-                           destination = filter_destination_cells,
-                           cost = cost)
+  #### Example (4): Supply a graph object
+  graph <- lcp_graph_surface(surface = r, cost = cost)
+  lcp_dist <- lcp_from_point(origin = origin, surface = r, graph = graph)
 
-#### Example (4): Supply a graph object
-graph    <- lcp_graph_surface(surface = r, cost = cost)
-lcp_dist <- lcp_from_point(origin = origin, surface = r, graph = graph)
-
-#### Example (5): Implement algorithm in parallel via use_all_cores
-lcp_dist <- lcp_from_point(origin = origin, surface = r, use_all_cores = TRUE)
-
+  #### Example (5): Implement algorithm in parallel via use_all_cores
+  lcp_dist <- lcp_from_point(origin = origin, surface = r, use_all_cores = TRUE)
 }
 
 }

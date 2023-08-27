@@ -55,8 +55,11 @@ pf_plot_3d(paths, bathy)
 #### Example (2): Customise the plot
 # Customise via add_paths() list
 pf_plot_3d(paths, bathy,
-           add_paths = list(line = list(color = "black", width = 10),
-                            marker = list(color = "blue", size = 10)))
+  add_paths = list(
+    line = list(color = "black", width = 10),
+    marker = list(color = "blue", size = 10)
+  )
+)
 # Adjust shift, stretch or aspectmode
 pf_plot_3d(paths, bathy, shift = 200, stretch = -10)
 # Customise via ... e.g., add coastline:
@@ -65,7 +68,7 @@ pf_plot_3d(paths, bathy, coastline = coast)
 # The returned plot objects can also be used for further customisation.
 
 #### Example (3): Plot individual paths separately
-if(interactive()) {
+if (interactive()) {
   pf_plot_3d(paths, bathy, prompt = TRUE)
 }
 

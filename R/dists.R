@@ -9,7 +9,7 @@
 #' @source This function is an internal function in the \code{\link[raster]{raster}} package (https://rdrr.io/rforge/raster/src/R/pointdistance.R). It is defined separately in \code{\link[flapper]{flapper}} for stability.
 #' @keywords internal
 
-.planedist2 <- function(p1, p2){
+.planedist2 <- function(p1, p2) {
   z0 <- complex(, p1[, 1], p1[, 2])
   z1 <- complex(, p2[, 1], p2[, 2])
   outer(z0, z1, function(z0, z1) Mod(z0 - z1))
@@ -35,31 +35,36 @@
 #'
 #' @examples
 #' #### Example (1): Implementation using lat/long coordinates
-#' dat <- data.frame(receiver_id = dat_moorings$receiver_id,
-#'                   receiver_long = dat_moorings$receiver_long,
-#'                   receiver_lat = dat_moorings$receiver_lat
-#'                   )
+#' dat <- data.frame(
+#'   receiver_id = dat_moorings$receiver_id,
+#'   receiver_long = dat_moorings$receiver_long,
+#'   receiver_lat = dat_moorings$receiver_lat
+#' )
 #' # Compute distances
 #' dist_btw_receivers_km <- dist_btw_receivers(dat)
 #' head(dist_btw_receivers_km)
 #'
 #' #### Example (2): Implementation using planar coordinates
 #' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-#' xy         <- sp::SpatialPoints(dat[, c("receiver_long", "receiver_lat")],
-#'                                 proj_wgs84)
-#' xy         <- sp::spTransform(xy, proj_utm)
-#' xy         <- sp::coordinates(xy)
-#' dat <- data.frame(receiver_id = dat_moorings$receiver_id,
-#'                   receiver_easting = xy[, 1],
-#'                   receiver_northing = xy[, 2])
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+#' xy <- sp::SpatialPoints(
+#'   dat[, c("receiver_long", "receiver_lat")],
+#'   proj_wgs84
+#' )
+#' xy <- sp::spTransform(xy, proj_utm)
+#' xy <- sp::coordinates(xy)
+#' dat <- data.frame(
+#'   receiver_id = dat_moorings$receiver_id,
+#'   receiver_easting = xy[, 1],
+#'   receiver_northing = xy[, 2]
+#' )
 #' head(dist_btw_receivers(dat))
 #'
 #' #### Example (3): Post-process distances via the f argument
 #' dist_btw_receivers_km_round <- dist_btw_receivers(dat, f = round)
 #' head(dist_btw_receivers_km_round)
 #' # convert distances to m
-#' dist_btw_receivers_m <- dist_btw_receivers(dat, f = function(x) x*1000)
+#' dist_btw_receivers_m <- dist_btw_receivers(dat, f = function(x) x * 1000)
 #' head(dist_btw_receivers_m)
 #'
 #' #### Example (4) Return distances in a matrix
@@ -74,25 +79,24 @@
 #'
 
 dist_btw_receivers <-
-  function(moorings, f = NULL, return = c("data.frame", "matrix")){
-
+  function(moorings, f = NULL, return = c("data.frame", "matrix")) {
     #### Checks
     return <- match.arg(return)
     check_names(input = moorings, req = "receiver_id", extract_names = colnames, type = all)
     check_names(input = moorings, req = c("receiver_long", "receiver_easting"), extract_names = colnames, type = any)
     check_names(input = moorings, req = c("receiver_lat", "receiver_northing"), extract_names = colnames)
-    if(any(c("receiver_long", "receiver_lat") %in% colnames(moorings))){
+    if (any(c("receiver_long", "receiver_lat") %in% colnames(moorings))) {
       check_names(input = moorings, req = c("receiver_long", "receiver_lat"), extract_names = colnames, type = all)
-    } else if(any(c("receiver_easting", "receiver_northing") %in% colnames(moorings))){
+    } else if (any(c("receiver_easting", "receiver_northing") %in% colnames(moorings))) {
       check_names(input = moorings, req = c("receiver_easting", "receiver_northing"), extract_names = colnames, type = all)
     }
 
     #### Define x and y coordinates
-    if("receiver_long" %in% colnames(moorings)) {
+    if ("receiver_long" %in% colnames(moorings)) {
       lonlat <- TRUE
       moorings$x <- moorings$receiver_long
       moorings$y <- moorings$receiver_lat
-    }  else {
+    } else {
       lonlat <- FALSE
       moorings$x <- moorings$receiver_easting
       moorings$y <- moorings$receiver_northing
@@ -100,21 +104,22 @@ dist_btw_receivers <-
 
     #### Compute the distances between each receiver combination in km (or map units/1000)
     dists <- moorings[, c("x", "y")]
-    out   <- raster::pointDistance(dists[, c("x", "y")], allpairs = TRUE, lonlat = lonlat)
+    out <- raster::pointDistance(dists[, c("x", "y")], allpairs = TRUE, lonlat = lonlat)
     rownames(out) <- colnames(out) <- moorings$receiver_id
-    out <- out/1000
-    if(!is.null(f)) out <- f(out)
+    out <- out / 1000
+    if (!is.null(f)) out <- f(out)
     out[upper.tri(out)] <- t(out)[upper.tri(out)]
-    if(return == "data.frame"){
-      out <- data.frame(r1 = moorings$receiver_id[row(out)],
-                        r2 = moorings$receiver_id[col(out)],
-                        dist = as.vector(out))
+    if (return == "data.frame") {
+      out <- data.frame(
+        r1 = moorings$receiver_id[row(out)],
+        r2 = moorings$receiver_id[col(out)],
+        dist = as.vector(out)
+      )
     }
 
     #### Return outputs
     return(out)
-
-}
+  }
 
 
 ######################################
@@ -140,22 +145,24 @@ dist_btw_receivers <-
 #' @export
 #'
 
-dist_btw_clicks <- function(calc_distance = raster::pointDistance,..., add_paths = list(length = 0.025)){
+dist_btw_clicks <- function(calc_distance = raster::pointDistance, ..., add_paths = list(length = 0.025)) {
   cat("Please click locations on the map and press [Esc] when you are done...\n")
   dat <- graphics::locator()
   cat("Getting distances...\n")
-  dat <- data.frame(segment = 1:length(dat$x),
-                    x = dat$x,
-                    x2 = dplyr::lead(dat$x),
-                    y = dat$y,
-                    y2 = dplyr::lead(dat$y))
-  if(!is.null(add_paths)){
+  dat <- data.frame(
+    segment = 1:length(dat$x),
+    x = dat$x,
+    x2 = dplyr::lead(dat$x),
+    y = dat$y,
+    y2 = dplyr::lead(dat$y)
+  )
+  if (!is.null(add_paths)) {
     add_paths$x <- dat$x
     add_paths$y <- dat$y
     do.call(prettyGraphics::add_sp_path, add_paths)
   }
   dat <- dat[stats::complete.cases(dat), ]
-  dat$dist <- raster::pointDistance(dat[, c("x", "y")], dat[, c("x2", "y2")],...)
+  dat$dist <- raster::pointDistance(dat[, c("x", "y")], dat[, c("x2", "y2")], ...)
   return(dat)
 }
 
@@ -181,17 +188,21 @@ dist_btw_clicks <- function(calc_distance = raster::pointDistance,..., add_paths
 #' sqrt((2 - 1)^2 + (2 - 1)^2 + (2 - 1)^2)
 #'
 #' #### Example (2): Multiple pairs of points (e.g., an animal movement path)
-#' xy <- data.frame(x = c(1, 2, 3, 4),
-#'                  y = c(1, 2, 3, 4),
-#'                  z = c(1, 2, 3, 4))
-#' dist_btw_points_3d(xy$x, dplyr::lead(xy$x),
-#'                    xy$y, dplyr::lead(xy$y),
-#'                    xy$z, dplyr::lead(xy$z))
+#' xy <- data.frame(
+#'   x = c(1, 2, 3, 4),
+#'   y = c(1, 2, 3, 4),
+#'   z = c(1, 2, 3, 4)
+#' )
+#' dist_btw_points_3d(
+#'   xy$x, dplyr::lead(xy$x),
+#'   xy$y, dplyr::lead(xy$y),
+#'   xy$z, dplyr::lead(xy$z)
+#' )
 #' @author Edward Lavender
 #' @export
 #'
 
-dist_btw_points_3d <- function(x1, x2, y1, y2, z1, z2){
+dist_btw_points_3d <- function(x1, x2, y1, y2, z1, z2) {
   sqrt((x2 - x1)^2 + (y2 - y1)^2 + (z2 - z1)^2)
 }
 
@@ -211,14 +222,18 @@ dist_btw_points_3d <- function(x1, x2, y1, y2, z1, z2){
 #' #### Simulate a hypothetical landscape
 #' # Define a miniature, blank landscape with known dimensions
 #' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
-#' r <- raster::raster(nrows = 3, ncols = 3,
-#'                     crs = proj_utm,
-#'                     resolution = c(5, 5),
-#'                     ext = raster::extent(0, 15, 0, 15))
+#' r <- raster::raster(
+#'   nrows = 3, ncols = 3,
+#'   crs = proj_utm,
+#'   resolution = c(5, 5),
+#'   ext = raster::extent(0, 15, 0, 15)
+#' )
 #' # Define a matrix of hypothetical values for the landscape
-#' mat <- matrix(c(5, 10, 3,
-#'                 2, 1, 4,
-#'                 5, 6, 6), ncol = 3, nrow = 3, byrow = TRUE)
+#' mat <- matrix(c(
+#'   5, 10, 3,
+#'   2, 1, 4,
+#'   5, 6, 6
+#' ), ncol = 3, nrow = 3, byrow = TRUE)
 #' r[] <- mat
 #' # Visualise simulated landscape
 #' raster::plot(r)
@@ -228,7 +243,7 @@ dist_btw_points_3d <- function(x1, x2, y1, y2, z1, z2){
 #' path_cells <- c(1, 2)
 #' path_matrix <- sp::coordinates(r)[path_cells, ]
 #' dist_over_surface(path_matrix, r)
-#' sqrt(5^2 + (10-5)^2)
+#' sqrt(5^2 + (10 - 5)^2)
 #'
 #' #### Example (2): Total distance between two example diagonal points
 #' path_cells <- c(1, 5)
@@ -240,7 +255,7 @@ dist_btw_points_3d <- function(x1, x2, y1, y2, z1, z2){
 #' path_cells <- c(1, 2, 3)
 #' path_matrix <- sp::coordinates(r)[path_cells, ]
 #' dist_over_surface(path_matrix, r)
-#' sqrt(5^2 + (10-5)^2) + sqrt(5^2 + (10-3)^2)
+#' sqrt(5^2 + (10 - 5)^2) + sqrt(5^2 + (10 - 3)^2)
 #'
 #' #### Example (4): Total distance along an even longer path
 #' path_cells <- c(1, 2, 3, 6, 8)
@@ -257,27 +272,30 @@ dist_btw_points_3d <- function(x1, x2, y1, y2, z1, z2){
 #' @export
 #'
 
-dist_over_surface <- function(path, surface){
+dist_over_surface <- function(path, surface) {
   # extract the coordinates from the path, if necessary
   check_class(input = path, to_class = c("matrix", "data.frame", "SpatialLines"), type = "stop")
-  if(!is.na(raster::crs(surface))){
+  if (!is.na(raster::crs(surface))) {
     message("The CRS of 'surface' is not NA. Note that this function only supports planar surfaces.")
   }
-  if(inherits(path, "SpatialLines")) {
-    if(!identical(raster::crs(surface), raster::crs(path))){
+  if (inherits(path, "SpatialLines")) {
+    if (!identical(raster::crs(surface), raster::crs(path))) {
       warning("The CRS of 'surface' and 'path' are not identical.",
-              immediate. = TRUE, call. = FALSE)
+        immediate. = TRUE, call. = FALSE
+      )
     }
     xy <- raster::geom(path)[, c("x", "y")]
-  } else xy <- path
+  } else {
+    xy <- path
+  }
   # calculate the number of coordinate pairs:
-  n  <- nrow(xy)
+  n <- nrow(xy)
   # extract the value of the surface for these coordinates:
   z <- raster::extract(surface, xy)
   # create a dataframe
   xyz <- data.frame(x1 = xy[, 1], y1 = xy[, 2], z1 = z)
   # remove the final row (we can't calculate a distance from the last value)
-  xyz <- xyz[1:(n-1), ]
+  xyz <- xyz[1:(n - 1), ]
   # add x2, y2, and z2 columns that are one shifted (i.e. the next one in the sequence)
   xyz$x2 <- xy[2:n, 1]
   xyz$y2 <- xy[2:n, 2]
@@ -289,4 +307,3 @@ dist_over_surface <- function(path, surface){
   # return the total distance:
   return(td_dist_tot)
 }
-

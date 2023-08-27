@@ -11,11 +11,11 @@
 #' @keywords internal
 #'
 
-check_class_acdc_record <- function(x, arg = deparse(substitute(x))){
-  if(!inherits(x, "acdc_record")){
-    if(inherits(x, "acdc_archive")) {
+check_class_acdc_record <- function(x, arg = deparse(substitute(x))) {
+  if (!inherits(x, "acdc_record")) {
+    if (inherits(x, "acdc_archive")) {
       stop(paste0("'", arg, "' must be converted from class 'acdc_archive' to class 'acdc_record' via flapper::acdc_simplify() before implementing this function."), call. = FALSE)
-    } else{
+    } else {
       stop(paste0("'", arg, "' must be of class 'acdc_record'."), call. = FALSE)
     }
   }
@@ -65,7 +65,7 @@ NULL
 #' @rdname acdc_access
 #' @export
 
-acdc_access_dat <- function(record){
+acdc_access_dat <- function(record) {
   check_class_acdc_record(record)
   dat <- lapply(record$record, function(record_elm) record_elm$dat)
   dat <- do.call(rbind, dat)
@@ -76,7 +76,7 @@ acdc_access_dat <- function(record){
 #' @rdname acdc_access
 #' @export
 
-acdc_access_timesteps <- function(record){
+acdc_access_timesteps <- function(record) {
   check_class_acdc_record(record)
   max(record$record[[length(record$record)]]$dat$timestep_cumulative)
 }
@@ -85,14 +85,14 @@ acdc_access_timesteps <- function(record){
 #' @rdname acdc_access
 #' @export
 
-acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"), select = NULL){
+acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"), select = NULL) {
   check_class_acdc_record(record)
   type <- match.arg(type)
-  maps <- lapply(record$record, function(record_elm){
+  maps <- lapply(record$record, function(record_elm) {
     lapply(record_elm$spatial, function(spatial_elm) spatial_elm[[type]])
   })
   maps <- unlist(maps)
-  if(!is.null(select)) maps <- maps[select]
+  if (!is.null(select)) maps <- maps[select]
   return(maps)
 }
 
@@ -131,34 +131,39 @@ acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"),
 #' id <- 25
 #' acc <- dat_acoustics[dat_acoustics$individual_id == id, ]
 #' acc$timestamp <- lubridate::round_date(acc$timestamp, "2 mins")
-#' acc$key       <- paste0(acc$timestamp, "-", acc$receiver_id)
-#' acc           <- acc[!duplicated(acc$key), ][1:20, ]
+#' acc$key <- paste0(acc$timestamp, "-", acc$receiver_id)
+#' acc <- acc[!duplicated(acc$key), ][1:20, ]
 #'
 #' ## Define receiver locations ('moorings' SPDF) and activity status matrix
 #' # Receiver locations
 #' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-#'                         proj_wgs84)
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+#' xy <- sp::SpatialPoints(
+#'   dat_moorings[, c("receiver_long", "receiver_lat")],
+#'   proj_wgs84
+#' )
 #' xy <- sp::spTransform(xy, proj_utm)
 #' moorings <- sp::SpatialPointsDataFrame(xy, data = dat_moorings)
 #' # Daily activity status matrix
 #' as_POSIXct <- function(x) as.POSIXct(paste0(x, "00:00:00"), tz = "UTC")
 #' moorings_mat <- make_matrix_receivers(dat_moorings,
-#'                                       delta_t = "days",
-#'                                       as_POSIXct = as_POSIXct)
+#'   delta_t = "days",
+#'   as_POSIXct = as_POSIXct
+#' )
 #'
 #' ## Prepare grid
 #' # We will use a regular, relatively high resolution grid,
 #' # focused on a small area around the receivers at which the ID was detected
 #' grid <- raster::raster(raster::extent(dat_gebco),
-#'                        res = c(25, 25),
-#'                        crs = raster::crs(dat_gebco))
+#'   res = c(25, 25),
+#'   crs = raster::crs(dat_gebco)
+#' )
 #' grid <- raster::resample(dat_gebco, grid)
 #' ext <-
 #'   raster::extent(
 #'     rgeos::gBuffer(moorings[moorings$receiver_id %in% acc$receiver_id, ],
-#'                    width = 10000)
+#'       width = 10000
+#'     )
 #'   )
 #' grid <- raster::crop(grid, ext)
 #' grid <- raster::trim(grid)
@@ -167,73 +172,82 @@ acdc_access_maps <- function(record, type = c("map_timestep", "map_cumulative"),
 #' ## Define detection containers/probability kernels
 #' # Define detection containers
 #' moorings <- raster::crop(moorings, grid)
-#' dat_container <- acs_setup_containers(xy = moorings,
-#'                                     detection_range = 425,
-#'                                     coastline = dat_coast,
-#'                                     boundaries = ext,
-#'                                     plot = TRUE,
-#'                                     resolution = 10,
-#'                                     verbose = TRUE)
+#' dat_container <- acs_setup_containers(
+#'   xy = moorings,
+#'   detection_range = 425,
+#'   coastline = dat_coast,
+#'   boundaries = ext,
+#'   plot = TRUE,
+#'   resolution = 10,
+#'   verbose = TRUE
+#' )
 #' # Define detection container overlaps
-#' containers_spdf      <- do.call(raster::bind, plyr::compact(dat_containers))
+#' containers_spdf <- do.call(raster::bind, plyr::compact(dat_containers))
 #' containers_spdf@data <- dat_moorings
 #' dat_containers_overlaps <-
-#'   get_detection_containers_overlap(containers = containers_spdf,
-#'                                   services = NULL)
+#'   get_detection_containers_overlap(
+#'     containers = containers_spdf,
+#'     services = NULL
+#'   )
 #' # Define detection probability kernels
 #' calc_dpr <-
-#'   function(x){
+#'   function(x) {
 #'     ifelse(x <= 425, stats::plogis(2.5 + -0.02 * x), 0)
 #'   }
-#' dat_kernels <- acs_setup_detection_kernels(xy = moorings,
-#'                                            services = NULL,
-#'                                            containers = dat_containers,
-#'                                            overlaps = dat_containers_overlaps,
-#'                                            calc_detection_pr = calc_dpr,
-#'                                            bathy = grid)
+#' dat_kernels <- acs_setup_detection_kernels(
+#'   xy = moorings,
+#'   services = NULL,
+#'   containers = dat_containers,
+#'   overlaps = dat_containers_overlaps,
+#'   calc_detection_pr = calc_dpr,
+#'   bathy = grid
+#' )
 #'
 #' ## Implement AC algorithm
-#' out_ac <- ac(acoustics = acc,
-#'              step = 120,
-#'              bathy = grid,
-#'              detection_containers = dat_containers,
-#'              detection_kernels = dat_kernels,
-#'              detection_kernels_overlap = dat_containers_overlaps,
-#'              mobility = 200,
-#'              save_record_spatial = NULL
-#'              )
+#' out_ac <- ac(
+#'   acoustics = acc,
+#'   step = 120,
+#'   bathy = grid,
+#'   detection_containers = dat_containers,
+#'   detection_kernels = dat_kernels,
+#'   detection_kernels_overlap = dat_containers_overlaps,
+#'   mobility = 200,
+#'   save_record_spatial = NULL
+#' )
 #'
 #' ## Simplify outputs
 #' record <- acdc_simplify(out_ac)
 #'
 #' #### Example (1): Implement the function with default arguments
-#' if(interactive()){
+#' if (interactive()) {
 #'   acdc_plot_trace(record, 1:10, moorings, moorings_mat)
 #' }
 #'
 #' #### Example (2): Customise plot via add_* arguments and ...
-#' if(interactive()){
+#' if (interactive()) {
 #'   acdc_plot_trace(record, 1:10, moorings, moorings_mat,
-#'                   add_raster =
-#'                     list(plot_method = raster::plot, legend = FALSE),
-#'                   add_coastline =
-#'                     list(x = dat_coast, col = scales::alpha("dimgrey", 0.5)),
-#'                   xlim = c(699000, 711000),
-#'                   ylim = c(6250000, 6269500))
+#'     add_raster =
+#'       list(plot_method = raster::plot, legend = FALSE),
+#'     add_coastline =
+#'       list(x = dat_coast, col = scales::alpha("dimgrey", 0.5)),
+#'     xlim = c(699000, 711000),
+#'     ylim = c(6250000, 6269500)
+#'   )
 #' }
 #'
 #' #### Example (3): Save plots to file via the png_param argument
 #' con <- paste0(tempdir(), "/acdc_trace/")
-#' if(!dir.exists(con)) dir.create(con)
+#' if (!dir.exists(con)) dir.create(con)
 #' acdc_plot_trace(record, 1:10, moorings, moorings_mat,
-#'                 add_raster =
-#'                   list(plot_method = raster::plot, legend = FALSE),
-#'                 add_coastline =
-#'                   list(x = dat_coast, col = scales::alpha("dimgrey", 0.5)),
-#'                 xlim = c(699000, 711000),
-#'                 ylim = c(6250000, 6269500),
-#'                 png_param = list(filename = con),
-#'                 prompt = FALSE)
+#'   add_raster =
+#'     list(plot_method = raster::plot, legend = FALSE),
+#'   add_coastline =
+#'     list(x = dat_coast, col = scales::alpha("dimgrey", 0.5)),
+#'   xlim = c(699000, 711000),
+#'   ylim = c(6250000, 6269500),
+#'   png_param = list(filename = con),
+#'   prompt = FALSE
+#' )
 #' list.files(con)
 #'
 #' @seealso \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}} implement the AC and ACDC algorithms and \code{\link[flapper]{acdc_simplify}} simplifies the results. \code{\link[flapper]{acdc_plot_record}} and \code{\link[flapper]{acdc_animate_record}} provide additional visualisation routines.
@@ -253,24 +267,25 @@ acdc_plot_trace <- function(record,
                             add_container_b = list(col = "darkorange"),
                             add_container_c = list(col = scales::alpha("forestgreen", 0.5), density = 20),
                             add_coastline = list(),
-                            add_main = list(),...,
+                            add_main = list(), ...,
                             par_param = list(),
                             png_param = list(),
-                            prompt = TRUE){
-
+                            prompt = TRUE) {
   #### Check user inputs
   check_class_acdc_record(record)
-  if(is.null(record$args))
+  if (is.null(record$args)) {
     stop("Please add the list of ac() or acdc() arguments to 'record'.", call. = FALSE)
+  }
   check_class(input = moorings, to_class = "SpatialPointsDataFrame")
   check_names(input = moorings, req = "receiver_id", type = all)
-  if(length(png_param) > 0L && prompt){
+  if (length(png_param) > 0L && prompt) {
     warning("Either 'png_param' or 'prompt' should be supplied: ignoring 'prompt'.",
-            immediate. = TRUE, call. = FALSE)
+      immediate. = TRUE, call. = FALSE
+    )
     prompt <- FALSE
   }
   save <- FALSE
-  if(length(png_param) > 0L){
+  if (length(png_param) > 0L) {
     check_named_list(input = png_param)
     check_names(input = png_param, req = "filename")
     png_param$filename <- check_dir(input = png_param$filename, check_slash = TRUE)
@@ -280,41 +295,46 @@ acdc_plot_trace <- function(record,
 
   #### Define objects
   # Helper functions
-  cat_to_console <- function(..., show = TRUE) if(show) cat(paste(..., "\n"))
-  continue <- function(.prompt) if(.prompt) readline(prompt = "Press [Enter] to continue or [Esc] to quit...")
+  cat_to_console <- function(..., show = TRUE) if (show) cat(paste(..., "\n"))
+  continue <- function(.prompt) if (.prompt) readline(prompt = "Press [Enter] to continue or [Esc] to quit...")
   # The acoustic/archival dataframes (in their processed form, as used by the AC* algorithm)
   dat_record <- acdc_access_dat(record)
-  if(all(!(c(dat_record$receiver_1_id, dat_record$receiver_2_id) %in% moorings$receiver_id)))
+  if (all(!(c(dat_record$receiver_1_id, dat_record$receiver_2_id) %in% moorings$receiver_id))) {
     stop("'moorings' does not contain all of the receivers found in 'record'.", call. = FALSE)
+  }
   # Define timestamps for 'intermediate' time steps if undefined
-  if(!rlang::has_name(dat_record, "archival_timestamp")){
+  if (!rlang::has_name(dat_record, "archival_timestamp")) {
     step <- record$args$step
     dat_record <-
       dat_record %>%
       dplyr::group_by(.data$timestep_detection) %>%
-      dplyr::mutate(archival_timestamp =
-                      seq(min(.data$receiver_1_timestamp), max(.data$receiver_2_timestamp),
-                          by = step)[.data$timestep_archival]) %>%
+      dplyr::mutate(
+        archival_timestamp =
+          seq(min(.data$receiver_1_timestamp), max(.data$receiver_2_timestamp),
+            by = step
+          )[.data$timestep_archival]
+      ) %>%
       data.frame()
   }
   # Get the spatial record as a contiguous record, with one element for each cumulative time step
-  record_spatial <- lapply(record$record, function(record_elm){
+  record_spatial <- lapply(record$record, function(record_elm) {
     lapply(record_elm$spatial, function(spatial_elm) spatial_elm)
   })
   record_spatial <- purrr::flatten(record_spatial)
   record_spatial <- compact(record_spatial)
   # Define the number of time steps with spatial records (before a NULL element)
   pos_wo_spatial <- which(sapply(record$record, function(elm) length(elm$spatial) > 0L) == FALSE)
-  if(length(pos_wo_spatial) > 1L){
+  if (length(pos_wo_spatial) > 1L) {
     max_t <- min(pos_wo_spatial) - 2L
-  } else{
+  } else {
     max_t <- nrow(dat_record) - 1L
   }
   time_steps <- 1:max_t
-  if(!is.null(plot)){
-    if(any(!(plot %in% time_steps))){
+  if (!is.null(plot)) {
+    if (any(!(plot %in% time_steps))) {
       warning("Not all indices in 'plot' can be plotted.",
-              immediate. = TRUE, call. = FALSE)
+        immediate. = TRUE, call. = FALSE
+      )
       time_steps <- time_steps[time_steps %in% plot]
     }
   }
@@ -322,26 +342,26 @@ acdc_plot_trace <- function(record,
   #### Define global plotting param
   pp <- graphics::par(no.readonly = TRUE)
   on.exit(graphics::par(pp), add = TRUE)
-  if(!save){
+  if (!save) {
     pb <- pbapply::pboptions(type = "none")
     on.exit(pbapply::pboptions(pb), add = TRUE)
   }
-  if(is.null(add_main$side)) add_main$side <- 3
+  if (is.null(add_main$side)) add_main$side <- 3
 
   #### Loop over cumulative time steps (with spatial data)
-  cl_lapply(x = time_steps, fun = function(t){
+  cl_lapply(x = time_steps, fun = function(t) {
     cat_to_console(paste0("On timestep: ", t, "..."), show = prompt)
 
     #### Define time specific parameters
     # t = 1
-    detection_timestep_for_t  <- dat_record$timestep_detection[t]
+    detection_timestep_for_t <- dat_record$timestep_detection[t]
     detection_timesteps_for_t <- detection_timestep_for_t:(detection_timestep_for_t + 2)
     dat_record_for_t <- dat_record[dat_record$timestep_detection %in% detection_timesteps_for_t, ]
-    spatial_for_t    <- record_spatial[[t]]
+    spatial_for_t <- record_spatial[[t]]
 
     #### Define plotting param
     ## Set up plot to save
-    if(save) {
+    if (save) {
       png_param$filename <- paste0(png_filename, t, ".png")
       do.call(grDevices::png, png_param)
     }
@@ -354,10 +374,10 @@ acdc_plot_trace <- function(record,
     add_raster$x <- spatial_for_t$map_timestep
     axis_ls <-
       suppressMessages(
-        prettyGraphics::pretty_map(add_rasters = add_raster,...)
+        prettyGraphics::pretty_map(add_rasters = add_raster, ...)
       )
     ext <- raster::extent(c(axis_ls[[1]]$lim, axis_ls[[2]]$lim))
-    if(length(add_coastline) > 0L){
+    if (length(add_coastline) > 0L) {
       add_coastline$add <- TRUE
       add_coastline$x <- raster::crop(add_coastline$x, ext)
       do.call(raster::plot, add_coastline)
@@ -365,16 +385,16 @@ acdc_plot_trace <- function(record,
     ## Add receivers
     # All active receivers
     active <- moorings_matrix[rownames(moorings_matrix) ==
-                                as.character(as.Date(dat_record$archival_timestamp[t])), , drop = FALSE]
+      as.character(as.Date(dat_record$archival_timestamp[t])), , drop = FALSE]
     add_receiver_n$x <-
       moorings[moorings$receiver_id %in% as.integer(colnames(active)[which(active == 1)]), ]
     do.call(graphics::points, add_receiver_n)
     # Add the receiver which recorded the detection, the next receiver and the receiver after that
     filter_moorings_by_detection_timestamp <-
-      function(index)
+      function(index) {
         moorings[moorings$receiver_id ==
-                   dat_record_for_t$receiver_id[dat_record_for_t$timestep_detection == detection_timesteps_for_t[index]],
-        ]
+          dat_record_for_t$receiver_id[dat_record_for_t$timestep_detection == detection_timesteps_for_t[index]], ]
+      }
     add_receiver_1$x <- filter_moorings_by_detection_timestamp(1)
     add_receiver_2$x <- filter_moorings_by_detection_timestamp(2)
     add_receiver_3$x <- filter_moorings_by_detection_timestamp(3)
@@ -387,18 +407,20 @@ acdc_plot_trace <- function(record,
     # ... time step of the detection
     # ... time step of the archival step
     # ... the actual time step
-    if(is.null(add_main$text)){
-      main <- paste0("Map for t = ", t,
-                     " (", dat_record$timestep_detection[t],
-                     "[", dat_record$timestep_archival[t], "]: ",
-                     format(dat_record$archival_timestamp[t], "%y-%m-%d %H:%M:%S"), ")")
+    if (is.null(add_main$text)) {
+      main <- paste0(
+        "Map for t = ", t,
+        " (", dat_record$timestep_detection[t],
+        "[", dat_record$timestep_archival[t], "]: ",
+        format(dat_record$archival_timestamp[t], "%y-%m-%d %H:%M:%S"), ")"
+      )
       add_main$text <- main
     }
     do.call(graphics::mtext, add_main)
 
     #### Add containers
     ## Add container (Ap)
-    if(!is.null(spatial_for_t$container_ap)){
+    if (!is.null(spatial_for_t$container_ap)) {
       cat_to_console("...Add container (An)...", show = prompt)
       add_container_ap$x <- spatial_for_t$container_ap
       add_container_ap$x <- raster::crop(add_container_ap$x, ext)
@@ -407,7 +429,7 @@ acdc_plot_trace <- function(record,
     }
 
     ## Add container (An)
-    if(!is.null(spatial_for_t$container_an)){
+    if (!is.null(spatial_for_t$container_an)) {
       cat_to_console("...Add container (An)...", show = prompt)
       add_container_an$x <- spatial_for_t$container_an
       add_container_an$x <- raster::crop(add_container_an$x, ext)
@@ -416,7 +438,7 @@ acdc_plot_trace <- function(record,
     }
 
     ## Add container (B)
-    if(!is.null(spatial_for_t$container_b)){
+    if (!is.null(spatial_for_t$container_b)) {
       cat_to_console("...Add container (B)...", show = prompt)
       add_container_b$x <- spatial_for_t$container_b
       add_container_b$x <- raster::crop(add_container_b$x, ext)
@@ -433,19 +455,18 @@ acdc_plot_trace <- function(record,
     continue(prompt)
 
     ## Add back coastline at end if necessary (for tidiness)
-    if(save && length(add_coastline) > 0L){
+    if (save && length(add_coastline) > 0L) {
       add_coastline$add <- TRUE
       do.call(raster::plot, add_coastline)
     }
 
     ## Save plot
-    if(save) grDevices::dev.off()
+    if (save) grDevices::dev.off()
     return(invisible())
   })
 
   #### Return blank
   return(invisible())
-
 }
 
 
@@ -484,79 +505,88 @@ acdc_plot_trace <- function(record,
 #' acdc_plot_record(record = dat_acdc)
 #'
 #' #### Example (2): Define the number of plots to be produced and control the plotting window
-#' acdc_plot_record(record = dat_acdc,
-#'                  plot = 1:2,
-#'                  par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)))
+#' acdc_plot_record(
+#'   record = dat_acdc,
+#'   plot = 1:2,
+#'   par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8))
+#' )
 #'
 #' #### Example (3): Add and customise spatial information via add_* args
 #' ## Define a SpatialPoints object of receiver locations
 #' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 #' rsp <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj_wgs84)
 #' rsp <- sp::spTransform(rsp, proj_utm)
 #' ## Plot with receiver locations and coastline, customise the containers and the raster
-#' acdc_plot_record(record = dat_acdc,
-#'                  add_coastline = list(x = dat_coast, col = "darkgreen"),
-#'                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-#'                  add_containers = list(col = "red"),
-#'                  add_raster = list(col = rev(topo.colors(100)))
-#'                  )
+#' acdc_plot_record(
+#'   record = dat_acdc,
+#'   add_coastline = list(x = dat_coast, col = "darkgreen"),
+#'   add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
+#'   add_containers = list(col = "red"),
+#'   add_raster = list(col = rev(topo.colors(100)))
+#' )
 #'
 #' #### Example (4): Control axis properties
 #' # ... via smallplot argument for raster, pretty_axis_args, xlim, ylim and fix_zlim
 #' # ... set crop_spatial = TRUE to crop spatial data within adjusted limits
-#' acdc_plot_record(record = dat_acdc,
-#'                  add_coastline = list(x = dat_coast, col = "darkgreen"),
-#'                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-#'                  add_containers = list(col = "red"),
-#'                  add_raster = list(smallplot= c(0.85, 0.9, 0.25, 0.75)),
-#'                  crop_spatial = TRUE,
-#'                  pretty_axis_args = list(side = 1:4,
-#'                                          control_sci_notation =
-#'                                            list(magnitude = 16L, digits = 0)),
-#'                  xlim = raster::extent(dat_coast)[1:2],
-#'                  ylim = raster::extent(dat_coast)[3:4],
-#'                  fix_zlim = c(0, 1)
-#'                  )
+#' acdc_plot_record(
+#'   record = dat_acdc,
+#'   add_coastline = list(x = dat_coast, col = "darkgreen"),
+#'   add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
+#'   add_containers = list(col = "red"),
+#'   add_raster = list(smallplot = c(0.85, 0.9, 0.25, 0.75)),
+#'   crop_spatial = TRUE,
+#'   pretty_axis_args = list(
+#'     side = 1:4,
+#'     control_sci_notation =
+#'       list(magnitude = 16L, digits = 0)
+#'   ),
+#'   xlim = raster::extent(dat_coast)[1:2],
+#'   ylim = raster::extent(dat_coast)[3:4],
+#'   fix_zlim = c(0, 1)
+#' )
 #'
 #' #### Example (5): Modify each plot after it is produced via add_additional
 #' # Specify a function to add titles to a plot
-#' add_titles <- function(){
+#' add_titles <- function() {
 #'   mtext(side = 1, "x (UTM)", line = 2)
 #'   mtext(side = 2, "y (UTM)", line = -8)
 #' }
 #' # Make plots with added titles
-#' acdc_plot_record(record = dat_acdc,
-#'                  plot = 1:2,
-#'                  par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)),
-#'                  add_coastline = list(x = dat_coast, col = "darkgreen"),
-#'                  add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
-#'                  add_containers = list(col = "red"),
-#'                  add_raster = list(),
-#'                  crop_spatial = TRUE,
-#'                  xlim = raster::extent(dat_coast)[1:2],
-#'                  ylim = raster::extent(dat_coast)[3:4],
-#'                  add_additional = add_titles
-#'                  )
+#' acdc_plot_record(
+#'   record = dat_acdc,
+#'   plot = 1:2,
+#'   par_param = list(mfrow = c(1, 2), mar = c(8, 8, 8, 8)),
+#'   add_coastline = list(x = dat_coast, col = "darkgreen"),
+#'   add_receivers = list(x = rsp, pch = 4, col = "royalblue"),
+#'   add_containers = list(col = "red"),
+#'   add_raster = list(),
+#'   crop_spatial = TRUE,
+#'   xlim = raster::extent(dat_coast)[1:2],
+#'   ylim = raster::extent(dat_coast)[3:4],
+#'   add_additional = add_titles
+#' )
 #'
 #' #### Example (6) Save plots via png_param
 #' list.files(tempdir())
-#' acdc_plot_record(record = dat_acdc,
-#'                  plot = 1:2,
-#'                  png_param = list(filename = tempdir())
-#'                  )
+#' acdc_plot_record(
+#'   record = dat_acdc,
+#'   plot = 1:2,
+#'   png_param = list(filename = tempdir())
+#' )
 #' list.files(tempdir())
 #'
 #' #### Example (7) To plot the overall map, you can also just use a
 #' # ... a raster plotting function like prettyGraphics::pretty_map()
 #' ext <- update_extent(raster::extent(dat_coast), -1000)
-#' prettyGraphics::pretty_map(x = ext,
-#'                            add_rasters = list(x = dat_acdc$map),
-#'                            add_points = list(x = rsp, pch = "*", col = "red"),
-#'                            add_polys = list(x = dat_coast, col = "lightgreen"),
-#'                            crop_spatial = TRUE,
-#'                            xlab = "Easting", ylab = "Northing"
-#'                            )
+#' prettyGraphics::pretty_map(
+#'   x = ext,
+#'   add_rasters = list(x = dat_acdc$map),
+#'   add_points = list(x = rsp, pch = "*", col = "red"),
+#'   add_polys = list(x = dat_coast, col = "lightgreen"),
+#'   crop_spatial = TRUE,
+#'   xlab = "Easting", ylab = "Northing"
+#' )
 #'
 #' @seealso This function is typically used following calls to \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}} or \code{\link[flapper]{acdc}} and \code{\link[flapper]{acdc_simplify}}.
 #' @author Edward Lavender
@@ -573,81 +603,88 @@ acdc_plot_record <- function(record,
                              add_additional = NULL,
                              crop_spatial = FALSE,
                              xlim = NULL, ylim = NULL, fix_zlim = FALSE,
-                             pretty_axis_args = list(side = 1:4,
-                                                     axis = list(list(),
-                                                                 list(),
-                                                                 list(labels = FALSE),
-                                                                 list(labels = FALSE)),
-                                                     control_axis = list(las = TRUE),
-                                                     control_sci_notation = list(magnitude = 16L, digits = 0)),
+                             pretty_axis_args = list(
+                               side = 1:4,
+                               axis = list(
+                                 list(),
+                                 list(),
+                                 list(labels = FALSE),
+                                 list(labels = FALSE)
+                               ),
+                               control_axis = list(las = TRUE),
+                               control_sci_notation = list(magnitude = 16L, digits = 0)
+                             ),
                              par_param = list(),
                              png_param = list(),
                              cl = NULL, varlist = NULL,
                              verbose = TRUE,
-                             check = TRUE,...){
-
+                             check = TRUE, ...) {
   #### Checks
-  cat_to_console <- function(..., show = verbose) if(show) cat(paste(..., "\n"))
+  cat_to_console <- function(..., show = verbose) if (show) cat(paste(..., "\n"))
   cat_to_console("flapper::acdc_plot_record() called...")
   type <- match.arg(type)
-  if(check){
+  if (check) {
     cat_to_console("... Checking function inputs...")
     ## Check object class
     check_class_acdc_record(record)
     ## Check plots to be produced
-    if(any(plot <= 0L)) stop("Input to 'plot' must be > 0.")
+    if (any(plot <= 0L)) stop("Input to 'plot' must be > 0.")
     ## Check spatial data have been provided correctly
-    if(!is.null(add_coastline)) {
+    if (!is.null(add_coastline)) {
       check_named_list(input = add_coastline)
       check_names(input = add_coastline, req = "x")
     }
-    if(!is.null(add_receivers)) {
+    if (!is.null(add_receivers)) {
       check_named_list(input = add_receivers)
       check_names(input = add_receivers, req = "x")
       check_class(input = add_receivers$x, to_class = "SpatialPoints", type = "stop")
     }
-    if(!is.null(add_raster)) check_named_list(input = add_raster)
-    if(!is.null(add_containers)) check_named_list(input = add_containers)
+    if (!is.null(add_raster)) check_named_list(input = add_raster)
+    if (!is.null(add_containers)) check_named_list(input = add_containers)
     ## Check plotting window param
     check_named_list(input = par_param, ignore_empty = TRUE)
     ## Check png_param, if provided
-    if(length(png_param) > 0){
+    if (length(png_param) > 0) {
       check_named_list(input = png_param)
       check_names(input = png_param, req = c("filename"), extract_names = names, type = all)
       png_param$filename <- check_dir(input = png_param$filename, check_slash = TRUE)
       save_png <- TRUE
-    } else save_png <- FALSE
+    } else {
+      save_png <- FALSE
+    }
     ## Check cluster
-    if(!is.null(cl) & is.null(png_param$filename)){
+    if (!is.null(cl) & is.null(png_param$filename)) {
       message("Input to 'cl' ignored as png_param$filename is unspecified.")
       cl <- NULL
     }
     ## Check spatial information
-    if(all(c(is.null(add_raster), is.null(add_coastline), is.null(add_receivers)))){
+    if (all(c(is.null(add_raster), is.null(add_coastline), is.null(add_receivers)))) {
       stop("At least one argument out of 'add_raster', 'add_coastline' and 'add_receivers' should be provided.")
     }
     ## Other plotting param
-    if(!is.null(pretty_axis_args$side)) {
-      if(length(pretty_axis_args$side) == 1) stop("At least two sides in pretty_axis_args$side should be specified for a map.")
+    if (!is.null(pretty_axis_args$side)) {
+      if (length(pretty_axis_args$side) == 1) stop("At least two sides in pretty_axis_args$side should be specified for a map.")
     }
     # Check dots
-    check...("zlim",...)
+    check...("zlim", ...)
   }
 
   #### Define data for background plot
   cat_to_console("... Defining data for background plot...")
   ## Unpack information for plotting and isolate relevant plots
   acdc_plot <- lapply(record$record, function(elm) elm$spatial)
-  acdc_plot <- lapply(acdc_plot, function(x) if(length(x) > 0) return(x))
+  acdc_plot <- lapply(acdc_plot, function(x) if (length(x) > 0) {
+    return(x)
+  })
   acdc_plot <- purrr::flatten(acdc_plot)
-  if(!is.null(plot)) acdc_plot <- acdc_plot[plot]
+  if (!is.null(plot)) acdc_plot <- acdc_plot[plot]
   acdc_plot <- acdc_plot[which(!sapply(acdc_plot, is.null))]
-  if(is.null(plot)) plot <- 1:length(acdc_plot)
-  if(check) {
-    if(length(acdc_plot) <= 0) stop("No plotting data available for selected plot(s).")
-    if(any(length(plot) > length(acdc_plot))) stop("'plot' exceeds the number of available plots.")
-    if(!is.null(add_containers)){
-      if(!rlang::has_name(acdc_plot[[1]], "container")){
+  if (is.null(plot)) plot <- 1:length(acdc_plot)
+  if (check) {
+    if (length(acdc_plot) <= 0) stop("No plotting data available for selected plot(s).")
+    if (any(length(plot) > length(acdc_plot))) stop("'plot' exceeds the number of available plots.")
+    if (!is.null(add_containers)) {
+      if (!rlang::has_name(acdc_plot[[1]], "container")) {
         add_containers <- NULL
         message("add_containers = NULL implemented: 'record' does not contain containers.")
       }
@@ -655,26 +692,26 @@ acdc_plot_record <- function(record,
   }
 
   ## Extent of area
-  if(!is.null(add_raster)) {
+  if (!is.null(add_raster)) {
     first_raster <- acdc_plot[[1]][[type]]
     ext_ras <- raster::extent(first_raster)
-    x_ras   <- ext_ras[1:2]
-    y_ras   <- ext_ras[3:4]
-  } else{
+    x_ras <- ext_ras[1:2]
+    y_ras <- ext_ras[3:4]
+  } else {
     x_ras <- NULL
     y_ras <- NULL
   }
   ## Extent of coastline provided
-  if(!is.null(add_coastline)) {
+  if (!is.null(add_coastline)) {
     ext_coastline <- raster::extent(add_coastline$x)
-    x_coastline   <- ext_coastline[1:2]
-    y_coastline   <- ext_coastline[3:4]
+    x_coastline <- ext_coastline[1:2]
+    y_coastline <- ext_coastline[3:4]
   } else {
     x_coastline <- NULL
     y_coastline <- NULL
   }
   ## Extent of receiver locations
-  if(!is.null(add_receivers)) {
+  if (!is.null(add_receivers)) {
     rxy <- add_receivers$x
     rxy <- sp::coordinates(rxy)
     x_rxy <- range(rxy[, 1])
@@ -687,21 +724,23 @@ acdc_plot_record <- function(record,
   x <- range(x_ras, x_coastline, x_rxy)
   y <- range(y_ras, y_coastline, y_rxy)
   ## Define axis limits
-  axis_param <- prettyGraphics::implement_pretty_axis_args(x = list(x, y),
-                                                           pretty_axis_args = pretty_axis_args,
-                                                           xlim = xlim,
-                                                           ylim = ylim)
+  axis_param <- prettyGraphics::implement_pretty_axis_args(
+    x = list(x, y),
+    pretty_axis_args = pretty_axis_args,
+    xlim = xlim,
+    ylim = ylim
+  )
   xlim <- axis_param[[1]]$lim
   ylim <- axis_param[[2]]$lim
   ext <- raster::extent(xlim, ylim)
   ## Crop spatial data within limits
-  if(!is.null(add_coastline)) if(crop_spatial) add_coastline$x <- raster::crop(add_coastline$x, ext)
+  if (!is.null(add_coastline)) if (crop_spatial) add_coastline$x <- raster::crop(add_coastline$x, ext)
 
   ## Define zlim, if requested
-  if(!is.null(add_raster)) {
-    if(is.logical(fix_zlim)) {
-      if(fix_zlim){
-        range_use <- lapply(acdc_plot, function(map_info){
+  if (!is.null(add_raster)) {
+    if (is.logical(fix_zlim)) {
+      if (fix_zlim) {
+        range_use <- lapply(acdc_plot, function(map_info) {
           min_use <- raster::minValue(map_info[[type]])
           max_use <- raster::maxValue(map_info[[type]])
           return(c(min_use, max_use))
@@ -720,10 +759,9 @@ acdc_plot_record <- function(record,
 
   #### Loop over every detection
   cat_to_console("... Making plots for each time step ...")
-  cl_lapply(1:length(acdc_plot), cl = cl, varlist = varlist, fun = function(i){
-
+  cl_lapply(1:length(acdc_plot), cl = cl, varlist = varlist, fun = function(i) {
     #### Set up image to save
-    if(save_png){
+    if (save_png) {
       title <- paste0(i, ".png")
       png_param_tmp <- png_param
       png_param_tmp$filename <- paste0(png_param_tmp$filename, title)
@@ -732,14 +770,14 @@ acdc_plot_record <- function(record,
 
     #### Define background plot
     map_info <- acdc_plot[[i]]
-    map      <- map_info[[type]]
+    map <- map_info[[type]]
     area <- sp::SpatialPoints(raster::coordinates(ext), raster::crs(first_raster))
-    raster::plot(x = area, xlim = xlim, ylim = ylim,...)
+    raster::plot(x = area, xlim = xlim, ylim = ylim, ...)
 
     #### Define time-specific zlim, if requested
-    if(!is.null(add_raster)) {
-      if(is.logical(fix_zlim)){
-        if(!fix_zlim) {
+    if (!is.null(add_raster)) {
+      if (is.logical(fix_zlim)) {
+        if (!fix_zlim) {
           min_use <- raster::minValue(map)
           max_use <- raster::maxValue(map)
           zlim <- c(min_use, max_use)
@@ -751,31 +789,31 @@ acdc_plot_record <- function(record,
 
     #### Add spatial objects
     # Add spatial use surface
-    if(!is.null(add_raster)) {
-      add_raster$x <-  map
+    if (!is.null(add_raster)) {
+      add_raster$x <- map
       add_raster$zlim <- zlim
-      if(crop_spatial) add_raster$x <- raster::crop(add_raster$x, ext)
+      if (crop_spatial) add_raster$x <- raster::crop(add_raster$x, ext)
       add_raster$add <- TRUE
       do.call(fields::image.plot, add_raster)
     }
     # Add acoustic container
-    if(!is.null(add_containers)) {
-      add_containers$x   <- map_info$container
-      if(crop_spatial) add_containers$x <- raster::crop(add_containers$x, ext)
+    if (!is.null(add_containers)) {
+      add_containers$x <- map_info$container
+      if (crop_spatial) add_containers$x <- raster::crop(add_containers$x, ext)
       add_containers$add <- TRUE
       do.call(raster::plot, add_containers)
     }
     # Add the coastline (note that the coastline has already been cropped, if necessary)
-    if(!is.null(add_coastline)) {
+    if (!is.null(add_coastline)) {
       add_coastline$add <- TRUE
       do.call(raster::plot, add_coastline)
     }
     # Add receivers
-    if(!is.null(add_receivers)) {
+    if (!is.null(add_receivers)) {
       do.call(graphics::points, add_receivers)
     }
     # Add additional
-    if(!is.null(add_additional)) {
+    if (!is.null(add_additional)) {
       add_additional()
     }
 
@@ -783,11 +821,10 @@ acdc_plot_record <- function(record,
     prettyGraphics::pretty_axis(axis_ls = axis_param, add = TRUE)
 
     #### Save fig
-    if(save_png) grDevices::dev.off()
+    if (save_png) grDevices::dev.off()
   })
 
   return(invisible())
-
 }
 
 
@@ -814,12 +851,15 @@ acdc_plot_record <- function(record,
 #' dir_current <- getwd()
 #' setwd(tempdir())
 #' acdc_record <- acdc_simplify(dat_acdc)
-#' acdc_animate_record(expr_param =
-#'                      list(record = acdc_record,
-#'                           add_coastline = list(x = dat_coast, col = "darkgreen"),
-#'                           plot = 1:5,
-#'                           fix_zlim = FALSE)
-#'                     )
+#' acdc_animate_record(
+#'   expr_param =
+#'     list(
+#'       record = acdc_record,
+#'       add_coastline = list(x = dat_coast, col = "darkgreen"),
+#'       plot = 1:5,
+#'       fix_zlim = FALSE
+#'     )
+#' )
 #' setwd(dir_current)
 #' @details This function requires the \code{\link[animation]{animation}} package.
 #' @author Edward Lavender
@@ -839,34 +879,35 @@ acdc_animate_record <-
            ani_res = 150,
            interval = 0.1,
            verbose = FALSE,
-           ...){
+           ...) {
     #### Checks
     ## animation package
     if (!requireNamespace("animation", quietly = TRUE)) {
       stop("This function requires the 'animation' package. Please install it before continuing with install.packages('animation').")
     }
     #### Set directory
-    if(is.null(dir)) dir <- dirname(html_name)
+    if (is.null(dir)) dir <- dirname(html_name)
     wd <- getwd()
     check_dir(input = dir)
     setwd(dir)
     on.exit(setwd(wd), add = TRUE)
     html_name <- basename(html_name)
     #### Make plot
-    animation::saveHTML({
-      do.call(acdc_plot_record, expr_param)
-    },
-    htmlfile = html_name,
-    img.name = image_name,
-    title = html_title,
-    description = html_description,
-    navigator = navigator,
-    ani.height = ani_height,
-    ani.width = ani_width,
-    ani.res = ani_res,
-    interval = interval,
-    verbose = verbose,...
+    animation::saveHTML(
+      {
+        do.call(acdc_plot_record, expr_param)
+      },
+      htmlfile = html_name,
+      img.name = image_name,
+      title = html_title,
+      description = html_description,
+      navigator = navigator,
+      ani.height = ani_height,
+      ani.width = ani_width,
+      ani.res = ani_res,
+      interval = interval,
+      verbose = verbose,
+      ...
     )
     return(invisible())
   }
-

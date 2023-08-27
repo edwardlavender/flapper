@@ -70,18 +70,20 @@ These functions are designed to provide `ballpark' estimates of individual swimm
 \examples{
 #### Estimate mobility from acoustic data using Euclidean distances
 ## (A) Define receiver coordinates as SPDF in UTM CRS
-proj     <- sp::CRS(SRS_string = "EPSG:4326")
+proj <- sp::CRS(SRS_string = "EPSG:4326")
 proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 moorings <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")], proj)
 moorings <- sp::spTransform(moorings, proj_utm)
 moorings <- sp::SpatialPointsDataFrame(moorings, data.frame(receiver_id = dat_moorings$receiver_id))
 ## (B) Implement algorithm using Euclidean distances
-mob_1 <- get_mvt_mobility_from_acoustics(data = dat_acoustics,
-                                         fct = "individual_id",
-                                         moorings = moorings,
-                                         detection_range = 750,
-                                         transmission_interval = 120,
-                                         step = 120)
+mob_1 <- get_mvt_mobility_from_acoustics(
+  data = dat_acoustics,
+  fct = "individual_id",
+  moorings = moorings,
+  detection_range = 750,
+  transmission_interval = 120,
+  step = 120
+)
 
 #### Estimate mobility from acoustic data using LCP distances
 ## (A) Define receiver coordinates
@@ -91,14 +93,16 @@ mob_1 <- get_mvt_mobility_from_acoustics(data = dat_acoustics,
 bathy <- raster::raster(ext = raster::extent(dat_gebco), resolution = 50)
 bathy <- raster::resample(dat_gebco, bathy, method = "bilinear")
 ## (C) Implement algorithm using LCP distances
-mob_2 <- get_mvt_mobility_from_acoustics(data = dat_acoustics,
-                                         fct = "individual_id",
-                                         moorings = moorings,
-                                         detection_range = 750,
-                                         calc_distance = "lcp",
-                                         bathy = bathy,
-                                         transmission_interval = 120,
-                                         step = 120)
+mob_2 <- get_mvt_mobility_from_acoustics(
+  data = dat_acoustics,
+  fct = "individual_id",
+  moorings = moorings,
+  detection_range = 750,
+  calc_distance = "lcp",
+  bathy = bathy,
+  transmission_interval = 120,
+  step = 120
+)
 
 #### Estimate mobility from archival data
 # Note the use of 'individual_id' for 'fct' here is only appropriate

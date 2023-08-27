@@ -29,16 +29,19 @@ This function converts a matrix of detections (0, 1) by time stamp and receiver 
 \examples{
 #### Define detection matrix
 # Simulate array
-array <- sim_array(boundaries = raster::extent(-1000, 1000, -1000, 1000),
-                   n_receivers = 24, seed = 1)
+array <- sim_array(
+  boundaries = raster::extent(-1000, 1000, -1000, 1000),
+  n_receivers = 24, seed = 1
+)
 # Simulate movement in this area
 path <- sim_path_sa(n = 50, area = array$array$area, seed = 1)
 # Simulate a detection matrix
-detections <- sim_detections(n = 100,
-                             path = path$xy_mat,
-                             xy = sp::coordinates(array$array$xy),
-                             calc_detection_pr = function(dist) ifelse(dist < 425, 1, 0),
-                             )
+detections <- sim_detections(
+  n = 100,
+  path = path$xy_mat,
+  xy = sp::coordinates(array$array$xy),
+  calc_detection_pr = function(dist) ifelse(dist < 425, 1, 0),
+)
 # Extract matrix
 mat <- detections$det_mat
 # Define row names

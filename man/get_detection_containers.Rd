@@ -38,9 +38,11 @@ This function defines the areas surveyed by receivers (termed `detection contain
 \examples{
 #### Define receiver locations as a SpatialPoints object with a UTM CRS
 proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
-xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-                        proj_wgs84)
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
+xy <- sp::SpatialPoints(
+  dat_moorings[, c("receiver_long", "receiver_lat")],
+  proj_wgs84
+)
 xy <- sp::spTransform(xy, proj_utm)
 
 #### Example (1): Get the simplest containers around receivers
@@ -66,11 +68,12 @@ sp_2 <- get_detection_containers(xy, coastline = dat_coast, byid = TRUE)
 sp_2
 # The total area of the former will be smaller, since areas covered
 # ... by multiple receivers are merged
-rgeos::gArea(sp_1); rgeos::gArea(sp_2)
+rgeos::gArea(sp_1)
+rgeos::gArea(sp_2)
 # But it can be more convenient to use the latter format in some cases
 # ... because it is easy to isolate specific containers:
 raster::plot(dat_coast)
-raster::plot(sp_1[1], add = TRUE, col = "red")  # single feature
+raster::plot(sp_1[1], add = TRUE, col = "red") # single feature
 raster::plot(sp_2[1], add = TRUE, col = "blue") # isolate specific features
 
 }

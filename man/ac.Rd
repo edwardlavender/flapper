@@ -97,12 +97,13 @@ acc <- dat_acoustics[dat_acoustics$individual_id == id, ][1:25, ]
 #### Example (1) Implement AC algorithm with default arguments
 # This implements the algorithm on a single core, printing messages
 # ... to the console to monitor function progress.
-out_ac <- ac(acoustics = acc,
-             step = 120,
-             bathy = dat_gebco,
-             detection_containers = dat_containers,
-             mobility = 200
-             )
+out_ac <- ac(
+  acoustics = acc,
+  step = 120,
+  bathy = dat_gebco,
+  detection_containers = dat_containers,
+  mobility = 200
+)
 
 #### Subsequent examples follow the implementation given in acdc().
 

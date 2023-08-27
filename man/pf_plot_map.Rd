@@ -57,8 +57,9 @@ For either implementation, raw scores can be transformed or scaled to facilitate
 # ... using pf_simplify() with return = "archive"
 dat_dcpf_histories_connected <-
   pf_simplify(dat_dcpf_histories,
-             summarise_pr = TRUE,
-             return = "archive")
+    summarise_pr = TRUE,
+    return = "archive"
+  )
 ## Path based implementation
 # The example data 'dat_dcpf_paths' contains a sample of paths reconstructed
 # ... by the DCPF algorithm and we can also implement the function for these paths.
@@ -79,12 +80,16 @@ par(pp)
 
 #### Example (3): Customise the map(s)
 pp <- par(mfrow = c(1, 2))
-pf_plot_map(dat_dcpf_histories_connected, map = dat_dc$args$bathy,
-            add_rasters = list(col = grDevices::grey.colors(n = 100)),
-            xlab = "x", ylab = "y")
-pf_plot_map(dat_dcpf_paths, map = dat_dc$args$bathy,
-            add_rasters = list(col = grDevices::topo.colors(n = 100)),
-            xlab = "x", ylab = "y")
+pf_plot_map(dat_dcpf_histories_connected,
+  map = dat_dc$args$bathy,
+  add_rasters = list(col = grDevices::grey.colors(n = 100)),
+  xlab = "x", ylab = "y"
+)
+pf_plot_map(dat_dcpf_paths,
+  map = dat_dc$args$bathy,
+  add_rasters = list(col = grDevices::topo.colors(n = 100)),
+  xlab = "x", ylab = "y"
+)
 par(pp)
 
 }

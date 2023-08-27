@@ -16,7 +16,7 @@
 #' @export
 #'
 
-pf_loglik <- function(paths){
+pf_loglik <- function(paths) {
   check_names(input = paths, req = c("path_id", "cell_pr"))
   op <- options()
   options(dplyr.summarise.inform = FALSE)
@@ -49,7 +49,7 @@ pf_loglik <- function(paths){
 #' @examples
 #' #### Implement pf() algorithm
 #' # Here, we use pre-defined outputs for speed
-#' paths    <- dat_dcpf_paths
+#' paths <- dat_dcpf_paths
 #' archival <- dat_dc$args$archival
 #'
 #' #### Example (1): The default implementation
@@ -61,7 +61,7 @@ pf_loglik <- function(paths){
 #' pf_plot_1d(paths, archival, add_lines = list(col = "red", lwd = 0.5))
 #'
 #' #### Example (3): Plot individual comparisons
-#' if(interactive()){
+#' if (interactive()) {
 #'   pp <- graphics::par(mfrow = c(3, 4))
 #'   pf_plot_1d(paths, depth, prompt = TRUE)
 #'   graphics::par(pp)
@@ -79,28 +79,34 @@ pf_plot_1d <- function(paths,
                        xlab = "Time (index)", ylab = "Depth (m)", type = "b",
                        add_lines = list(col = "royalblue", type = "b"),
                        prompt = FALSE,
-                       ...){
+                       ...) {
   # Checks
   check_names(input = archival, req = c("depth"))
   check_names(input = paths, req = c("path_id", "timestep", "cell_z"), type = all)
-  if(any(is.na(paths$cell_z))) stop("paths$cell_z contains NAs.")
+  if (any(is.na(paths$cell_z))) stop("paths$cell_z contains NAs.")
   # Drop origin, if supplied, to avoid alignment issues
   # paths <- paths[paths$timestep != 0, ]
-  if(nrow(paths) < 1) stop("'paths' does not contain any timesteps post-origin.")
+  if (nrow(paths) < 1) stop("'paths' does not contain any timesteps post-origin.")
   # Make plots
-  if(!prompt) prettyGraphics::pretty_plot(1:nrow(archival), archival$depth*scale,
-                                          pretty_axis_args = pretty_axis_args,
-                                          xlab = xlab, ylab = ylab,
-                                          type = type,...)
-  lapply(split(paths, paths$path_id), function(d){
-    if(prompt) prettyGraphics::pretty_plot(archival$depth*scale,
-                                           pretty_axis_args = pretty_axis_args,
-                                           xlab = xlab, ylab = ylab,
-                                           type = type,...)
+  if (!prompt) {
+    prettyGraphics::pretty_plot(1:nrow(archival), archival$depth * scale,
+      pretty_axis_args = pretty_axis_args,
+      xlab = xlab, ylab = ylab,
+      type = type, ...
+    )
+  }
+  lapply(split(paths, paths$path_id), function(d) {
+    if (prompt) {
+      prettyGraphics::pretty_plot(archival$depth * scale,
+        pretty_axis_args = pretty_axis_args,
+        xlab = xlab, ylab = ylab,
+        type = type, ...
+      )
+    }
     add_lines$x <- d$timestep
-    add_lines$y <- d$cell_z*scale
+    add_lines$y <- d$cell_z * scale
     do.call(graphics::lines, add_lines)
-    if(prompt) readline(prompt = "Press [enter] to continue...")
+    if (prompt) readline(prompt = "Press [enter] to continue...")
   })
   return(invisible())
 }
@@ -131,15 +137,18 @@ pf_plot_1d <- function(paths,
 #' #### Example (2): Plot customisation options
 #' # Customise the appearance of the path(s)
 #' pf_plot_2d(paths, bathy,
-#'              add_paths = list(length = 0.075, col = viridis::viridis(100)))
+#'   add_paths = list(length = 0.075, col = viridis::viridis(100))
+#' )
 #' # Pass arguments to prettyGraphics::pretty_map() via ... , e.g.:
 #' pf_plot_2d(paths, bathy, xlab = "Easting (UTM)", ylab = "Northing (UTM)")
 #'
 #' #### Example (3): Plot individual paths separately
-#' if(interactive()){
+#' if (interactive()) {
 #'   pp <- graphics::par(mfrow = c(3, 4))
-#'   pf_plot_2d(paths, bathy, add_paths = list(length = 0.01),
-#'                prompt = TRUE, verbose = FALSE)
+#'   pf_plot_2d(paths, bathy,
+#'     add_paths = list(length = 0.01),
+#'     prompt = TRUE, verbose = FALSE
+#'   )
 #'   graphics::par(pp)
 #' }
 #'
@@ -152,16 +161,16 @@ pf_plot_2d <- function(paths,
                        bathy,
                        add_bathy = list(),
                        add_paths = list(),
-                       prompt = FALSE,...){
+                       prompt = FALSE, ...) {
   check_names(input = paths, req = c("path_id", "cell_x", "cell_y"))
   add_bathy$x <- bathy
-  if(!prompt) prettyGraphics::pretty_map(add_rasters = add_bathy,...)
-  lapply(split(paths, paths$path_id), function(d){
-    if(prompt) prettyGraphics::pretty_map(add_rasters = add_bathy,...)
+  if (!prompt) prettyGraphics::pretty_map(add_rasters = add_bathy, ...)
+  lapply(split(paths, paths$path_id), function(d) {
+    if (prompt) prettyGraphics::pretty_map(add_rasters = add_bathy, ...)
     add_paths$x <- d$cell_x
     add_paths$y <- d$cell_y
     do.call(prettyGraphics::add_sp_path, add_paths)
-    if(prompt) readline(prompt = "Press [enter] to continue...")
+    if (prompt) readline(prompt = "Press [enter] to continue...")
   })
   return(invisible())
 }
@@ -198,8 +207,11 @@ pf_plot_2d <- function(paths,
 #' #### Example (2): Customise the plot
 #' # Customise via add_paths() list
 #' pf_plot_3d(paths, bathy,
-#'            add_paths = list(line = list(color = "black", width = 10),
-#'                             marker = list(color = "blue", size = 10)))
+#'   add_paths = list(
+#'     line = list(color = "black", width = 10),
+#'     marker = list(color = "blue", size = 10)
+#'   )
+#' )
 #' # Adjust shift, stretch or aspectmode
 #' pf_plot_3d(paths, bathy, shift = 200, stretch = -10)
 #' # Customise via ... e.g., add coastline:
@@ -208,7 +220,7 @@ pf_plot_2d <- function(paths,
 #' # The returned plot objects can also be used for further customisation.
 #'
 #' #### Example (3): Plot individual paths separately
-#' if(interactive()) {
+#' if (interactive()) {
 #'   pf_plot_3d(paths, bathy, prompt = TRUE)
 #' }
 #'
@@ -225,37 +237,45 @@ pf_plot_3d <- function(paths,
                        shift = 5,
                        stretch = -5,
                        aspectmode = "data",
-                       prompt = FALSE,...){
+                       prompt = FALSE, ...) {
   # Checks
-  if(!requireNamespace("plotly", quietly = TRUE)) stop("This function requires the 'plotly' package. Please install it with `install.packages('plotly')` first.")
+  if (!requireNamespace("plotly", quietly = TRUE)) stop("This function requires the 'plotly' package. Please install it with `install.packages('plotly')` first.")
   check_names(input = paths, req = c("path_id", "cell_x", "cell_y", "cell_z"))
-  if(any(is.na(paths$cell_z))) stop("paths$cell_z contains NAs.")
+  if (any(is.na(paths$cell_z))) stop("paths$cell_z contains NAs.")
   # Define a list of outputs
   p_ls <- list()
   # Plot the surface
-  if(!prompt) p <- prettyGraphics::pretty_scape_3d(r = bathy,
-                                                   stretch = stretch,
-                                                   aspectmode = aspectmode,...)
+  if (!prompt) {
+    p <- prettyGraphics::pretty_scape_3d(
+      r = bathy,
+      stretch = stretch,
+      aspectmode = aspectmode, ...
+    )
+  }
   # Add paths sequentially to the surface
   paths$cell_z <- paths$cell_z * stretch + shift
   paths_ls <- split(paths, paths$path_id)
-  for(i in 1:length(paths_ls)){
-    if(prompt) p <- prettyGraphics::pretty_scape_3d(r = bathy,
-                                                    stretch = stretch,
-                                                    aspectmode = aspectmode,...)
+  for (i in 1:length(paths_ls)) {
+    if (prompt) {
+      p <- prettyGraphics::pretty_scape_3d(
+        r = bathy,
+        stretch = stretch,
+        aspectmode = aspectmode, ...
+      )
+    }
     d <- paths_ls[[i]]
     add_paths$p <- p
     add_paths$x <- d$cell_x
     add_paths$y <- d$cell_y
     add_paths$z <- d$cell_z
     p <- do.call(plotly::add_paths, add_paths)
-    if(prompt) {
+    if (prompt) {
       print(p)
       readline(prompt = "Press [enter] to continue...")
       p_ls[[i]] <- p
     }
   }
-  if(!prompt) {
+  if (!prompt) {
     print(p)
     p_ls <- p
   }

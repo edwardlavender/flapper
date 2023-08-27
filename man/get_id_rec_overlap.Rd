@@ -45,26 +45,29 @@ dat_ids$tag_end_date <- as.Date("2017-06-05")
 dat <- get_id_rec_overlap(dat_ids, dat_moorings)
 
 #### Example (2): Temporal overlap between all combinations of specified
-#... individuals/receivers
+# ... individuals/receivers
 dat <- get_id_rec_overlap(dat_ids,
-                          dat_moorings,
-                          individual_id = c(25, 26),
-                          receiver_id = c(3, 4),
-                          type = 2L)
+  dat_moorings,
+  individual_id = c(25, 26),
+  receiver_id = c(3, 4),
+  type = 2L
+)
 
 #### Example (3): Temporal overlap between specified individual/receiver pairs
 dat <- get_id_rec_overlap(dat_ids,
-                          dat_moorings,
-                          individual_id = c(25, 26),
-                          receiver_id = c(3, 4),
-                          type = 1L)
+  dat_moorings,
+  individual_id = c(25, 26),
+  receiver_id = c(3, 4),
+  type = 1L
+)
 
 #### Example (4): Match temporal overlap to another dataframe
 dat_acoustics$get_id_rec_overlap <-
   get_id_rec_overlap(dat_ids,
-                     dat_moorings,
-                     match_to = dat_acoustics,
-                     type = 1L)
+    dat_moorings,
+    match_to = dat_acoustics,
+    type = 1L
+  )
 
 }
 \author{

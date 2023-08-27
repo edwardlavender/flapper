@@ -97,14 +97,18 @@ The function returns a warning produced by \code{\link[gdistance]{transition}} w
 #### Simulate a hypothetical landscape
 # Define a miniature, blank landscape with appropriate dimensions
 proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
-r <- raster::raster(nrows = 3, ncols = 3,
-                    crs = proj_utm,
-                    resolution = c(5, 5),
-                    ext = raster::extent(0, 15, 0, 15))
+r <- raster::raster(
+  nrows = 3, ncols = 3,
+  crs = proj_utm,
+  resolution = c(5, 5),
+  ext = raster::extent(0, 15, 0, 15)
+)
 # Define a matrix of hypothetical values for the landscape
-mat <- matrix(c(5, 10, 3,
-                2, 1, 4,
-                5, 6, 6), ncol = 3, nrow = 3, byrow = TRUE)
+mat <- matrix(c(
+  5, 10, 3,
+  2, 1, 4,
+  5, 6, 6
+), ncol = 3, nrow = 3, byrow = TRUE)
 r[] <- mat
 # Visualise simulated landscape
 raster::plot(r)
@@ -118,9 +122,11 @@ rxy <- raster::coordinates(r)
 
 #### Example (1): Find the distance between a single origin and destination
 # ... using the "cppRouting" method:
-out1 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                         destination = rxy[2, , drop = FALSE],
-                         surface = r)
+out1 <- lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[2, , drop = FALSE],
+  surface = r
+)
 # Extract shortest distance
 out1$dist_lcp
 
@@ -157,11 +163,12 @@ out1$time
 
 #### Example (2): Find the distance between a single origin and destination
 # ... using the "gdistance" method
-out2 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                         destination = rxy[2, , drop = FALSE],
-                         surface = r,
-                         method = "gdistance"
-                         )
+out2 <- lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[2, , drop = FALSE],
+  surface = r,
+  method = "gdistance"
+)
 # Extract distance
 out2$dist_lcp
 # Elements of the returned list are the same apart from 'gdistance_param'
@@ -172,17 +179,21 @@ utils::str(out2$gdistance_param)
 #### Example (3): Find the distances between other origins and destinations
 ## Implement function to determine shortest distances:
 # shortest distance between cell 1 and 6 via gdistance
-lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                 destination = rxy[6, , drop = FALSE],
-                 surface = r,
-                 method = "gdistance",
-                 verbose = FALSE)$dist_lcp
+lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[6, , drop = FALSE],
+  surface = r,
+  method = "gdistance",
+  verbose = FALSE
+)$dist_lcp
 # shortest distance between cell 1 and 6 via cppRouting
-lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                 destination = rxy[6, , drop = FALSE],
-                 surface = r,
-                 method = "cppRouting",
-                 verbose = FALSE)$dist_lcp
+lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[6, , drop = FALSE],
+  surface = r,
+  method = "cppRouting",
+  verbose = FALSE
+)$dist_lcp
 ## Compare to manually computed distances
 # The shortest distance from cell 1 to cell 6 is to move diagonally
 # ... from cell 1 to 5 and then 6.
@@ -197,24 +208,30 @@ sqrt((5 - 1)^2 + d_pb^2) + sqrt((4 - 1)^2 + d_pr^2)
 ## Force the 5th cell to be NA
 rtmp <- r
 rtmp[5] <- NA
-raster::plot(rtmp); raster::text(rtmp)
+raster::plot(rtmp)
+raster::text(rtmp)
 ## Compute shortest distances via algorithm:
 # Now compute shortest distances, which we can see have increased the distance
 # ... since movement through an NA cell is not allowed. Therefore, if this NA
 # ... reflects missing data, it may be appropriate to interpolate NAs using
 # ... surrounding cells (e.g., see raster::approxNA()) so that movement
 # ... is possible through these cells
-out1 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                         destination = rxy[6, , drop = FALSE],
-                         surface = rtmp,
-                         method = "gdistance",
-                         verbose = FALSE)
-out2 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                         destination = rxy[6, , drop = FALSE],
-                         surface = rtmp,
-                         method = "cppRouting",
-                         verbose = FALSE)
-out1$dist_lcp; out2$dist_lcp
+out1 <- lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[6, , drop = FALSE],
+  surface = rtmp,
+  method = "gdistance",
+  verbose = FALSE
+)
+out2 <- lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[6, , drop = FALSE],
+  surface = rtmp,
+  method = "cppRouting",
+  verbose = FALSE
+)
+out1$dist_lcp
+out2$dist_lcp
 ## Compare to manual calculations of shortest route:
 # Route option one: cell 1 to 2, 2 to 6
 sqrt((5 - 10)^2 + d_pr^2) + sqrt((10 - 4)^2 + d_pb^2)
@@ -224,17 +241,22 @@ out1$cost$dist_total[1, 2] + out1$cost$dist_total[2, 6]
 # In the same way, we can force the shortest path away from particular areas
 # ... by making the height of the landscape in those areas very large or Inf:
 rtmp[5] <- 1e20
-raster::plot(rtmp); raster::text(rtmp)
-lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                 destination = rxy[6, , drop = FALSE],
-                 surface = rtmp,
-                 method = "cppRouting",
-                 verbose = FALSE)$dist_lcp
-lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                 destination = rxy[6, , drop = FALSE],
-                 surface = rtmp,
-                 method = "gdistance",
-                 verbose = FALSE)$dist_lcp
+raster::plot(rtmp)
+raster::text(rtmp)
+lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[6, , drop = FALSE],
+  surface = rtmp,
+  method = "cppRouting",
+  verbose = FALSE
+)$dist_lcp
+lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[6, , drop = FALSE],
+  surface = rtmp,
+  method = "gdistance",
+  verbose = FALSE
+)$dist_lcp
 
 #### Example (4): Find the distances between points on a real landscape
 ## We will use some example bathymetry data:
@@ -245,9 +267,11 @@ raster::plot(dat_gebco_oban)
 dat_gebco_utm <- raster::projectRaster(dat_gebco_oban, crs = proj_utm)
 raster::res(dat_gebco_utm)
 # (b) Resample so that the resolution in the x and y directions is identical
-dat_gebco_utm_planar <- raster::raster(crs = proj_utm,
-                                       ext = raster::extent(dat_gebco_utm),
-                                       resolution = 250)
+dat_gebco_utm_planar <- raster::raster(
+  crs = proj_utm,
+  ext = raster::extent(dat_gebco_utm),
+  resolution = 250
+)
 dat_gebco_utm_planar <- raster::resample(dat_gebco_utm, dat_gebco_utm_planar, method = "bilinear")
 # Examine processed raster
 pp <- par(mfrow = c(1, 2))
@@ -257,48 +281,60 @@ par(pp)
 ## Define example origin and destination
 set.seed(1)
 dat_gebco_utm_planar_xy <- raster::coordinates(dat_gebco_utm_planar)
-index       <- sample(1:nrow(dat_gebco_utm_planar_xy), 2)
-origin      <- dat_gebco_utm_planar_xy[index[1], , drop = FALSE]
+index <- sample(1:nrow(dat_gebco_utm_planar_xy), 2)
+origin <- dat_gebco_utm_planar_xy[index[1], , drop = FALSE]
 destination <- dat_gebco_utm_planar_xy[index[2], , drop = FALSE]
 ## Implement function to compute shortest distances
-out_gebco1 <- lcp_over_surface(origin = origin,
-                               destination = destination,
-                               surface = dat_gebco_utm_planar,
-                               method = "gdistance")
-out_gebco2 <- lcp_over_surface(origin = origin,
-                               destination = destination,
-                               surface = dat_gebco_utm_planar,
-                              method = "cppRouting")
+out_gebco1 <- lcp_over_surface(
+  origin = origin,
+  destination = destination,
+  surface = dat_gebco_utm_planar,
+  method = "gdistance"
+)
+out_gebco2 <- lcp_over_surface(
+  origin = origin,
+  destination = destination,
+  surface = dat_gebco_utm_planar,
+  method = "cppRouting"
+)
 # Compare Euclidean and shortest distances
-out_gebco1$dist_euclid; out_gebco1$dist_lcp
-out_gebco2$dist_euclid; out_gebco2$dist_lcp
+out_gebco1$dist_euclid
+out_gebco1$dist_lcp
+out_gebco2$dist_euclid
+out_gebco2$dist_lcp
 
 #### Example (5A): Reduce the complexity of the landscape by cropping
 ext <- raster::extent(dat_gebco_utm_planar)
 ext[3] <- 6255000
 ext[4] <- 6265000
-out_gebco1 <- lcp_over_surface(origin = origin,
-                               destination = destination,
-                               surface = dat_gebco_utm_planar,
-                               method = "gdistance",
-                               crop = ext)
+out_gebco1 <- lcp_over_surface(
+  origin = origin,
+  destination = destination,
+  surface = dat_gebco_utm_planar,
+  method = "gdistance",
+  crop = ext
+)
 out_gebco1$dist_lcp
 
 #### Example (5B): Reduce the complexity of the landscape around a buffer
-out_gebco1 <- lcp_over_surface(origin = origin,
-                               destination = destination,
-                               surface = dat_gebco_utm_planar,
-                               method = "gdistance",
-                               buffer = list(width = 1000))
+out_gebco1 <- lcp_over_surface(
+  origin = origin,
+  destination = destination,
+  surface = dat_gebco_utm_planar,
+  method = "gdistance",
+  buffer = list(width = 1000)
+)
 out_gebco1$dist_lcp
 
 #### Example (5C): Reduce the complexity of the landscape via aggregation
-out_gebco1 <- lcp_over_surface(origin = origin,
-                               destination = destination,
-                               surface = dat_gebco_utm_planar,
-                               method = "gdistance",
-                               buffer = list(width = 1000),
-                               aggregate = list(fact = 5, fun = mean, na.rm = TRUE))
+out_gebco1 <- lcp_over_surface(
+  origin = origin,
+  destination = destination,
+  surface = dat_gebco_utm_planar,
+  method = "gdistance",
+  buffer = list(width = 1000),
+  aggregate = list(fact = 5, fun = mean, na.rm = TRUE)
+)
 out_gebco1$dist_lcp
 
 #### Example (6C): Implement a mask
@@ -309,47 +345,58 @@ coastline <- sp::spTransform(dat_coast_around_oban, proj_utm)
 raster::plot(dat_gebco_utm_planar)
 raster::lines(coastline)
 # Define example origin and destination within the sea
-origin      <- matrix(c(714000, 6260000), ncol = 2)
+origin <- matrix(c(714000, 6260000), ncol = 2)
 destination <- matrix(c(721000, 6265000), ncol = 2)
 # Implement algorithm
-out_gebco1 <- lcp_over_surface(origin = origin,
-                               destination = destination,
-                               surface = dat_gebco_utm_planar,
-                               method = "gdistance",
-                               crop = raster::extent(coastline),
-                               mask = coastline,
-                               mask_inside = TRUE)
-out_gebco2 <- lcp_over_surface(origin = origin,
-                               destination = destination,
-                               surface = dat_gebco_utm_planar,
-                               method = "cppRouting",
-                               crop = raster::extent(coastline),
-                               mask = coastline,
-                               mask_inside = TRUE)
+out_gebco1 <- lcp_over_surface(
+  origin = origin,
+  destination = destination,
+  surface = dat_gebco_utm_planar,
+  method = "gdistance",
+  crop = raster::extent(coastline),
+  mask = coastline,
+  mask_inside = TRUE
+)
+out_gebco2 <- lcp_over_surface(
+  origin = origin,
+  destination = destination,
+  surface = dat_gebco_utm_planar,
+  method = "cppRouting",
+  crop = raster::extent(coastline),
+  mask = coastline,
+  mask_inside = TRUE
+)
 # Compare Euclidean and least-cost distances
-out_gebco1$dist_euclid; out_gebco1$dist_lcp
-out_gebco2$dist_euclid; out_gebco2$dist_lcp
+out_gebco1$dist_euclid
+out_gebco1$dist_lcp
+out_gebco2$dist_euclid
+out_gebco2$dist_lcp
 
 #### Example (7) Implement shortest distance algorithms in parallel:
 # With the default method ("cppRouting"), use use_all_cores = TRUE
-out_gebco1 <- lcp_over_surface(origin = origin,
-                               destination = destination,
-                               surface = dat_gebco_utm_planar,
-                               method = "cppRouting",
-                               crop = raster::extent(coastline),
-                               mask = coastline,
-                               mask_inside = TRUE,
-                               use_all_cores = TRUE)
+out_gebco1 <- lcp_over_surface(
+  origin = origin,
+  destination = destination,
+  surface = dat_gebco_utm_planar,
+  method = "cppRouting",
+  crop = raster::extent(coastline),
+  mask = coastline,
+  mask_inside = TRUE,
+  use_all_cores = TRUE
+)
 # With method = "gdistance" use cl argument
-out_gebco2 <- lcp_over_surface(origin = origin,
-                               destination = destination,
-                               surface = dat_gebco_utm_planar,
-                               method = "cppRouting",
-                               crop = raster::extent(coastline),
-                               mask = coastline,
-                               mask_inside = TRUE,
-                               cl = parallel::makeCluster(2L))
-out_gebco1$dist_lcp; out_gebco2$dist_lcp
+out_gebco2 <- lcp_over_surface(
+  origin = origin,
+  destination = destination,
+  surface = dat_gebco_utm_planar,
+  method = "cppRouting",
+  crop = raster::extent(coastline),
+  mask = coastline,
+  mask_inside = TRUE,
+  cl = parallel::makeCluster(2L)
+)
+out_gebco1$dist_lcp
+out_gebco2$dist_lcp
 
 
 ############################################################################
@@ -357,10 +404,12 @@ out_gebco1$dist_lcp; out_gebco2$dist_lcp
 
 #### Example (8) Shortest paths (goal = 2) only using default method
 # Implement function
-out1 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                         destination = rxy[6, , drop = FALSE],
-                         surface = r,
-                         goal = 2)
+out1 <- lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[6, , drop = FALSE],
+  surface = r,
+  goal = 2
+)
 # The path is stored in path_lcp, This includes:
 # ... (a) a dataframe with the cells comprising each path:
 # ... (b) a SpatialLines object of the path
@@ -373,18 +422,23 @@ out1$cppRouting_param$get_path_pair_param
 # Note the path is also added to the plot produced, if plot = TRUE.
 
 #### Example (9) Shortest distances and paths (goal = 3) using default method
-out1 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                         destination = rxy[6, , drop = FALSE],
-                         surface = r,
-                         goal = 3)
-out1$dist_lcp; out1$path_lcp
+out1 <- lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[6, , drop = FALSE],
+  surface = r,
+  goal = 3
+)
+out1$dist_lcp
+out1$path_lcp
 
 #### Example (10) Shortest distances and paths (goal = 3) via gdistance
-out1 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                         destination = rxy[6, , drop = FALSE],
-                         surface = r,
-                         goal = 3,
-                         method = "gdistance")
+out1 <- lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[6, , drop = FALSE],
+  surface = r,
+  goal = 3,
+  method = "gdistance"
+)
 # As above, paths are stored in path_lcp and distances in dist_lcp
 out1$path_lcp
 # For method = "gdistance", paths between pairs of coordinates are computed
@@ -397,23 +451,29 @@ out1$gdistance_param$shortestPath_param
 # ... is only implemented for distance calculations (so not if goal = 2),
 # ... while parallelisation is implemented for both distance and shortest
 # ... paths for method = "gdistance"
-out1 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                         destination = rxy[6, , drop = FALSE],
-                         surface = r,
-                         goal = 3,
-                         use_all_cores = TRUE)
-out1 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                         destination = rxy[6, , drop = FALSE],
-                         surface = r,
-                         goal = 2,
-                         method = "gdistance",
-                         cl = parallel::makeCluster(2L))
-out1 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
-                         destination = rxy[6, , drop = FALSE],
-                         surface = r,
-                         goal = 3,
-                         method = "gdistance",
-                         cl = parallel::makeCluster(2L))
+out1 <- lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[6, , drop = FALSE],
+  surface = r,
+  goal = 3,
+  use_all_cores = TRUE
+)
+out1 <- lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[6, , drop = FALSE],
+  surface = r,
+  goal = 2,
+  method = "gdistance",
+  cl = parallel::makeCluster(2L)
+)
+out1 <- lcp_over_surface(
+  origin = rxy[1, , drop = FALSE],
+  destination = rxy[6, , drop = FALSE],
+  surface = r,
+  goal = 3,
+  method = "gdistance",
+  cl = parallel::makeCluster(2L)
+)
 
 
 ############################################################################
@@ -421,40 +481,52 @@ out1 <- lcp_over_surface(origin = rxy[1, , drop = FALSE],
 
 #### Example (12): Shortest distances/paths computed in sequence:
 # cppRouting method
-out1 <- lcp_over_surface(origin = rxy[1:2, , drop = FALSE],
-                         destination = rxy[5:6, , drop = FALSE],
-                         surface = r,
-                         goal = 3)
+out1 <- lcp_over_surface(
+  origin = rxy[1:2, , drop = FALSE],
+  destination = rxy[5:6, , drop = FALSE],
+  surface = r,
+  goal = 3
+)
 # gdistance method
-out2 <- lcp_over_surface(origin = rxy[1:2, , drop = FALSE],
-                         destination = rxy[5:6, , drop = FALSE],
-                         surface = r,
-                         goal = 3,
-                         method = "gdistance")
-out1$dist_lcp; out1$path_lcp
-out2$dist_lcp; out2$path_lcp
+out2 <- lcp_over_surface(
+  origin = rxy[1:2, , drop = FALSE],
+  destination = rxy[5:6, , drop = FALSE],
+  surface = r,
+  goal = 3,
+  method = "gdistance"
+)
+out1$dist_lcp
+out1$path_lcp
+out2$dist_lcp
+out2$path_lcp
 
 #### Example (13): Shortest distances/paths computed in parallel:
 # cppRouting method for goal 3
-out1 <- lcp_over_surface(origin = rxy[1:2, , drop = FALSE],
-                         destination = rxy[5:6, , drop = FALSE],
-                         surface = r,
-                         goal = 3,
-                         use_all_cores = TRUE)
+out1 <- lcp_over_surface(
+  origin = rxy[1:2, , drop = FALSE],
+  destination = rxy[5:6, , drop = FALSE],
+  surface = r,
+  goal = 3,
+  use_all_cores = TRUE
+)
 # gdistance method for goal 2
-out1 <- lcp_over_surface(origin = rxy[1:2, , drop = FALSE],
-                         destination = rxy[5:6, , drop = FALSE],
-                         surface = r,
-                         goal = 2,
-                         method = "gdistance",
-                         cl = parallel::makeCluster(2L))
+out1 <- lcp_over_surface(
+  origin = rxy[1:2, , drop = FALSE],
+  destination = rxy[5:6, , drop = FALSE],
+  surface = r,
+  goal = 2,
+  method = "gdistance",
+  cl = parallel::makeCluster(2L)
+)
 # gdistance method for goal 3
-out1 <- lcp_over_surface(origin = rxy[1:2, , drop = FALSE],
-                         destination = rxy[5:6, , drop = FALSE],
-                         surface = r,
-                         goal = 3,
-                         method = "gdistance",
-                         cl = parallel::makeCluster(2L))
+out1 <- lcp_over_surface(
+  origin = rxy[1:2, , drop = FALSE],
+  destination = rxy[5:6, , drop = FALSE],
+  surface = r,
+  goal = 3,
+  method = "gdistance",
+  cl = parallel::makeCluster(2L)
+)
 
 
 ############################################################################
@@ -462,30 +534,40 @@ out1 <- lcp_over_surface(origin = rxy[1:2, , drop = FALSE],
 
 #### Example (14) Compute all combinations via combination = "matrix"
 # cppRouting goal 3
-out1 <- lcp_over_surface(origin = rxy[1:2, , drop = FALSE],
-                         destination = rxy[5:6, , drop = FALSE],
-                         surface = r,
-                         goal = 3,
-                         cppRouting_algorithm = "phast",
-                         combination = "matrix")
-out1$dist_euclid; out1$dist_lcp; out1$path_lcp
+out1 <- lcp_over_surface(
+  origin = rxy[1:2, , drop = FALSE],
+  destination = rxy[5:6, , drop = FALSE],
+  surface = r,
+  goal = 3,
+  cppRouting_algorithm = "phast",
+  combination = "matrix"
+)
+out1$dist_euclid
+out1$dist_lcp
+out1$path_lcp
 # cppRouting goal 3 parallelised
-out1 <- lcp_over_surface(origin = rxy[1:2, , drop = FALSE],
-                         destination = rxy[5:6, , drop = FALSE],
-                         surface = r,
-                         goal = 3,
-                         combination = "matrix",
-                         cppRouting_algorithm = "phast",
-                         use_all_cores = TRUE)
+out1 <- lcp_over_surface(
+  origin = rxy[1:2, , drop = FALSE],
+  destination = rxy[5:6, , drop = FALSE],
+  surface = r,
+  goal = 3,
+  combination = "matrix",
+  cppRouting_algorithm = "phast",
+  use_all_cores = TRUE
+)
 # gdistance goal 3
-out1 <- lcp_over_surface(origin = rxy[1:2, , drop = FALSE],
-                         destination = rxy[5:6, , drop = FALSE],
-                         surface = r,
-                         goal = 3,
-                         method = "gdistance",
-                         combination = "matrix",
-                         cl = parallel::makeCluster(2L))
-out1$dist_euclid; out1$dist_lcp; out1$path_lcp
+out1 <- lcp_over_surface(
+  origin = rxy[1:2, , drop = FALSE],
+  destination = rxy[5:6, , drop = FALSE],
+  surface = r,
+  goal = 3,
+  method = "gdistance",
+  combination = "matrix",
+  cl = parallel::makeCluster(2L)
+)
+out1$dist_euclid
+out1$dist_lcp
+out1$path_lcp
 
 #### Example (15): Real world example with multiple origins/destinations
 ## Zoom in on an area of interest
@@ -496,30 +578,36 @@ dat_gebco_utm_planar_zoom <- raster::crop(dat_gebco_utm_planar, ext)
 dat_gebco_utm_planar_zoom_xy <- raster::coordinates(dat_gebco_utm_planar_zoom)
 # Sample random origins
 set.seed(2019)
-index       <- sample(1:nrow(dat_gebco_utm_planar_zoom_xy), 2)
-origin      <- dat_gebco_utm_planar_zoom_xy[index, ]
+index <- sample(1:nrow(dat_gebco_utm_planar_zoom_xy), 2)
+origin <- dat_gebco_utm_planar_zoom_xy[index, ]
 # Sample random destinations
 set.seed(2020)
-index       <- sample(1:nrow(dat_gebco_utm_planar_zoom_xy), 3)
+index <- sample(1:nrow(dat_gebco_utm_planar_zoom_xy), 3)
 destination <- dat_gebco_utm_planar_zoom_xy[index, ]
 # Implement algorithm
-out_gebco1 <- lcp_over_surface(origin = origin,
-                               destination = destination,
-                               surface = dat_gebco_utm_planar,
-                               method = "gdistance",
-                               goal = 3,
-                               combination = "matrix")
-out_gebco2 <- lcp_over_surface(origin = origin,
-                               destination = destination,
-                               surface = dat_gebco_utm_planar,
-                               method = "cppRouting",
-                               goal = 3,
-                               combination = "matrix",
-                               cppRouting_algorithm = "phast")
+out_gebco1 <- lcp_over_surface(
+  origin = origin,
+  destination = destination,
+  surface = dat_gebco_utm_planar,
+  method = "gdistance",
+  goal = 3,
+  combination = "matrix"
+)
+out_gebco2 <- lcp_over_surface(
+  origin = origin,
+  destination = destination,
+  surface = dat_gebco_utm_planar,
+  method = "cppRouting",
+  goal = 3,
+  combination = "matrix",
+  cppRouting_algorithm = "phast"
+)
 # The function returns distances between all combinations
-out_gebco1$dist_lcp; out_gebco2$dist_lcp
+out_gebco1$dist_lcp
+out_gebco2$dist_lcp
 # The two outputs are the same (though the ordering of factor levels differs)
-str(out_gebco1$path_lcp$cells); str(out_gebco2$path_lcp$cells)
+str(out_gebco1$path_lcp$cells)
+str(out_gebco2$path_lcp$cells)
 
 }
 \author{

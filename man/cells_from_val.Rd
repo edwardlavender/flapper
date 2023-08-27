@@ -27,7 +27,7 @@ This function obtains a RasterLayer or the cells of a RasterLayer that are equal
 # Define an example RasterLayer
 ncl <- 10
 nrw <- 10
-n   <- ncl*nrw
+n <- ncl * nrw
 mat <- matrix(1:n, ncol = ncl, nrow = nrw, byrow = TRUE)
 r <- raster::raster(mat)
 # Visualise example RasterLayer

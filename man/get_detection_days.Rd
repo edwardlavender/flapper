@@ -45,23 +45,26 @@ utils::head(dat)
 
 #### Example (2) Detection days between specified individual/receiver pairs
 dat <- get_detection_days(dat_acoustics,
-                          individual_id = c(25, 28),
-                          receiver_id = c(3, 24),
-                          type = 1L)
+  individual_id = c(25, 28),
+  receiver_id = c(3, 24),
+  type = 1L
+)
 utils::head(dat)
 
 #### Example (3) Detection days between all combinations of specified
-#... individuals/receivers
+# ... individuals/receivers
 dat <- get_detection_days(dat_acoustics,
-                          individual_id = c(25, 28),
-                          receiver_id = c(3, 24),
-                          type = 2L)
+  individual_id = c(25, 28),
+  receiver_id = c(3, 24),
+  type = 2L
+)
 utils::head(dat)
 
 #### Example (4) Match detection days to another dataframe
 dat_acoustics$detection_days <- get_detection_days(dat_acoustics,
-                                                   match_to = dat_acoustics,
-                                                   type = 1L)
+  match_to = dat_acoustics,
+  type = 1L
+)
 
 utils::head(dat_acoustics)
 

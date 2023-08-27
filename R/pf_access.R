@@ -23,7 +23,7 @@
 #' # ... For speed, we will implement the algorithm using pre-defined data
 #' pf_args <- dat_dcpf_histories$args
 #' pf_args$calc_distance_euclid_fast <- TRUE
-#' pf_args$write_history             <- list(file = root)
+#' pf_args$write_history <- list(file = root)
 #' do.call(pf, pf_args)
 #' # List the files
 #' files <- pf_access_history_files(root)
@@ -33,14 +33,14 @@
 #' @author Edward Lavender
 #' @export
 
-pf_access_history_files <- function(root, use_absolute_paths = FALSE, use_list = FALSE,...){
-  if(!requireNamespace("stringr", quietly = TRUE)){
+pf_access_history_files <- function(root, use_absolute_paths = FALSE, use_list = FALSE, ...) {
+  if (!requireNamespace("stringr", quietly = TRUE)) {
     stop("This function requires the 'stringr' package. Please install it before continuing with install.packages('stringr').")
   }
-  check...("full.names",...)
+  check...("full.names", ...)
   check_dir(input = root)
-  files <- list.files(root,...)
-  if(!grepl("pf_", files[1], fixed = TRUE)){
+  files <- list.files(root, ...)
+  if (!grepl("pf_", files[1], fixed = TRUE)) {
     stop("File naming structure is unrecognised.", immediate. = TRUE)
   }
   files <- data.frame(index = 1:length(files), name = files)
@@ -48,12 +48,12 @@ pf_access_history_files <- function(root, use_absolute_paths = FALSE, use_list =
   files$pf_id <- substr(files$pf_id, 1, nchar(files$pf_id) - 4)
   files$pf_id <- as.integer(as.character(files$pf_id))
   files <- files %>% dplyr::arrange(.data$pf_id)
-  files <- list.files(root, full.names = TRUE,...)[files$index]
-  if(use_absolute_paths) {
+  files <- list.files(root, full.names = TRUE, ...)[files$index]
+  if (use_absolute_paths) {
     files <- sapply(files, function(f) tools::file_path_as_absolute(f))
     names(files) <- NULL
   }
-  if(use_list) files <- as.list(files)
+  if (use_list) files <- as.list(files)
   return(files)
 }
 
@@ -74,18 +74,17 @@ pf_access_history_files <- function(root, use_absolute_paths = FALSE, use_list =
 #' @export
 
 pf_access_history <- function(archive,
-                              bathy = NULL
-){
+                              bathy = NULL) {
   check_class(input = archive, to_class = "pf_archive")
-  if(is.null(bathy)) bathy <- archive$args$bathy
-  history <- lapply(1:length(archive$history), function(t){
+  if (is.null(bathy)) bathy <- archive$args$bathy
+  history <- lapply(1:length(archive$history), function(t) {
     elm <- archive$history[[t]]
-    if(!rlang::has_name(elm, "timestep")) elm$timestep <- t
+    if (!rlang::has_name(elm, "timestep")) elm$timestep <- t
     elm <- elm[, c("timestep", "id_current", "pr_current")]
   })
   history <- do.call(rbind, history)
   colnames(history) <- c("timestep", "cell_id", "cell_pr")
-  if(!is.null(bathy)){
+  if (!is.null(bathy)) {
     history[, c("cell_x", "cell_y")] <- raster::extract(bathy, history$cell_id)
     history$cell_z <- raster::extract(bathy, history$cell_id)
   }
@@ -119,7 +118,8 @@ pf_access_history <- function(archive,
 #' pf_access_particles_unique(dat_dcpf_histories$history)
 #' # Supply a cluster to speed up the algorithm (for very large lists)
 #' pf_access_particles_unique(dat_dcpf_histories$history,
-#'                            cl = parallel::makeCluster(2L))
+#'   cl = parallel::makeCluster(2L)
+#' )
 #'
 #' #### Example (2): Access unique particles when 'history' is a list of file paths
 #'
@@ -136,13 +136,15 @@ pf_access_history <- function(archive,
 #' pf_access_particles_unique(pf_access_history_files(root, use_list = TRUE))
 #' # Supply a cluster to speed up the algorithm (for very large lists)
 #' pf_access_particles_unique(pf_access_history_files(root, use_list = TRUE),
-#'                            cl = parallel::makeCluster(2L))
+#'   cl = parallel::makeCluster(2L)
+#' )
 #'
 #' ## Access particle histories using the 'memory_safe' option
 #' # For large lists, this is likely to be slower
 #' # ... but it may be the only option in some cases.
 #' pf_access_particles_unique(pf_access_history_files(root, use_list = TRUE),
-#'                            use_memory_safe = TRUE)
+#'   use_memory_safe = TRUE
+#' )
 #'
 #' @seealso \code{\link[flapper]{pf}} implements particle filtering.
 #' @author Edward Lavender
@@ -150,56 +152,53 @@ pf_access_history <- function(archive,
 
 pf_access_particles_unique <- function(history,
                                        use_memory_safe = FALSE,
-                                       cl = NULL, varlist = NULL){
-
+                                       cl = NULL, varlist = NULL) {
   #### Setup
   check_class(input = history, to_class = "list")
-  if(inherits(history, "pf_archive")) history <- history$history
-  history_1   <- history[[1]]
+  if (inherits(history, "pf_archive")) history <- history$history
+  history_1 <- history[[1]]
   read_history <- FALSE
-  if(inherits(history_1, "character")){
+  if (inherits(history_1, "character")) {
     read_history <- TRUE
-    if(!file.exists(history_1)) stop(paste0("history[[1]] ('", history_1, "') does not exist."))
+    if (!file.exists(history_1)) stop(paste0("history[[1]] ('", history_1, "') does not exist."))
     history_1 <- readRDS(history_1)
   }
 
   #### Access unique cells (from file)
-  if(read_history){
-
+  if (read_history) {
     ## Memory-safe(r) option: load files sequentially, selecting unique cells at each step
-    if(use_memory_safe){
-      if(!is.null(cl)) {
+    if (use_memory_safe) {
+      if (!is.null(cl)) {
         warning("'cl' is not implemented for loading files when use_memory_safe = TRUE.",
-                immediate. = TRUE, call. = FALSE)
+          immediate. = TRUE, call. = FALSE
+        )
         cl <- varlist <- NULL
       }
       cells <- unique(history_1$id_current)
-      for(i in 2:length(history)){
+      for (i in 2:length(history)) {
         cells <- unique(c(cells, readRDS(history[[i]])$id_current))
       }
 
       ## Faster option: load all cells for each time step, selecting unique cells at the end
     } else {
       cells_by_time <- cl_lapply(history,
-                                 cl = cl, varlist = varlist,
-                                 function(f) readRDS(f)$id_current)
+        cl = cl, varlist = varlist,
+        function(f) readRDS(f)$id_current
+      )
       cells <- unlist(cells_by_time)
       cells <- unique(cells)
-
     }
 
     #### Access unique cells (in memory)
   } else {
-
     cells <- cl_lapply(history,
-                       cl = cl, varlist = varlist,
-                       fun = function(d) d$id_current)
+      cl = cl, varlist = varlist,
+      fun = function(d) d$id_current
+    )
     cells <- unlist(cells)
     cells <- unique(cells)
-
   }
 
   #### Return unique cells
   return(cells)
 }
-

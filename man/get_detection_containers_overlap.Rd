@@ -28,49 +28,57 @@ This function requires the \code{\link[tidyr]{tidyr-package}} (specifically \cod
 #### Define receiver containers
 ## Define receiver locations as a SpatialPoints object with a UTM CRS
 proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 rownames(dat_moorings) <- dat_moorings$receiver_id
-xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-                        proj_wgs84)
+xy <- sp::SpatialPoints(
+  dat_moorings[, c("receiver_long", "receiver_lat")],
+  proj_wgs84
+)
 xy <- sp::spTransform(xy, proj_utm)
 ## Get receiver-specific detection containers
 # ... via get_detection_containers with byid = TRUE
 containers <- get_detection_containers(xy, byid = TRUE)
 ## Link detection containers with receiver IDs and deployment dates
 # ... in a SpatialPointsDataFrame, as required for this function.
-containers_df <- dat_moorings[, c("receiver_id",
-                                 "receiver_start_date",
-                                 "receiver_end_date")]
+containers_df <- dat_moorings[, c(
+  "receiver_id",
+  "receiver_start_date",
+  "receiver_end_date"
+)]
 row.names(containers_df) <- names(containers)
 containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
 
 ## Simulate some receiver 'servicing' dates for demonstration purposes
 set.seed(1)
 # Loop over each receiver...
-services_by_receiver <- lapply(split(dat_moorings, 1:nrow(dat_moorings)), function(din){
+services_by_receiver <- lapply(split(dat_moorings, 1:nrow(dat_moorings)), function(din) {
   # For the receiver, simulate the number of servicing events
   n <- sample(0:3, 1)
   dout <- NULL
-  if(n > 0){
+  if (n > 0) {
     # simulate the timing of servicing events
     dates <- sample(seq(min(din$receiver_start_date), max(din$receiver_end_date), "days"), n)
-    dout <- data.frame(receiver_id = rep(din$receiver_id, length(dates)),
-                       service_start_date = dates,
-                       service_end_date = dates)
+    dout <- data.frame(
+      receiver_id = rep(din$receiver_id, length(dates)),
+      service_start_date = dates,
+      service_end_date = dates
+    )
   }
   return(dout)
 })
 services <- do.call(rbind, services_by_receiver)
 rownames(services) <- NULL
-if(nrow(services) == 0) services <- NULL
+if (nrow(services) == 0) services <- NULL
 
 #### Example (1): Implement function using containers alone
 overlaps_1 <- get_detection_containers_overlap(containers = containers)
 summary(overlaps_1)
 
 #### Example (2): Account for servicing dates
-overlaps_2 <- get_detection_containers_overlap(containers = containers,
-                                              services = services)
+overlaps_2 <- get_detection_containers_overlap(
+  containers = containers,
+  services = services
+)
 # Examine the first few simulated servicing events
 services[1:3, ]
 # Show that the list_by_date element for the first servicing event
@@ -83,9 +91,9 @@ overlaps_2$list_by_date[[as.character(services$service_start_date[1])]]
 # ... includes overlapping receivers in overlaps_1 but not overlaps_2:
 r_id <- services$receiver_id[1]
 overlaps_1$list_by_receiver[[r_id]][overlaps_1$list_by_receiver[[r_id]]$timestamp \%in\%
-                                      services$service_start_date[services$receiver_id == r_id], ]
+  services$service_start_date[services$receiver_id == r_id], ]
 overlaps_2$list_by_receiver[[r_id]][overlaps_2$list_by_receiver[[r_id]]$timestamp \%in\%
-                                      services$service_start_date[services$receiver_id == r_id], ]
+  services$service_start_date[services$receiver_id == r_id], ]
 
 }
 \seealso{

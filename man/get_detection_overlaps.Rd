@@ -42,16 +42,20 @@ utils::head(dat)
 ## (see ?flapper::get_detection_container_overlaps)
 # Define receiver locations
 proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
+proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 rownames(dat_moorings) <- dat_moorings$receiver_id
-xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-                        proj_wgs84)
+xy <- sp::SpatialPoints(
+  dat_moorings[, c("receiver_long", "receiver_lat")],
+  proj_wgs84
+)
 xy <- sp::spTransform(xy, proj_utm)
 # Get receiver-specific detection containers
 containers <- get_detection_containers(xy, byid = TRUE)
-containers_df <- dat_moorings[, c("receiver_id",
-                                 "receiver_start_date",
-                                 "receiver_end_date")]
+containers_df <- dat_moorings[, c(
+  "receiver_id",
+  "receiver_start_date",
+  "receiver_end_date"
+)]
 row.names(containers_df) <- names(containers)
 containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
 # Define detection container overlaps
@@ -65,11 +69,13 @@ utils::head(dat)
 # For some individuals, there are simultaneous detections at receivers with
 # ... non overlapping detection containers, suggesting these are probably too small.
 dat_by_id <-
-  lapply(split(dat_acoustics, dat_acoustics$individual_id),
-         function(acc_for_id){
-           print(paste("individual_id", acc_for_id$individual_id[1], "-------"))
-           get_detection_overlaps(acoustics = acc_for_id, overlaps = overlaps)
-         })
+  lapply(
+    split(dat_acoustics, dat_acoustics$individual_id),
+    function(acc_for_id) {
+      print(paste("individual_id", acc_for_id$individual_id[1], "-------"))
+      get_detection_overlaps(acoustics = acc_for_id, overlaps = overlaps)
+    }
+  )
 ## Test this hypothesis by re-implementing approach with larger containers
 # Re-define containers and receiver overlap
 containers <- get_detection_containers(xy, detection_range = 750, byid = TRUE)
@@ -77,11 +83,13 @@ containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
 overlaps <- get_detection_containers_overlap(containers = containers)
 # Re-implement algorithm
 dat_by_id <-
-  lapply(split(dat_acoustics, dat_acoustics$individual_id),
-         function(acc_for_id){
-           print(paste("individual_id", acc_for_id$individual_id[1], "-------"))
-           get_detection_overlaps(acoustics = acc_for_id, overlaps = overlaps)
-         })
+  lapply(
+    split(dat_acoustics, dat_acoustics$individual_id),
+    function(acc_for_id) {
+      print(paste("individual_id", acc_for_id$individual_id[1], "-------"))
+      get_detection_overlaps(acoustics = acc_for_id, overlaps = overlaps)
+    }
+  )
 # There are now no observations within clock_drift at receivers with
 # ... non-overlapping containers.
 

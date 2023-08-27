@@ -30,7 +30,7 @@ The function is implemented as follows:
 }
 }
 \examples{
-if(interactive()) crop_from_click(dat_gebco)
+if (interactive()) crop_from_click(dat_gebco)
 }
 \author{
 Edward Lavender

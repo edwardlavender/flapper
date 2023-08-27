@@ -33,24 +33,30 @@ This function is designed to populate a raster with simulated values. To impleme
 \examples{
 #### Example (1): Simulate values across the whole raster
 sim_surface(dat_gebco,
-            sim_values = function(n) stats::runif(n = n, 0, 1))
+  sim_values = function(n) stats::runif(n = n, 0, 1)
+)
 sim_surface(dat_gebco,
-            sim_values = function(n) stats::rnorm(n = n, 0, 1))
+  sim_values = function(n) stats::rnorm(n = n, 0, 1)
+)
 
 #### Example (2): Simulate values differently across different areas
 # .. by defining the number of areas into which to split the raster
 # .. and a list of function(s)
 sim_surface(dat_gebco,
-            n = 2, sim_values = list(function(n) stats::runif(n = n, 0, 1),
-                                     function(n) stats::runif(n = n, 10, 11))
-            )
+  n = 2, sim_values = list(
+    function(n) stats::runif(n = n, 0, 1),
+    function(n) stats::runif(n = n, 10, 11)
+  )
+)
 
 #### Example (3): Include a spatial mask
 sim_surface(dat_gebco,
-            n = 2, sim_values = list(function(n) stats::runif(n = n, 9, 10),
-                                    function(n) stats::runif(n = n, 10, 11)),
-            mask = dat_coast, mask_inside = TRUE
-            )
+  n = 2, sim_values = list(
+    function(n) stats::runif(n = n, 9, 10),
+    function(n) stats::runif(n = n, 10, 11)
+  ),
+  mask = dat_coast, mask_inside = TRUE
+)
 
 }
 \author{

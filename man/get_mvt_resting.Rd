@@ -41,33 +41,41 @@ This approach was motivated by the need to identify efficiently `resting' period
 }
 \examples{
 #### Example (1): Assign 'resting' based on a simple depth threshold
-dat_archival$state_1 <- get_mvt_resting(archival = dat_archival,
-                                        fct = "individual_id",
-                                        th_depth = 0.25)
+dat_archival$state_1 <- get_mvt_resting(
+  archival = dat_archival,
+  fct = "individual_id",
+  th_depth = 0.25
+)
 
 #### Example (2): Assign 'resting' based on depth and time thresholds
 # ... Under the default settings, all of observations in the time threshold
 # ... must be below the depth threshold to qualify as 'resting'
-dat_archival$state_2 <- get_mvt_resting(archival = dat_archival,
-                                        fct = "individual_id",
-                                        th_depth = 0.25,
-                                        th_time = 30)
+dat_archival$state_2 <- get_mvt_resting(
+  archival = dat_archival,
+  fct = "individual_id",
+  th_depth = 0.25,
+  th_time = 30
+)
 
 #### Example (3): Dampen the effects of occasionally exceeding the depth threshold
 # ... by increasing the proportion of observations that are allowed to
 # ... exceed the depth threshold in a each time window
-dat_archival$state_3 <- get_mvt_resting(archival = dat_archival,
-                                        fct = "individual_id",
-                                        th_depth = 0.25,
-                                        th_time = 30,
-                                        discrete = 0.05)
+dat_archival$state_3 <- get_mvt_resting(
+  archival = dat_archival,
+  fct = "individual_id",
+  th_depth = 0.25,
+  th_time = 30,
+  discrete = 0.05
+)
 
 #### Example (4): Return average state scores via discrete = NULL
-dat_archival$state_4 <- get_mvt_resting(archival = dat_archival,
-                                        fct = "individual_id",
-                                        th_depth = 0.25,
-                                        th_time = 30,
-                                        discrete = NULL)
+dat_archival$state_4 <- get_mvt_resting(
+  archival = dat_archival,
+  fct = "individual_id",
+  th_depth = 0.25,
+  th_time = 30,
+  discrete = NULL
+)
 
 #### Compare the frequency distribution of states among methods
 # In the first example, a large number of 'resting' states are assigned
@@ -90,16 +98,19 @@ graphics::par(pp)
 dat_archival_1 <- dat_archival[dat_archival$individual_id == 25, ]
 ## Define helper functions
 # Define helper function to plot blank depth time series
-plot_blank <- function(...){
-  prettyGraphics::pretty_plot(dat_archival_1$timestamp, dat_archival_1$depth*-1,
-                              pretty_axis_args = list(side = 3:2),
-                              type = "n",...)
+plot_blank <- function(...) {
+  prettyGraphics::pretty_plot(dat_archival_1$timestamp, dat_archival_1$depth * -1,
+    pretty_axis_args = list(side = 3:2),
+    type = "n", ...
+  )
 }
 # Define helper function to add depth time series, coloured by state, to the plot
-add_lines_for_state <- function(state,...){
-  prettyGraphics::add_lines(x = dat_archival_1$timestamp,
-                            y1 = dat_archival_1$depth*-1,
-                            y2 = dat_archival_1[, state],...)
+add_lines_for_state <- function(state, ...) {
+  prettyGraphics::add_lines(
+    x = dat_archival_1$timestamp,
+    y1 = dat_archival_1$depth * -1,
+    y2 = dat_archival_1[, state], ...
+  )
 }
 ## Make plots
 pp <- graphics::par(mfrow = c(2, 2))

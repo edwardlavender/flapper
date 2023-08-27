@@ -30,9 +30,11 @@ dat_sea <- invert_poly(dat_coast)
 raster::plot(dat_sea, col = "skyblue")
 graphics::par(pp)
 # The CRS of the two objects is identical
-raster::crs(dat_coast); raster::crs(dat_sea)
+raster::crs(dat_coast)
+raster::crs(dat_sea)
 # Compare the classes of the two objects
-class(dat_coast); class(dat_sea)
+class(dat_coast)
+class(dat_sea)
 }
 \author{
 Edward Lavender

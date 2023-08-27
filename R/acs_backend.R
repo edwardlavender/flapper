@@ -45,22 +45,22 @@
 #' #### Step (3) Prepare movement time series for algorithm(s)
 #' # Add required columns to dataframes:
 #' dat_acoustics$timestamp_num <- as.numeric(dat_acoustics$timestamp)
-#' dat_archival$timestamp_num  <- as.numeric(dat_archival$timestamp)
+#' dat_archival$timestamp_num <- as.numeric(dat_archival$timestamp)
 #' # Focus on an example individual
 #' id <- 25
 #' acc <- dat_acoustics[dat_acoustics$individual_id == id, ]
 #' arc <- dat_archival[dat_archival$individual_id == id, ]
 #' # Focus on the subset of data for which we have both acoustic and archival detections
-#' acc <- acc[acc$timestamp >= min(arc$timestamp) - 2*60 &
-#'              acc$timestamp <= max(arc$timestamp) + 2*60, ]
-#' arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
-#'              arc$timestamp <= max(acc$timestamp) + 2*60, ]
+#' acc <- acc[acc$timestamp >= min(arc$timestamp) - 2 * 60 &
+#'   acc$timestamp <= max(arc$timestamp) + 2 * 60, ]
+#' arc <- arc[arc$timestamp >= min(acc$timestamp) - 2 * 60 &
+#'   arc$timestamp <= max(acc$timestamp) + 2 * 60, ]
 #' # We'll focus on a one day period with overlapping detection/depth time series for speed
 #' end <- as.POSIXct("2016-03-18")
 #' acc <- acc[acc$timestamp <= end, ]
 #' arc <- arc[arc$timestamp <= end, ]
-#' arc <- arc[arc$timestamp >= min(acc$timestamp) - 2*60 &
-#'              arc$timestamp <= max(acc$timestamp) + 2*60, ]
+#' arc <- arc[arc$timestamp >= min(acc$timestamp) - 2 * 60 &
+#'   arc$timestamp <= max(acc$timestamp) + 2 * 60, ]
 #' # Process time series
 #' # ... Detections should be rounded to the nearest step
 #' # ... Duplicate detections
@@ -69,104 +69,121 @@
 #' # ... This step has already been implemented for dat_acoustics.
 #'
 #' #### Example (1) Implement AC algorithm with default arguments
-#' out_acdc_1 <- flapper:::.acs(acoustics = acc,
-#'                              bathy = gebco,
-#'                              detection_containers = dat_containers,
-#'                              mobility = 200
-#'                              )
+#' out_acdc_1 <- flapper:::.acs(
+#'   acoustics = acc,
+#'   bathy = gebco,
+#'   detection_containers = dat_containers,
+#'   mobility = 200
+#' )
 #'
 #' #### Example (2) Implement ACDC algorithm with default arguments
-#' out_acdc_2 <- flapper:::.acs(acoustics = acc,
-#'                              archival = arc,
-#'                              bathy = gebco,
-#'                              detection_containers = dat_containers,
-#'                              mobility = 200,
-#'                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
-#'                              )
+#' out_acdc_2 <- flapper:::.acs(
+#'   acoustics = acc,
+#'   archival = arc,
+#'   bathy = gebco,
+#'   detection_containers = dat_containers,
+#'   mobility = 200,
+#'   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
+#' )
 #'
 #' #### Example (3) Implement AC or ACDC algorithm with detection probability kernels
 #'
 #' ## (A) Get detection container overlaps
 #' # Define receiver locations as a SpatialPointsDataFrame object with a UTM CRS
 #' proj_wgs84 <- sp::CRS(SRS_string = "EPSG:4326")
-#' proj_utm   <- sp::CRS(SRS_string = "EPSG:32629")
+#' proj_utm <- sp::CRS(SRS_string = "EPSG:32629")
 #' rownames(dat_moorings) <- dat_moorings$receiver_id
-#' xy <- sp::SpatialPoints(dat_moorings[, c("receiver_long", "receiver_lat")],
-#'                         proj_wgs84)
+#' xy <- sp::SpatialPoints(
+#'   dat_moorings[, c("receiver_long", "receiver_lat")],
+#'   proj_wgs84
+#' )
 #' xy <- sp::spTransform(xy, proj_utm)
-#' xy <- sp::SpatialPointsDataFrame(xy, dat_moorings[, c("receiver_id",
-#'                                                       "receiver_start_date",
-#'                                                       "receiver_end_date")])
+#' xy <- sp::SpatialPointsDataFrame(xy, dat_moorings[, c(
+#'   "receiver_id",
+#'   "receiver_start_date",
+#'   "receiver_end_date"
+#' )])
 #' # Get detection overlap(s) as a SpatialPolygonsDataFrame
-#' containers <- get_detection_containers(xy = sp::SpatialPoints(xy),
-#'                                      detection_range = 425,
-#'                                      coastline = dat_coast,
-#'                                      byid = TRUE)
-#' containers_df <- dat_moorings[, c("receiver_id",
-#'                                  "receiver_start_date",
-#'                                  "receiver_end_date")]
+#' containers <- get_detection_containers(
+#'   xy = sp::SpatialPoints(xy),
+#'   detection_range = 425,
+#'   coastline = dat_coast,
+#'   byid = TRUE
+#' )
+#' containers_df <- dat_moorings[, c(
+#'   "receiver_id",
+#'   "receiver_start_date",
+#'   "receiver_end_date"
+#' )]
 #' row.names(containers_df) <- names(containers)
 #' containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
-#' overlaps <- get_detection_containers_overlap(containers =  containers)
+#' overlaps <- get_detection_containers_overlap(containers = containers)
 #'
 #' ## (B) Define detection probability function based on distance and detection_range
 #' calc_dpr <-
-#'   function(x){
+#'   function(x) {
 #'     ifelse(x <= 425, stats::plogis(2.5 + -0.02 * x), 0)
 #'   }
 #'
 #' ## (C) Get detection kernels (a slow step)
-#' kernels <- acs_setup_detection_kernels(xy = xy,
-#'                                        containers = dat_containers,
-#'                                        overlaps = overlaps,
-#'                                        calc_detection_pr = calc_dpr,
-#'                                        bathy = gebco)
+#' kernels <- acs_setup_detection_kernels(
+#'   xy = xy,
+#'   containers = dat_containers,
+#'   overlaps = overlaps,
+#'   calc_detection_pr = calc_dpr,
+#'   bathy = gebco
+#' )
 #' ## (D) Implement algorithm
-#' out_acdc_3 <- flapper:::.acs(acoustics = acc,
-#'                              archival = arc,
-#'                              bathy = gebco,
-#'                              detection_containers = dat_containers,
-#'                              detection_kernels = kernels,
-#'                              detection_kernels_overlap = overlaps$list_by_receiver,
-#'                              detection_time_window = 10,
-#'                              mobility = 200,
-#'                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
-#'                              )
+#' out_acdc_3 <- flapper:::.acs(
+#'   acoustics = acc,
+#'   archival = arc,
+#'   bathy = gebco,
+#'   detection_containers = dat_containers,
+#'   detection_kernels = kernels,
+#'   detection_kernels_overlap = overlaps$list_by_receiver,
+#'   detection_time_window = 10,
+#'   mobility = 200,
+#'   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
+#' )
 #'
 #' #### Example (4): Compare outputs with/without detection probability and normalisation
 #' ## Without detection kernels
-#' out_acdc_4a <- flapper:::.acs(acoustics = acc,
-#'                               archival = arc,
-#'                               bathy = gebco,
-#'                               detection_containers = dat_containers,
-#'                               mobility = 200,
-#'                               calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
-#'                               )
-#' out_acdc_4b <- flapper:::.acs(acoustics = acc,
-#'                               archival = arc,
-#'                               bathy = gebco,
-#'                               detection_containers = dat_containers,
-#'                               normalise = TRUE,
-#'                               mobility = 200,
-#'                               calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
-#'                               )
+#' out_acdc_4a <- flapper:::.acs(
+#'   acoustics = acc,
+#'   archival = arc,
+#'   bathy = gebco,
+#'   detection_containers = dat_containers,
+#'   mobility = 200,
+#'   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
+#' )
+#' out_acdc_4b <- flapper:::.acs(
+#'   acoustics = acc,
+#'   archival = arc,
+#'   bathy = gebco,
+#'   detection_containers = dat_containers,
+#'   normalise = TRUE,
+#'   mobility = 200,
+#'   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
+#' )
 #' ## With detection kernels
-#' out_acdc_4c <- flapper:::.acs(acoustics = acc,
-#'                               archival = arc,
-#'                               bathy = gebco,
-#'                               detection_containers = dat_containers,
-#'                               detection_kernels = kernels,
-#'                               mobility = 200,
-#'                               calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
-#'                               )
-#' out_acdc_4d <- flapper:::.acs(acoustics = acc,
-#'                               archival = arc,
-#'                               bathy = gebco,
-#'                                detection_containers = dat_containers,
-#'                               detection_kernels = kernels, normalise = TRUE,
-#'                               mobility = 200,
-#'                               calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
-#'                               )
+#' out_acdc_4c <- flapper:::.acs(
+#'   acoustics = acc,
+#'   archival = arc,
+#'   bathy = gebco,
+#'   detection_containers = dat_containers,
+#'   detection_kernels = kernels,
+#'   mobility = 200,
+#'   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
+#' )
+#' out_acdc_4d <- flapper:::.acs(
+#'   acoustics = acc,
+#'   archival = arc,
+#'   bathy = gebco,
+#'   detection_containers = dat_containers,
+#'   detection_kernels = kernels, normalise = TRUE,
+#'   mobility = 200,
+#'   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2)
+#' )
 #' ## Comparison of final maps
 #' pp <- par(mfrow = c(2, 2))
 #' raster::plot(out_acdc_4a$map, main = "4a")
@@ -176,15 +193,16 @@
 #' par(pp)
 #'
 #' #### Example (5): Implement AC or ACDC algorithm and write messages to file via 'con'
-#' out_acdc_5 <- flapper:::.acs(acoustics = acc,
-#'                              archival = arc,
-#'                              bathy = gebco,
-#'                              detection_containers = dat_containers,
-#'                              mobility = 200,
-#'                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-#'                              verbose = TRUE,
-#'                              con = paste0(tempdir(), "/", "acdc_log.txt")
-#'                              )
+#' out_acdc_5 <- flapper:::.acs(
+#'   acoustics = acc,
+#'   archival = arc,
+#'   bathy = gebco,
+#'   detection_containers = dat_containers,
+#'   mobility = 200,
+#'   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+#'   verbose = TRUE,
+#'   con = paste0(tempdir(), "/", "acdc_log.txt")
+#' )
 #' # Check log
 #' utils::head(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
 #' utils::tail(readLines(paste0(tempdir(), "/", "acdc_log.txt")))
@@ -192,46 +210,43 @@
 #' #### Example (6): Implement AC or ACDC algorithm and return spatial information
 #' # Specify save_record_spatial = NULL to include spatial information for all time steps
 #' # ... (used for plotting) or a vector to include this information for specific time steps
-#' out_acdc_6 <- flapper:::.acs(acoustics = acc,
-#'                              archival = arc,
-#'                              bathy = gebco,
-#'                              detection_containers = dat_containers,
-#'                              mobility = 200,
-#'                              calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-#'                              save_record_spatial = NULL,
-#'                              verbose = TRUE,
-#'                              con = paste0(tempdir(), "/", "acdc_log.txt")
-#'                              )
-#'
+#' out_acdc_6 <- flapper:::.acs(
+#'   acoustics = acc,
+#'   archival = arc,
+#'   bathy = gebco,
+#'   detection_containers = dat_containers,
+#'   mobility = 200,
+#'   calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+#'   save_record_spatial = NULL,
+#'   verbose = TRUE,
+#'   con = paste0(tempdir(), "/", "acdc_log.txt")
+#' )
 #'
 #' @author Edward Lavender
 #' @keywords internal
 
 .acs <-
   function(
-    acoustics,
-    archival = NULL,
-    step = 120,
-    round_ts = TRUE,
-    plot_ts = TRUE,
-    bathy,
-    map = NULL,
-    detection_containers,
-    detection_kernels = NULL, detection_kernels_overlap = NULL, detection_time_window = 5,
-    mobility,
-    calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
-    normalise = TRUE,
-    chunk = 1L,
-    save_record_spatial = 1L,
-    write_record_spatial_for_pf = NULL,
-    save_args = TRUE,
-    verbose = TRUE,
-    con = "",
-    progress = 1L,
-    check = TRUE
-  ){
-
-
+      acoustics,
+      archival = NULL,
+      step = 120,
+      round_ts = TRUE,
+      plot_ts = TRUE,
+      bathy,
+      map = NULL,
+      detection_containers,
+      detection_kernels = NULL, detection_kernels_overlap = NULL, detection_time_window = 5,
+      mobility,
+      calc_depth_error = function(...) matrix(c(-2.5, 2.5), nrow = 2),
+      normalise = TRUE,
+      chunk = 1L,
+      save_record_spatial = 1L,
+      write_record_spatial_for_pf = NULL,
+      save_args = TRUE,
+      verbose = TRUE,
+      con = "",
+      progress = 1L,
+      check = TRUE) {
     ######################################
     ######################################
     #### Set up
@@ -242,42 +257,44 @@
     # ... any saved spatial data
     # ... the final space use raster
     out <- list(map = NULL, record = NULL, time = NULL, args = NULL, chunks = NULL, simplify = FALSE)
-    if(save_args) {
-      out$args <- list(acoustics = acoustics,
-                       archival = archival,
-                       step = step,
-                       round_ts = round_ts,
-                       plot_ts = plot_ts,
-                       bathy = bathy,
-                       map = map,
-                       detection_containers = detection_containers,
-                       detection_kernels = detection_kernels,
-                       detection_kernels_overlap = detection_kernels_overlap,
-                       detection_time_window = detection_time_window,
-                       mobility = mobility,
-                       calc_depth_error = calc_depth_error,
-                       normalise = normalise,
-                       chunk = chunk,
-                       save_record_spatial = save_record_spatial,
-                       write_record_spatial_for_pf = write_record_spatial_for_pf,
-                       save_args = save_args,
-                       verbose = verbose,
-                       con = con,
-                       progress = progress,
-                       check = check)
+    if (save_args) {
+      out$args <- list(
+        acoustics = acoustics,
+        archival = archival,
+        step = step,
+        round_ts = round_ts,
+        plot_ts = plot_ts,
+        bathy = bathy,
+        map = map,
+        detection_containers = detection_containers,
+        detection_kernels = detection_kernels,
+        detection_kernels_overlap = detection_kernels_overlap,
+        detection_time_window = detection_time_window,
+        mobility = mobility,
+        calc_depth_error = calc_depth_error,
+        normalise = normalise,
+        chunk = chunk,
+        save_record_spatial = save_record_spatial,
+        write_record_spatial_for_pf = write_record_spatial_for_pf,
+        save_args = save_args,
+        verbose = verbose,
+        con = con,
+        progress = progress,
+        check = check
+      )
     }
     out$record <- list()
 
     #### Define function for printing messages to file or console
     ## Check the connection for writing files, if applicable
-    if(check & con != ""){
-      if(!verbose) {
+    if (check & con != "") {
+      if (!verbose) {
         message("Input to 'con' ignored since verbose = FALSE.")
       } else {
         # Check directory
         check_dir(input = dirname(con))
         # Write black file to directory if required
-        if(!file.exists(con)){
+        if (!file.exists(con)) {
           message("'con' file does not exist: attempting to write file in specified directory...")
           file.create(file1 = con)
           message("Blank 'con' successfully written to file.")
@@ -286,8 +303,8 @@
     }
     ## Define function
     append_messages <- ifelse(con == "", FALSE, TRUE)
-    cat_to_cf <- function(..., message = verbose, file = con, append = append_messages){
-      if(message) cat(paste(..., "\n"), file = con, append = append)
+    cat_to_cf <- function(..., message = verbose, file = con, append = append_messages) {
+      if (message) cat(paste(..., "\n"), file = con, append = append)
     }
 
     #### Checks
@@ -295,123 +312,145 @@
     t_onset <- Sys.time()
     cat_to_cf(paste0("flapper::.acs() called (@ ", t_onset, ")..."))
     out$time <- data.frame(event = "onset", time = t_onset)
-    if(check){
+    if (check) {
       cat_to_cf("... Checking user inputs...")
       # Check acoustics contains required column names and correct variable types
-      check_names(input = acoustics,
-                  req = c("index", "timestamp", "timestamp_num", "receiver_id"),
-                  extract_names = colnames,
-                  type = all)
+      check_names(
+        input = acoustics,
+        req = c("index", "timestamp", "timestamp_num", "receiver_id"),
+        extract_names = colnames,
+        type = all
+      )
       check_class(input = acoustics$timestamp, to_class = "POSIXct", type = "stop")
       check_class(input = acoustics$receiver_id, to_class = "integer", type = "stop")
       # Check archival contains required column names and correct variable types
-      if(!is.null(archival)){
-        check_names(input = archival,
-                    req = c("timestamp", "timestamp_num", "depth"),
-                    extract_names = colnames,
-                    type = all)
+      if (!is.null(archival)) {
+        check_names(
+          input = archival,
+          req = c("timestamp", "timestamp_num", "depth"),
+          extract_names = colnames,
+          type = all
+        )
         check_class(input = archival$timestamp, to_class = "POSIXct", type = "stop")
         check_class(input = archival$depth, to_class = "numeric", type = "stop")
         # Check data volume
-        if(nrow(archival) <= 1) stop("'archival' dataframe only contains one or fewer rows.")
+        if (nrow(archival) <= 1) stop("'archival' dataframe only contains one or fewer rows.")
         # Check archival step length
         step_est <- as.numeric(difftime(archival$timestamp[2], archival$timestamp[1], units = "s"))
-        if(!all.equal(step, step_est)){
+        if (!all.equal(step, step_est)) {
           stop("'step' does not equal difftime(archival$timestamp[2], archival$timestamp[1], units = 's'.)")
         }
       }
       # Check detection containers have been supplied as a list
       check_class(input = detection_containers, to_class = "list", type = "stop")
       # Focus on the subset of data for which we have both acoustic and archival detections
-      if(!is.null(archival)){
+      if (!is.null(archival)) {
         nrw_acc_pre <- nrow(acoustics)
         nrw_arc_pre <- nrow(archival)
         acoustics <- acoustics[acoustics$timestamp >= min(archival$timestamp) - step &
-                                 acoustics$timestamp <= max(archival$timestamp) + step, ]
+          acoustics$timestamp <= max(archival$timestamp) + step, ]
         archival <- archival[archival$timestamp >= min(acoustics$timestamp) - step, ]
         nrw_acc_post <- nrow(acoustics)
         nrw_arc_post <- nrow(archival)
         nrw_acc_delta <- nrw_acc_pre - nrw_acc_post
         nrw_arc_delta <- nrw_arc_pre - nrw_arc_post
-        if(nrw_acc_post == 0 | nrw_arc_post == 0) stop("No overlapping acoustic/archival observations to implement algorithm.")
-        if(nrw_acc_delta != 0) message(paste(nrw_acc_delta, "acoustic observation(s) beyond the ranges of archival detections ignored."))
-        if(nrw_arc_delta != 0) message(paste(nrw_arc_delta, "archival observation(s) before the start of (processed) acoustic detections ignored."))
+        if (nrw_acc_post == 0 | nrw_arc_post == 0) stop("No overlapping acoustic/archival observations to implement algorithm.")
+        if (nrw_acc_delta != 0) message(paste(nrw_acc_delta, "acoustic observation(s) beyond the ranges of archival detections ignored."))
+        if (nrw_arc_delta != 0) message(paste(nrw_arc_delta, "archival observation(s) before the start of (processed) acoustic detections ignored."))
       }
       # Check detection kernels
-      if(!is.null(detection_kernels)) {
+      if (!is.null(detection_kernels)) {
         # Check input is as expected
-        check_names(input = detection_kernels,
-                    req = c("receiver_specific_kernels",
-                            "receiver_specific_inv_kernels",
-                            "array_design_intervals",
-                            "bkg_surface_by_design",
-                            "bkg_inv_surface_by_design"),
-                    type = all)
+        check_names(
+          input = detection_kernels,
+          req = c(
+            "receiver_specific_kernels",
+            "receiver_specific_inv_kernels",
+            "array_design_intervals",
+            "bkg_surface_by_design",
+            "bkg_inv_surface_by_design"
+          ),
+          type = all
+        )
         # Check example kernel matches the properties of bathy
         index_of_kernel_to_check <- which.min(sapply(detection_kernels$receiver_specific_kernels, is.null))
-        if(!is.null(bathy)){
+        if (!is.null(bathy)) {
           raster_comparison <-
             tryCatch(
               raster::compareRaster(bathy, detection_kernels$receiver_specific_kernels[[index_of_kernel_to_check]]),
-              error = function(e) return(e)
+              error = function(e) {
+                return(e)
+              }
             )
-          if(inherits(raster_comparison, "error")){
-            warning(paste0("Checked detection kernel (detection_kernels$receiver_specific_kernels[[",
-                           index_of_kernel_to_check,
-                           "]]) and 'bathy' have different properties."),
-                    immediate. = TRUE, call. = FALSE)
+          if (inherits(raster_comparison, "error")) {
+            warning(
+              paste0(
+                "Checked detection kernel (detection_kernels$receiver_specific_kernels[[",
+                index_of_kernel_to_check,
+                "]]) and 'bathy' have different properties."
+              ),
+              immediate. = TRUE, call. = FALSE
+            )
             stop(raster_comparison)
           }
         }
       }
       # Check depth error
-      if(!is.null(archival)){
+      if (!is.null(archival)) {
         de <- calc_depth_error(archival$depth)
-        if(inherits(de, "matrix")){
-          if(nrow(de) == 2){
-            if(ncol(de) == 1) { message("'calc_depth_error' function taken to be independent of depth.")
+        if (inherits(de, "matrix")) {
+          if (nrow(de) == 2) {
+            if (ncol(de) == 1) {
+              message("'calc_depth_error' function taken to be independent of depth.")
             } else {
               message("'calc_depth_error' taken to depend on depth.")
             }
-            if(any(de[1, ] > 0) | any(de[2, ] < 0)) stop("'calc_depth_error' should be a function that returns a two-row matrix with lower (negative) adjustment(s) (top row) and upper (positive) adjustment(s) (bottom row).'", call. = FALSE)
-          } else stop("'calc_depth_error' should return a two-row matrix.", call. = FALSE)
-        } else stop("'calc_depth_error' should return a two-row matrix.", call. = FALSE)
+            if (any(de[1, ] > 0) | any(de[2, ] < 0)) stop("'calc_depth_error' should be a function that returns a two-row matrix with lower (negative) adjustment(s) (top row) and upper (positive) adjustment(s) (bottom row).'", call. = FALSE)
+          } else {
+            stop("'calc_depth_error' should return a two-row matrix.", call. = FALSE)
+          }
+        } else {
+          stop("'calc_depth_error' should return a two-row matrix.", call. = FALSE)
+        }
       }
       # Check write opts
-      if(!is.null(write_record_spatial_for_pf)){
+      if (!is.null(write_record_spatial_for_pf)) {
         check_named_list(input = write_record_spatial_for_pf)
         check_names(input = write_record_spatial_for_pf, req = "filename")
         write_record_spatial_for_pf$filename <- check_dir(input = write_record_spatial_for_pf$filename, check_slash = TRUE)
-        if(length(list.files(write_record_spatial_for_pf$filename)) != 0L) {
+        if (length(list.files(write_record_spatial_for_pf$filename)) != 0L) {
           warning("write_record_spatial_for_pf$filename' is not an empty directory.", immediate. = TRUE, call. = FALSE)
         }
       }
     }
 
     #### Process time series
-    if(round_ts){
-      acoustics$timestamp <- lubridate::round_date(acoustics$timestamp, paste0(step/60, "mins"))
-      if(is.null(archival)) archival$timestamp <- lubridate::round_date(archival$timestamp, paste(step/60, "mins"))
+    if (round_ts) {
+      acoustics$timestamp <- lubridate::round_date(acoustics$timestamp, paste0(step / 60, "mins"))
+      if (is.null(archival)) archival$timestamp <- lubridate::round_date(archival$timestamp, paste(step / 60, "mins"))
     }
 
     #### Visualise time series
-    if(plot_ts) {
+    if (plot_ts) {
       ## AC algorithm implementation
-      if(is.null(archival)){
+      if (is.null(archival)) {
         prettyGraphics::pretty_line(acoustics$timestamp,
-                                    pch = 21, col = "royalblue", bg = "royalblue")
+          pch = 21, col = "royalblue", bg = "royalblue"
+        )
         ## ACDC implementation
       } else {
-        axis_ls <- prettyGraphics::pretty_plot(archival$timestamp, abs(archival$depth)*-1,
-                                               pretty_axis_args = list(side = 3:2),
-                                               xlab = "Timestamp", ylab = "Depth (m)",
-                                               type = "l")
+        axis_ls <- prettyGraphics::pretty_plot(archival$timestamp, abs(archival$depth) * -1,
+          pretty_axis_args = list(side = 3:2),
+          xlab = "Timestamp", ylab = "Depth (m)",
+          type = "l"
+        )
         prettyGraphics::pretty_line(acoustics$timestamp,
-                                    pretty_axis_args = list(axis_ls = axis_ls),
-                                    inherit = TRUE,
-                                    replace_axis = list(side = 1, pos = axis_ls[[2]]$lim[1]),
-                                    add = TRUE,
-                                    pch = 21, col = "royalblue", bg = "royalblue")
+          pretty_axis_args = list(axis_ls = axis_ls),
+          inherit = TRUE,
+          replace_axis = list(side = 1, pos = axis_ls[[2]]$lim[1]),
+          add = TRUE,
+          pch = 21, col = "royalblue", bg = "royalblue"
+        )
       }
     }
 
@@ -420,7 +459,7 @@
     timestep_cumulative <- 0
 
     #### Define space use raster that will be updated inside this function
-    if(is.null(map)) {
+    if (is.null(map)) {
       map <- raster::setValues(bathy, 0)
       map <- raster::mask(map, bathy)
     }
@@ -429,27 +468,28 @@
     write_record_spatial_for_pf_dir <- write_record_spatial_for_pf$filename
 
     ##### Define 'uniform' detection probability across study area if detection kernels unsupplied
-    if(is.null(detection_kernels)){
+    if (is.null(detection_kernels)) {
       kernel <- raster::setValues(bathy, 1)
       kernel <- raster::mask(kernel, bathy)
-      if(normalise) kernel <- kernel/raster::cellStats(kernel, "sum")
+      if (normalise) kernel <- kernel / raster::cellStats(kernel, "sum")
     }
 
     #### Define depth errors (if applicable)
-    if(!is.null(archival)){
+    if (!is.null(archival)) {
       archival$depth_lwr <- archival$depth + calc_depth_error(archival$depth)[1, ]
       archival$depth_upr <- archival$depth + calc_depth_error(archival$depth)[2, ]
     }
 
     ##### Wipe timestep_archival and timestep_detection from memory for safety
-    timestep_archival <- NULL; timestep_detection <- NULL
+    timestep_archival <- NULL
+    timestep_detection <- NULL
     rm(timestep_archival, timestep_detection)
 
     #### Define progress bar
     # this will indicate how far along acoustic time steps we are.
     pb1 <- pb2 <- NULL
-    if(progress %in% c(1, 3)) {
-      pb1 <- utils::txtProgressBar(min = 0, max = (nrow(acoustics)-1), style = 3)
+    if (progress %in% c(1, 3)) {
+      pb1 <- utils::txtProgressBar(min = 0, max = (nrow(acoustics) - 1), style = 3)
     }
 
 
@@ -463,9 +503,7 @@
     # ... we'll implement the algorithm
     out$time <- rbind(out$time, data.frame(event = "algorithm_initiation", time = Sys.time()))
     cat_to_cf("... Initiating algorithm: moving over acoustic and internal ('archival') time steps...")
-    for(timestep_detection in seq_along(1:(nrow(acoustics)-1))){
-
-
+    for (timestep_detection in seq_along(1:(nrow(acoustics) - 1))) {
       ######################################
       #### Define the details of the current and next acoustic detection
 
@@ -484,8 +522,8 @@
       # If we are on a later detection time stamp, then we can define the previous receiver
       # ... from the objects created at the previous time step.
       index <- acoustics$index[timestep_detection]
-      if(index > 1L) {
-        if(timestep_detection == 1L){
+      if (index > 1L) {
+        if (timestep_detection == 1L) {
           receiver_0_id <- acoustics$receiver_id[timestep_detection]
         } else {
           receiver_0_id <- receiver_1_id
@@ -501,10 +539,10 @@
 
       #### Obtain details of next acoustic detection
       # Define time of next acoustic detection
-      receiver_2_timestamp <- acoustics$timestamp[timestep_detection+1]
-      receiver_2_timestamp_num <- acoustics$timestamp_num[timestep_detection+1]
+      receiver_2_timestamp <- acoustics$timestamp[timestep_detection + 1]
+      receiver_2_timestamp_num <- acoustics$timestamp_num[timestep_detection + 1]
       # Identify the next receiver at which the individual was detected:
-      receiver_2_id      <- acoustics$receiver_id[timestep_detection+1]
+      receiver_2_id <- acoustics$receiver_id[timestep_detection + 1]
 
       #### Duration between detections
       time_btw_dets <- as.numeric(difftime(receiver_2_timestamp, receiver_1_timestamp, units = "s"))
@@ -514,24 +552,24 @@
       #### Identify the number of archival records between the current and next acoustic detections
 
       #### AC implementation
-      if(is.null(archival)){
+      if (is.null(archival)) {
         # Define the sequence of time steps
         pos <- seq(receiver_1_timestamp, receiver_2_timestamp, step)
         # Number of steps
         lpos_loop <- lpos <- length(pos)
         # If the last step coincides with the detection at the next receiver, we will drop this step
         # ... (we will account for this at the next time step instead)
-        if(lpos > 1 & max(pos) == receiver_2_timestamp) lpos_loop <- lpos - 1
+        if (lpos > 1 & max(pos) == receiver_2_timestamp) lpos_loop <- lpos - 1
 
         #### ACDC implementation
       } else {
         # Identify the position of archival record which is closest to the current acoustic detection
         archival_pos1 <- which.min(abs(archival$timestamp_num - receiver_1_timestamp_num))
         # Define the positions of archival records between the two detections
-        pos <- seq(archival_pos1, (archival_pos1 + time_btw_dets/step), by = 1)
+        pos <- seq(archival_pos1, (archival_pos1 + time_btw_dets / step), by = 1)
         # Define the number of archival records between acoustic detections
         lpos_loop <- lpos <- length(pos)
-        if(length(pos) > 1 & max(archival$timestamp[pos]) == receiver_2_timestamp) lpos_loop <- lpos - 1
+        if (length(pos) > 1 & max(archival$timestamp[pos]) == receiver_2_timestamp) lpos_loop <- lpos - 1
       }
 
 
@@ -551,12 +589,10 @@
       # This is useful if there are a large number of archival time steps between
       # ... acoustic detections:
       # NB: only bother having a second progress bar if there are more than 1 archival time steps to move through.
-      if(progress %in% c(2, 3) & lpos > 1) pb2 <- utils::txtProgressBar(min = 0, max = lpos, style = 3)
+      if (progress %in% c(2, 3) & lpos > 1) pb2 <- utils::txtProgressBar(min = 0, max = lpos, style = 3)
 
       # For each archival time step between our acoustic detections...
-      for(timestep_archival in 1:lpos_loop){
-
-
+      for (timestep_archival in 1:lpos_loop) {
         ######################################
         #### Identify the depth at the current time step:
 
@@ -569,9 +605,9 @@
         timestep_cumulative <- timestep_cumulative + 1
 
         # Identify depth at that time
-        if(!is.null(archival)) {
-          arc_ind   <- pos[timestep_archival]
-          depth     <- archival$depth[arc_ind]
+        if (!is.null(archival)) {
+          arc_ind <- pos[timestep_archival]
+          depth <- archival$depth[arc_ind]
           depth_lwr <- archival$depth_lwr[arc_ind]
           depth_upr <- archival$depth_upr[arc_ind]
         }
@@ -581,15 +617,15 @@
         #### Implement container expansion and contraction
 
         #### At the moment of detection, get the detection containers
-        if(timestep_archival == 1){
-
+        if (timestep_archival == 1) {
           ## Previous container (perspective Ap)
           # If the current detection is at a new receiver (compared to the previous time step),
           # ... get the (expanded) detection container from the previous time step
           container_ap <- NULL
-          if(index > 1){
-            if(receiver_0_id != receiver_1_id)
+          if (index > 1) {
+            if (receiver_0_id != receiver_1_id) {
               container_ap <- rgeos::gBuffer(container_c, width = mobility, quadsegs = 1000)
+            }
           }
 
           ## Detection container (perspective A or An)
@@ -599,10 +635,12 @@
           ## Next container (perspective B)
           # If the individual was next detected at a different receiver,
           # ... we also need the (expanded) container around that receiver
-          if(receiver_1_id != receiver_2_id){
+          if (receiver_1_id != receiver_2_id) {
             container_b <- detection_containers[[receiver_2_id]]
             container_b <- rgeos::gBuffer(container_b, width = mobility * (lpos - 1), quadsegs = 1000)
-          } else container_b <- NULL
+          } else {
+            container_b <- NULL
+          }
 
           ## Individual's container (perspective C)
           # (i.e., the boundaries of the individuals location, given perspectives A, Ap and B)
@@ -610,11 +648,9 @@
 
           #### For subsequent time steps in-between detections
         } else {
-
           #### Dynamics (1): If the current and next receiver are identical
           # .... we simply expand/contract the container around this receiver
-          if(receiver_1_id == receiver_2_id){
-
+          if (receiver_1_id == receiver_2_id) {
             ## Define blank containers
             container_an <- container_ap <- container_b <- NULL
 
@@ -622,14 +658,13 @@
             # ... increase the size of the container by the value of mobility (m) at each time step
             # Note the use of ceiling: if lpos is odd, then this takes us to the middle timestep_archival;
             # ... if lpos is even, then there are two middle timestep_archivals, and this takes us to the first one.
-            if(timestep_archival <= ceiling(lpos/2)){
+            if (timestep_archival <= ceiling(lpos / 2)) {
               cat_to_cf(paste0("... ... ... Acoustic container is expanding..."))
               container_c <- rgeos::gBuffer(container_c, width = mobility, quadsegs = 1000)
 
               ## Option 2: as the time step increases, from beyond halfway through acoustic detections,
               # ... to time of the next acoustic detection, we decrease the container size
-            } else if(timestep_archival > ceiling(lpos/2)){
-
+            } else if (timestep_archival > ceiling(lpos / 2)) {
               ## Retain or shrink the container as appropriate
               ## For sequences with an even number of steps, the first post-middle value the stays the same
               # For example, if lpos = 4, then
@@ -645,7 +680,7 @@
               # ... container 3 = 1200 m
               # ... container 4 = 1000 m [first post-middle value - shrinks]
               # ... container 5 = 800 m
-              if(timestep_archival == (lpos/2 + 1)){
+              if (timestep_archival == (lpos / 2 + 1)) {
                 cat_to_cf(paste0("... ... ... Acoustic container is constant ..."))
               } else {
                 cat_to_cf(paste0("... ... ... Acoustic container is shrinking ..."))
@@ -671,7 +706,7 @@
 
         #### Check container validity
         # Containers may fail to intersect if the detection range parameter is too small
-        if(is.null(container_c)){
+        if (is.null(container_c)) {
           stop("The container(s) for each receiver do not intersect.", call. = FALSE)
         }
 
@@ -680,24 +715,21 @@
         #### Update map based on detection kernels
 
         #### Incorporate detection kernels, if supplied
-        if(!is.null(detection_kernels)){
-
+        if (!is.null(detection_kernels)) {
           #### Detection kernel at the moment of detection (timestep_archival == 1)
           # (Because we only go to one archival step before the next detection, the individual is only detected at timestep_archival == 1)
           # Option (1): Receiver detection kernel does not overlap with any other kernels: standard detection probability kernel
           # Option (2): Receiver detection kernel overlaps with other kernels
           # ... ... i): ... If there is only a detection at the one receiver, we down-weight overlapping regions
           # ... ... ii): ... If there are detections are multiple receivers, we upweight/downweight overlapping regions as necessary
-          if(timestep_archival == 1){
-
+          if (timestep_archival == 1) {
             #### Define which option to implement
             # We start by assuming option 1 (no overlapping receivers)
             use_detection_kernel_option_1 <- TRUE
             # If receivers are well-synchronised and there are overlapping receivers, we will check whether or not
             # ... there are overlapping receivers for the current receiver
             # ... at the current time step
-            if(!is.null(detection_time_window) & !is.null(detection_kernels_overlap)){
-
+            if (!is.null(detection_time_window) & !is.null(detection_kernels_overlap)) {
               ## Identify the full set of receivers whose deployments overlapped in space/time with receiver_1_id
               # ... from 'detection_kernels_overlap$list_by_receiver' list, derived from get_detection_containers_overlap().
               # ... This is a list, with one element for each receiver.
@@ -710,36 +742,37 @@
               receiver_id_at_time_all$receiver_id <- NULL
 
               ## If there are overlapping receivers, we need to account for the overlap
-              if(any(receiver_id_at_time_all == 1)){
+              if (any(receiver_id_at_time_all == 1)) {
                 use_detection_kernel_option_1 <- FALSE
                 receiver_id_at_time_all <- as.integer(colnames(receiver_id_at_time_all)[receiver_id_at_time_all == 1])
-                receiver_id_at_time_all <- data.frame(receiver_id = receiver_id_at_time_all,
-                                                      detection = 0)
+                receiver_id_at_time_all <- data.frame(
+                  receiver_id = receiver_id_at_time_all,
+                  detection = 0
+                )
                 # Check whether any overlapping receivers made a detection
                 # Only do this if the current and next detection are effectively at the same time (for speed)
-                if(time_btw_dets <= detection_time_window){
+                if (time_btw_dets <= detection_time_window) {
                   # Isolate all detections that occurred within the clock drift
                   acc_at_time <- acoustics %>% dplyr::filter(.data$timestamp >= receiver_1_timestamp - detection_time_window &
-                                                               .data$timestamp <= receiver_1_timestamp + detection_time_window)
+                    .data$timestamp <= receiver_1_timestamp + detection_time_window)
                   # Identify unique receivers at which detections occurred within the clock drift
-                  if(nrow(acc_at_time) > 0){
+                  if (nrow(acc_at_time) > 0) {
                     receiver_id_at_time_all$detection[which(receiver_id_at_time_all$receiver_id %in%
-                                                              unique(acc_at_time$receiver_id))] <- 1
+                      unique(acc_at_time$receiver_id))] <- 1
                   }
                 }
               }
             }
 
             #### Implement option 1 (no overlapping receivers --> standard detection probability kernel)
-            if(use_detection_kernel_option_1){
+            if (use_detection_kernel_option_1) {
               kernel <- detection_kernels$receiver_specific_kernels[[receiver_1_id]]
 
               #### Implement option 2 (overlapping receivers --> upweight/downweight kernels)
-            } else{
-
+            } else {
               kernel <- detection_kernels$receiver_specific_kernels[[receiver_1_id]]
-              for(i in 1:nrow(receiver_id_at_time_all)){
-                if(receiver_id_at_time_all$detection[i] == 0){
+              for (i in 1:nrow(receiver_id_at_time_all)) {
+                if (receiver_id_at_time_all$detection[i] == 0) {
                   kernel <- kernel * detection_kernels$receiver_specific_inv_kernels[[receiver_id_at_time_all$receiver_id[i]]]
                 } else {
                   kernel <- kernel * detection_kernels$receiver_specific_kernels[[receiver_id_at_time_all$receiver_id[i]]]
@@ -751,15 +784,13 @@
             # ... we simply upweight areas away from receivers relative to those within detection containers
             # ... by using a single inverse detection probability surface calculated across all receivers
           } else {
-
             # Define an index to select the right kernel
-            kernel_index <- which(as.Date(receiver_1_timestamp + (timestep_archival - 1)*step) %within%
-                                    detection_kernels$array_design_intervals$array_interval)
+            kernel_index <- which(as.Date(receiver_1_timestamp + (timestep_archival - 1) * step) %within%
+              detection_kernels$array_design_intervals$array_interval)
             kernel <- detection_kernels$bkg_inv_surface_by_design[[kernel_index]]
-
           }
           #### Normalise detection kernel
-          if(normalise) kernel <- kernel/raster::cellStats(kernel, "sum")
+          if (normalise) kernel <- kernel / raster::cellStats(kernel, "sum")
         }
 
         #### Define uniform probabilities across study site, if detection kernels unsupplied
@@ -771,46 +802,49 @@
         #### Update map based on the location and depth.
 
         #### AC algorithm implementation only depends on detection probability kernels
-        if(is.null(archival)){
+        if (is.null(archival)) {
           map_timestep <- raster::mask(kernel, container_c)
-          if(is.null(detection_kernels)) map_timestep <- raster::mask(map_timestep, bathy)
+          if (is.null(detection_kernels)) map_timestep <- raster::mask(map_timestep, bathy)
 
           #### ACDC algorithm implementation also incorporates depth
         } else {
-
           # Identify the area of the bathymetry raster which is contained within the
           # ... allowed polygon. This step can be slow.
           bathy_sbt <- raster::mask(bathy, container_c)
-          if(is.null(detection_kernels)) bathy_sbt <- raster::mask(bathy_sbt, bathy)
+          if (is.null(detection_kernels)) bathy_sbt <- raster::mask(bathy_sbt, bathy)
 
           # Identify possible position of individual at this time step based on depth ± depth_error m:
           # this returns a raster with cells of value 0 (not depth constraint) or 1 (meets depth constraint)
           map_timestep <- bathy_sbt >= depth_lwr & bathy_sbt <= depth_upr
 
           # Weight by detection probability, if necessary
-          if(!is.null(detection_kernels)) map_timestep <- map_timestep * kernel
+          if (!is.null(detection_kernels)) map_timestep <- map_timestep * kernel
         }
 
         # Add these positions to the map raster
-        if(normalise) map_timestep <- map_timestep/raster::cellStats(map_timestep, "sum")
-        map_cumulative <- sum(map_cumulative,  map_timestep, na.rm = TRUE)
+        if (normalise) map_timestep <- map_timestep / raster::cellStats(map_timestep, "sum")
+        map_cumulative <- sum(map_cumulative, map_timestep, na.rm = TRUE)
         # map_cumulative <- raster::mask(map_cumulative, bathy)
 
         # If the user has specified spatial information to be recorded along the way...
         # ... (e.g. for illustrative plots and/or error checking):
-        if(is.null(save_record_spatial) | timestep_cumulative %in% save_record_spatial){
+        if (is.null(save_record_spatial) | timestep_cumulative %in% save_record_spatial) {
           # Create a list, plot options (po), which contains relevant spatial information:
-          po <- list(container_ap    = container_ap,
-                     container_an     = container_an,
-                     container_b     = container_b,
-                     container_c     = container_c,
-                     kernel         = kernel,
-                     map_timestep   = map_timestep,
-                     map_cumulative = map_cumulative)
+          po <- list(
+            container_ap = container_ap,
+            container_an = container_an,
+            container_b = container_b,
+            container_c = container_c,
+            kernel = kernel,
+            map_timestep = map_timestep,
+            map_cumulative = map_cumulative
+          )
 
           # If the user hasn't selected to save the spatial record, simply define po = NULL,
           # ... so we can proceed to add plot options to the list() below without errors:
-        } else po <- NULL
+        } else {
+          po <- NULL
+        }
 
 
         ######################################
@@ -827,9 +861,9 @@
           receiver_2_timestamp = receiver_2_timestamp,
           time_btw_dets        = time_btw_dets
         )
-        if(!is.null(archival)){
-          dat$archival_timestamp   <- archival$timestamp[pos[timestep_archival]]
-          dat$archival_depth       <- depth
+        if (!is.null(archival)) {
+          dat$archival_timestamp <- archival$timestamp[pos[timestep_archival]]
+          dat$archival_depth <- depth
         }
 
         # Add the dataframe to als
@@ -839,7 +873,7 @@
         spatial[[timestep_archival]] <- po
 
         # Write to file
-        if(!is.null(write_record_spatial_for_pf)){
+        if (!is.null(write_record_spatial_for_pf)) {
           write_record_spatial_for_pf$x <- map_timestep
           write_record_spatial_for_pf$filename <- paste0(write_record_spatial_for_pf_dir, "chu_", chunk, "_acc_", timestep_detection, "_arc_", timestep_archival)
           do.call(raster::writeRaster, write_record_spatial_for_pf)
@@ -848,24 +882,22 @@
         # Update progress bar describing moment over archival time steps
         # only define title on the first archival time step out of the sequence
         # (this stops the progress bar being replotted on every run of this loop with the same title)
-        if(progress %in% c(2, 3) & lpos > 1){
+        if (progress %in% c(2, 3) & lpos > 1) {
           utils::setTxtProgressBar(pb2, timestep_archival)
         }
-
       } # close for(j in 1:lpos){ (looping over archival time steps)
-      if(!is.null(pb2)) close(pb2)
+      if (!is.null(pb2)) close(pb2)
 
       #### Update overall lists
       als_df <- dplyr::bind_rows(als)
       out$record[[timestep_detection]] <- list(dat = als_df, spatial = spatial)
 
       # Update progress bar:
-      if(progress %in% c(1, 3)) {
+      if (progress %in% c(1, 3)) {
         utils::setTxtProgressBar(pb1, timestep_detection)
       }
-
     } # close for(i in 1:nrow(acoustics)){ (looping over acoustic time steps)
-    if(!is.null(pb1)) close(pb1)
+    if (!is.null(pb1)) close(pb1)
 
     #### Return function outputs
     cat_to_cf("... Movement over acoustic and internal ('archival') time steps has been completed.")
@@ -880,6 +912,4 @@
     cat_to_cf(paste0("... flapper::.acs() call completed (@ ", t_end, ") after ~", round(total_duration, digits = 2), " minutes."))
     class(out) <- c(class(out), "acdc_record")
     return(out)
-
   }
-

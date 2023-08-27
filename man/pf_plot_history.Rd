@@ -45,17 +45,20 @@ pf_plot_history(dat_dcpf_histories, time_steps = 1)
 #### Example (2): Plot customisation options, e.g.:
 # Customise bathy via add_bathy()
 pf_plot_history(dat_dcpf_histories,
-                time_steps = 1,
-                add_surface = list(col = c(grDevices::topo.colors(2))))
+  time_steps = 1,
+  add_surface = list(col = c(grDevices::topo.colors(2)))
+)
 # Customise particles via add_particles
 pf_plot_history(dat_dcpf_histories,
-                time_steps = 1,
-                add_particles = list(col = "red"))
+  time_steps = 1,
+  add_particles = list(col = "red")
+)
 # Pass other arguments to prettyGraphics::pretty_map() via ...
 pf_plot_history(dat_dcpf_histories,
-                time_steps = 1,
-                add_polys = list(x = dat_coast, col = "brown"),
-                crop_spatial = TRUE)
+  time_steps = 1,
+  add_polys = list(x = dat_coast, col = "brown"),
+  crop_spatial = TRUE
+)
 
 #### Example (3): Plot multiple time steps
 pp <- graphics::par(mfrow = c(2, 2))
@@ -66,12 +69,16 @@ graphics::par(pp)
 dat_dcpf_histories_connected <-
   pf_simplify(dat_dcpf_histories, return = "archive")
 pp <- graphics::par(mfcol = c(2, 4))
-pf_plot_history(dat_dcpf_histories, time_steps = 1:4,
-                add_particles = list(pch = 21, bg = "black"),
-                prompt  = FALSE)
-pf_plot_history(dat_dcpf_histories_connected, time_steps = 1:4,
-                add_particles = list(pch = 21, bg = "black"),
-                prompt = FALSE)
+pf_plot_history(dat_dcpf_histories,
+  time_steps = 1:4,
+  add_particles = list(pch = 21, bg = "black"),
+  prompt = FALSE
+)
+pf_plot_history(dat_dcpf_histories_connected,
+  time_steps = 1:4,
+  add_particles = list(pch = 21, bg = "black"),
+  prompt = FALSE
+)
 graphics::par(pp)
 
 }
