@@ -35,6 +35,8 @@ xy <- sp::SpatialPoints(
   proj_wgs84
 )
 xy <- sp::spTransform(xy, proj_utm)
+xy@data <- as.data.frame(xy)
+rownames(xy@data) <- dat_moorings$receiver_id
 ## Get receiver-specific detection containers
 # ... via get_detection_containers with byid = TRUE
 containers <- get_detection_containers(xy, byid = TRUE)
@@ -45,7 +47,7 @@ containers_df <- dat_moorings[, c(
   "receiver_start_date",
   "receiver_end_date"
 )]
-row.names(containers_df) <- names(containers)
+row.names(containers_df) <- dat_moorings$receiver_id
 containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
 
 ## Simulate some receiver 'servicing' dates for demonstration purposes

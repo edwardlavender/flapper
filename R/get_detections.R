@@ -111,6 +111,7 @@ get_detection_pr <- function(distance = 1:1000,
 #'   proj_wgs84
 #' )
 #' xy <- sp::spTransform(xy, proj_utm)
+#' xy@data <- as.data.frame(xy)
 #'
 #' #### Example (1): Get the simplest containers around receivers
 #' get_detection_containers(xy)
@@ -222,6 +223,8 @@ get_detection_containers <- function(xy,
 #'   proj_wgs84
 #' )
 #' xy <- sp::spTransform(xy, proj_utm)
+#' xy@data <- as.data.frame(xy)
+#' rownames(xy@data) <- dat_moorings$receiver_id
 #' ## Get receiver-specific detection containers
 #' # ... via get_detection_containers with byid = TRUE
 #' containers <- get_detection_containers(xy, byid = TRUE)
@@ -232,7 +235,7 @@ get_detection_containers <- function(xy,
 #'   "receiver_start_date",
 #'   "receiver_end_date"
 #' )]
-#' row.names(containers_df) <- names(containers)
+#' row.names(containers_df) <- dat_moorings$receiver_id
 #' containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
 #'
 #' ## Simulate some receiver 'servicing' dates for demonstration purposes
@@ -882,6 +885,7 @@ get_id_rec_overlap <- function(ids,
 #'   proj_wgs84
 #' )
 #' xy <- sp::spTransform(xy, proj_utm)
+#' xy@data <- as.data.frame(xy)
 #'
 #' #### Example (1): Extract all depth values within each receiver's container
 #' depths_by_container <-
@@ -1420,6 +1424,8 @@ get_detection_clumps <-
 #'   proj_wgs84
 #' )
 #' xy <- sp::spTransform(xy, proj_utm)
+#' xy@data <- as.data.frame(xy)
+#' rownames(xy@data) <- dat_moorings$receiver_id
 #' # Get receiver-specific detection containers
 #' containers <- get_detection_containers(xy, byid = TRUE)
 #' containers_df <- dat_moorings[, c(
@@ -1427,7 +1433,7 @@ get_detection_clumps <-
 #'   "receiver_start_date",
 #'   "receiver_end_date"
 #' )]
-#' row.names(containers_df) <- names(containers)
+#' row.names(containers_df) <- dat_moorings$receiver_id
 #' containers <- sp::SpatialPolygonsDataFrame(containers, containers_df)
 #' # Define detection container overlaps
 #' overlaps <- get_detection_containers_overlap(containers = containers)

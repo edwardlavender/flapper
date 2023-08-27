@@ -44,6 +44,7 @@ xy <- sp::SpatialPoints(
   proj_wgs84
 )
 xy <- sp::spTransform(xy, proj_utm)
+xy@data <- as.data.frame(xy)
 
 #### Example (1): Get the simplest containers around receivers
 get_detection_containers(xy)
