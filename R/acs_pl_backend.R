@@ -175,7 +175,7 @@
       check_overlaps <-
         sapply(split(multiples, multiples$timestamp), function(d) {
           issue <- FALSE
-          .overlaps <- detection_kernels_overlap[[d$receiver[1]]]
+          .overlaps <- detection_kernels_overlap[[d$receiver_id[1]]]
           if (any(.overlaps[, colnames(.overlaps)[colnames(.overlaps) %in% d$receiver_id]] == 0L)) {
             issue <- TRUE
             warning(
