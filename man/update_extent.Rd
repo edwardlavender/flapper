@@ -7,7 +7,7 @@
 update_extent(x, x_shift, y_shift = x_shift)
 }
 \arguments{
-\item{x}{A \code{\link[raster]{raster}} or an \code{\link[raster]{extent}} object.}
+\item{x}{An \code{\link[raster]{extent}} object or an object from which there is an \code{\link[raster]{extent}} method (e.g., a \code{\link[raster]{raster}}).}
 
 \item{x_shift}{A number that defines the change in the x limits. Positive numbers increase the extent (i.e., the lower limit is reduced and the upper limit is increased) while negative numbers reduce extent (i.e., the lower limit is increased and the upper limit is decreased).}
 

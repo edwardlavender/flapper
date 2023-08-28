@@ -5,7 +5,7 @@
 #' @title Shrink or expand an \code{\link[raster]{extent}} object
 #' @description This function updates a \code{\link[raster]{raster}}'s \code{\link[raster]{extent}} by shrinking or expanding the x and y limits.
 #'
-#' @param x A \code{\link[raster]{raster}} or an \code{\link[raster]{extent}} object.
+#' @param x An \code{\link[raster]{extent}} object or an object from which there is an \code{\link[raster]{extent}} method (e.g., a \code{\link[raster]{raster}}).
 #' @param x_shift A number that defines the change in the x limits. Positive numbers increase the extent (i.e., the lower limit is reduced and the upper limit is increased) while negative numbers reduce extent (i.e., the lower limit is increased and the upper limit is decreased).
 #' @param y_shift A number that defines the change in the y limits. By default, this equals \code{x_shift} (i.e., the \code{\link[raster]{extent}} is changed uniformly in all directions).
 #'
@@ -30,7 +30,9 @@
 #'
 
 update_extent <- function(x, x_shift, y_shift = x_shift) {
-  if (inherits(x, "RasterLayer")) x <- raster::extent(x)
+  if (!inherits(x, "Extent")) {
+    x <- raster::extent(x)
+  }
   x[1] <- x[1] - x_shift
   x[2] <- x[2] + x_shift
   x[3] <- x[3] - y_shift
