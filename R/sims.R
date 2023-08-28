@@ -6,10 +6,10 @@
 #' @description This function is designed to simulate different kinds of array designs for monitoring stations. The function has been particularly inspired by the need to simulate passive acoustic telemetry array designs, which comprise networks of acoustic hydrophones that listen for acoustic transmissions from tagged marine animals. To implement the function, it is necessary to define the boundaries of the area (\code{boundaries}). Barriers to movement, such as coastline, within this area can be simulated or included from real datasets. The area is populated with a specified number of receivers (\code{n_receivers}) that are simulated under different array designs (namely, regular, random, stratified, non-aligned, hexagonal and clustered arrangements) or incorporated from real data. The function returns a list of spatial objects that define the array and, if requested, a plot of the area.
 #'
 #' @param boundaries An \code{\link[raster]{extent}} object that defines the boundaries of the (simulated) study area.
-#' @param coastline (optional) This argument is used to incorporate the presence of barriers, such as coastline, in the area. There are three options. If \code{coastline = NULL}, no barriers are incorporated. If \code{coastline = "simple_random"}, then a triangular island is simulated in the study area. Alternatively, a spatial object, such as a SpatialPolygonsDataFrame, that defines the coastline in an area can be incorporated into the array design by passing this \code{coastline}.
-#' @param land_inside_coastline A logical variable that defines whether or not the land is `inside' the polygon(s) defined by \code{coastline} (\code{land_inside_coastline = TRUE}) or the sea is `inside' the polygon(s) (\code{land_inside_coastline = FALSE}).
+#' @param coastline (optional) This argument is used to incorporate the presence of barriers, such as coastline, in the area. There are three options. If \code{coastline = NULL}, no barriers are incorporated. If \code{coastline = "simple_random"}, then a triangular island is simulated in the study area. Alternatively, a spatial object (such as a SpatialPolygonsDataFrame) or a \code{\link[raster]{raster}} that defines the coastline in an area can be incorporated into the array design by passing this \code{coastline}. If a \code{\link[raster]{raster}} is used, cells with NA are excluded from sampling.
+#' @param land_inside_coastline If \code{coastline} is a Spatial okject, \code{land_inside_coastline} is a logical variable that defines whether or not the land is `inside' the polygon(s) defined by \code{coastline} (\code{land_inside_coastline = TRUE}) or the sea is `inside' the polygon(s) (\code{land_inside_coastline = FALSE}).
 #' @param n_receivers An integer that defines the number of receivers in the array. This is ignored if receiver locations are specified via \code{arrangement}.
-#' @param arrangement,... A character string or a SpatialPoints object that defines the arrangement of receivers. Supported character string options for simulated arrays are \code{"regular"}, \code{"random"}, \code{"stratified"}, \code{"nonaligned"}, \code{"hexagonal"} and \code{"clustered"} (see \code{\link[sp]{spsample}}, which is used to simulate receiver locations). Additional arguments can be passed to this function via \code{...} for further control. Otherwise, a SpatialPoints object that defines the coordinates of receivers (in the same coordinate reference system as \code{boundaries} and, if applicable, \code{coastline}) is assumed to have been provided.
+#' @param arrangement,... A character string or a SpatialPoints object that defines the arrangement of receivers. If a character is supplied, sampling is implemented via \code{\link[sp]{spsample}} unless \code{coastline} is a \code{\link[raster]{raster}} in which case sampling is implemented via \code{\link[raster]{sampleRegular}}, \code{\link[raster]{sampleRandom}} or \code{\link[raster]{sampleStratified}}, depending on \code{arrangement}. Supported character string options for simulated arrays are \code{"regular"}, \code{"random"}, \code{"stratified"} (for all supported function inputs) and  \code{"nonaligned"}, \code{"hexagonal"} and \code{"clustered"} (only for \code{\link[sp]{spsample}} implementations). Additional arguments can be passed to this function via \code{...} for further control. Otherwise, a SpatialPoints object that defines the coordinates of receivers (in the same coordinate reference system as \code{boundaries} and, if applicable, \code{coastline}) is assumed to have been provided.
 #' @param seed An integer that is used to set the seed to enable reproducible simulations (see \code{\link[base]{set.seed}}).
 #' @param plot A logical variable that defines whether or not plot the array (via \code{\link[prettyGraphics]{pretty_map}}).
 #' @param xlim,ylim (optional) Axis limits for the plot. These can be specified in any way supported by \code{\link[prettyGraphics]{pretty_axis}}.
@@ -18,9 +18,9 @@
 #'
 #' @details Note that this function does not currently support temporally varying array designs.
 #'
-#' For coupled simulation--analysis workflows (such as \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_sa}} and \code{\link[flapper]{sim_detections}} plus \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}},  \code{\link[flapper]{acdc}} and \code{\link[flapper]{pf}}) note that the representation of the \code{coastline} as \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects by the \code{sim_*} functions, rather than a \code{\link[raster]{raster}} grid, may be problematic at the land--sea interface if the Spatial* data used for the simulation do not agree precisely with the \code{\link[raster]{raster}} data used to reconstruct movements: locations that are `allowed' from the perspective of the Spatial* data may not be allowed by the \code{\link[raster]{raster}} data (and vice versa). At the time of writing, this can be resolved by simply checking simulated array positions in relation to the grid across which movements are reconstructed. Receiver locations should also be translated onto the \code{\link[raster]{raster}} before simulating detections (see \code{\link[flapper]{sim_detections}}). In the future, this should be resolved by defining simulation areas across a \code{\link[raster]{raster}} too (see also \code{\link[flapper]{acs_setup_containers}}).
+#' For coupled simulation--analysis workflows (such as \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_sa}} and \code{\link[flapper]{sim_detections}} plus \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}},  \code{\link[flapper]{acdc}} and \code{\link[flapper]{pf}}) note that the representation of the \code{coastline} as \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects by the \code{sim_*} functions, rather than a \code{\link[raster]{raster}} grid, may be problematic at the land--sea interface if the Spatial* data used for the simulation do not agree precisely with the \code{\link[raster]{raster}} data used to reconstruct movements: locations that are `allowed' from the perspective of the Spatial* data may not be allowed by the \code{\link[raster]{raster}} data (and vice versa). At the time of writing, this can be resolved in two ways. (A) Check simulated array positions in relation to the grid across which movements are reconstructed. Receiver locations should also be translated onto the \code{\link[raster]{raster}} before simulating detections (see \code{\link[flapper]{sim_detections}}). (B) For this function, you can now use a \code{\link[raster]{raster}} to simulate receiver locations (see also \code{\link[flapper]{acs_setup_containers}}).
 #'
-#' @return The function returns a named list of (a) the spatial objects that define the simulated array (`array') and (b) the arguments used to generate this array (`args'). The `array' element is a named list contains the following elements: `boundaries', an \code{\link[raster]{Extent-class}} object that defines the boundaries of the area (as inputted); `area', a \code{\link[sp]{SpatialPolygons-class}} object that defines the boundaries of the area; `land' and `sea', \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects that define the land and sea respectively; and `xy', a \code{\link[sp]{SpatialPoints-class}} object that defines receiver locations. If \code{plot = TRUE}, the function also returns a plot of the array.
+#' @return The function returns a named list of (a) the spatial objects that define the simulated array (`array') and (b) the arguments used to generate this array (`args'). The `array' element is a named list contains the following elements: `boundaries', an \code{\link[raster]{Extent-class}} object that defines the boundaries of the area (as inputted); `area', a \code{\link[sp]{SpatialPolygons-class}} object that defines the boundaries of the area; `land' and `sea', \code{\link[sp]{SpatialPolygons-class}}, \code{\link[sp]{SpatialPolygonsDataFrame-class}} or \code{\link[rasrer]{raster}} objects that define the land and sea respectively; and `xy', a \code{\link[sp]{SpatialPoints-class}} object that defines receiver locations. If \code{plot = TRUE}, the function also returns a plot of the array.
 #'
 #' @examples
 #' #### Example (1): Simulate an array using default parameters
@@ -137,6 +137,7 @@ sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
 
   #### Define the land and sea
   ## If coastline has been specified, we will simulate or incorporate coastline
+  coastline_is_raster <- FALSE
   if (!is.null(coastline)) {
     cat_to_console("... Incorporating coastline...")
     ## Simulate coastline
@@ -153,8 +154,11 @@ sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
       } else {
         stop("Input to 'coastline' is not supported.")
       }
-
       ## Or incorporate coastline
+    } else if (inherits(coastline, "RasterLayer")) {
+      coastline_is_raster <- TRUE
+      land <- NULL
+      sea <- coastline
     } else {
       if (land_inside_coastline) {
         land <- coastline
@@ -175,7 +179,20 @@ sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
   cat_to_console("... Incorporating receivers...")
   if (is.character(arrangement)) {
     cat_to_console("... ... Simulating receivers...")
-    rxy <- sp::spsample(sea, n = n_receivers, type = arrangement, ...)
+    if (coastline_is_raster) {
+      sample_raster <- function(type = c("random", "regular", "stratified")) {
+        type <- match.arg(type)
+        switch(
+          type,
+          random = raster::sampleRandom(sea, size = n_receivers, xy = TRUE, na.rm = TRUE)[, c("x", "y")],
+          regular = raster::sampleRegular(sea, size = n_receivers, xy = TRUE, na.rm = TRUE)[, c("x", "y")],
+          statified = raster::sampleStratified(sea, size = n_receivers, xy = TRUE, na.rm = TRUE)[, c("x", "y")]
+        )
+      }
+      rxy <- sample_raster(arrangement)
+    } else {
+      rxy <- sp::spsample(sea, n = n_receivers, type = arrangement, ...)
+    }
   } else {
     rxy <- arrangement
   }
@@ -184,14 +201,29 @@ sim_array <- function(boundaries = raster::extent(-10, 10, -10, 10),
   if (plot) {
     cat_to_console("... Plotting array...")
     # Define spatial layers
-    if (!is.null(add_land)) add_land$x <- land
-    if (!is.null(add_sea)) add_sea$x <- sea
+    if (!is.null(add_land) && !is.null(land)) add_land$x <- land
+    if (!is.null(add_sea) && !is.null(sea)) add_sea$x <- sea
     if (!is.null(add_receivers)) add_receivers$x <- rxy
+    add_rasters <- add_polys <- NULL
+    if (coastline_is_raster) {
+      add_rasters <- compact(list(add_land, add_sea))
+    } else {
+      add_polys <- compact(list(add_land, add_sea))
+    }
+    if (!is.null(add_rasters) && length(purrr::flatten(add_rasters)) == 0L) add_rasters <- NULL
+    if (!is.null(add_polys) && length(purrr::flatten(add_polys)) == 0L) add_polys <- NULL
     # Make map
+    print(land)
+    print(sea)
+    print(add_land)
+    print(add_sea)
+    print(add_rasters)
+
     prettyGraphics::pretty_map(
       x = area,
       xlim = xlim, ylim = ylim,
-      add_polys = list(add_land, add_sea),
+      add_rasters = add_rasters,
+      add_polys = add_polys,
       add_points = add_receivers
     )
   }
@@ -249,10 +281,10 @@ NULL
 #### sim_path_sa()
 
 #' @title Simulate discrete-time movement paths from step lengths and turning angles
-#' @description This function simulates movement paths from step lengths and turning angles. To implement the function, the number of time steps (\code{n}) needs to be specified and, if applicable, the area within which movement should occur. For example, in marine environments, the inclusion of the sea as a spatial layer would restrict movement within the sea*. The starting location (\code{p_1}) can be provided or simulated. At each time step, user-defined functions are used to simulate step lengths and turning angles, which can depend previous values of those variables via a \code{lag} parameter, from which the next position is calculated. This implementation enables movement paths to be simulated under a variety of movement models, including random walks and correlated random walks, providing that they are conceptualised in terms of step lengths and turning angles. The function returns a list of outputs that includes the simulated path and, if requested, produces a plot of the simulated path.
+#' @description This function simulates movement paths from step lengths and turning angles. To implement the function, the number of time steps (\code{n}) needs to be specified and, if applicable, the area within which movement should occur. For example, in marine environments, the inclusion of the sea as a spatial or \code{\link[raster]{raster}} layer would restrict movement within the sea*. The starting location (\code{p_1}) can be provided or simulated. At each time step, user-defined functions are used to simulate step lengths and turning angles, which can depend previous values of those variables via a \code{lag} parameter, from which the next position is calculated. This implementation enables movement paths to be simulated under a variety of movement models, including random walks and correlated random walks, providing that they are conceptualised in terms of step lengths and turning angles. The function returns a list of outputs that includes the simulated path and, if requested, produces a plot of the simulated path.
 #'
 #' @param n An integer that defines the number of time steps in the simulation.
-#' @param area (optional) A \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} object that defines the area(s) within which movement is allowed.
+#' @param area (optional) A \code{\link[sp]{SpatialPolygons-class}}, \code{\link[sp]{SpatialPolygonsDataFrame-class}} or \code{\link[raster]{raster}} object that defines the area(s) within which movement is allowed.
 #' @param p_1 (optional) A matrix with one row and two columns that defines the starting location (x, y). If \code{p_1 = NULL}, then a random location is sampled from \code{area}, if applicable, or simulated from a uniform distribution with a minimum and maximum value of 0 and 1 respectively.
 #' @param sim_angle A function that is used to simulate turning angles. This must accept a single number that represents some previous turning angle (degrees), even if this is simply ignored (see \code{lag}, below). For example, \code{sim_angle = function() 1} will break but \code{sim_angle = function(...) 1} is fine. For convenience, a default function is included that simulates angles from a wrapped normal circular distribution with a mean and standard deviation of 1 (see \code{\link[circular]{rwrappednormal}}). Functions that actually depend on some previous angle also need to be able to generate initial angles before enough previous angles have been generated for the function to depend on those (see \code{lag}, below). All functions should return a single number that defines the turning angle in degrees.
 #' @param sim_step A function that is used to simulate step lengths. This follows the same rules as for \code{sim_angle}. For convenience, a default function is included that simulates angles from a gamma distribution with shape and scale parameters of 15 (see \code{\link[stats]{rgamma}}).
@@ -265,7 +297,7 @@ NULL
 #'
 #' @details *Strictly speaking, only sequential positions are restricted to be within the allowed area. Yet since steps in the current implementation of the function are linear, the simulation of relatively large step lengths in an area with complex barriers to movement (e.g., convoluted coastlines), may lead to movement over inappropriate areas (e.g., over a peninsula) even through sequential positions are within the allowed area (e.g., either side of a peninsula). This problem can be mitigated by simulating time series for which sequential observations are closer in time (and thus for which step lengths are more constrained). For longer time series for which short time steps are undesirable, least-cost paths (e.g., see \code{\link[flapper]{lcp_over_surface}}) may be implemented to ensure biologically meaningful movements in future (but this is more computationally demanding for rapid simulations).
 #'
-#' For coupled simulation--analysis workflows (such as \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_sa}} and \code{\link[flapper]{sim_detections}} plus \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}},  \code{\link[flapper]{acdc}} and \code{\link[flapper]{pf}}) note that the representation of the \code{area} as \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects by the \code{sim_*} functions, rather than a \code{\link[raster]{raster}} grid, may be problematic at the land--sea interface if the Spatial* data used for the simulation do not agree precisely with the \code{\link[raster]{raster}} data used to reconstruct movements: locations that are `allowed' from the perspective of the Spatial* data may not be allowed by the \code{\link[raster]{raster}} data (and vice versa). Furthermore, distances in the Spatial* data may differ from distances in the \code{\link[raster]{raster}} data depending on grid resolution. At the time of writing, these issues can be resolved by simply checking simulated movements in relation to the grid across which movements are reconstructed. Animal locations should also be translated onto the \code{\link[raster]{raster}} before simulating detections (see \code{\link[flapper]{sim_detections}}). Movement distances should remain admissible under the movement model. In the future, these issues should be resolved by defining simulation areas across a \code{\link[raster]{raster}} too (see also \code{\link[flapper]{acs_setup_containers}})
+#' For coupled simulation--analysis workflows (such as \code{\link[flapper]{sim_array}}, \code{\link[flapper]{sim_path_sa}} and \code{\link[flapper]{sim_detections}} plus \code{\link[flapper]{ac}}, \code{\link[flapper]{dc}}, \code{\link[flapper]{acdc}} and \code{\link[flapper]{pf}}) note that the representation of the \code{area} as \code{\link[sp]{SpatialPolygons-class}} or \code{\link[sp]{SpatialPolygonsDataFrame-class}} objects by the \code{sim_*} functions, rather than a \code{\link[raster]{raster}} grid, may be problematic at the land--sea interface if the Spatial* data used for the simulation do not agree precisely with the \code{\link[raster]{raster}} data used to reconstruct movements: locations that are `allowed' from the perspective of the Spatial* data may not be allowed by the \code{\link[raster]{raster}} data (and vice versa). Furthermore, distances in the Spatial* data may differ from distances in the \code{\link[raster]{raster}} data depending on grid resolution. At the time of writing, this can be resolved in two ways. (A) Check simulated movements in relation to the grid across which movements are reconstructed. Animal locations should also be translated onto the \code{\link[raster]{raster}} before simulating detections (see \code{\link[flapper]{sim_detections}}). Movement distances should remain admissible under the movement model. (B) For this function, you can now use a \code{\link[raster]{raster}} to simulate receiver locations (see also \code{\link[flapper]{acs_setup_containers}}).
 #'
 #' This function requires the \code{\link[circular]{circular}} package.
 #'
@@ -435,7 +467,7 @@ sim_path_sa <- function(n = 10,
         # ... one that is inside the domain of interest is generated.
 
         repeat_count <- 0
-        repeat{
+        repeat {
           ## Simulate step lengths and turning angles using user-supplied functions
           step <- sim_step(step_mat[t - lag])
           angle <- sim_angle(angle_mat[t - lag])
@@ -447,10 +479,14 @@ sim_path_sa <- function(n = 10,
           py <- xy_mat[t - 1, 2] + dy # new y position is previous y + change in y
 
           ## Identify whether the point is outside the domain
-          psp <- sp::SpatialPoints(matrix(c(px, py), ncol = 2))
-          raster::crs(psp) <- raster::crs(area)
-          outside <- is.na(sp::over(psp, area))
-
+          pm <- cbind(px, py)
+          if (inherits(area, "RasterLayer")) {
+            outside <- is.na(raster::extract(area, pm))
+          } else {
+            psp <- sp::SpatialPoints(pm)
+            raster::crs(psp) <- raster::crs(area)
+            outside <- is.na(sp::over(psp, area))
+          }
           ## If the point is not outside of the area, then break the loop
           repeat_count <- repeat_count + 1
           if (!outside) break
