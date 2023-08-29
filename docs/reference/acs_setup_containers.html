@@ -130,26 +130,29 @@
 <span class="r-in"><span><span class="co"># CRS of receiver locations as recorded in dat_moorings</span></span></span>
 <span class="r-in"><span><span class="va">proj_wgs84</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:4326"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># CRS of receiver locations required</span></span></span>
-<span class="r-in"><span><span class="va">proj_utm</span>   <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">proj_utm</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Define SpatialPoints object</span></span></span>
 <span class="r-in"><span><span class="va">xy_wgs84</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_long"</span>, <span class="st">"receiver_lat"</span><span class="op">)</span><span class="op">]</span>, <span class="va">proj_wgs84</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">xy_utm</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/spTransform.html" class="external-link">spTransform</a></span><span class="op">(</span><span class="va">xy_wgs84</span>, <span class="va">proj_utm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Link with receiver IDs to define a SpatialPointsDataFrame</span></span></span>
 <span class="r-in"><span><span class="va">xy_utm</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPointsDataFrame</a></span><span class="op">(</span><span class="va">xy_utm</span>,</span></span>
-<span class="r-in"><span>                            <span class="va">dat_moorings</span><span class="op">[</span>, <span class="st">"receiver_id"</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPointsDataFrame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">xy_utm</span>,</span></span>
+<span class="r-in"><span>    <span class="va">dat_moorings</span><span class="op">[</span>, <span class="st">"receiver_id"</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (1): Define a list of containers with specified parameters</span></span></span>
 <span class="r-in"><span><span class="co"># ... (Argument values are small to reduce computation time for examples)</span></span></span>
-<span class="r-in"><span><span class="va">containers</span> <span class="op">&lt;-</span> <span class="fu">acs_setup_containers</span><span class="op">(</span>xy <span class="op">=</span> <span class="va">xy_utm</span>,</span></span>
-<span class="r-in"><span>                                 detection_range <span class="op">=</span> <span class="fl">500</span></span></span>
-<span class="r-in"><span>                                 <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_containers() called (@ 2023-02-19 14:52:01)... </span>
+<span class="r-in"><span><span class="va">containers</span> <span class="op">&lt;-</span> <span class="fu">acs_setup_containers</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  xy <span class="op">=</span> <span class="va">xy_utm</span>,</span></span>
+<span class="r-in"><span>  detection_range <span class="op">=</span> <span class="fl">500</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_containers() called (@ 2023-08-29 15:35:19)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Making containers... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Processing containers... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_containers() call completed (@ 2023-02-19 14:52:01) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_containers() call completed (@ 2023-08-29 15:35:19) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co"># A list of SpatialPolygonsDataFrames is returned</span></span></span>
 <span class="r-in"><span><span class="co"># with elements from 1:max(xy_utm$receiver_id)</span></span></span>
 <span class="r-in"><span><span class="co"># NULL elements correspond to numbers in this sequence that do not refer to receivers</span></span></span>
@@ -167,7 +170,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 705972.2, 706972.2, 6253501, 6254501  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :           3, 706472.237977747, 6254001.47143853,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[4]]</span>
@@ -176,7 +179,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 709257.8, 710257.8, 6267227, 6268227  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :           4, 709757.838706845, 6267726.89057173,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[5]]</span>
@@ -191,8 +194,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 708276.6, 709276.6, 6268637, 6269637  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> value       :           7, 708776.612630041, 6269137.04656454,        1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,       coords.x1,        coords.x2, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> value       :           7, 708776.61263004, 6269137.04656454,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[8]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
@@ -203,7 +206,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 705539.9, 706539.9, 6253830, 6254830  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :           9, 706039.851551317, 6254329.75898771,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[10]]</span>
@@ -215,7 +218,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 707042.3, 708042.3, 6267227, 6268227  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,   receiver_long,    receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,       coords.x1,       coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          11, 707542.34971065, 6267727.0245263,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[12]]</span>
@@ -224,8 +227,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 709576.1, 710576.1, 6266821, 6267821  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> value       :          12, 710076.090170494, 6267320.89031923,        1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> value       :          12, 710076.090170495, 6267320.89031923,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[13]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
@@ -236,7 +239,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 703120.8, 704120.8, 6265789, 6266789  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          14, 703620.828045288, 6266289.28828596,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[15]]</span>
@@ -254,7 +257,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 708105.6, 709105.6, 6261775, 6262775  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          18, 708605.560505287, 6262275.05546168,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[19]]</span>
@@ -266,7 +269,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 702012.6, 703012.6, 6264400, 6265400  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          20, 702512.639477486, 6264900.03635278,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[21]]</span>
@@ -275,7 +278,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 708244.2, 709244.2, 6252351, 6253351  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          21, 708744.224623811, 6252850.83006878,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[22]]</span>
@@ -287,7 +290,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 702364.7, 703364.7, 6264861, 6265861  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          23, 702864.703528681, 6265360.98651514,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[24]]</span>
@@ -296,7 +299,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 708644.6, 709644.6, 6261965, 6262965  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          24, 709144.620204365, 6262465.13201869,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[25]]</span>
@@ -308,7 +311,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 708775.6, 709775.6, 6252617, 6253617  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          26, 709275.587533625, 6253116.72186051,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[27]]</span>
@@ -317,7 +320,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 703910.1, 704910.1, 6249743, 6250743  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          27, 704410.062684187, 6250242.84019987,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[28]]</span>
@@ -329,7 +332,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 699113.2, 700113.2, 6267058, 6268058  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          29, 699613.246077539, 6267558.48978002,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[30]]</span>
@@ -338,7 +341,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 707295.1, 708295.1, 6252403, 6253403  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          30, 707795.055093705, 6252902.81442825,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[31]]</span>
@@ -347,7 +350,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 709290.5, 710290.5, 6252776, 6253776  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          31, 709790.510737235, 6253275.94670318,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[32]]</span>
@@ -359,7 +362,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 706823.1, 707823.1, 6252924, 6253924  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          33, 707323.074814243, 6253424.16474594,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[34]]</span>
@@ -371,7 +374,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 708090.7, 709090.7, 6262787, 6263787  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          35, 708590.650204488, 6263287.07874507,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[36]]</span>
@@ -380,7 +383,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 708931.1, 709931.1, 6254563, 6255563  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          36, 709431.056489983, 6255062.70399093,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[37]]</span>
@@ -389,7 +392,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 706400.2, 707400.2, 6251298, 6252298  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          37, 706900.208559446, 6251798.00038536,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[38]]</span>
@@ -398,7 +401,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 707271.9, 708271.9, 6261487, 6262487  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          38, 707771.919408766, 6261986.83813631,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[39]]</span>
@@ -407,7 +410,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 704831, 705831, 6264713, 6265713  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          39, 705331.007064075, 6265212.51343058,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[40]]</span>
@@ -416,7 +419,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 708918.4, 709918.4, 6267669, 6268669  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          40, 709418.368318636, 6268169.10033173,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[41]]</span>
@@ -425,7 +428,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 703076, 704076, 6266036, 6267036  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          41, 703576.003622304, 6266536.09000155,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[42]]</span>
@@ -437,7 +440,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 707489.4, 708489.4, 6252351, 6253351  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          43, 707989.389162253, 6252851.01070556,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[44]]</span>
@@ -446,7 +449,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 709587.4, 710587.4, 6266178, 6267178  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          44, 710087.448896256, 6266678.41000209,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[45]]</span>
@@ -455,7 +458,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 708634.5, 709634.5, 6253011, 6254011  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,    receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,       coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          45, 709134.451181599, 6253511.1606833,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[46]]</span>
@@ -464,7 +467,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 702030.4, 703030.4, 6265101, 6266101  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          46, 702530.410574209, 6265601.37925326,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[47]]</span>
@@ -473,7 +476,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 702512.8, 703512.8, 6265823, 6266823  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          47, 703012.757869926, 6266323.23956501,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[48]]</span>
@@ -482,7 +485,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 706695.3, 707695.3, 6253239, 6254239  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          48, 707195.281171695, 6253739.36429899,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[49]]</span>
@@ -491,8 +494,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 705852.3, 706852.3, 6253784, 6254784  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> value       :          49, 706352.314484401, 6254283.62589339,        1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,       coords.x2, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> value       :          49, 706352.314484401, 6254283.6258934,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[50]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygonsDataFrame </span>
@@ -500,7 +503,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 707425.6, 708425.6, 6260558, 6261558  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          50, 707925.605617203, 6261057.79757075,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[51]]</span>
@@ -509,7 +512,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 706707.4, 707707.4, 6260511, 6261511  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          51, 707207.430187169, 6261011.42556153,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[52]]</span>
@@ -518,7 +521,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 702198.1, 703198.1, 6265474, 6266474  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          52, 702698.057272382, 6265973.99135867,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[53]]</span>
@@ -527,7 +530,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 705558.6, 706558.6, 6254034, 6255034  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          53, 706058.562480969, 6254534.03230611,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[54]]</span>
@@ -536,7 +539,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 701922.5, 702922.5, 6264753, 6265753  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          54, 702422.531139993, 6265252.59847609,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[55]]</span>
@@ -545,7 +548,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 709905.8, 710905.8, 6252868, 6253868  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          55, 710405.757752217, 6253367.62261389,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[56]]</span>
@@ -554,7 +557,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 709123.1, 710123.1, 6252797, 6253797  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          56, 709623.053614371, 6253296.88416775,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[57]]</span>
@@ -563,16 +566,17 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 707967.6, 708967.6, 6252362, 6253362  (xmin, xmax, ymin, ymax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variables   : 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,    receiver_long,     receiver_lat, optional </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> names       : receiver_id,        coords.x1,        coords.x2, optional </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> value       :          57, 708467.606224498, 6252861.98611045,        1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2): Visualise the containers produced via plot = TRUE</span></span></span>
-<span class="r-in"><span><span class="va">containers</span> <span class="op">&lt;-</span> <span class="fu">acs_setup_containers</span><span class="op">(</span>xy <span class="op">=</span> <span class="va">xy_utm</span>,</span></span>
-<span class="r-in"><span>                                  detection_range <span class="op">=</span> <span class="fl">500</span>,</span></span>
-<span class="r-in"><span>                                  plot <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span>                                  <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_containers() called (@ 2023-02-19 14:52:01)... </span>
+<span class="r-in"><span><span class="va">containers</span> <span class="op">&lt;-</span> <span class="fu">acs_setup_containers</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  xy <span class="op">=</span> <span class="va">xy_utm</span>,</span></span>
+<span class="r-in"><span>  detection_range <span class="op">=</span> <span class="fl">500</span>,</span></span>
+<span class="r-in"><span>  plot <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_containers() called (@ 2023-08-29 15:35:19)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting background map of area... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Making containers... </span>
@@ -580,15 +584,16 @@
 <span class="r-plt img"><img src="acs_setup_containers-1.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting containers on map... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Processing containers... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_containers() call completed (@ 2023-02-19 14:52:01) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_containers() call completed (@ 2023-08-29 15:35:19) after ~0 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3): Remove areas of the containers that overlap with coastline</span></span></span>
-<span class="r-in"><span><span class="va">containers</span> <span class="op">&lt;-</span> <span class="fu">acs_setup_containers</span><span class="op">(</span>xy <span class="op">=</span> <span class="va">xy_utm</span>,</span></span>
-<span class="r-in"><span>                                  detection_range <span class="op">=</span> <span class="fl">500</span>,</span></span>
-<span class="r-in"><span>                                  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                                  coastline <span class="op">=</span> <span class="va">dat_coast</span></span></span>
-<span class="r-in"><span>                                  <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_containers() called (@ 2023-02-19 14:52:01)... </span>
+<span class="r-in"><span><span class="va">containers</span> <span class="op">&lt;-</span> <span class="fu">acs_setup_containers</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  xy <span class="op">=</span> <span class="va">xy_utm</span>,</span></span>
+<span class="r-in"><span>  detection_range <span class="op">=</span> <span class="fl">500</span>,</span></span>
+<span class="r-in"><span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  coastline <span class="op">=</span> <span class="va">dat_coast</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_containers() called (@ 2023-08-29 15:35:19)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting background map of area... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Making containers... </span>
@@ -676,22 +681,24 @@
 <span class="r-plt img"><img src="acs_setup_containers-2.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting containers on map... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Processing containers... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_containers() call completed (@ 2023-02-19 14:52:02) after ~0.01 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_containers() call completed (@ 2023-08-29 15:35:19) after ~0.01 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (4): Remove areas of the containers beyond a boundary</span></span></span>
 <span class="r-in"><span><span class="va">xy_utm_coords</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">xy_utm</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">boundaries</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">xy_utm_coords</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                             <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">xy_utm_coords</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                             <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">xy_utm_coords</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                             <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">xy_utm_coords</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                        <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">containers</span> <span class="op">&lt;-</span> <span class="fu">acs_setup_containers</span><span class="op">(</span>xy <span class="op">=</span> <span class="va">xy_utm</span>,</span></span>
-<span class="r-in"><span>                                  detection_range <span class="op">=</span> <span class="fl">500</span>,</span></span>
-<span class="r-in"><span>                                  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                                  coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
-<span class="r-in"><span>                                  boundaries <span class="op">=</span> <span class="va">boundaries</span></span></span>
-<span class="r-in"><span>                                  <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_containers() called (@ 2023-02-19 14:52:02)... </span>
+<span class="r-in"><span><span class="va">boundaries</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">xy_utm_coords</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">xy_utm_coords</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">xy_utm_coords</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">xy_utm_coords</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">containers</span> <span class="op">&lt;-</span> <span class="fu">acs_setup_containers</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  xy <span class="op">=</span> <span class="va">xy_utm</span>,</span></span>
+<span class="r-in"><span>  detection_range <span class="op">=</span> <span class="fl">500</span>,</span></span>
+<span class="r-in"><span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
+<span class="r-in"><span>  boundaries <span class="op">=</span> <span class="va">boundaries</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_containers() called (@ 2023-08-29 15:35:19)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting background map of area... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Making containers... </span>
@@ -739,7 +746,7 @@
 <span class="r-plt img"><img src="acs_setup_containers-3.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting containers on map... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Processing containers... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_containers() call completed (@ 2023-02-19 14:52:03) after ~0.02 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_containers() call completed (@ 2023-08-29 15:35:20) after ~0.02 minutes. </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

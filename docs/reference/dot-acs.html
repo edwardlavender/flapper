@@ -211,22 +211,22 @@
 <span class="r-in"><span><span class="co">#### Step (3) Prepare movement time series for algorithm(s)</span></span></span>
 <span class="r-in"><span><span class="co"># Add required columns to dataframes:</span></span></span>
 <span class="r-in"><span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">timestamp_num</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">dat_archival</span><span class="op">$</span><span class="va">timestamp_num</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">dat_archival</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat_archival</span><span class="op">$</span><span class="va">timestamp_num</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">dat_archival</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Focus on an example individual</span></span></span>
 <span class="r-in"><span><span class="va">id</span> <span class="op">&lt;-</span> <span class="fl">25</span></span></span>
 <span class="r-in"><span><span class="va">acc</span> <span class="op">&lt;-</span> <span class="va">dat_acoustics</span><span class="op">[</span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">individual_id</span> <span class="op">==</span> <span class="va">id</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">arc</span> <span class="op">&lt;-</span> <span class="va">dat_archival</span><span class="op">[</span><span class="va">dat_archival</span><span class="op">$</span><span class="va">individual_id</span> <span class="op">==</span> <span class="va">id</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="co"># Focus on the subset of data for which we have both acoustic and archival detections</span></span></span>
-<span class="r-in"><span><span class="va">acc</span> <span class="op">&lt;-</span> <span class="va">acc</span><span class="op">[</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">arc</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="fl">60</span> <span class="op">&amp;</span></span></span>
-<span class="r-in"><span>             <span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&lt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">arc</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span> <span class="op">+</span> <span class="fl">2</span><span class="op">*</span><span class="fl">60</span>, <span class="op">]</span></span></span>
-<span class="r-in"><span><span class="va">arc</span> <span class="op">&lt;-</span> <span class="va">arc</span><span class="op">[</span><span class="va">arc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="fl">60</span> <span class="op">&amp;</span></span></span>
-<span class="r-in"><span>             <span class="va">arc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&lt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span> <span class="op">+</span> <span class="fl">2</span><span class="op">*</span><span class="fl">60</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">acc</span> <span class="op">&lt;-</span> <span class="va">acc</span><span class="op">[</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">arc</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span> <span class="op">*</span> <span class="fl">60</span> <span class="op">&amp;</span></span></span>
+<span class="r-in"><span>  <span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&lt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">arc</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="fl">60</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">arc</span> <span class="op">&lt;-</span> <span class="va">arc</span><span class="op">[</span><span class="va">arc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span> <span class="op">*</span> <span class="fl">60</span> <span class="op">&amp;</span></span></span>
+<span class="r-in"><span>  <span class="va">arc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&lt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="fl">60</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="co"># We'll focus on a one day period with overlapping detection/depth time series for speed</span></span></span>
 <span class="r-in"><span><span class="va">end</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2016-03-18"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">acc</span> <span class="op">&lt;-</span> <span class="va">acc</span><span class="op">[</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&lt;=</span> <span class="va">end</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">arc</span> <span class="op">&lt;-</span> <span class="va">arc</span><span class="op">[</span><span class="va">arc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&lt;=</span> <span class="va">end</span>, <span class="op">]</span></span></span>
-<span class="r-in"><span><span class="va">arc</span> <span class="op">&lt;-</span> <span class="va">arc</span><span class="op">[</span><span class="va">arc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="fl">60</span> <span class="op">&amp;</span></span></span>
-<span class="r-in"><span>             <span class="va">arc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&lt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span> <span class="op">+</span> <span class="fl">2</span><span class="op">*</span><span class="fl">60</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">arc</span> <span class="op">&lt;-</span> <span class="va">arc</span><span class="op">[</span><span class="va">arc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span> <span class="op">*</span> <span class="fl">60</span> <span class="op">&amp;</span></span></span>
+<span class="r-in"><span>  <span class="va">arc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&lt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span><span class="op">)</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="fl">60</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="co"># Process time series</span></span></span>
 <span class="r-in"><span><span class="co"># ... Detections should be rounded to the nearest step</span></span></span>
 <span class="r-in"><span><span class="co"># ... Duplicate detections</span></span></span>
@@ -235,12 +235,13 @@
 <span class="r-in"><span><span class="co"># ... This step has already been implemented for dat_acoustics.</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (1) Implement AC algorithm with default arguments</span></span></span>
-<span class="r-in"><span><span class="va">out_acdc_1</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span>acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
-<span class="r-in"><span>                             bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
-<span class="r-in"><span>                             detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>                             mobility <span class="op">=</span> <span class="fl">200</span></span></span>
-<span class="r-in"><span>                             <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-02-19 14:54:38)... </span>
+<span class="r-in"><span><span class="va">out_acdc_1</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
+<span class="r-in"><span>  detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  mobility <span class="op">=</span> <span class="fl">200</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-08-29 15:38:58)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%... Initiating algorithm: moving over acoustic and internal ('archival') time steps... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... On acoustic time step ('timestep_detection') 1. </span>
@@ -917,17 +918,18 @@
 <span class="r-plt img"><img src="dot-acs-1.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================| 100%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Movement over acoustic and internal ('archival') time steps has been completed. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-02-19 14:54:48) after ~0.17 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-08-29 15:39:06) after ~0.14 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2) Implement ACDC algorithm with default arguments</span></span></span>
-<span class="r-in"><span><span class="va">out_acdc_2</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span>acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
-<span class="r-in"><span>                             archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
-<span class="r-in"><span>                             bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
-<span class="r-in"><span>                             detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>                             mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
-<span class="r-in"><span>                             calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                             <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-02-19 14:54:48)... </span>
+<span class="r-in"><span><span class="va">out_acdc_2</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
+<span class="r-in"><span>  detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
+<span class="r-in"><span>  calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-08-29 15:39:06)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%... Initiating algorithm: moving over acoustic and internal ('archival') time steps... </span>
@@ -1605,26 +1607,32 @@
 <span class="r-plt img"><img src="dot-acs-2.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================| 100%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Movement over acoustic and internal ('archival') time steps has been completed. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-02-19 14:55:02) after ~0.23 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-08-29 15:39:15) after ~0.15 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3) Implement AC or ACDC algorithm with detection probability kernels</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## (A) Get detection container overlaps</span></span></span>
 <span class="r-in"><span><span class="co"># Define receiver locations as a SpatialPointsDataFrame object with a UTM CRS</span></span></span>
 <span class="r-in"><span><span class="va">proj_wgs84</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:4326"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">proj_utm</span>   <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">proj_utm</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">dat_moorings</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">dat_moorings</span><span class="op">$</span><span class="va">receiver_id</span></span></span>
-<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_long"</span>, <span class="st">"receiver_lat"</span><span class="op">)</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                        <span class="va">proj_wgs84</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_long"</span>, <span class="st">"receiver_lat"</span><span class="op">)</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  <span class="va">proj_wgs84</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/spTransform.html" class="external-link">spTransform</a></span><span class="op">(</span><span class="va">xy</span>, <span class="va">proj_utm</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPointsDataFrame</a></span><span class="op">(</span><span class="va">xy</span>, <span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_id"</span>,</span></span>
-<span class="r-in"><span>                                                      <span class="st">"receiver_start_date"</span>,</span></span>
-<span class="r-in"><span>                                                      <span class="st">"receiver_end_date"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPointsDataFrame</a></span><span class="op">(</span><span class="va">xy</span>, <span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"receiver_id"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"receiver_start_date"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"receiver_end_date"</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Get detection overlap(s) as a SpatialPolygonsDataFrame</span></span></span>
-<span class="r-in"><span><span class="va">containers</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_detection_containers.html">get_detection_containers</a></span><span class="op">(</span>xy <span class="op">=</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="va">xy</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                     detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
-<span class="r-in"><span>                                     coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
-<span class="r-in"><span>                                     byid <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">containers</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_detection_containers.html">get_detection_containers</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  xy <span class="op">=</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="va">xy</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
+<span class="r-in"><span>  coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
+<span class="r-in"><span>  byid <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>spgeom1 and spgeom2 have different proj4 strings</span>
@@ -1707,26 +1715,30 @@
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>spgeom1 and spgeom2 have different proj4 strings</span>
 <span class="r-plt img"><img src="dot-acs-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="va">containers_df</span> <span class="op">&lt;-</span> <span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_id"</span>,</span></span>
-<span class="r-in"><span>                                 <span class="st">"receiver_start_date"</span>,</span></span>
-<span class="r-in"><span>                                 <span class="st">"receiver_end_date"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">containers_df</span> <span class="op">&lt;-</span> <span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"receiver_id"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"receiver_start_date"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"receiver_end_date"</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">containers_df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">containers</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">containers</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">SpatialPolygonsDataFrame</a></span><span class="op">(</span><span class="va">containers</span>, <span class="va">containers_df</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">overlaps</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_detection_containers_overlap.html">get_detection_containers_overlap</a></span><span class="op">(</span>containers <span class="op">=</span>  <span class="va">containers</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">overlaps</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_detection_containers_overlap.html">get_detection_containers_overlap</a></span><span class="op">(</span>containers <span class="op">=</span> <span class="va">containers</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## (B) Define detection probability function based on distance and detection_range</span></span></span>
 <span class="r-in"><span><span class="va">calc_dpr</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&lt;=</span> <span class="fl">425</span>, <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="fl">2.5</span> <span class="op">+</span> <span class="op">-</span><span class="fl">0.02</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## (C) Get detection kernels (a slow step)</span></span></span>
-<span class="r-in"><span><span class="va">kernels</span> <span class="op">&lt;-</span> <span class="fu"><a href="acs_setup_detection_kernels.html">acs_setup_detection_kernels</a></span><span class="op">(</span>xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
-<span class="r-in"><span>                                       containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>                                       overlaps <span class="op">=</span> <span class="va">overlaps</span>,</span></span>
-<span class="r-in"><span>                                       calc_detection_pr <span class="op">=</span> <span class="va">calc_dpr</span>,</span></span>
-<span class="r-in"><span>                                       bathy <span class="op">=</span> <span class="va">gebco</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_kernels() called (@ 2023-02-19 14:55:03)... </span>
+<span class="r-in"><span><span class="va">kernels</span> <span class="op">&lt;-</span> <span class="fu"><a href="acs_setup_detection_kernels.html">acs_setup_detection_kernels</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
+<span class="r-in"><span>  containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  overlaps <span class="op">=</span> <span class="va">overlaps</span>,</span></span>
+<span class="r-in"><span>  calc_detection_pr <span class="op">=</span> <span class="va">calc_dpr</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">gebco</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_kernels() called (@ 2023-08-29 15:39:16)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting receiver-specific kernels (for detection)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -2050,19 +2062,20 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... ... ... Extract detection probability kernels for active receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... ... ... Combining detection kernels to calculate the background detection probability surfaces (this is a slow step)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Process detection probability kernels ... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_kernels() call completed (@ 2023-02-19 14:55:13) after ~0.17 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_kernels() call completed (@ 2023-08-29 15:39:19) after ~0.05 minutes. </span>
 <span class="r-in"><span><span class="co">## (D) Implement algorithm</span></span></span>
-<span class="r-in"><span><span class="va">out_acdc_3</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span>acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
-<span class="r-in"><span>                             archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
-<span class="r-in"><span>                             bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
-<span class="r-in"><span>                             detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>                             detection_kernels <span class="op">=</span> <span class="va">kernels</span>,</span></span>
-<span class="r-in"><span>                             detection_kernels_overlap <span class="op">=</span> <span class="va">overlaps</span><span class="op">$</span><span class="va">list_by_receiver</span>,</span></span>
-<span class="r-in"><span>                             detection_time_window <span class="op">=</span> <span class="fl">10</span>,</span></span>
-<span class="r-in"><span>                             mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
-<span class="r-in"><span>                             calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                             <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-02-19 14:55:13)... </span>
+<span class="r-in"><span><span class="va">out_acdc_3</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
+<span class="r-in"><span>  detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  detection_kernels <span class="op">=</span> <span class="va">kernels</span>,</span></span>
+<span class="r-in"><span>  detection_kernels_overlap <span class="op">=</span> <span class="va">overlaps</span><span class="op">$</span><span class="va">list_by_receiver</span>,</span></span>
+<span class="r-in"><span>  detection_time_window <span class="op">=</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>  mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
+<span class="r-in"><span>  calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-08-29 15:39:19)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%... Initiating algorithm: moving over acoustic and internal ('archival') time steps... </span>
@@ -2739,18 +2752,19 @@
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================| 100%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Movement over acoustic and internal ('archival') time steps has been completed. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-02-19 14:55:31) after ~0.29 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-08-29 15:39:28) after ~0.16 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (4): Compare outputs with/without detection probability and normalisation</span></span></span>
 <span class="r-in"><span><span class="co">## Without detection kernels</span></span></span>
-<span class="r-in"><span><span class="va">out_acdc_4a</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span>acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
-<span class="r-in"><span>                              archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
-<span class="r-in"><span>                              bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
-<span class="r-in"><span>                              detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>                              mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
-<span class="r-in"><span>                              calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                              <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-02-19 14:55:31)... </span>
+<span class="r-in"><span><span class="va">out_acdc_4a</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
+<span class="r-in"><span>  detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
+<span class="r-in"><span>  calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-08-29 15:39:28)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%... Initiating algorithm: moving over acoustic and internal ('archival') time steps... </span>
@@ -3428,16 +3442,17 @@
 <span class="r-plt img"><img src="dot-acs-4.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================| 100%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Movement over acoustic and internal ('archival') time steps has been completed. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-02-19 14:55:45) after ~0.24 minutes. </span>
-<span class="r-in"><span><span class="va">out_acdc_4b</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span>acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
-<span class="r-in"><span>                              archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
-<span class="r-in"><span>                              bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
-<span class="r-in"><span>                              detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>                              normalise <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                              mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
-<span class="r-in"><span>                              calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                              <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-02-19 14:55:45)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-08-29 15:39:37) after ~0.14 minutes. </span>
+<span class="r-in"><span><span class="va">out_acdc_4b</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
+<span class="r-in"><span>  detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  normalise <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
+<span class="r-in"><span>  calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-08-29 15:39:37)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%... Initiating algorithm: moving over acoustic and internal ('archival') time steps... </span>
@@ -4114,17 +4129,18 @@
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================| 100%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Movement over acoustic and internal ('archival') time steps has been completed. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-02-19 14:55:59) after ~0.23 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-08-29 15:39:46) after ~0.15 minutes. </span>
 <span class="r-in"><span><span class="co">## With detection kernels</span></span></span>
-<span class="r-in"><span><span class="va">out_acdc_4c</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span>acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
-<span class="r-in"><span>                              archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
-<span class="r-in"><span>                              bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
-<span class="r-in"><span>                              detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>                              detection_kernels <span class="op">=</span> <span class="va">kernels</span>,</span></span>
-<span class="r-in"><span>                              mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
-<span class="r-in"><span>                              calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                              <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-02-19 14:55:59)... </span>
+<span class="r-in"><span><span class="va">out_acdc_4c</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
+<span class="r-in"><span>  detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  detection_kernels <span class="op">=</span> <span class="va">kernels</span>,</span></span>
+<span class="r-in"><span>  mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
+<span class="r-in"><span>  calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-08-29 15:39:46)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%... Initiating algorithm: moving over acoustic and internal ('archival') time steps... </span>
@@ -4801,16 +4817,17 @@
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================| 100%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Movement over acoustic and internal ('archival') time steps has been completed. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-02-19 14:56:16) after ~0.28 minutes. </span>
-<span class="r-in"><span><span class="va">out_acdc_4d</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span>acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
-<span class="r-in"><span>                              archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
-<span class="r-in"><span>                              bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
-<span class="r-in"><span>                               detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>                              detection_kernels <span class="op">=</span> <span class="va">kernels</span>, normalise <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                              mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
-<span class="r-in"><span>                              calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                              <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-02-19 14:56:16)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-08-29 15:39:57) after ~0.19 minutes. </span>
+<span class="r-in"><span><span class="va">out_acdc_4d</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
+<span class="r-in"><span>  detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  detection_kernels <span class="op">=</span> <span class="va">kernels</span>, normalise <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
+<span class="r-in"><span>  calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-08-29 15:39:57)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%... Initiating algorithm: moving over acoustic and internal ('archival') time steps... </span>
@@ -5487,7 +5504,7 @@
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================| 100%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Movement over acoustic and internal ('archival') time steps has been completed. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-02-19 14:56:31) after ~0.25 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-08-29 15:40:09) after ~0.19 minutes. </span>
 <span class="r-in"><span><span class="co">## Comparison of final maps</span></span></span>
 <span class="r-in"><span><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">out_acdc_4a</span><span class="op">$</span><span class="va">map</span>, main <span class="op">=</span> <span class="st">"4a"</span><span class="op">)</span></span></span>
@@ -5498,15 +5515,16 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">pp</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (5): Implement AC or ACDC algorithm and write messages to file via 'con'</span></span></span>
-<span class="r-in"><span><span class="va">out_acdc_5</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span>acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
-<span class="r-in"><span>                             archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
-<span class="r-in"><span>                             bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
-<span class="r-in"><span>                             detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>                             mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
-<span class="r-in"><span>                             calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                             verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                             con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/"</span>, <span class="st">"acdc_log.txt"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                             <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out_acdc_5</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
+<span class="r-in"><span>  detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
+<span class="r-in"><span>  calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/"</span>, <span class="st">"acdc_log.txt"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |=                                                                     |   1%  |                                                                              |=                                                                     |   2%</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
@@ -5791,7 +5809,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================| 100%</span>
 <span class="r-in"><span><span class="co"># Check log</span></span></span>
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/"</span>, <span class="st">"acdc_log.txt"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "flapper::.acs_pl() called (@ 2023-02-19 14:45:52)... "</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "flapper::.acs_pl() called (@ 2023-08-29 15:21:57)... "</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] "... Checking user inputs... "                         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3] "... Splitting 'acoustics' into chunks... "            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4] "... Processing acoustics chunks... "                  </span>
@@ -5803,21 +5821,22 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3] "... On acoustic time step ('timestep_detection') 101. "                              </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4] "... ... On internal time step ('timestep_archival') 1. "                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5] "... Movement over acoustic and internal ('archival') time steps has been completed. "</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "... flapper::.acs() call completed (@ 2023-02-19 14:56:44) after ~0.22 minutes. "    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "... flapper::.acs() call completed (@ 2023-08-29 15:40:18) after ~0.16 minutes. "    </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (6): Implement AC or ACDC algorithm and return spatial information</span></span></span>
 <span class="r-in"><span><span class="co"># Specify save_record_spatial = NULL to include spatial information for all time steps</span></span></span>
 <span class="r-in"><span><span class="co"># ... (used for plotting) or a vector to include this information for specific time steps</span></span></span>
-<span class="r-in"><span><span class="va">out_acdc_6</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span>acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
-<span class="r-in"><span>                             archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
-<span class="r-in"><span>                             bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
-<span class="r-in"><span>                             detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>                             mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
-<span class="r-in"><span>                             calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                             save_record_spatial <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>                             verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                             con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/"</span>, <span class="st">"acdc_log.txt"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                             <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out_acdc_6</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">:::</span><span class="fu">.acs</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">arc</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">gebco</span>,</span></span>
+<span class="r-in"><span>  detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
+<span class="r-in"><span>  calc_depth_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  save_record_spatial <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/"</span>, <span class="st">"acdc_log.txt"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |=                                                                     |   1%  |                                                                              |=                                                                     |   2%</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
@@ -6101,7 +6120,6 @@
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-plt img"><img src="dot-acs-6.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================| 100%</span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -90,10 +90,11 @@
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#### Example (1): flapper_run_parallel</span></span></span>
 <span class="r-in"><span><span class="co">## Illustration of intended usage for a parallelised function</span></span></span>
-<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="va">flapper_run_parallel</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">flapper_run_parallel</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="cl.html">cl_lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,</span></span>
-<span class="r-in"><span>            <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>            cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>    cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
@@ -128,32 +129,32 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2): flapper_run_slow</span></span></span>
 <span class="r-in"><span><span class="co">## Illustration of intended usage for a slow function</span></span></span>
-<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="va">flapper_run_slow</span><span class="op">)</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">pf_args</span>               <span class="op">&lt;-</span> <span class="va">dat_dcpf_histories</span><span class="op">$</span><span class="va">args</span></span></span>
-<span class="r-in"><span>  <span class="va">pf_args</span><span class="op">$</span><span class="va">n</span>             <span class="op">&lt;-</span> <span class="fl">100</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">flapper_run_slow</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">pf_args</span> <span class="op">&lt;-</span> <span class="va">dat_dcpf_histories</span><span class="op">$</span><span class="va">args</span></span></span>
+<span class="r-in"><span>  <span class="va">pf_args</span><span class="op">$</span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">100</span></span></span>
 <span class="r-in"><span>  <span class="va">pf_args</span><span class="op">$</span><span class="va">calc_distance</span> <span class="op">&lt;-</span> <span class="st">"lcp"</span></span></span>
-<span class="r-in"><span>  <span class="va">pf_args</span><span class="op">$</span><span class="va">seed</span>          <span class="op">&lt;-</span> <span class="fl">1</span></span></span>
-<span class="r-in"><span>  <span class="va">out_pf</span>                <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">pf</span>, <span class="va">pf_args</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">pf_args</span><span class="op">$</span><span class="va">seed</span> <span class="op">&lt;-</span> <span class="fl">1</span></span></span>
+<span class="r-in"><span>  <span class="va">out_pf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">pf</span>, <span class="va">pf_args</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf() called (@ 2023-02-19 14:57:40)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf() called (@ 2023-08-29 15:40:50)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up cost-surface for calc_distance = 'lcp'... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_costs() called (@ 2023-02-19 14:57:40)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_costs() called (@ 2023-08-29 15:40:50)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining transition matrices... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Calculating distance matrices... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Assembling LCP costs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_costs() call completed (@ 2023-02-19 14:57:40) after ~0 minutes. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_graph_surface() called (@ 2023-02-19 14:57:40)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_costs() call completed (@ 2023-08-29 15:40:50) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_graph_surface() called (@ 2023-08-29 15:40:50)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining nodes, edges and costs to make graph... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Constructing graph object... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_graph_surface() call completed (@ 2023-02-19 14:57:40) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_graph_surface() call completed (@ 2023-08-29 15:40:50) after ~0 minutes. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Determining the set of possible starting locations (t = 1)... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_from_point() called (@ 2023-02-19 14:57:40)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_from_point() called (@ 2023-08-29 15:40:50)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Calling cppRouting::get_distance_matrix() to get least-cost distances... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Making raster of least-cost distances from origin ... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_from_point() call completed (@ 2023-02-19 14:57:40) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_from_point() call completed (@ 2023-08-29 15:40:50) after ~0 minutes. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing algorithm iteratively over time steps... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Time = 1... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... ... Selecting candidate starting positions for the current time step... </span>
@@ -1908,7 +1909,7 @@
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Time = 18... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... ... Selecting candidate starting positions for the current time step... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf() call completed (@ 2023-02-19 14:58:27) after ~0.78 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf() call completed (@ 2023-08-29 15:41:11) after ~0.35 minutes. </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

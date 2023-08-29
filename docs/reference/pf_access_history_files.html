@@ -117,14 +117,14 @@
 <span class="r-in"><span><span class="co"># Define a directory in which to save files from PF</span></span></span>
 <span class="r-in"><span><span class="va">root</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/pf/"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">root</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpUnZ226/pf' already exists</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'/var/folders/nl/ygb3g6tj24z06jddbqqhj6hw0000gn/T//Rtmpwb5KFV/pf' already exists</span>
 <span class="r-in"><span><span class="co"># Implement the PF algorithm with write_history specified</span></span></span>
 <span class="r-in"><span><span class="co"># ... For speed, we will implement the algorithm using pre-defined data</span></span></span>
 <span class="r-in"><span><span class="va">pf_args</span> <span class="op">&lt;-</span> <span class="va">dat_dcpf_histories</span><span class="op">$</span><span class="va">args</span></span></span>
 <span class="r-in"><span><span class="va">pf_args</span><span class="op">$</span><span class="va">calc_distance_euclid_fast</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span><span class="va">pf_args</span><span class="op">$</span><span class="va">write_history</span>             <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">root</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pf_args</span><span class="op">$</span><span class="va">write_history</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">root</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">pf</span>, <span class="va">pf_args</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf() called (@ 2023-02-19 15:02:43)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf() called (@ 2023-08-29 15:45:00)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Determining the set of possible starting locations (t = 1)... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
@@ -199,7 +199,7 @@
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Time = 18... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... ... Selecting candidate starting positions for the current time step... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf() call completed (@ 2023-02-19 15:02:44) after ~0.01 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf() call completed (@ 2023-08-29 15:45:00) after ~0.01 minutes. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $history</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $history[[1]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    id_current   pr_current timestep</span>
@@ -668,20 +668,20 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $args$calc_movement_pr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> function(distance,...) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  pr &lt;- stats::plogis(5 + distance * -0.05)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  pr[distance &gt; 200] &lt;- 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  return(pr)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;bytecode: 0x7fb9dd25f8c8&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> function(distance, ...) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       pr &lt;- stats::plogis(5 + distance * -0.05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       pr[distance &gt; 200] &lt;- 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       return(pr)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;bytecode: 0x12f2554f8&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $args$calc_movement_pr_from_origin</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> function(distance,...) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  pr &lt;- stats::plogis(5 + distance * -0.05)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  pr[distance &gt; 200] &lt;- 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  return(pr)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;bytecode: 0x7fb9dd257cf0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> function(distance, ...) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       pr &lt;- stats::plogis(5 + distance * -0.05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       pr[distance &gt; 200] &lt;- 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       return(pr)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;bytecode: 0x12f23ef10&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $args$mobility</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 200</span>
@@ -703,7 +703,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $args$write_history</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $args$write_history$file</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpUnZ226/pf/"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/var/folders/nl/ygb3g6tj24z06jddbqqhj6hw0000gn/T//Rtmpwb5KFV/pf/"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $args$cl</span>
@@ -737,12 +737,12 @@
 <span class="r-in"><span><span class="co"># List the files</span></span></span>
 <span class="r-in"><span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu">pf_access_history_files</span><span class="op">(</span><span class="va">root</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpUnZ226/pf//pf_1.rds"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpUnZ226/pf//pf_2.rds"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpUnZ226/pf//pf_3.rds"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpUnZ226/pf//pf_4.rds"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpUnZ226/pf//pf_5.rds"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpUnZ226/pf//pf_6.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/var/folders/nl/ygb3g6tj24z06jddbqqhj6hw0000gn/T//Rtmpwb5KFV/pf//pf_1.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "/var/folders/nl/ygb3g6tj24z06jddbqqhj6hw0000gn/T//Rtmpwb5KFV/pf//pf_2.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "/var/folders/nl/ygb3g6tj24z06jddbqqhj6hw0000gn/T//Rtmpwb5KFV/pf//pf_3.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4] "/var/folders/nl/ygb3g6tj24z06jddbqqhj6hw0000gn/T//Rtmpwb5KFV/pf//pf_4.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "/var/folders/nl/ygb3g6tj24z06jddbqqhj6hw0000gn/T//Rtmpwb5KFV/pf//pf_5.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "/var/folders/nl/ygb3g6tj24z06jddbqqhj6hw0000gn/T//Rtmpwb5KFV/pf//pf_6.rds"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

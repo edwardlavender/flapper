@@ -123,18 +123,26 @@
 <span class="r-in"><span><span class="co">#### Example (1): Implement function using barrier only</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Define example starting and ending locations</span></span></span>
-<span class="r-in"><span><span class="va">start</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">701854.9</span>, <span class="fl">6260399</span>,</span></span>
-<span class="r-in"><span>                  <span class="fl">709202.5</span>, <span class="fl">6258892</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">end</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">706753.3</span>, <span class="fl">6264261</span>,</span></span>
-<span class="r-in"><span>                <span class="fl">709673.5</span>, <span class="fl">6257102</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">start</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fl">701854.9</span>, <span class="fl">6260399</span>,</span></span>
+<span class="r-in"><span>  <span class="fl">709202.5</span>, <span class="fl">6258892</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">end</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fl">706753.3</span>, <span class="fl">6264261</span>,</span></span>
+<span class="r-in"><span>  <span class="fl">709673.5</span>, <span class="fl">6257102</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Visualise segments</span></span></span>
 <span class="r-in"><span><span class="co"># ... The first segment crosses the coastline (our barrier)</span></span></span>
 <span class="r-in"><span><span class="co"># ... The second segment does not cross the coastline (our barrier)</span></span></span>
-<span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/arrows.html" class="external-link">arrows</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">start</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, y0 <span class="op">=</span> <span class="va">start</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                 x1 <span class="op">=</span> <span class="va">end</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, y1 <span class="op">=</span> <span class="va">end</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/arrows.html" class="external-link">arrows</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">start</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">]</span>, y0 <span class="op">=</span> <span class="va">start</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                 x1 <span class="op">=</span> <span class="va">end</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">]</span>, y1 <span class="op">=</span> <span class="va">end</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/arrows.html" class="external-link">arrows</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x0 <span class="op">=</span> <span class="va">start</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, y0 <span class="op">=</span> <span class="va">start</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  x1 <span class="op">=</span> <span class="va">end</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, y1 <span class="op">=</span> <span class="va">end</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/arrows.html" class="external-link">arrows</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x0 <span class="op">=</span> <span class="va">start</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">]</span>, y0 <span class="op">=</span> <span class="va">start</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  x1 <span class="op">=</span> <span class="va">end</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">]</span>, y1 <span class="op">=</span> <span class="va">end</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="segments_cross_barrier-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Implement function</span></span></span>
@@ -151,8 +159,10 @@
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .local(x, y = y, ...):</span> RasterLayer has no NA cells (for which to compute a distance)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Implement function for a specified mobility parameter</span></span></span>
-<span class="r-in"><span><span class="fu">segments_cross_barrier</span><span class="op">(</span><span class="va">start</span>, <span class="va">end</span>, barrier <span class="op">=</span> <span class="va">barrier</span>,</span></span>
-<span class="r-in"><span>                       distance <span class="op">=</span> <span class="va">dat_dist</span>, mobility <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">segments_cross_barrier</span><span class="op">(</span><span class="va">start</span>, <span class="va">end</span>,</span></span>
+<span class="r-in"><span>  barrier <span class="op">=</span> <span class="va">barrier</span>,</span></span>
+<span class="r-in"><span>  distance <span class="op">=</span> <span class="va">dat_dist</span>, mobility <span class="op">=</span> <span class="fl">500</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       [,1]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,] FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2,] FALSE</span>
@@ -162,7 +172,7 @@
 <span class="r-in"><span><span class="co">## Sample a large number of random starting/ending locations</span></span></span>
 <span class="r-in"><span><span class="va">start</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/sampleRandom.html" class="external-link">sampleRandom</a></span><span class="op">(</span><span class="va">dat_gebco</span>, size <span class="op">=</span> <span class="fl">3000</span>, xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .local(x, size, ...):</span> size &lt;= ncell(x) is not TRUE</span>
-<span class="r-in"><span><span class="va">end</span>   <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/sampleRandom.html" class="external-link">sampleRandom</a></span><span class="op">(</span><span class="va">dat_gebco</span>, size <span class="op">=</span> <span class="fl">3000</span>, xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">end</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/sampleRandom.html" class="external-link">sampleRandom</a></span><span class="op">(</span><span class="va">dat_gebco</span>, size <span class="op">=</span> <span class="fl">3000</span>, xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .local(x, size, ...):</span> size &lt;= ncell(x) is not TRUE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Compare the duration of the function without/with distance included</span></span></span>
@@ -170,15 +180,17 @@
 <span class="r-in"><span><span class="co"># (~0.714 s versus 0.131 s for 3000 locations)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">int_1</span> <span class="op">&lt;-</span> <span class="fu">segments_cross_barrier</span><span class="op">(</span><span class="va">start</span>, <span class="va">end</span>, barrier <span class="op">=</span> <span class="va">barrier</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    0.02    0.00    0.02 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.003   0.000   0.004 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">int_2</span> <span class="op">&lt;-</span> <span class="fu">segments_cross_barrier</span><span class="op">(</span><span class="va">start</span>, <span class="va">end</span>, barrier <span class="op">=</span> <span class="va">barrier</span>,</span></span>
-<span class="r-in"><span>                                  distance <span class="op">=</span> <span class="va">dat_dist</span>, mobility <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">int_2</span> <span class="op">&lt;-</span> <span class="fu">segments_cross_barrier</span><span class="op">(</span><span class="va">start</span>, <span class="va">end</span>,</span></span>
+<span class="r-in"><span>    barrier <span class="op">=</span> <span class="va">barrier</span>,</span></span>
+<span class="r-in"><span>    distance <span class="op">=</span> <span class="va">dat_dist</span>, mobility <span class="op">=</span> <span class="fl">500</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.005   0.000   0.005 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.002   0.000   0.003 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## The two approaches return identical solutions:</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">int_1</span>, <span class="va">int_2</span><span class="op">)</span></span></span>

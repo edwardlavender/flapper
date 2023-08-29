@@ -107,7 +107,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Define an example RasterLayer</span></span></span>
 <span class="r-in"><span><span class="va">ncl</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
 <span class="r-in"><span><span class="va">nrw</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
-<span class="r-in"><span><span class="va">n</span>   <span class="op">&lt;-</span> <span class="va">ncl</span><span class="op">*</span><span class="va">nrw</span></span></span>
+<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="va">ncl</span> <span class="op">*</span> <span class="va">nrw</span></span></span>
 <span class="r-in"><span><span class="va">mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span>, ncol <span class="op">=</span> <span class="va">ncl</span>, nrow <span class="op">=</span> <span class="va">nrw</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></span><span class="op">(</span><span class="va">mat</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Visualise example RasterLayer</span></span></span>

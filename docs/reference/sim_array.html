@@ -91,11 +91,11 @@
 
 
 <dt>coastline</dt>
-<dd><p>(optional) This argument is used to incorporate the presence of barriers, such as coastline, in the area. There are three options. If <code>coastline = NULL</code>, no barriers are incorporated. If <code>coastline = "simple_random"</code>, then a triangular island is simulated in the study area. Alternatively, a spatial object, such as a SpatialPolygonsDataFrame, that defines the coastline in an area can be incorporated into the array design by passing this <code>coastline</code>.</p></dd>
+<dd><p>(optional) This argument is used to incorporate the presence of barriers, such as coastline, in the area. There are three options. If <code>coastline = NULL</code>, no barriers are incorporated. If <code>coastline = "simple_random"</code>, then a triangular island is simulated in the study area. Alternatively, a spatial object (such as a SpatialPolygonsDataFrame) or a <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> that defines the coastline in an area can be incorporated into the array design by passing this <code>coastline</code>. If a <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> is used, cells with NA are excluded from sampling.</p></dd>
 
 
 <dt>land_inside_coastline</dt>
-<dd><p>A logical variable that defines whether or not the land is `inside' the polygon(s) defined by <code>coastline</code> (<code>land_inside_coastline = TRUE</code>) or the sea is `inside' the polygon(s) (<code>land_inside_coastline = FALSE</code>).</p></dd>
+<dd><p>If <code>coastline</code> is a Spatial okject, <code>land_inside_coastline</code> is a logical variable that defines whether or not the land is `inside' the polygon(s) defined by <code>coastline</code> (<code>land_inside_coastline = TRUE</code>) or the sea is `inside' the polygon(s) (<code>land_inside_coastline = FALSE</code>).</p></dd>
 
 
 <dt>n_receivers</dt>
@@ -103,7 +103,7 @@
 
 
 <dt>arrangement, ...</dt>
-<dd><p>A character string or a SpatialPoints object that defines the arrangement of receivers. Supported character string options for simulated arrays are <code>"regular"</code>, <code>"random"</code>, <code>"stratified"</code>, <code>"nonaligned"</code>, <code>"hexagonal"</code> and <code>"clustered"</code> (see <code><a href="https://rdrr.io/pkg/sp/man/spsample.html" class="external-link">spsample</a></code>, which is used to simulate receiver locations). Additional arguments can be passed to this function via <code>...</code> for further control. Otherwise, a SpatialPoints object that defines the coordinates of receivers (in the same coordinate reference system as <code>boundaries</code> and, if applicable, <code>coastline</code>) is assumed to have been provided.</p></dd>
+<dd><p>A character string or a SpatialPoints object that defines the arrangement of receivers. If a character is supplied, sampling is implemented via <code><a href="https://rdrr.io/pkg/sp/man/spsample.html" class="external-link">spsample</a></code> unless <code>coastline</code> is a <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> in which case sampling is implemented via <code><a href="https://rdrr.io/pkg/raster/man/sampleRegular.html" class="external-link">sampleRegular</a></code>, <code><a href="https://rdrr.io/pkg/raster/man/sampleRandom.html" class="external-link">sampleRandom</a></code> or <code><a href="https://rdrr.io/pkg/raster/man/sampleStratified.html" class="external-link">sampleStratified</a></code>, depending on <code>arrangement</code>. Supported character string options for simulated arrays are <code>"regular"</code>, <code>"random"</code>, <code>"stratified"</code> (for all supported function inputs) and  <code>"nonaligned"</code>, <code>"hexagonal"</code> and <code>"clustered"</code> (only for <code><a href="https://rdrr.io/pkg/sp/man/spsample.html" class="external-link">spsample</a></code> implementations). Additional arguments can be passed to this function via <code>...</code> for further control. Otherwise, a SpatialPoints object that defines the coordinates of receivers (in the same coordinate reference system as <code>boundaries</code> and, if applicable, <code>coastline</code>) is assumed to have been provided.</p></dd>
 
 
 <dt>seed</dt>
@@ -130,12 +130,12 @@
     <h2>Value</h2>
     
 
-<p>The function returns a named list of (a) the spatial objects that define the simulated array (`array') and (b) the arguments used to generate this array (`args'). The `array' element is a named list contains the following elements: `boundaries', an <code><a href="https://rdrr.io/pkg/raster/man/Extent-class.html" class="external-link">Extent-class</a></code> object that defines the boundaries of the area (as inputted); `area', a <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons-class.html" class="external-link">SpatialPolygons-class</a></code> object that defines the boundaries of the area; `land' and `sea', <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons-class.html" class="external-link">SpatialPolygons-class</a></code> or <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygonsDataFrame-class.html" class="external-link">SpatialPolygonsDataFrame-class</a></code> objects that define the land and sea respectively; and `xy', a <code><a href="https://rdrr.io/pkg/sp/man/SpatialPoints-class.html" class="external-link">SpatialPoints-class</a></code> object that defines receiver locations. If <code>plot = TRUE</code>, the function also returns a plot of the array.</p>
+<p>The function returns a named list of (a) the spatial objects that define the simulated array (`array') and (b) the arguments used to generate this array (`args'). The `array' element is a named list contains the following elements: `boundaries', an <code><a href="https://rdrr.io/pkg/raster/man/Extent-class.html" class="external-link">Extent-class</a></code> object that defines the boundaries of the area (as inputted); `area', a <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons-class.html" class="external-link">SpatialPolygons-class</a></code> object that defines the boundaries of the area; `land' and `sea', <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons-class.html" class="external-link">SpatialPolygons-class</a></code>, <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygonsDataFrame-class.html" class="external-link">SpatialPolygonsDataFrame-class</a></code> or <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> objects that define the land and sea respectively; and `xy', a <code><a href="https://rdrr.io/pkg/sp/man/SpatialPoints-class.html" class="external-link">SpatialPoints-class</a></code> object that defines receiver locations. If <code>plot = TRUE</code>, the function also returns a plot of the array.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
     <p>Note that this function does not currently support temporally varying array designs.</p>
-<p>For coupled simulation--analysis workflows (such as <code>sim_array</code>, <code><a href="sim_path_sa.html">sim_path_sa</a></code> and <code><a href="sim_detections.html">sim_detections</a></code> plus <code><a href="ac.html">ac</a></code>, <code><a href="dc.html">dc</a></code>,  <code><a href="acdc.html">acdc</a></code> and <code><a href="pf.html">pf</a></code>) note that the representation of the <code>coastline</code> as <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons-class.html" class="external-link">SpatialPolygons-class</a></code> or <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygonsDataFrame-class.html" class="external-link">SpatialPolygonsDataFrame-class</a></code> objects by the <code>sim_*</code> functions, rather than a <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> grid, may be problematic at the land--sea interface if the Spatial* data used for the simulation do not agree precisely with the <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> data used to reconstruct movements: locations that are `allowed' from the perspective of the Spatial* data may not be allowed by the <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> data (and vice versa). At the time of writing, this can be resolved by simply checking simulated array positions in relation to the grid across which movements are reconstructed. Receiver locations should also be translated onto the <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> before simulating detections (see <code><a href="sim_detections.html">sim_detections</a></code>). In the future, this should be resolved by defining simulation areas across a <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> too (see also <code><a href="acs_setup_containers.html">acs_setup_containers</a></code>).</p>
+<p>For coupled simulation--analysis workflows (such as <code>sim_array</code>, <code><a href="sim_path_sa.html">sim_path_sa</a></code> and <code><a href="sim_detections.html">sim_detections</a></code> plus <code><a href="ac.html">ac</a></code>, <code><a href="dc.html">dc</a></code>,  <code><a href="acdc.html">acdc</a></code> and <code><a href="pf.html">pf</a></code>) note that the representation of the <code>coastline</code> as <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons-class.html" class="external-link">SpatialPolygons-class</a></code> or <code><a href="https://rdrr.io/pkg/sp/man/SpatialPolygonsDataFrame-class.html" class="external-link">SpatialPolygonsDataFrame-class</a></code> objects by the <code>sim_*</code> functions, rather than a <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> grid, may be problematic at the land--sea interface if the Spatial* data used for the simulation do not agree precisely with the <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> data used to reconstruct movements: locations that are `allowed' from the perspective of the Spatial* data may not be allowed by the <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> data (and vice versa). At the time of writing, this can be resolved in two ways. (A) Check simulated array positions in relation to the grid across which movements are reconstructed. Receiver locations should also be translated onto the <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> before simulating detections (see <code><a href="sim_detections.html">sim_detections</a></code>). (B) For this function, you can now use a <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></code> to simulate receiver locations (see also <code><a href="acs_setup_containers.html">acs_setup_containers</a></code>).</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -150,28 +150,39 @@
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#### Example (1): Simulate an array using default parameters</span></span></span>
 <span class="r-in"><span><span class="co"># ... And force reproducible simulations by defining the seed</span></span></span>
-<span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>boundaries <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span>, <span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  boundaries <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span>, <span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  seed <span class="op">=</span> <span class="fl">1</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> CRS of area is NA.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Simulating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -10, 10, -10, 10  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="sim_array-1.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:13) after ~0 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2): Simulate coastline and customise plot</span></span></span>
 <span class="r-in"><span><span class="co"># ... via add_land and add_sea</span></span></span>
-<span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>boundaries <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span>, <span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   coastline <span class="op">=</span> <span class="st">"simple_random"</span>,</span></span>
-<span class="r-in"><span>                   add_land <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="st">"darkgreen"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   add_sea <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha</a></span><span class="op">(</span><span class="st">"skyblue"</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   seed <span class="op">=</span> <span class="fl">1</span></span></span>
-<span class="r-in"><span>                   <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  boundaries <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span>, <span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  coastline <span class="op">=</span> <span class="st">"simple_random"</span>,</span></span>
+<span class="r-in"><span>  add_land <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="st">"darkgreen"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  add_sea <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha</a></span><span class="op">(</span><span class="st">"skyblue"</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  seed <span class="op">=</span> <span class="fl">1</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> CRS of area is NA.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating coastline... </span>
@@ -181,130 +192,258 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Simulating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Spatial layers do not have identical CRS strings</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -4.689827, 1.457067, -5.966361, 8.164156  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -10, 10, -10, 10  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "darkgreen"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $x</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -4.689827, 1.457067, -5.966361, 8.164156  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#87CEEB33"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $x</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -10, 10, -10, 10  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="sim_array-2.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:13) after ~0 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3): Add custom coastline</span></span></span>
-<span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>boundaries <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">dat_coast</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
-<span class="r-in"><span>                   add_land <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="st">"darkgreen"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   add_sea <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha</a></span><span class="op">(</span><span class="st">"skyblue"</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   seed <span class="op">=</span> <span class="fl">1</span></span></span>
-<span class="r-in"><span>                   <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  boundaries <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">dat_coast</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
+<span class="r-in"><span>  add_land <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="st">"darkgreen"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  add_sea <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha</a></span><span class="op">(</span><span class="st">"skyblue"</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  seed <span class="op">=</span> <span class="fl">1</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating coastline... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Simulating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Object of class "SpatialPolygonsDataFrame" (package sp):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Number of SpatialPolygons:  1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variables measured:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   GID_0         NAME_0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   GBR United Kingdom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 697637.7, 712448.9, 6248627, 6270681  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "darkgreen"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $x</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Object of class "SpatialPolygonsDataFrame" (package sp):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Number of SpatialPolygons:  1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variables measured:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   GID_0         NAME_0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   GBR United Kingdom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#87CEEB33"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $x</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 697637.7, 712448.9, 6248627, 6270681  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span>
 <span class="r-plt img"><img src="sim_array-3.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:13) after ~0 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (4): Change the number of receivers</span></span></span>
 <span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>n_receivers <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> CRS of area is NA.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Simulating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -10, 10, -10, 10  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="sim_array-4.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:13) after ~0 minutes. </span>
 <span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>n_receivers <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> CRS of area is NA.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Simulating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -10, 10, -10, 10  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="sim_array-5.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:13) after ~0 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (5): Change the arrangement of receivers</span></span></span>
 <span class="r-in"><span><span class="co">## Explore different arrangements</span></span></span>
 <span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>n_receivers <span class="op">=</span> <span class="fl">25</span>, arrangement <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> CRS of area is NA.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Simulating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -10, 10, -10, 10  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="sim_array-6.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:13) after ~0 minutes. </span>
 <span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>n_receivers <span class="op">=</span> <span class="fl">25</span>, arrangement <span class="op">=</span> <span class="st">"regular"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> CRS of area is NA.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Simulating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -10, 10, -10, 10  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="sim_array-7.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:13) after ~0 minutes. </span>
 <span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>n_receivers <span class="op">=</span> <span class="fl">25</span>, arrangement <span class="op">=</span> <span class="st">"clustered"</span>, nclusters <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> CRS of area is NA.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Simulating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -10, 10, -10, 10  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="sim_array-8.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:13) after ~0 minutes. </span>
 <span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>n_receivers <span class="op">=</span> <span class="fl">25</span>, arrangement <span class="op">=</span> <span class="st">"stratified"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> CRS of area is NA.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Simulating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -10, 10, -10, 10  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="sim_array-9.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:13) after ~0 minutes. </span>
 <span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>n_receivers <span class="op">=</span> <span class="fl">25</span>, arrangement <span class="op">=</span> <span class="st">"nonaligned"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> CRS of area is NA.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Simulating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -10, 10, -10, 10  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="sim_array-10.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:13) after ~0 minutes. </span>
 <span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>n_receivers <span class="op">=</span> <span class="fl">25</span>, arrangement <span class="op">=</span> <span class="st">"hexagonal"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> CRS of area is NA.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Simulating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -10, 10, -10, 10  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="sim_array-11.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:13) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co">## Force arrangements around coastline</span></span></span>
 <span class="r-in"><span><span class="co"># Simulated island</span></span></span>
-<span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>n_receivers <span class="op">=</span> <span class="fl">25</span>,</span></span>
-<span class="r-in"><span>                   coastline <span class="op">=</span> <span class="st">"simple_random"</span>,</span></span>
-<span class="r-in"><span>                   arrangement <span class="op">=</span> <span class="st">"regular"</span>,</span></span>
-<span class="r-in"><span>                   add_land <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  n_receivers <span class="op">=</span> <span class="fl">25</span>,</span></span>
+<span class="r-in"><span>  coastline <span class="op">=</span> <span class="st">"simple_random"</span>,</span></span>
+<span class="r-in"><span>  arrangement <span class="op">=</span> <span class="st">"regular"</span>,</span></span>
+<span class="r-in"><span>  add_land <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> CRS of area is NA.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating coastline... </span>
@@ -314,52 +453,120 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Simulating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Spatial layers do not have identical CRS strings</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -3.632555, -2.500754, 0.7677006, 5.374274  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -10, 10, -10, 10  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $x</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : -3.632555, -2.500754, 0.7677006, 5.374274  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="sim_array-12.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:13) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co"># Real coastline</span></span></span>
-<span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>boundaries <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">dat_coast</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   n_receivers <span class="op">=</span> <span class="fl">25</span>,</span></span>
-<span class="r-in"><span>                   coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
-<span class="r-in"><span>                   arrangement <span class="op">=</span> <span class="st">"regular"</span>,</span></span>
-<span class="r-in"><span>                   add_land <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  boundaries <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">dat_coast</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  n_receivers <span class="op">=</span> <span class="fl">25</span>,</span></span>
+<span class="r-in"><span>  coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
+<span class="r-in"><span>  arrangement <span class="op">=</span> <span class="st">"regular"</span>,</span></span>
+<span class="r-in"><span>  add_land <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating coastline... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Simulating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Object of class "SpatialPolygonsDataFrame" (package sp):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Number of SpatialPolygons:  1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variables measured:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   GID_0         NAME_0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   GBR United Kingdom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 697637.7, 712448.9, 6248627, 6270681  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $x</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Object of class "SpatialPolygonsDataFrame" (package sp):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Number of SpatialPolygons:  1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variables measured:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   GID_0         NAME_0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   GBR United Kingdom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span>
 <span class="r-plt img"><img src="sim_array-13.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:13) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co">## Incorporate custom arrangements</span></span></span>
 <span class="r-in"><span><span class="co"># Define receiver locations as a SpatialPoints object with a UTM CRS</span></span></span>
 <span class="r-in"><span><span class="co"># ... to match other spatial datasets</span></span></span>
 <span class="r-in"><span><span class="va">proj_wgs84</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:4326"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">proj_utm</span>   <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_long"</span>, <span class="st">"receiver_lat"</span><span class="op">)</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                        <span class="va">proj_wgs84</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">proj_utm</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_long"</span>, <span class="st">"receiver_lat"</span><span class="op">)</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  <span class="va">proj_wgs84</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/spTransform.html" class="external-link">spTransform</a></span><span class="op">(</span><span class="va">xy</span>, <span class="va">proj_utm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Make array</span></span></span>
-<span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span>boundaries <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">dat_coast</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
-<span class="r-in"><span>                   arrangement <span class="op">=</span> <span class="va">xy</span>,</span></span>
-<span class="r-in"><span>                   add_land <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                   <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-02-19 15:04:47)... </span>
+<span class="r-in"><span><span class="va">array</span> <span class="op">&lt;-</span> <span class="fu">sim_array</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  boundaries <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">dat_coast</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
+<span class="r-in"><span>  arrangement <span class="op">=</span> <span class="va">xy</span>,</span></span>
+<span class="r-in"><span>  add_land <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_array() called (@ 2023-08-29 15:46:14)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating coastline... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Incorporating receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting array... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Object of class "SpatialPolygonsDataFrame" (package sp):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Number of SpatialPolygons:  1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variables measured:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   GID_0         NAME_0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   GBR United Kingdom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialPolygons </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 697637.7, 712448.9, 6248627, 6270681  (xmin, xmax, ymin, ymax)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $x</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Object of class "SpatialPolygonsDataFrame" (package sp):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Number of SpatialPolygons:  1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variables measured:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   GID_0         NAME_0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   GBR United Kingdom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span>
 <span class="r-plt img"><img src="sim_array-14.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining outputs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-02-19 15:04:47) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_array() call completed (@ 2023-08-29 15:46:14) after ~0 minutes. </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

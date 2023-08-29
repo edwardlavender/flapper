@@ -129,7 +129,7 @@
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#### Implement pf() algorithm</span></span></span>
 <span class="r-in"><span><span class="co"># Here, we use pre-defined outputs for speed</span></span></span>
-<span class="r-in"><span><span class="va">paths</span>    <span class="op">&lt;-</span> <span class="va">dat_dcpf_paths</span></span></span>
+<span class="r-in"><span><span class="va">paths</span> <span class="op">&lt;-</span> <span class="va">dat_dcpf_paths</span></span></span>
 <span class="r-in"><span><span class="va">archival</span> <span class="op">&lt;-</span> <span class="va">dat_dc</span><span class="op">$</span><span class="va">args</span><span class="op">$</span><span class="va">archival</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (1): The default implementation</span></span></span>
@@ -145,7 +145,7 @@
 <span class="r-plt img"><img src="pf_plot_1d-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3): Plot individual comparisons</span></span></span>
-<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">pf_plot_1d</span><span class="op">(</span><span class="va">paths</span>, <span class="va">depth</span>, prompt <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">pp</span><span class="op">)</span></span></span>

@@ -128,30 +128,32 @@
 <span class="r-in"><span><span class="co"># We will use particles sampled by a particle filtering algorithm</span></span></span>
 <span class="r-in"><span><span class="co"># ... to create a UD:</span></span></span>
 <span class="r-in"><span><span class="va">particles</span> <span class="op">&lt;-</span> <span class="fu"><a href="pf_simplify.html">pf_simplify</a></span><span class="op">(</span><span class="va">dat_dcpf_histories</span>,</span></span>
-<span class="r-in"><span>                         summarise_pr <span class="op">=</span> <span class="va">max</span>,</span></span>
-<span class="r-in"><span>                         return <span class="op">=</span> <span class="st">"archive"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf_simplify() called (@ 2023-02-19 14:59:38)... </span>
+<span class="r-in"><span>  summarise_pr <span class="op">=</span> <span class="va">max</span>,</span></span>
+<span class="r-in"><span>  return <span class="op">=</span> <span class="st">"archive"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf_simplify() called (@ 2023-08-29 15:42:19)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting pairwise cell movements based on calc_distance = 'euclid'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Stepping through time steps to join coordinate pairs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Identifying connected cells... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Processing connected cells for return = 'archive'... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf_simplify() call completed (@ 2023-02-19 14:59:39) after ~0.01 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf_simplify() call completed (@ 2023-08-29 15:42:19) after ~0.01 minutes. </span>
 <span class="r-in"><span><span class="co"># Define grids for UD estimation</span></span></span>
-<span class="r-in"><span><span class="va">map</span>       <span class="op">&lt;-</span> <span class="va">dat_dcpf_histories</span><span class="op">$</span><span class="va">args</span><span class="op">$</span><span class="va">bathy</span></span></span>
-<span class="r-in"><span><span class="va">habitat</span>   <span class="op">&lt;-</span> <span class="fu"><a href="kud_habitat.html">kud_habitat</a></span><span class="op">(</span><span class="va">map</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">map</span> <span class="op">&lt;-</span> <span class="va">dat_dcpf_histories</span><span class="op">$</span><span class="va">args</span><span class="op">$</span><span class="va">bathy</span></span></span>
+<span class="r-in"><span><span class="va">habitat</span> <span class="op">&lt;-</span> <span class="fu"><a href="kud_habitat.html">kud_habitat</a></span><span class="op">(</span><span class="va">map</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Define UD as a raster</span></span></span>
-<span class="r-in"><span><span class="va">ud</span>        <span class="op">&lt;-</span> <span class="fu"><a href="pf_kud_.html">pf_kud_2</a></span><span class="op">(</span><span class="va">particles</span>,</span></span>
-<span class="r-in"><span>                      bathy <span class="op">=</span> <span class="va">map</span>, grid <span class="op">=</span> <span class="va">habitat</span>,</span></span>
-<span class="r-in"><span>                      estimate_ud <span class="op">=</span> <span class="va">kud_around_coastline</span>,</span></span>
-<span class="r-in"><span>                      plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf_kud_2() called (@ 2023-02-19 14:59:39)... </span>
+<span class="r-in"><span><span class="va">ud</span> <span class="op">&lt;-</span> <span class="fu"><a href="pf_kud_.html">pf_kud_2</a></span><span class="op">(</span><span class="va">particles</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">map</span>, grid <span class="op">=</span> <span class="va">habitat</span>,</span></span>
+<span class="r-in"><span>  estimate_ud <span class="op">=</span> <span class="va">kud_around_coastline</span>,</span></span>
+<span class="r-in"><span>  plot <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf_kud_2() called (@ 2023-08-29 15:42:19)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> CRS taken as: 'NA'.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Processing sampled locations... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing KUD estimation... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Processing KUD(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting KUD... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf_kud_2() call completed (@ 2023-02-19 14:59:39) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf_kud_2() call completed (@ 2023-08-29 15:42:19) after ~0 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Plot UD and home range estimators</span></span></span>
 <span class="r-in"><span><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>

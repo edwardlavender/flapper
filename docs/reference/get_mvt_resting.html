@@ -126,33 +126,41 @@
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#### Example (1): Assign 'resting' based on a simple depth threshold</span></span></span>
-<span class="r-in"><span><span class="va">dat_archival</span><span class="op">$</span><span class="va">state_1</span> <span class="op">&lt;-</span> <span class="fu">get_mvt_resting</span><span class="op">(</span>archival <span class="op">=</span> <span class="va">dat_archival</span>,</span></span>
-<span class="r-in"><span>                                        fct <span class="op">=</span> <span class="st">"individual_id"</span>,</span></span>
-<span class="r-in"><span>                                        th_depth <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat_archival</span><span class="op">$</span><span class="va">state_1</span> <span class="op">&lt;-</span> <span class="fu">get_mvt_resting</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">dat_archival</span>,</span></span>
+<span class="r-in"><span>  fct <span class="op">=</span> <span class="st">"individual_id"</span>,</span></span>
+<span class="r-in"><span>  th_depth <span class="op">=</span> <span class="fl">0.25</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2): Assign 'resting' based on depth and time thresholds</span></span></span>
 <span class="r-in"><span><span class="co"># ... Under the default settings, all of observations in the time threshold</span></span></span>
 <span class="r-in"><span><span class="co"># ... must be below the depth threshold to qualify as 'resting'</span></span></span>
-<span class="r-in"><span><span class="va">dat_archival</span><span class="op">$</span><span class="va">state_2</span> <span class="op">&lt;-</span> <span class="fu">get_mvt_resting</span><span class="op">(</span>archival <span class="op">=</span> <span class="va">dat_archival</span>,</span></span>
-<span class="r-in"><span>                                        fct <span class="op">=</span> <span class="st">"individual_id"</span>,</span></span>
-<span class="r-in"><span>                                        th_depth <span class="op">=</span> <span class="fl">0.25</span>,</span></span>
-<span class="r-in"><span>                                        th_time <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat_archival</span><span class="op">$</span><span class="va">state_2</span> <span class="op">&lt;-</span> <span class="fu">get_mvt_resting</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">dat_archival</span>,</span></span>
+<span class="r-in"><span>  fct <span class="op">=</span> <span class="st">"individual_id"</span>,</span></span>
+<span class="r-in"><span>  th_depth <span class="op">=</span> <span class="fl">0.25</span>,</span></span>
+<span class="r-in"><span>  th_time <span class="op">=</span> <span class="fl">30</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3): Dampen the effects of occasionally exceeding the depth threshold</span></span></span>
 <span class="r-in"><span><span class="co"># ... by increasing the proportion of observations that are allowed to</span></span></span>
 <span class="r-in"><span><span class="co"># ... exceed the depth threshold in a each time window</span></span></span>
-<span class="r-in"><span><span class="va">dat_archival</span><span class="op">$</span><span class="va">state_3</span> <span class="op">&lt;-</span> <span class="fu">get_mvt_resting</span><span class="op">(</span>archival <span class="op">=</span> <span class="va">dat_archival</span>,</span></span>
-<span class="r-in"><span>                                        fct <span class="op">=</span> <span class="st">"individual_id"</span>,</span></span>
-<span class="r-in"><span>                                        th_depth <span class="op">=</span> <span class="fl">0.25</span>,</span></span>
-<span class="r-in"><span>                                        th_time <span class="op">=</span> <span class="fl">30</span>,</span></span>
-<span class="r-in"><span>                                        discrete <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat_archival</span><span class="op">$</span><span class="va">state_3</span> <span class="op">&lt;-</span> <span class="fu">get_mvt_resting</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">dat_archival</span>,</span></span>
+<span class="r-in"><span>  fct <span class="op">=</span> <span class="st">"individual_id"</span>,</span></span>
+<span class="r-in"><span>  th_depth <span class="op">=</span> <span class="fl">0.25</span>,</span></span>
+<span class="r-in"><span>  th_time <span class="op">=</span> <span class="fl">30</span>,</span></span>
+<span class="r-in"><span>  discrete <span class="op">=</span> <span class="fl">0.05</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (4): Return average state scores via discrete = NULL</span></span></span>
-<span class="r-in"><span><span class="va">dat_archival</span><span class="op">$</span><span class="va">state_4</span> <span class="op">&lt;-</span> <span class="fu">get_mvt_resting</span><span class="op">(</span>archival <span class="op">=</span> <span class="va">dat_archival</span>,</span></span>
-<span class="r-in"><span>                                        fct <span class="op">=</span> <span class="st">"individual_id"</span>,</span></span>
-<span class="r-in"><span>                                        th_depth <span class="op">=</span> <span class="fl">0.25</span>,</span></span>
-<span class="r-in"><span>                                        th_time <span class="op">=</span> <span class="fl">30</span>,</span></span>
-<span class="r-in"><span>                                        discrete <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat_archival</span><span class="op">$</span><span class="va">state_4</span> <span class="op">&lt;-</span> <span class="fu">get_mvt_resting</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">dat_archival</span>,</span></span>
+<span class="r-in"><span>  fct <span class="op">=</span> <span class="st">"individual_id"</span>,</span></span>
+<span class="r-in"><span>  th_depth <span class="op">=</span> <span class="fl">0.25</span>,</span></span>
+<span class="r-in"><span>  th_time <span class="op">=</span> <span class="fl">30</span>,</span></span>
+<span class="r-in"><span>  discrete <span class="op">=</span> <span class="cn">NULL</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Compare the frequency distribution of states among methods</span></span></span>
 <span class="r-in"><span><span class="co"># In the first example, a large number of 'resting' states are assigned</span></span></span>
@@ -176,16 +184,19 @@
 <span class="r-in"><span><span class="va">dat_archival_1</span> <span class="op">&lt;-</span> <span class="va">dat_archival</span><span class="op">[</span><span class="va">dat_archival</span><span class="op">$</span><span class="va">individual_id</span> <span class="op">==</span> <span class="fl">25</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="co">## Define helper functions</span></span></span>
 <span class="r-in"><span><span class="co"># Define helper function to plot blank depth time series</span></span></span>
-<span class="r-in"><span><span class="va">plot_blank</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="fu">prettyGraphics</span><span class="fu">::</span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_plot.html" class="external-link">pretty_plot</a></span><span class="op">(</span><span class="va">dat_archival_1</span><span class="op">$</span><span class="va">timestamp</span>, <span class="va">dat_archival_1</span><span class="op">$</span><span class="va">depth</span><span class="op">*</span><span class="op">-</span><span class="fl">1</span>,</span></span>
-<span class="r-in"><span>                              pretty_axis_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>side <span class="op">=</span> <span class="fl">3</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                              type <span class="op">=</span> <span class="st">"n"</span>,<span class="va">...</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">plot_blank</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu">prettyGraphics</span><span class="fu">::</span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_plot.html" class="external-link">pretty_plot</a></span><span class="op">(</span><span class="va">dat_archival_1</span><span class="op">$</span><span class="va">timestamp</span>, <span class="va">dat_archival_1</span><span class="op">$</span><span class="va">depth</span> <span class="op">*</span> <span class="op">-</span><span class="fl">1</span>,</span></span>
+<span class="r-in"><span>    pretty_axis_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>side <span class="op">=</span> <span class="fl">3</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    type <span class="op">=</span> <span class="st">"n"</span>, <span class="va">...</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="co"># Define helper function to add depth time series, coloured by state, to the plot</span></span></span>
-<span class="r-in"><span><span class="va">add_lines_for_state</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">state</span>,<span class="va">...</span><span class="op">)</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="fu">prettyGraphics</span><span class="fu">::</span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/add_lines.html" class="external-link">add_lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dat_archival_1</span><span class="op">$</span><span class="va">timestamp</span>,</span></span>
-<span class="r-in"><span>                            y1 <span class="op">=</span> <span class="va">dat_archival_1</span><span class="op">$</span><span class="va">depth</span><span class="op">*</span><span class="op">-</span><span class="fl">1</span>,</span></span>
-<span class="r-in"><span>                            y2 <span class="op">=</span> <span class="va">dat_archival_1</span><span class="op">[</span>, <span class="va">state</span><span class="op">]</span>,<span class="va">...</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">add_lines_for_state</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">state</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu">prettyGraphics</span><span class="fu">::</span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/add_lines.html" class="external-link">add_lines</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    x <span class="op">=</span> <span class="va">dat_archival_1</span><span class="op">$</span><span class="va">timestamp</span>,</span></span>
+<span class="r-in"><span>    y1 <span class="op">=</span> <span class="va">dat_archival_1</span><span class="op">$</span><span class="va">depth</span> <span class="op">*</span> <span class="op">-</span><span class="fl">1</span>,</span></span>
+<span class="r-in"><span>    y2 <span class="op">=</span> <span class="va">dat_archival_1</span><span class="op">[</span>, <span class="va">state</span><span class="op">]</span>, <span class="va">...</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="co">## Make plots</span></span></span>
 <span class="r-in"><span><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>

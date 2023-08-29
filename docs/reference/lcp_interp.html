@@ -130,21 +130,23 @@
 <span class="r-in"><span><span class="co"># ... reconstructed by the DCPF algorithm (dc() &amp; pf()), using the</span></span></span>
 <span class="r-in"><span><span class="co"># ... example dat_dcpf_* datasets. We extract the paths</span></span></span>
 <span class="r-in"><span><span class="co"># ... and the surface over which movement occurred from this object:</span></span></span>
-<span class="r-in"><span><span class="va">paths</span>   <span class="op">&lt;-</span> <span class="va">dat_dcpf_paths</span></span></span>
+<span class="r-in"><span><span class="va">paths</span> <span class="op">&lt;-</span> <span class="va">dat_dcpf_paths</span></span></span>
 <span class="r-in"><span><span class="va">surface</span> <span class="op">&lt;-</span> <span class="va">dat_dcpf_histories</span><span class="op">$</span><span class="va">args</span><span class="op">$</span><span class="va">bathy</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (1): Implement lcp_interp() for an example path</span></span></span>
 <span class="r-in"><span><span class="co"># ... with calc_distance = FALSE</span></span></span>
 <span class="r-in"><span><span class="co"># Implement approach</span></span></span>
 <span class="r-in"><span><span class="va">paths_1</span> <span class="op">&lt;-</span> <span class="va">paths</span><span class="op">[</span><span class="va">paths</span><span class="op">$</span><span class="va">path_id</span> <span class="op">==</span> <span class="fl">1</span>, <span class="op">]</span></span></span>
-<span class="r-in"><span><span class="va">paths_interp_1</span> <span class="op">&lt;-</span> <span class="fu">lcp_interp</span><span class="op">(</span>paths <span class="op">=</span> <span class="va">paths_1</span>,</span></span>
-<span class="r-in"><span>                             surface <span class="op">=</span> <span class="va">surface</span>,</span></span>
-<span class="r-in"><span>                             calc_distance <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_interp() called (@ 2023-02-19 15:01:42)... </span>
+<span class="r-in"><span><span class="va">paths_interp_1</span> <span class="op">&lt;-</span> <span class="fu">lcp_interp</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  paths <span class="op">=</span> <span class="va">paths_1</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">surface</span>,</span></span>
+<span class="r-in"><span>  calc_distance <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_interp() called (@ 2023-08-29 15:43:56)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Processing paths... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Calculating least-cost paths via flapper::lcp_over_surface()... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:42)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:43:56)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -152,8 +154,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining nodes, edges and costs to make graph... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Constructing graph object... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost paths(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:42) after ~0 minutes. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_interp() call completed (@ 2023-02-19 15:01:42) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:43:57) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_interp() call completed (@ 2023-08-29 15:43:57) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co"># With calc_distance = FALSE, we get a dataframe with sequential locations</span></span></span>
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">paths_interp_1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   path_id timestep   cell_x  cell_y   cell_z</span>
@@ -161,15 +163,17 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2): Keep the original columns in 'paths'</span></span></span>
 <span class="r-in"><span><span class="co"># ... via keep_cols = TRUE</span></span></span>
-<span class="r-in"><span><span class="va">paths_interp_2</span> <span class="op">&lt;-</span> <span class="fu">lcp_interp</span><span class="op">(</span>paths <span class="op">=</span> <span class="va">paths_1</span>,</span></span>
-<span class="r-in"><span>                             surface <span class="op">=</span> <span class="va">surface</span>,</span></span>
-<span class="r-in"><span>                             calc_distance <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>                             keep_cols <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_interp() called (@ 2023-02-19 15:01:42)... </span>
+<span class="r-in"><span><span class="va">paths_interp_2</span> <span class="op">&lt;-</span> <span class="fu">lcp_interp</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  paths <span class="op">=</span> <span class="va">paths_1</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">surface</span>,</span></span>
+<span class="r-in"><span>  calc_distance <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>  keep_cols <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_interp() called (@ 2023-08-29 15:43:57)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Processing paths... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Calculating least-cost paths via flapper::lcp_over_surface()... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:42)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:43:57)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -178,8 +182,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining nodes, edges and costs to make graph... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Constructing graph object... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost paths(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:42) after ~0 minutes. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_interp() call completed (@ 2023-02-19 15:01:42) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:43:57) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_interp() call completed (@ 2023-08-29 15:43:57) after ~0 minutes. </span>
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">paths_interp_2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   path_id timestep cell_x.x cell_y.x cell_z.x cell_id cell_x.y cell_y.y</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       1       12 709572.1  6253992 86.75919    4548 709572.1  6253992</span>
@@ -188,13 +192,15 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3): Calculate shortest distances along each path</span></span></span>
 <span class="r-in"><span><span class="co"># ... via calc_distance = TRUE (the default)</span></span></span>
-<span class="r-in"><span><span class="va">paths_interp_3</span> <span class="op">&lt;-</span> <span class="fu">lcp_interp</span><span class="op">(</span>paths <span class="op">=</span> <span class="va">paths_1</span>,</span></span>
-<span class="r-in"><span>                             surface <span class="op">=</span> <span class="va">surface</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_interp() called (@ 2023-02-19 15:01:42)... </span>
+<span class="r-in"><span><span class="va">paths_interp_3</span> <span class="op">&lt;-</span> <span class="fu">lcp_interp</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  paths <span class="op">=</span> <span class="va">paths_1</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">surface</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_interp() called (@ 2023-08-29 15:43:57)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Processing paths... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Calculating least-cost paths via flapper::lcp_over_surface()... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:42)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:43:57)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -202,9 +208,9 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining nodes, edges and costs to make graph... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Constructing graph object... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost paths(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:42) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:43:57) after ~0 minutes. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Summarising distances for each least-cost path... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_interp() call completed (@ 2023-02-19 15:01:43) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_interp() call completed (@ 2023-08-29 15:43:57) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co"># A named list is returned</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">paths_interp_3</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "path_lcp" "dist_lcp"</span>

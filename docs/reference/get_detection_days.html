@@ -138,9 +138,10 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2) Detection days between specified individual/receiver pairs</span></span></span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu">get_detection_days</span><span class="op">(</span><span class="va">dat_acoustics</span>,</span></span>
-<span class="r-in"><span>                          individual_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">28</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                          receiver_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">24</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                          type <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  individual_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">28</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  receiver_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">24</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  type <span class="op">=</span> <span class="fl">1L</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   receiver_id individual_id detection_days</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1           3            25              5</span>
@@ -149,11 +150,12 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4          24            28              1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3) Detection days between all combinations of specified</span></span></span>
-<span class="r-in"><span><span class="co">#... individuals/receivers</span></span></span>
+<span class="r-in"><span><span class="co"># ... individuals/receivers</span></span></span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu">get_detection_days</span><span class="op">(</span><span class="va">dat_acoustics</span>,</span></span>
-<span class="r-in"><span>                          individual_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">28</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                          receiver_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">24</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                          type <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  individual_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">28</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  receiver_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">24</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  type <span class="op">=</span> <span class="fl">2L</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   individual_id receiver_id detection_days</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1            25           3              5</span>
@@ -163,8 +165,9 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (4) Match detection days to another dataframe</span></span></span>
 <span class="r-in"><span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">detection_days</span> <span class="op">&lt;-</span> <span class="fu">get_detection_days</span><span class="op">(</span><span class="va">dat_acoustics</span>,</span></span>
-<span class="r-in"><span>                                                   match_to <span class="op">=</span> <span class="va">dat_acoustics</span>,</span></span>
-<span class="r-in"><span>                                                   type <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  match_to <span class="op">=</span> <span class="va">dat_acoustics</span>,</span></span>
+<span class="r-in"><span>  type <span class="op">=</span> <span class="fl">1L</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat_acoustics</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   individual_id transmitter_id index           timestamp receiver_id</span>

@@ -165,14 +165,14 @@
 <span class="r-in"><span><span class="co">#### Example (1): Implement algorithm with default options</span></span></span>
 <span class="r-in"><span><span class="co">## Implement algorithm</span></span></span>
 <span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span>archival <span class="op">=</span> <span class="va">depth</span>, bathy <span class="op">=</span> <span class="va">dat_gebco</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-02-19 14:53:45)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-08-29 15:37:35)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing calc_depth_error()... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting movement time series (for each chunk)... </span>
 <span class="r-plt img"><img src="dc-1.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing algorithm over time steps... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-02-19 14:53:47) after ~0.02 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-08-29 15:37:40) after ~0.09 minutes. </span>
 <span class="r-in"><span><span class="co">## dc() returns a named list that is an 'acdc_archive' class object</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">out_dc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Length Class      Mode</span>
@@ -200,22 +200,28 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acdc_plot_record() called... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking function inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining data for background plot... </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> add_containers = NULL implemented: 'record' does not contain containers.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> `add_containers = NULL` implemented: 'record' does not contain containers (`container_c` element).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting plotting window... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Making plots for each time step ... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Nothing to summarize if you provide a single RasterLayer; see cellStats</span>
 <span class="r-plt img"><img src="dc-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co">## Examine overall map via a raster* plotting function</span></span></span>
 <span class="r-in"><span><span class="co"># Each cell shows expected proportion of time steps spent in each cell</span></span></span>
-<span class="r-in"><span><span class="fu">prettyGraphics</span><span class="fu">::</span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_map.html" class="external-link">pretty_map</a></span><span class="op">(</span>add_rasters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dc_summary</span><span class="op">$</span><span class="va">map</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                           add_polys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dat_coast</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">prettyGraphics</span><span class="fu">::</span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_map.html" class="external-link">pretty_map</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  add_rasters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dc_summary</span><span class="op">$</span><span class="va">map</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  add_polys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dat_coast</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span>
 <span class="r-plt img"><img src="dc-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># Convert counts on map to percentages</span></span></span>
-<span class="r-in"><span><span class="fu">prettyGraphics</span><span class="fu">::</span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_map.html" class="external-link">pretty_map</a></span><span class="op">(</span>add_rasters <span class="op">=</span></span></span>
-<span class="r-in"><span>                             <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dc_summary</span><span class="op">$</span><span class="va">map</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">depth</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>,</span></span>
-<span class="r-in"><span>                                  zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                           add_polys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dat_coast</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">prettyGraphics</span><span class="fu">::</span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_map.html" class="external-link">pretty_map</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  add_rasters <span class="op">=</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      x <span class="op">=</span> <span class="va">dc_summary</span><span class="op">$</span><span class="va">map</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">depth</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>,</span></span>
+<span class="r-in"><span>      zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  add_polys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dat_coast</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: '+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs'.</span>
 <span class="r-plt img"><img src="dc-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># Check for occasions when the individual's depth was not consistent</span></span></span>
@@ -229,36 +235,38 @@
 <span class="r-in"><span><span class="co"># ... tag error</span></span></span>
 <span class="r-in"><span><span class="co"># ... tidal range</span></span></span>
 <span class="r-in"><span><span class="co"># ... a depth-dependent bathymetry error</span></span></span>
-<span class="r-in"><span><span class="va">cde</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">depth</span><span class="op">)</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">e</span> <span class="op">&lt;-</span> <span class="fl">4.77</span> <span class="op">+</span> <span class="fl">2.5</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">0.5</span> <span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="op">(</span><span class="fl">0.013</span> <span class="op">*</span> <span class="va">depth</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cde</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">depth</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">e</span> <span class="op">&lt;-</span> <span class="fl">4.77</span> <span class="op">+</span> <span class="fl">2.5</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="op">(</span><span class="fl">0.013</span> <span class="op">*</span> <span class="va">depth</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">e</span>, <span class="va">e</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="op">}</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="co"># Vectorise function over depths (essential)</span></span></span>
 <span class="r-in"><span><span class="va">cde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Vectorize.html" class="external-link">Vectorize</a></span><span class="op">(</span><span class="va">cde</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co">## Implement algorithm with  depth-dependent error</span></span></span>
 <span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span>archival <span class="op">=</span> <span class="va">depth</span>, bathy <span class="op">=</span> <span class="va">dat_gebco</span>, calc_depth_error <span class="op">=</span> <span class="va">cde</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-02-19 14:53:47)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-08-29 15:37:41)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' taken to depend on depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing calc_depth_error()... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting movement time series (for each chunk)... </span>
 <span class="r-plt img"><img src="dc-5.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing algorithm over time steps... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-02-19 14:53:48) after ~0.02 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-08-29 15:37:45) after ~0.08 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3): Write timestep-specific maps of allowed positions to file</span></span></span>
-<span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span>archival <span class="op">=</span> <span class="va">depth</span>, bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
-<span class="r-in"><span>             write_record_spatial_for_pf <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-02-19 14:53:48)... </span>
+<span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">depth</span>, bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
+<span class="r-in"><span>  write_record_spatial_for_pf <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-08-29 15:37:45)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> '/' added to the directory inputted to the argument 'write_record_spatial_for_pf$filename' ('/var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpUnZ226').</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> '/' added to the directory inputted to the argument 'write_record_spatial_for_pf$filename' ('/var/folders/nl/ygb3g6tj24z06jddbqqhj6hw0000gn/T//Rtmpwb5KFV').</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing calc_depth_error()... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting movement time series (for each chunk)... </span>
 <span class="r-plt img"><img src="dc-6.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing algorithm over time steps... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-02-19 14:53:51) after ~0.05 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-08-29 15:37:53) after ~0.13 minutes. </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [1] "1.png"                    "2.png"                   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [3] "25"                       "28"                      </span>
@@ -367,11 +375,11 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [209] "css"                      "dot_acdc_log_1.txt"      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [211] "dot_acdc_log_2.txt"       "dot_acdc_log_3.txt"      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [213] "dot_acdc_log_4.txt"       "dot_acdc_log_5.txt"      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [215] "downlit"                  "file77b31494a445"        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [217] "file77b3284fa5e6"         "file77b330cf712d"        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [219] "file77b331894d7a"         "file77b3353096a0"        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [221] "file77b33e14800b"         "file77b359d252e"         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [223] "file77b38f0fda8"          "images"                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [215] "downlit"                  "file1217f158f0912"       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [217] "file1217f1b0b625c"        "file1217f2183169d"       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [219] "file1217f619c87cc"        "file1217f667087b8"       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [221] "file1217f6772064"         "file1217f67eddc54"       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [223] "file1217f6b979424"        "images"                  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [225] "js"                      </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (4): Implement the algorithm in parallel</span></span></span>
@@ -388,17 +396,19 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "raster"    "sp"        "stats"     "graphics"  "grDevices" "utils"    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [7] "datasets"  "methods"   "base"     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span>archival <span class="op">=</span> <span class="va">depth</span>,</span></span>
-<span class="r-in"><span>             bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
-<span class="r-in"><span>             plot_ts <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>             split <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>             cl <span class="op">=</span> <span class="va">cl</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-02-19 14:53:57)... </span>
+<span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">depth</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
+<span class="r-in"><span>  plot_ts <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>  split <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  cl <span class="op">=</span> <span class="va">cl</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-08-29 15:37:56)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing calc_depth_error()... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing algorithm over chunks... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-02-19 14:53:58) after ~0.02 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-08-29 15:37:58) after ~0.04 minutes. </span>
 <span class="r-in"><span><span class="va">at2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Approach (2)</span></span></span>
 <span class="r-in"><span><span class="va">bt1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span></span></span>
@@ -412,56 +422,62 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "raster"    "sp"        "stats"     "graphics"  "grDevices" "utils"    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [7] "datasets"  "methods"   "base"     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span>archival <span class="op">=</span> <span class="va">depth</span>,</span></span>
-<span class="r-in"><span>             bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
-<span class="r-in"><span>             plot_ts <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>             split <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>             cl <span class="op">=</span> <span class="va">cl</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-02-19 14:54:04)... </span>
+<span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">depth</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
+<span class="r-in"><span>  plot_ts <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>  split <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>  cl <span class="op">=</span> <span class="va">cl</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-08-29 15:38:00)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing calc_depth_error()... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing algorithm over chunks... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-02-19 14:54:06) after ~0.03 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-08-29 15:38:03) after ~0.04 minutes. </span>
 <span class="r-in"><span><span class="va">bt2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Compare timings</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/difftime.html" class="external-link">difftime</a></span><span class="op">(</span><span class="va">at2</span>, <span class="va">at1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Time difference of 6.828754 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time difference of 5.250416 secs</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/difftime.html" class="external-link">difftime</a></span><span class="op">(</span><span class="va">bt2</span>, <span class="va">bt1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Time difference of 7.341262 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time difference of 4.520967 secs</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (5): Write messages to file via con</span></span></span>
-<span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span>archival <span class="op">=</span> <span class="va">depth</span>, bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
-<span class="r-in"><span>             con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/dc_log.txt"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> /var/folders/lx/dhz6yx2n2b7bg93hwz8t97zr0000gq/T//RtmpUnZ226/dc_log.txt does not exist: attempting to write file in specified directory...</span>
+<span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">depth</span>, bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
+<span class="r-in"><span>  con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/dc_log.txt"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> /var/folders/nl/ygb3g6tj24z06jddbqqhj6hw0000gn/T//Rtmpwb5KFV/dc_log.txt does not exist: attempting to write file in specified directory...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ... Blank file successfully written to file.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/dc_log.txt"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "flapper::dc() called (@ 2023-02-19 14:54:06)... "                              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "flapper::dc() called (@ 2023-08-29 15:38:03)... "                              </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] "... Setting up function... "                                                   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3] "... Implementing calc_depth_error()... "                                       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4] "... Plotting movement time series (for each chunk)... "                        </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5] "... Implementing algorithm over time steps... "                                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "... flapper::dc() call completed (@ 2023-02-19 14:54:07) after ~0.03 minutes. "</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "... flapper::dc() call completed (@ 2023-08-29 15:38:07) after ~0.07 minutes. "</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (6) Compare an automated vs. manual implementation of DC</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## (A) Compare step-wise results for randomly select time steps</span></span></span>
 <span class="r-in"><span><span class="co"># Implement algorithm (using default calc_depth_error)</span></span></span>
-<span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span>archival <span class="op">=</span> <span class="va">depth</span>,</span></span>
-<span class="r-in"><span>             bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
-<span class="r-in"><span>             save_record_spatial <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-02-19 14:54:07)... </span>
+<span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">depth</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
+<span class="r-in"><span>  save_record_spatial <span class="op">=</span> <span class="cn">NULL</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-08-29 15:38:07)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing calc_depth_error()... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting movement time series (for each chunk)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing algorithm over time steps... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-02-19 14:54:09) after ~0.03 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-08-29 15:38:12) after ~0.08 minutes. </span>
 <span class="r-in"><span><span class="co"># Compare results for randomly selected time steps to manual implementation</span></span></span>
 <span class="r-in"><span><span class="co"># ... with the same simple calc_depth_error model</span></span></span>
 <span class="r-in"><span><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">depth</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">depth</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="co"># Extract map created via dc()</span></span></span>
 <span class="r-in"><span>  <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">out_dc</span><span class="op">$</span><span class="va">archive</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">record</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">spatial</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">map_timestep</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="co"># Compare to manual creation of map</span></span></span>
@@ -472,24 +488,26 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## (B) Compare the chunk-wise results and manual implementation</span></span></span>
 <span class="r-in"><span><span class="co"># Implement algorithm chunk-wise</span></span></span>
-<span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span>archival <span class="op">=</span> <span class="va">depth</span>,</span></span>
-<span class="r-in"><span>             bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
-<span class="r-in"><span>             save_record_spatial <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>             split <span class="op">=</span> <span class="fl">10L</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-02-19 14:54:10)... </span>
+<span class="r-in"><span><span class="va">out_dc</span> <span class="op">&lt;-</span> <span class="fu">dc</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival <span class="op">=</span> <span class="va">depth</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
+<span class="r-in"><span>  save_record_spatial <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>  split <span class="op">=</span> <span class="fl">10L</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dc() called (@ 2023-08-29 15:38:12)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'calc_depth_error' function taken to be independent of depth.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing calc_depth_error()... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting movement time series (for each chunk)... </span>
 <span class="r-plt img"><img src="dc-8.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing algorithm over chunks... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-02-19 14:54:11) after ~0.03 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::dc() call completed (@ 2023-08-29 15:38:18) after ~0.09 minutes. </span>
 <span class="r-in"><span><span class="co"># Get overall map via acdc_simplify()</span></span></span>
 <span class="r-in"><span><span class="va">map_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="acdc_simplify.html">acdc_simplify</a></span><span class="op">(</span><span class="va">out_dc</span>, type <span class="op">=</span> <span class="st">"dc"</span>, mask <span class="op">=</span> <span class="va">dat_gebco</span><span class="op">)</span><span class="op">$</span><span class="va">map</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> acdc_simplify() implemented for type = 'dc'.</span>
 <span class="r-in"><span><span class="co"># Get overall map via a simple custom approach</span></span></span>
 <span class="r-in"><span><span class="va">map_2</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/setValues.html" class="external-link">setValues</a></span><span class="op">(</span><span class="va">dat_gebco</span>, <span class="fl">0</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">depth</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">depth</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">map_2</span> <span class="op">&lt;-</span> <span class="va">map_2</span> <span class="op">+</span> <span class="op">(</span><span class="va">dat_gebco</span> <span class="op">&gt;=</span> <span class="va">depth</span><span class="op">$</span><span class="va">depth</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">-</span> <span class="fl">2.5</span> <span class="op">&amp;</span> <span class="va">dat_gebco</span> <span class="op">&lt;=</span> <span class="va">depth</span><span class="op">$</span><span class="va">depth</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2.5</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="va">map_2</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">map_2</span>, <span class="va">dat_gebco</span><span class="op">)</span></span></span>

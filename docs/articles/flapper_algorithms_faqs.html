@@ -97,8 +97,9 @@
 </h2>
 <p>This vignette addresses frequently asked questions (FAQs) for
 practitioners seeking to apply the <code>flapper</code> algorithms. For
-further details, consult Lavender <em>et al.</em> (in review). To submit
-a new question, go to <a href="https://github.com/edwardlavender/flapper/issues" class="external-link uri">https://github.com/edwardlavender/flapper/issues</a>.</p>
+further details, consult Lavender <em>et al.</em> (2023). To submit a
+new question, go to <a href="https://github.com/edwardlavender/flapper/issues" class="external-link uri">https://github.com/edwardlavender/flapper/issues</a> or
+contact <a href="mailto:edward.lavender@eawag.ch" class="email">edward.lavender@eawag.ch</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="abbreviations">Abbreviations<a class="anchor" aria-label="anchor" href="#abbreviations"></a>
@@ -199,35 +200,164 @@ the set of possible locations in which the individual could have been
 located through time.</p>
 </div>
 <div class="section level3">
-<h3 id="the-different-flapper-algorithms-suggest-different-patterns-of-space-use--how-do-i-choose-which-algorithm-to-use">The different flapper algorithms suggest different patterns of space
-use. How do I choose which algorithm to use?<a class="anchor" aria-label="anchor" href="#the-different-flapper-algorithms-suggest-different-patterns-of-space-use--how-do-i-choose-which-algorithm-to-use"></a>
+<h3 id="practitioners-of-acoustic-telemetry-often-make-judgments-about-fish-that-died-or-tags-that-were-expelled-near-a-receiver--these-cases-appear-as-a-flat-line-of-constant-detections-at-one-location--what-would-this-look-like-when-processed-through-the-flapper-algorithms">Practitioners of acoustic telemetry often make judgments about fish
+that died or tags that were expelled near a receiver. These cases appear
+as a ‘flat line’ of constant detections at one location. What would this
+look like when processed through the flapper algorithms?<a class="anchor" aria-label="anchor" href="#practitioners-of-acoustic-telemetry-often-make-judgments-about-fish-that-died-or-tags-that-were-expelled-near-a-receiver--these-cases-appear-as-a-flat-line-of-constant-detections-at-one-location--what-would-this-look-like-when-processed-through-the-flapper-algorithms"></a>
 </h3>
-<p>The choice of algorithm depends on data availability and study
-objectives. For reconstructing patterns of space use, the different
-algorithms suggest different patterns because they incorporate different
-information. Let’s use Fig. 3 in Lavender <em>et al.</em> (in review) to
-illustrate this point and clarify algorithm choice. Recall that Fig. 3A
-shows a map reconstructed from the depth time series; Fig. 3B–C show
-maps reconstructed from acoustic detections; and Fig. 3D shows a map
-based on both datasets. If you only have depth time series, or you are
-interested in the extent to which a region (such as a Marine Protected
-Area) represents the depths used by an individual, the DC algorithm
-(Fig. 3A), is the appropriate choice. If you only have detection data at
-receivers, you have the choice of a number of existing methods, such as
-the mean-position algorithm (Fig. 3B), or our ACPF algorithm (Fig. 3C).
-As noted in Lavender <em>et al.</em>, (in review), the relative utility
-of these methods may vary in different settings but in clustered
-receiver arrays the mean-position algorithm may perform poorly (Fig. 3B)
-and the ACPF algorithm (Fig. 3C) is the clear choice here. If you have
-both depth and detection time series, the ACDCPF algorithm is a
-refinement. Thus, for flapper skate, the ACDCPF algorithm is the best
-choice when it comes to reconstructing patterns of space use and Fig. 3D
-is the most-refined map of space use for the analysed individual. In
-summary, the best algorithm for reconstructing patterns of space use
-depends on the data you have available: if you only have depth time
-series, use the DC algorithm; if you only have acoustic time series, use
-the ACPF algorithm; if you have both depth and acoustic data, then use
-the ACDCPF algorithm, which can integrate both types of data.</p>
+<p>The flapper algorithms simply resolve the set of locations in which a
+tag could have been located through time, given the data and supporting
+information (e.g., detection probability). They make no judgement about
+whether a tagged individual has died or expelled the transmitter. If you
+have a stationary tag regularly transmitting within the detection
+container of a receiver, then the set of possible locations for the tag
+is restricted by this information and this is what is recapitulated by
+the flapper algorithms. Overlapping receivers and/or ancillary
+observations place additional restrictions on the possible locations of
+a tag which can make it possible to determine location more precisely.
+However, if there are gaps in detections due to imperfect detection
+probability, then the flapper algorithms may also (correctly) permit
+limited movements beyond the receiver’s detection container (unless you
+have defined a movement model in which the probability of ‘movement’ is
+lower under certain conditions, for instance for individuals that were
+tagged in poor condition or after a certain period of time due to an
+increase in tag expulsion or mortality risk).</p>
+<p>We reiterate: the algorithms simply provide an honest assessment of
+the set of possible locations that are consistent with the data through
+time. With any individual time series, this is the complete extent of
+our knowledge, and that is the point of the flapper algorithms. If you,
+as a researcher, have external information about the likelihood of tag
+expulsion or death from study of the detection patterns of multiple
+individuals, in which serially repeated detections are unusual, then you
+are at liberty to infer expulsion or mortality. In unclear cases with
+detection gaps, reconstructing the set of possible locations through
+time may help to suggest whether tag expulsion/mortality is a more
+likely explanation of the data (given the scale of possible movements
+away from receivers) than other possibilities, although some
+back-of-the-envelope calculations may be simpler. If you are confident
+about tag expulsion or mortality, we would generally recommend against
+implementing the flapper algorithms, although there are circumstances in
+which this could be useful (for example, identification of the possible
+location(s) of a stationary tag facilitates opportunistic study of
+detection probability).</p>
+</div>
+<div class="section level3">
+<h3 id="how-can-i-handle-dramatic-changes-in-behaviour-associated-with-seasonal-changes-reproduction-or-ontogeny">How can I handle dramatic changes in behaviour associated with
+seasonal changes, reproduction or ontogeny?<a class="anchor" aria-label="anchor" href="#how-can-i-handle-dramatic-changes-in-behaviour-associated-with-seasonal-changes-reproduction-or-ontogeny"></a>
+</h3>
+<p>Passive acoustic telemetry has opened the door to studies of
+individuals over extended time scales that may encompass seasonal,
+reproductive and ontogenetic changes in movement. In theory, these
+changes can be handled in the flapper algorithms through the
+incorporation of a time-varying movement model. However, behavioural
+switches need to be specified as part of the algorithm implementation:
+the flapper algorithms do not estimate movement parameters; they simply
+use the data to reconstruct the set of locations through time that is
+consistent with known properties of movement (and other algorithm
+components). That being said, in practice, we recommend structuring
+analyses on the basis of existing knowledge of animal movement and life
+history. If there are notable seasonal changes in movement, for
+instance, the simple approach is to implement separate, season-specific
+algorithms. Under specific conditions, no information is lost with this
+approach with existing routines. More generally, any information lost
+(from the end of one time series to the start of another) is negligible.
+Over longer, multi-annual time series, implementations of the flapper
+algorithms, as illustrated here, are likely to be prohibitively
+expensive in computational terms. Further work is needed to develop
+tailored methodologies that can handle these volumes of data. This
+includes computational optimisation of existing routines and
+consideration of the influence of algorithm resolution and data
+processing (e.g., thinning detections, as suggested by Aspillaga et
+al. [2019a]) on reconstructed patterns.</p>
+</div>
+<div class="section level3">
+<h3 id="what-advice-can-you-provide-for-reconciling-the-spatial-resolution-of-the-flapper-algorithms-with-environmental-datasets-for-reconstructing-movements-and-inferring-habitat-use-the-flapper-algorithms-often-identify-many-possible-locations-for-an-individual-which-suggests-that-increasing-spatial-heterogeneity-in-substrate-would-render-the-flapper-algorithms-less-and-less-useful-for-inferring-habitat-use--in-this-case-should-i-aggregate-habitat-layers-before-analysis">What advice can you provide for reconciling the spatial resolution
+of the flapper algorithms with environmental datasets for reconstructing
+movements and inferring habitat use? The flapper algorithms often
+identify many possible locations for an individual, which suggests that
+increasing spatial heterogeneity in substrate would render the flapper
+algorithms less and less useful for inferring habitat use. In this case,
+should I aggregate habitat layers before analysis?<a class="anchor" aria-label="anchor" href="#what-advice-can-you-provide-for-reconciling-the-spatial-resolution-of-the-flapper-algorithms-with-environmental-datasets-for-reconstructing-movements-and-inferring-habitat-use-the-flapper-algorithms-often-identify-many-possible-locations-for-an-individual-which-suggests-that-increasing-spatial-heterogeneity-in-substrate-would-render-the-flapper-algorithms-less-and-less-useful-for-inferring-habitat-use--in-this-case-should-i-aggregate-habitat-layers-before-analysis"></a>
+</h3>
+<p>This is an important, and very general, query about how to reconcile
+datasets (such as animal tracks and environmental data products) that
+differ in resolution and uncertainty. There is a limited amount of
+specific advice we can offer in this context, but there are some
+important points that need to be made, starting with the resolution at
+which movements can be resolved. In this study, we develop the
+algorithms in discretised form, with locations represented on a uniform
+grid. The consequence of this approach is that grid resolution
+determines the resolution of the outputs and uncertainty (as measured by
+the number of locations on the grid in which an individual could have
+been located and their associated probabilities) is propagated
+accordingly. A large number of possible locations (with similar
+probabilities) reflects a high degree of uncertainty and a smaller
+number of locations (and/or a skewed probability distribution) reflects
+a lower degree of uncertainty. The degree of uncertainty at any one time
+depends on the strength of the constraints on individual location,
+including observations, array design, movement capacity and other
+parameters. This means that the spatial scale of uncertainty can be much
+smaller than the detection container of a receiver, or rather larger. In
+the ACPF algorithm, for instance, the growth, expansion and intersection
+of acoustic containers depends on array design, detection range,
+movement capacity and the detection time series. In the ACDCPF
+algorithm, the incorporation of depth time series can dramatically
+reduce uncertainty, as shown in this study. Both flapper algorithms are
+unique in that all of these properties of the system mechanistically
+determine uncertainty. Moreover, (almost) no further reductions in
+uncertainty can be achieved without the imposition of additional
+constraints (such as new data): the dynamics of the system are
+comprehensively represented. Incidentally, in all other methods,
+uncertainty is necessarily higher because only a subset of the full
+suite of constraints on individual location is incorporated. This point
+is not obvious because uncertainty is typically unquantified or only
+quantified indirectly by other methods, so the true level of uncertainty
+in an individual’s location is unknown.</p>
+<p>What are the implications of high uncertainty for analyses of habitat
+use? It is true that when uncertainty is high and substrates are
+spatially heterogeneous, we can be less certain about the habitat use of
+an individual and the flapper algorithms will reflect this uncertainty.
+But here we are limited by the data and not the methodology. In fact,
+from a methodological perspective, the propagation of uncertainty is
+highly desirable because it safeguards against overconfident or
+misplaced inferences. As we show for the mean-position algorithm,
+failure to consider movements away from receivers can suggest highly
+biased patterns of habitat use (Fig. 3).</p>
+<p>So how can we reconcile the resolution and uncertainty of the flapper
+algorithms with habitat data that differ in resolution and uncertainty?
+As noted above, this is a difficult question that pervades the fields of
+movement ecology and spatial modelling. In previous work investigating
+possible habitat preferences in flapper skate, we studied the
+distribution of environmental conditions within detection containers
+(Lavender et al., 2021). The flapper algorithms resolve movement both
+within and beyond detection containers, facilitating more holistic
+analyses of habitat preferences. In general, our approach is to use
+habitat data at the resolution and extent at which it is available.
+Where habitat data provide an important constraint on individual
+location and are used as part of a flapper algorithm, we suggest
+implementing the flapper algorithms at a similar resolution (where
+practical). For example, in this study, we incorporated a bathymetry
+layer at the original (5 x 5 m) resolution and resolved movements across
+the same grid. This approach trades off computation time with precision.
+In our study system, depth time series impose a strong constraint on
+location. This constraint dramatically weakens if you aggregate the
+data, which greatly reduces the utility of depth observations for
+reconstructing movements. We recommend practitioners consult the
+documentation of the process_surface() function for advice in this
+context.</p>
+<p>Where the outputs of the flapper algorithms are combined with
+environmental data to infer habitat use, we also broadly favour using
+data at their original resolution. It is not clear what could be gained
+by aggregating (or disaggregating) data. As explained above, the
+precision with which movements are resolved by the flapper algorithm can
+change through time but uncertainty is propagated. Moreover,
+environmental datasets are often complex data products that incorporate
+observations, interpolation and modelling. Aggregation of these datasets
+can mask important variation and add another layer of complexity when it
+comes to understanding uncertainty that is usually swept under the rug.
+That being said, where aggregation (or disaggregation) is necessary, we
+encourage the use of simulations and comparisons (where feasible) to
+evaluate the influence of resolution on results.</p>
 </div>
 </div>
 <div class="section level2">
@@ -261,6 +391,204 @@ likely to emerge if the time between detections is short (relative to
 the movement capacity), such that the individual could (or must have)
 moved directly from one to another during the detection gap.</p>
 </div>
+<div class="section level3">
+<h3 id="in-the-flapper-algorithms-the-incorporation-of-different-data-types-can-change-reconstructed-patterns--isnt-this-disconcerting">In the flapper algorithms, the incorporation of different data types
+can change reconstructed patterns. Isn’t this disconcerting?<a class="anchor" aria-label="anchor" href="#in-the-flapper-algorithms-the-incorporation-of-different-data-types-can-change-reconstructed-patterns--isnt-this-disconcerting"></a>
+</h3>
+<p>The short answer to this is ‘no’. To see why, first consider passive
+acoustic telemetry in isolation. In an acoustic array, the information
+we have on an individual’s location is limited to detections at
+receivers, detection probability and movement capacity (in the context
+of barriers to movement, such as coastline). Of these sources of
+information, most approaches for modelling acoustic time series
+(including the mean-position algorithm) only consider detections at
+receivers, which means there is typically a high degree of uncertainty
+in the individual’s location through time (even if this is not
+represented). By considering the detection and movement processes that
+generate observations, the ACPF algorithm more effectively represents
+uncertainty, but it still exists. However, if we consider additional
+sources of information on individual location (which is possible within
+the flapper algorithms), our uncertainty can decrease. (This is
+naturally quantified by a reduction in the number of locations in which
+the individual could have been located, accounting for their relative
+probabilities.) Imagine we collect both acoustic and archival (depth)
+time series. Now, when an individual is detected, we know not only that
+it must be within the detection container of a receiver but we can
+identify the subset of locations that is also consistent with the
+observed depth. The same principle is true in the gaps between
+detections. These additional restrictions can lead to differences in
+maps of space use. It is not that a map constructed with acoustic time
+series alone is ‘wrong’ whilst one constructed with both acoustic and
+archival time series is ‘right’. With the flapper algorithms, both maps
+are valid representations of the individual’s possible locations, given
+the data, it’s just that depth observations place an additional
+restriction on location that refines the map. More generally, datasets
+that place multiple, distinct restrictions on location suggest more
+refined maps of space use. These differences are not only inevitable but
+desirable.</p>
+<p>Quantification of the extent to which the addition of new datasets
+updates maps of space use is valuable because it indicates the relative
+amount of information contained within different datasets, which can
+guide tag and array deployment programmes. In our illustrative analyses
+of flapper skate, it is clear that the integration of both acoustic and
+archival data refines reconstructed patterns of space use (Fig. 3). This
+demonstrates the benefits of a coupled acoustic and archival tagging
+programme in our study area. Building on this work, where feasible, we
+encourage practitioners leading tag and array deployment programmes to
+evaluate the merits of designing systems that collect detections
+alongside ancillary data (such as depth observations). Obvious
+considerations concern the accuracy of ancillary data and the resolution
+of background (e.g., depth) layers. In general, if background data
+layers are relatively homogeneous, then collecting ancillary information
+is unlikely to refine maps of space use substantially and improvements
+to the receiver network may be a better use of limited resources (except
+perhaps in situations where background data resolution, while currently
+a limiting factor, is expected to improve). In contrast, if background
+data layers are heterogeneous, then coupling passive acoustic telemetry
+with ancillary information on individual habitat use has the potential
+to refine inferences and investments in ancillary recording capacities
+may be worthwhile. We support the use of simulation to explore the
+relative value of different datasets (though comparison of maps
+reconstructed from different combinations of information) and note the
+potential to integrate this research with economic modelling to design
+optimal array/tag deployment programmes that maximise the information
+gleaned for a given budget.</p>
+<p>Where beneficial, we also encourage practitioners to exploit the
+flexibility of the flapper algorithms to incorporate multiple datasets
+by considering not only acoustic and archival time series, but other
+spatially or temporally heterogeneous data types as well (such as
+salinity or temperature). The construction of the algorithms provides a
+straightforward means to ‘slot in’ ancillary data in the same way that
+we incorporate depth time series. All you need is a model that compares
+ancillary observations and a background layer to describe the
+probability of an individual being in any given location through time,
+according to that particular dataset. This information can be combined
+with equivalent surfaces from the AC algorithm (via eqn 13 in Lavender
+et al. 2023) and PF can be implemented for the combined surfaces in the
+usual way. When you do this, do not feel disconcerted if the results
+change: it is a sign that your efforts have been worthwhile.</p>
+</div>
+<div class="section level3">
+<h3 id="the-different-flapper-algorithms-suggest-different-patterns-of-space-use--how-do-i-choose-which-algorithm-to-use">The different flapper algorithms suggest different patterns of space
+use. How do I choose which algorithm to use?<a class="anchor" aria-label="anchor" href="#the-different-flapper-algorithms-suggest-different-patterns-of-space-use--how-do-i-choose-which-algorithm-to-use"></a>
+</h3>
+<p>The choice of algorithm depends on data availability and study
+objectives. For reconstructing patterns of space use, the different
+algorithms suggest different patterns because they incorporate different
+information. Let’s use Fig. 3 in Lavender <em>et al.</em> (2023) to
+illustrate this point and clarify algorithm choice. Recall that Fig. 3A
+shows a map reconstructed from the depth time series; Fig. 3B–C show
+maps reconstructed from acoustic detections; and Fig. 3D shows a map
+based on both datasets. If you only have depth time series, or you are
+interested in the extent to which a region (such as a Marine Protected
+Area) represents the depths used by an individual, the DC algorithm
+(Fig. 3A), is the appropriate choice. If you only have detection data at
+receivers, you have the choice of a number of existing methods, such as
+the mean-position algorithm (Fig. 3B), or our ACPF algorithm (Fig. 3C).
+As noted in Lavender <em>et al.</em> (2023), the relative utility of
+these methods may vary in different settings but in clustered receiver
+arrays the mean-position algorithm may perform poorly (Fig. 3B) and the
+ACPF algorithm (Fig. 3C) is the clear choice here. If you have both
+depth and detection time series, the ACDCPF algorithm is a refinement.
+Thus, for flapper skate, the ACDCPF algorithm is the best choice when it
+comes to reconstructing patterns of space use and Fig. 3D is the
+most-refined map of space use for the analysed individual. In summary,
+the best algorithm for reconstructing patterns of space use depends on
+the data you have available: if you only have depth time series, use the
+DC algorithm; if you only have acoustic time series, use the ACPF
+algorithm; if you have both depth and acoustic data, then use the ACDCPF
+algorithm, which can integrate both types of data.</p>
+</div>
+<div class="section level3">
+<h3 id="can-you-clarify-your-analysis-of-habitat-use-in-fig--3e-in-lavender-et-al--2023-what-is-the-dominant-habitat-type-that-was-selected-by-this-fish-was-it-muddy-sand-or-mud-and-what-is-the-basis-for-this-conclusion">Can you clarify your analysis of habitat use in Fig. 3E in Lavender
+et al. (2023)? What is the dominant habitat type that was selected by
+this fish: was it muddy sand or mud? And what is the basis for this
+conclusion?<a class="anchor" aria-label="anchor" href="#can-you-clarify-your-analysis-of-habitat-use-in-fig--3e-in-lavender-et-al--2023-what-is-the-dominant-habitat-type-that-was-selected-by-this-fish-was-it-muddy-sand-or-mud-and-what-is-the-basis-for-this-conclusion"></a>
+</h3>
+<p>We have emphasised above that different algorithms can produce
+different patterns of space use (and we should not be disconcerted by
+this). The purpose of Fig. 3E is to take this point one step further and
+illustrate that differences in patterns of space use reconstructed by
+different methods have wider implications, using the example of sediment
+use. What Fig. 3E is showing is the proportion of each sediment type
+that is found within the core range suggested by each algorithm, as
+delineated in Figs 3B–D, relative to the proportional availability of
+each sediment type in the study area at large. According to the
+mean-position algorithm, the proportion of muddy sand in the
+individual’s core area substantially exceeds background levels. But the
+mean-position algorithm is strongly biased by the locations of receivers
+and this result is thus an artefact of COA’s localised distribution. By
+accounting for possible movement away from receivers, the flapper
+algorithms produce more informative maps of space use, as explained
+previously, and these suggest a different conclusion. According to both
+flapper algorithms, the use of muddy sand is not considerably higher
+than we might expect (given the prevalence of this sediment type in the
+study area) and the results instead point ‘towards the exploitation of
+multiple benthic habitats, in concordance with recent work’ (Thorburn et
+al., 2021). That being said, the most refined map of space use (Fig.
+3D), which integrates information from both acoustic and archival time
+series, suggests that mud is used proportionally more than the other
+sediment types, relative to background availability. We should be
+cautious of overinterpreting this result for a single individual, but it
+highlights a potential habitat preference that is worthy of further
+study.</p>
+</div>
+<div class="section level3">
+<h3 id="my-simulated-and-reconstructed-patterns-of-space-use-based-on-the-correct-parameters-look-different--whats-going-on">My simulated and reconstructed patterns of space use (based on the
+correct parameters) look different. What’s going on?<a class="anchor" aria-label="anchor" href="#my-simulated-and-reconstructed-patterns-of-space-use-based-on-the-correct-parameters-look-different--whats-going-on"></a>
+</h3>
+<p>Simulations are a device we can use to explore algorithm behaviour
+and utility in different settings, but care is needed in the
+interpretation of such analyses. In the flapper algorithms, unlike other
+methods, it is necessarily true that maps reconstructed by (correctly
+specified) algorithm implementations will encompass the true path (given
+sufficient samples). In general terms, it is also true that we should
+expect a ‘reasonable’ match between simulated and reconstructed
+patterns, and that this match should often be better than for methods
+that do not encapsulate the processes that generate observations.
+However, what is ‘reasonable’ depends on the information provided by
+observations (and other algorithm components). In systems with ‘high’
+information, there are strong restrictions on the possible locations of
+an individual though time and we expect a close match between simulated
+and reconstructed patterns. In contrast, in systems with low information
+(the typical case), there are fewer such restrictions and a wider range
+of movements could have generated the observations. In this kind of
+situation, movements beyond a simulated path allowed by the observations
+can lead to differences between that path, which is only one realisation
+of a particular data-generating process, and the reconstructed pattern,
+which encapsulates the range of movements that could have generated the
+observations. Thus, you should not be surprised if simulated and
+reconstructed patterns do not match perfectly.</p>
+<p>There are important consequences of the representation of uncertainty
+in the flapper algorithms when it comes to comparing the fidelity with
+which different algorithms reconstruct a simulated path. As we show in
+this study, in any individual case, COAs from the mean-position
+algorithm may align more closely with the true path than particle
+samples from the flapper algorithms (for instance, because the latter
+permit movement into areas where the individual could have, but did not,
+venture). Since particle samples represent the distribution of
+possibilities, it is only on average (if one imagines many simulated
+outcomes of a data-generating process) that we expect (correctly
+specified) flapper algorithms to reconstruct the true path more
+accurately (especially in non-uniform arrays) than methods that do not
+recapitulate the data-generating process. That being said, we cannot at
+this stage discount the possibility that the mean-position algorithm (or
+other methods) may outperform the flapper algorithms in unexpected
+settings. We encourage the use of simulations to compare the behaviour
+of different approaches in different scenarios to guide analyses. A key
+avenue for future research is to develop quantitative metrics for the
+comparisons of simulated and modelled patterns of space use in different
+settings.</p>
+<p>Alongside the fidelity with which the true path is reconstructed in
+any particular situation, the wider advantages and disadvantages of each
+method should be used to guide the choice of methodology. Important
+criteria include implementation ease, speed and study objectives. For
+example, by accounting for movement in the gaps between detections, the
+flapper algorithms are well-suited to studies of residency, whereas
+alternative methods (such as the mean-position algorithm, network
+analysis and Aspillaga et al.’s (2019a) synthetic-path method) are
+not.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="sensitivity">Sensitivity<a class="anchor" aria-label="anchor" href="#sensitivity"></a>
@@ -269,39 +597,35 @@ moved directly from one to another during the detection gap.</p>
 <h3 id="how-sensitive-are-the-algorithms-to-the-mobility-parameter">How sensitive are the algorithms to the mobility parameter?<a class="anchor" aria-label="anchor" href="#how-sensitive-are-the-algorithms-to-the-mobility-parameter"></a>
 </h3>
 <p>The mobility parameter controls how far an individual can move in any
-given time step. Intuitively, underestimation of mobility will lead to
-overly concentrated patterns of space use, while overestimation of
+given time step. Intuitively, under-estimation of mobility will lead to
+overly concentrated patterns of space use, while over-estimation of
 mobility will lead to overly diffuse patterns of space use. However,
 these two outcomes are not necessarily equally plausible. Algorithm
 sensitivity also depends on additional constraints, such as array
 design.</p>
-<p>First, note that it can be quite hard to underestimate the mobility
-parameter. If you, for example, half mobility, the PF algorithm is
-unlikely to converge: during the simulation of individual movements, you
-are likely to reach a time step in which the set of locations in which
-the individual could be located at a subsequent time step (given
-previously sampled locations) does not overlap with the set of locations
-within which the individual must have been located (given the data),
-because mobility is too restricted (assuming you sample a sufficient
-number of particles). This situation is more likely to arise in studies
-in which constraints on an individual’s location through time (e.g.,
-detections or ancillary time series) successfully restrict the number of
-possible routes between sequential locations. If you attempt to repeat
-the case-study analyses in Lavender <em>et al.</em> (in review) (e.g.,
-analysis A2) with a reduced mobility, you will run into exactly this
-issue. This provides good evidence that the mobility parameter is
-appropriate for the analysed data in this study.</p>
-<p>While it can be difficult to underestimate mobility, it is possible
-to overestimate it. The effects of doing so will be most apparent in the
-AC-branch algorithms and depend on constraints (such as array design).
-In a sparse array that records few detections, there is little
-information to constrain movement and an overestimated mobility
+<p>First, note that it can be quite hard to under-estimate the mobility
+parameter. If you, for example, halve mobility, the PF algorithm may
+fail to converge: during the simulation of individual movements, you may
+reach a time step in which the set of locations in which the individual
+could be located at a subsequent time step (given previously sampled
+locations) does not overlap with the set of locations within which the
+individual must have been located (given the data), because mobility is
+too restricted (assuming you sample a sufficient number of particles).
+This situation is more likely to arise in studies in which constraints
+on an individual’s location through time (e.g., detections or ancillary
+time series) successfully restrict the number of possible routes between
+sequential locations.</p>
+<p>While it can be difficult to under-estimate mobility, it is possible
+to over-estimate it. The effects of doing so will be most apparent in
+the AC-branch algorithms and depend on constraints (such as array
+design). In a sparse array that records few detections, there is little
+information to constrain movement and an over-estimated mobility
 parameter will produce more diffuse patterns of space use. However, the
 coupling of AC- and PF- branch algorithms can limit the influence of an
-overestimated mobility parameter because the latter incorporates a
+over-estimated mobility parameter because the latter incorporates a
 movement model in which longer-range movements, while permitted, can be
 made less likely. This is what the movement model for flapper skate does
-in Lavender <em>et al.</em> (in review).</p>
+in Lavender <em>et al.</em> (2023).</p>
 <p>Finally, it is important to note that these considerations are not
 unique to our methods. The flapper algorithms simply make the influence
 of movement constraints explicit, but the interpretation of passive
@@ -345,19 +669,19 @@ mechanistic description of all inputted information about the location
 of the animal through time (i.e., all detections, all gaps between
 detections and all ancillary data, given the detection probability
 model, the movement model and other parameters). Consequently, unless
-the algorithm is misspecified (see below), the set of possible locations
-will include the ‘true’ movement path, even in sparse arrays with few
-detections. However, care is required in the interpretation of the ‘set
-of possible locations of an individual through time’: while this, by
-definition, will include the ‘true’ movement path, it is not guaranteed
-(nor even desirable) that the pattern of space use exhibited by the set
-of possible locations should match the pattern of space use exhibited by
-the ‘true’ path.</p>
+the algorithm is mis-specified (see below), the set of possible
+locations will include the ‘true’ movement path, even in sparse arrays
+with few detections. However, care is required in the interpretation of
+the ‘set of possible locations of an individual through time’: while
+this, by definition, will include the ‘true’ movement path, it is not
+guaranteed (nor even desirable) that the pattern of space use exhibited
+by the set of possible locations should match the pattern of space use
+exhibited by the ‘true’ path.</p>
 <p>While a correctly specified algorithm will reconstruct a set of
 possible locations that includes the ‘true’ path (assuming you sample a
 sufficiently large number of particles in the PF step), the algorithms
 are sensitive to misspecification like any other method. However, the
-consequences of mis specifying algorithm components, such as the
+consequences of mis-specifying algorithm components, such as the
 detection range, detection kernels or movement parameters, vary. See
 ‘Sensitivity’ for further commentary.</p>
 <p>The ‘usefulness’ of the algorithms in different settings is a
@@ -370,9 +694,9 @@ inputs unavoidably influences the utility of the outputs.</p>
 <p>These comments notwithstanding, as for other emerging movement
 modelling approaches in passive acoustic telemetry systems, more needs
 to be learnt about the utility of the flapper algorithms in different
-settings. As argued in the main text, an improved understanding of the
-relative utility of different methods in different settings will help to
-move the field forwards.</p>
+settings. As argued in Lavender et al. (2023), an improved understanding
+of the relative utility of different methods in different settings will
+help to move the field forwards.</p>
 </div>
 <div class="section level3">
 <h3 id="how-does-transmission-interval-affect-the-algorithm">How does transmission interval affect the algorithm?<a class="anchor" aria-label="anchor" href="#how-does-transmission-interval-affect-the-algorithm"></a>
@@ -401,32 +725,233 @@ continuous, fine-scale positioning records (i.e., a ‘known’ track?)<a class=
 movement and detection processes that give rise to detections. This
 means that, by definition, reconstructed patterns of space use will
 contain the ‘true’ movement path (assuming they have been correctly
-specified: see ‘Sensitivity’). As in Lavender <em>et al.</em> (in
-review), you can explore the correspondence between a ‘known’ and
-reconstructed movements under different conditions using simulation. In
-real-world settings, fine-scale positioning records collected during
-drift tests of detection probability can also be used for this purpose.
-The probability distribution of the set of possible locations through
-time provides a measure of our certainty in the location of an
-individual: a flat surface emerges when there are few constraints on an
-individual’s possible location and reflects low certainty; a more
-concentrated surface emerges when the set of possible locations for an
-individual is more constrained and reflects higher certainty. However,
-even for more concentrated distributions, it is not guaranteed (nor even
-desirable) that the pattern of space use exhibited by the simulated
-locations will match the pattern of space use exhibited by the ‘true’
-path (see ‘Optimisation’).</p>
+specified: see ‘Sensitivity’). As in Lavender <em>et al.</em> (2023),
+you can explore the correspondence between a ‘known’ and reconstructed
+movements under different conditions using simulation. In real-world
+settings, fine-scale positioning records collected during drift tests of
+detection probability can also be used for this purpose. The probability
+distribution of the set of possible locations through time provides a
+measure of our certainty in the location of an individual: a flat
+surface emerges when there are few constraints on an individual’s
+possible location and reflects low certainty; a more concentrated
+surface emerges when the set of possible locations for an individual is
+more constrained and reflects higher certainty. However, even for more
+concentrated distributions, it is not guaranteed (nor even desirable)
+that the pattern of space use exhibited by the simulated locations will
+match the pattern of space use exhibited by the ‘true’ path (see
+‘Optimisation’).</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="extensions">Extensions<a class="anchor" aria-label="anchor" href="#extensions"></a>
+</h2>
+<div class="section level3">
+<h3 id="what-are-the-main-advantages-of-the-flapper-algorithms">What are the main advantages of the flapper algorithms?<a class="anchor" aria-label="anchor" href="#what-are-the-main-advantages-of-the-flapper-algorithms"></a>
+</h3>
+<p>The central contribution of the flapper framework is the mechanistic
+perspective that recapitulates the processes that generate observations.
+This perspective has a number of methodological benefits:</p>
+<ol style="list-style-type: upper-alpha">
+<li>Data integration. The flapper algorithms naturally integrate
+multiple sources of information, including detections, the detection
+process (for any array design), movement capacity, barriers to movement
+and ancillary data. Previous studies have shown that the absence of
+these processes (especially detection probability, which has received
+most attention) can bias inferences (Pedersen &amp; Weng, 2013; Winton
+et al., 2018). This finding is developed by this study.<br>
+</li>
+<li>Uncertainty. By recapitulating the processes that generate
+observations, the flapper algorithms inherently propagate uncertainty.
+This is naturally measured by the set of possible locations of an
+individual at each time step (and their associated probabilities). Lower
+uncertainty results in more concentrated patterns of space use, while
+higher uncertainty manifests as more diffuse patterns of space use. This
+contrasts with other methods that either do not represent uncertainty
+(e.g., the mean-position algorithm) or in which uncertainty does not
+emerge directly from the data-generating processes but is applied
+post-hoc (e.g., refined-shortest paths [RSPs]).</li>
+<li>Smoothing. The flapper algorithms naturally reconstruct utilisation
+distributions without post-hoc smoothing. The latter can be useful, in
+some circumstances, however. Simulations suggest that flapper algorithm
+outputs (i.e., POU maps) may be less sensitive to the degree of
+smoothing than the outputs from other algorithms—namely, COAs (see Fig.
+S14).</li>
+<li>Movements. Movement can be flexibly incorporated into the flapper
+algorithms via a movement model. The representation of movements in the
+gaps between detections is particularly significant.<br>
+</li>
+<li>Shortest paths. In the reconstruction of possible movements,
+shortest paths are easily incorporated. This is a detail, but we mention
+it because there is wide interest in shortest path calculations in the
+ecological literature (van Etten, 2017; Wang, 2020). Within the flapper
+package, we exploit shortest path routines and novel approximations that
+are more efficient that those typically used in the ecological
+literature (Aspillaga et al., 2019a, 2019b; Niella et al., 2020; Wang,
+2020).</li>
+</ol>
+<p>These methodological innovations have important practical
+consequences:</p>
+<ol style="list-style-type: upper-alpha">
+<li>Interpretation. Because the flapper algorithms are process-based,
+the outputs have a natural interpretation. At each time step, we resolve
+the set of locations within which the individual could have been located
+(and their associated probabilities). Using these locations, we can
+construct possible movement paths or (gridded) maps of space use in
+which each cell represents POU or the probability that the individual
+was in that location at a randomly chosen time. This natural
+interpretation is generally lacking in other methods. For example, the
+mean-position algorithm averages the locations of receivers at which
+individuals are detected and, while these averages have been called
+COAs, the extent to which receiver-location averages have a meaningful,
+biological interpretation is questionable in many circumstances.</li>
+<li>Movement paths. Within the flapper algorithms, the movement paths
+that could have generated observations are reconstructed. This differs
+from ‘top-down’ approaches such as the mean-position algorithm in which
+movements are unresolved. It also differs from other ‘synthetic path’
+approaches that generate least-cost path(s) between detection containers
+(which are at least consistent with the locations of detection) in that
+the representation of detection gaps permits a fuller exploration of the
+distribution of possible movements. Furthermore, the integration of
+ancillary data means that paths can (potentially) be resolved more
+precisely than possible with discrete detection data alone (e.g., Fig.
+3). This moves passive acoustic telemetry a (small) step closer to other
+animal tracking technologies and facilitates analyses of fine-scale
+movements and their drivers, alongside studies of receiver- and
+array-scale movement metrics (such as time spent around receivers).</li>
+<li>Space use. As shown in this study, the recapitulation of the
+data-generating processes in the flapper algorithms and the integration
+of multiple data types can generate more refined maps of space use. By
+resolving the distribution of possible movements, maps can be less
+biased by receiver locations and more useful for prediction. This
+facilitates improved analyses of patterns of space use and their
+drivers, such as habitat preferences.<br>
+</li>
+<li>Residency. The resolution of movements both during periods of
+detection and in the gaps between detections makes the flapper
+algorithms uniquely well-suited to analyses of residency. With the
+flapper algorithms, it is possible to investigate residency in regions
+with incomplete receiver coverage, such as MPAs. In our study area, we
+demonstrate that data collected from an example flapper skate are
+consistent with continued residency, despite gaps in detections during
+which the individual could have moved beyond the study area. This is not
+proof of residency, but it is the first conclusive demonstration that
+residency is a valid explanation that is fully consistent with the data.
+This is a step beyond the residency indices that have been developed in
+previous studies, which have (necessarily) been based on time spent
+around receivers, rather in wider regions of interest (Kessel et al.,
+2016; Lavender et al., 2021).</li>
+</ol>
+<p>We encourage users to consider these potential advantages in the
+context of those of other methods, alongside their respective
+disadvantages, to evaluate the relative merits of existing approaches in
+different settings.</p>
+</div>
+<div class="section level3">
+<h3 id="what-future-research-avenues-are-suggested-by-the-flapper-algorithms">What future research avenues are suggested by the flapper
+algorithms?<a class="anchor" aria-label="anchor" href="#what-future-research-avenues-are-suggested-by-the-flapper-algorithms"></a>
+</h3>
+<p>The flapper algorithms encapsulate a new, bottom-up, mechanistic
+perspective of passive acoustic telemetry systems. This perspective has
+notable conceptual and practical advantages that have the potential to
+support applied research in the future (see above). However, our main
+hope is that this unique perspective will motivate a conversation about
+how we model passive acoustic telemetry data and encourage new research
+into the dynamics, performance, sensitivity, optimisation and uses of
+alternative methods in different settings, which are areas that have
+hitherto received insufficient attention. In this context, we highlight
+eight avenues for future methodological research that emerge from this
+study:</p>
+<ol style="list-style-type: upper-alpha">
+<li>Dynamics. Questions remain over how we can model the processes that
+generate observations most realistically (and usefully) in different
+settings. For example, in the AC algorithm, the dynamics of acoustic
+containers are a conceptually appealing representation of how the set of
+possible locations for an individual evolves between two detections, but
+we can envisage other possible ways of capturing the same information
+that may have advantages. Scope also remains to represent hierarchical
+dynamics that emerge in studies of multiple individuals, such as
+transmission collisions.</li>
+<li>Sensitivity. The sensitivity of all methods to data processing
+decisions and different parameters in different settings requires
+further study.</li>
+<li>Optimisation. Key questions remain around how algorithm settings can
+be tuned to improve inference in different contexts. For example, with
+respect to the flapper algorithms, what is the optimal resolution at
+which to resolve movements that maximises performance but minimises
+computation time?</li>
+<li>Approximation. For practical applications, understanding how we can
+best approximate the processes that generate observations in different
+settings and for different purposes is critical. With our holistic,
+mechanistic framework as a baseline, we encourage modellers to frame
+new, bottom-up methods explicitly in terms of how they approximate the
+processes that generate observations. This should make it easier to
+interpret algorithms, understand uncertainty and judge methods (on the
+basis of whether or not selected approximations are acceptable).</li>
+<li>Performance. Understanding how the performance of alternative
+methods (including the mean-position algorithm, the flapper algorithms
+and other approaches) for reconstructing patterns of space use varies in
+different settings remains a key knowledge gap. We encourage the use of
+simulation studies to explore algorithm performance in different
+settings. This process will be supported by research into the behaviour
+of quantitative metrics of performance.</li>
+<li>Packages. The accessibility and speed of method implementations,
+including those provided by the flapper, fishtrack3d (Aspillaga et al.,
+2019a, 2019b) and RSP (Niella et al., 2020) packages, are key areas for
+improvement. Highly optimised routines for both ‘approximate’ and
+‘greedy’ algorithms are required to facilitate both methodological
+research (e.g., comparisons of alternative methods) and practical
+applications.</li>
+<li>Applications. Much remains to be learnt about the relative utility
+of existing methods in different settings and we encourage practitioners
+to trial multiple approaches, including the flapper algorithms, in
+different settings.<br>
+</li>
+<li>Array design. The flapper algorithms present opportunities to inform
+tag and array deployment programmes. We encourage the use of simulations
+to study the relative benefits of investments in different technologies
+(such as acoustic receivers and archival tags) in different settings and
+exploration of how the methods can be used to inform optimal array
+designs.</li>
+</ol>
 </div>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<p>Lavender, E. <em>et al.</em> (in review). A semi-stochastic modelling
-framework for passive acoustic telemetry.</p>
+<p>Aspillaga, E. <em>et al.</em> (2019a). Modelling the
+three-dimensional space use of aquatic animals combining topography and
+Eulerian telemetry data. Methods in Ecology and Evolution, 10(9),
+1551–1557. <a href="https://doi.org/10.1111/2041-210X.13232" class="external-link uri">https://doi.org/10.1111/2041-210X.13232</a></p>
+<p>Aspillaga, E. <em>et al.</em> (2019b). fishtrack3d: Analysis of
+passive acoustic telemetry data in 3D. <a href="http://github.com/aspillaga/fishtrack3d" class="external-link uri">http://github.com/aspillaga/fishtrack3d</a></p>
+<p>Kessel, S. T. <em>et al.</em> (2016). Distinct patterns of Arctic cod
+(<em>Boreogadus saida</em>) presence and absence in a shallow high
+Arctic embayment, revealed across open-water and ice-covered periods
+through acoustic telemetry. Polar Biology, 39(6), 1057–1068. <a href="https://doi.org/10.1007/s00300-015-1723-y" class="external-link uri">https://doi.org/10.1007/s00300-015-1723-y</a></p>
 <p>Lavender, E. <em>et al.</em> (2021). Movement patterns of a
 Critically Endangered elasmobranch (<em>Dipturus intermedius</em>) in a
 Marine Protected Area. <em>Aquatic Conservation: Marine and Freshwater
 Ecosystems</em>, 32(2), 348–365. <a href="https://doi.org/10.1002/aqc.3753" class="external-link uri">https://doi.org/10.1002/aqc.3753</a></p>
+<p>Lavender, E. <em>et al.</em> (2023). A semi-stochastic modelling
+framework for passive acoustic telemetry. Methods in Ecology and
+Evolution. <a href="https://doi.org/10.1111/2041-210X.14193" class="external-link uri">https://doi.org/10.1111/2041-210X.14193</a></p>
+<p>Niella, Y. <em>et al.</em> (2020). Refined Shortest Paths (RSP):
+incorporation of topography in space use estimation from node-based
+telemetry data. Methods in Ecology and Evolution, 11(12), 1733–1742. <a href="https://doi.org/10.1111/2041-210X.13484" class="external-link uri">https://doi.org/10.1111/2041-210X.13484</a></p>
+<p>Pedersen, M. W. &amp; Weng, K. C. (2013). Estimating individual
+animal movement from observation networks. Methods in Ecology and
+Evolution, 4(10), 920–929. <a href="https://doi.org/10.1111/2041-210X.12086" class="external-link uri">https://doi.org/10.1111/2041-210X.12086</a></p>
+<p>Thorburn, J. <em>et al.</em> (2021). Seasonal and Ontogenetic
+Variation in Depth Use by a Critically Endangered Benthic Elasmobranch
+and Its Implications for Spatial Management. Frontiers in Marine
+Science, 8, 656368. <a href="https://doi.org/10.3389/fmars.2021.656368" class="external-link uri">https://doi.org/10.3389/fmars.2021.656368</a></p>
+<p>Wang, I. J. (2020). Topographic path analysis for modeling dispersal
+and functional connectivity: calculating topographic distances using the
+topoDistance R package. Methods in Ecology and Evolution, 11, 265–272.
+<a href="https://doi.org/10.1111/2041-210X.13317" class="external-link uri">https://doi.org/10.1111/2041-210X.13317</a></p>
+<p>Winton, M. V. <em>et al.</em> (2018). A spatial point process model
+to estimate individual centres of activity from passive acoustic
+telemetry data. Methods in Ecology and Evolution, 9(11), 2262–2272. <a href="https://doi.org/10.1111/2041-210X.13080" class="external-link uri">https://doi.org/10.1111/2041-210X.13080</a></p>
 </div>
   </div>
 

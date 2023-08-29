@@ -144,14 +144,15 @@
 <span class="r-in"><span><span class="co"># ... using pf_simplify() with return = "archive"</span></span></span>
 <span class="r-in"><span><span class="va">dat_dcpf_histories_connected</span> <span class="op">&lt;-</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="pf_simplify.html">pf_simplify</a></span><span class="op">(</span><span class="va">dat_dcpf_histories</span>,</span></span>
-<span class="r-in"><span>             summarise_pr <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>             return <span class="op">=</span> <span class="st">"archive"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf_simplify() called (@ 2023-02-19 15:03:46)... </span>
+<span class="r-in"><span>    summarise_pr <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>    return <span class="op">=</span> <span class="st">"archive"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf_simplify() called (@ 2023-08-29 15:45:44)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting pairwise cell movements based on calc_distance = 'euclid'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Stepping through time steps to join coordinate pairs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Identifying connected cells... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Processing connected cells for return = 'archive'... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf_simplify() call completed (@ 2023-02-19 15:03:46) after ~0.01 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf_simplify() call completed (@ 2023-08-29 15:45:45) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co">## Path based implementation</span></span></span>
 <span class="r-in"><span><span class="co"># The example data 'dat_dcpf_paths' contains a sample of paths reconstructed</span></span></span>
 <span class="r-in"><span><span class="co"># ... by the DCPF algorithm and we can also implement the function for these paths.</span></span></span>
@@ -180,13 +181,17 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3): Customise the map(s)</span></span></span>
 <span class="r-in"><span><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">pf_plot_map</span><span class="op">(</span><span class="va">dat_dcpf_histories_connected</span>, map <span class="op">=</span> <span class="va">dat_dc</span><span class="op">$</span><span class="va">args</span><span class="op">$</span><span class="va">bathy</span>,</span></span>
-<span class="r-in"><span>            add_rasters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu">grDevices</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grDevices/gray.colors.html" class="external-link">grey.colors</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>            xlab <span class="op">=</span> <span class="st">"x"</span>, ylab <span class="op">=</span> <span class="st">"y"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">pf_plot_map</span><span class="op">(</span><span class="va">dat_dcpf_histories_connected</span>,</span></span>
+<span class="r-in"><span>  map <span class="op">=</span> <span class="va">dat_dc</span><span class="op">$</span><span class="va">args</span><span class="op">$</span><span class="va">bathy</span>,</span></span>
+<span class="r-in"><span>  add_rasters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu">grDevices</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grDevices/gray.colors.html" class="external-link">grey.colors</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  xlab <span class="op">=</span> <span class="st">"x"</span>, ylab <span class="op">=</span> <span class="st">"y"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
-<span class="r-in"><span><span class="fu">pf_plot_map</span><span class="op">(</span><span class="va">dat_dcpf_paths</span>, map <span class="op">=</span> <span class="va">dat_dc</span><span class="op">$</span><span class="va">args</span><span class="op">$</span><span class="va">bathy</span>,</span></span>
-<span class="r-in"><span>            add_rasters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu">grDevices</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">topo.colors</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>            xlab <span class="op">=</span> <span class="st">"x"</span>, ylab <span class="op">=</span> <span class="st">"y"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">pf_plot_map</span><span class="op">(</span><span class="va">dat_dcpf_paths</span>,</span></span>
+<span class="r-in"><span>  map <span class="op">=</span> <span class="va">dat_dc</span><span class="op">$</span><span class="va">args</span><span class="op">$</span><span class="va">bathy</span>,</span></span>
+<span class="r-in"><span>  add_rasters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu">grDevices</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">topo.colors</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  xlab <span class="op">=</span> <span class="st">"x"</span>, ylab <span class="op">=</span> <span class="st">"y"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="pf_plot_map-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">pp</span><span class="op">)</span></span></span>

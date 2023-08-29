@@ -127,26 +127,29 @@
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu">get_id_rec_overlap</span><span class="op">(</span><span class="va">dat_ids</span>, <span class="va">dat_moorings</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2): Temporal overlap between all combinations of specified</span></span></span>
-<span class="r-in"><span><span class="co">#... individuals/receivers</span></span></span>
+<span class="r-in"><span><span class="co"># ... individuals/receivers</span></span></span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu">get_id_rec_overlap</span><span class="op">(</span><span class="va">dat_ids</span>,</span></span>
-<span class="r-in"><span>                          <span class="va">dat_moorings</span>,</span></span>
-<span class="r-in"><span>                          individual_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">26</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                          receiver_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                          type <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">dat_moorings</span>,</span></span>
+<span class="r-in"><span>  individual_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">26</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  receiver_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  type <span class="op">=</span> <span class="fl">2L</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3): Temporal overlap between specified individual/receiver pairs</span></span></span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu">get_id_rec_overlap</span><span class="op">(</span><span class="va">dat_ids</span>,</span></span>
-<span class="r-in"><span>                          <span class="va">dat_moorings</span>,</span></span>
-<span class="r-in"><span>                          individual_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">26</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                          receiver_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                          type <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">dat_moorings</span>,</span></span>
+<span class="r-in"><span>  individual_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">26</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  receiver_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  type <span class="op">=</span> <span class="fl">1L</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (4): Match temporal overlap to another dataframe</span></span></span>
 <span class="r-in"><span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">get_id_rec_overlap</span> <span class="op">&lt;-</span></span></span>
 <span class="r-in"><span>  <span class="fu">get_id_rec_overlap</span><span class="op">(</span><span class="va">dat_ids</span>,</span></span>
-<span class="r-in"><span>                     <span class="va">dat_moorings</span>,</span></span>
-<span class="r-in"><span>                     match_to <span class="op">=</span> <span class="va">dat_acoustics</span>,</span></span>
-<span class="r-in"><span>                     type <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">dat_moorings</span>,</span></span>
+<span class="r-in"><span>    match_to <span class="op">=</span> <span class="va">dat_acoustics</span>,</span></span>
+<span class="r-in"><span>    type <span class="op">=</span> <span class="fl">1L</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -134,11 +134,11 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#### Example (1) Construct matrix from detected individuals using detection time series</span></span></span>
 <span class="r-in"><span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">receiver_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">receiver_id</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">mat_by_id</span> <span class="op">&lt;-</span> <span class="fu">make_matrix_detections</span><span class="op">(</span><span class="va">dat_acoustics</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::make_matrix_detections() called (@ 2023-02-19 15:02:26)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::make_matrix_detections() called (@ 2023-08-29 15:44:52)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining time bins given 'delta_t'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Making detection matrix... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::make_matrix_detections() call completed (@ 2023-02-19 15:02:26) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::make_matrix_detections() call completed (@ 2023-08-29 15:44:52) after ~0 minutes. </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mat_by_id</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Length Class Mode   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 25 206505 table numeric</span>
@@ -150,14 +150,16 @@
 <span class="r-in"><span><span class="co">#### Example (2) Construct matrix across all receivers and use set_outside</span></span></span>
 <span class="r-in"><span><span class="va">dat_moorings</span><span class="op">$</span><span class="va">receiver_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dat_moorings</span><span class="op">$</span><span class="va">receiver_id</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">receiver_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">receiver_id</span>,</span></span>
-<span class="r-in"><span>                                    levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">dat_moorings</span><span class="op">$</span><span class="va">receiver_id</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">dat_moorings</span><span class="op">$</span><span class="va">receiver_id</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">match_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">individual_id</span>, <span class="va">dat_ids</span><span class="op">$</span><span class="va">individual_id</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">tag_start_date</span> <span class="op">&lt;-</span> <span class="va">dat_ids</span><span class="op">$</span><span class="va">tag_start_date</span><span class="op">[</span><span class="va">match_index</span><span class="op">]</span></span></span>
-<span class="r-in"><span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">tag_end_date</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2017-06-02"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">tag_end_date</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2017-06-02"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">mat_by_id</span> <span class="op">&lt;-</span> <span class="fu">make_matrix_detections</span><span class="op">(</span><span class="va">dat_acoustics</span>,</span></span>
-<span class="r-in"><span>                                    moorings <span class="op">=</span> <span class="va">dat_moorings</span>,</span></span>
-<span class="r-in"><span>                                    set_outside <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::make_matrix_detections() called (@ 2023-02-19 15:02:26)... </span>
+<span class="r-in"><span>  moorings <span class="op">=</span> <span class="va">dat_moorings</span>,</span></span>
+<span class="r-in"><span>  set_outside <span class="op">=</span> <span class="cn">NA</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::make_matrix_detections() called (@ 2023-08-29 15:44:52)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Argument 'acoustics$tag_start_date' coerced to class 'POSIXct' from class(es): 'Date'.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Argument 'acoustics$tag_end_date' coerced to class 'POSIXct' from class(es): 'Date'.</span>
@@ -166,7 +168,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining time bins given 'delta_t'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Making receiver matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Making detection matrix... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::make_matrix_detections() call completed (@ 2023-02-19 15:02:27) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::make_matrix_detections() call completed (@ 2023-08-29 15:44:52) after ~0 minutes. </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mat_by_id</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Length Class Mode   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 25 211800 table numeric</span>

@@ -92,8 +92,7 @@ In the future, parallelisation routines in flapper may be improved to reduce mem
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="va">flapper_run_slow</span><span class="op">)</span><span class="op">{</span></span></span>
-<span class="r-in"><span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">flapper_run_slow</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="co">#### Background</span></span></span>
 <span class="r-in"><span>  <span class="co"># In this example, we explore, for a small time series</span></span></span>
 <span class="r-in"><span>  <span class="co"># ... of particles created via pf(), the speed of alternative</span></span></span>
@@ -101,34 +100,37 @@ In the future, parallelisation routines in flapper may be improved to reduce mem
 <span class="r-in"><span>  <span class="co"># ... and with sockets versus forking.</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co">#### Implement pf() for example data using a large number of particles</span></span></span>
-<span class="r-in"><span>  <span class="va">pf_args</span>   <span class="op">&lt;-</span> <span class="va">dat_dcpf_histories</span><span class="op">$</span><span class="va">args</span></span></span>
+<span class="r-in"><span>  <span class="va">pf_args</span> <span class="op">&lt;-</span> <span class="va">dat_dcpf_histories</span><span class="op">$</span><span class="va">args</span></span></span>
 <span class="r-in"><span>  <span class="va">pf_args</span><span class="op">$</span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">200L</span></span></span>
 <span class="r-in"><span>  <span class="va">pf_args</span><span class="op">$</span><span class="va">calc_distance_euclid_fast</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="va">out_pf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">pf</span>, <span class="va">pf_args</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co">#### Compare the speed of alternative parallelisation approaches</span></span></span>
 <span class="r-in"><span>  <span class="co"># ... for particle processing</span></span></span>
-<span class="r-in"><span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"rbenchmark"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"rbenchmark"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="va">pb_op</span> <span class="op">&lt;-</span> <span class="fu">pbapply</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pbapply/man/pboptions.html" class="external-link">pboptions</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu">rbenchmark</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rbenchmark/man/benchmark.html" class="external-link">benchmark</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>      baseline <span class="op">=</span> <span class="fu"><a href="pf_simplify.html">pf_simplify</a></span><span class="op">(</span><span class="va">out_pf</span>,</span></span>
-<span class="r-in"><span>                             cl <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>                             calc_distance <span class="op">=</span> <span class="st">"lcp"</span>,</span></span>
-<span class="r-in"><span>                             verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        cl <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>        calc_distance <span class="op">=</span> <span class="st">"lcp"</span>,</span></span>
+<span class="r-in"><span>        verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>      <span class="op">)</span>,</span></span>
 <span class="r-in"><span>      fork <span class="op">=</span> <span class="fu"><a href="pf_simplify.html">pf_simplify</a></span><span class="op">(</span><span class="va">out_pf</span>,</span></span>
-<span class="r-in"><span>                         cl <span class="op">=</span> <span class="fl">2L</span>,</span></span>
-<span class="r-in"><span>                         calc_distance <span class="op">=</span> <span class="st">"lcp"</span>,</span></span>
-<span class="r-in"><span>                         verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      socket <span class="op">=</span> <span class="fu"><a href="pf_simplify.html">pf_simplify</a></span><span class="op">(</span><span class="va">out_pf</span>, calc_distance <span class="op">=</span> <span class="st">"lcp"</span>,</span></span>
-<span class="r-in"><span>                           cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                           verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        cl <span class="op">=</span> <span class="fl">2L</span>,</span></span>
+<span class="r-in"><span>        calc_distance <span class="op">=</span> <span class="st">"lcp"</span>,</span></span>
+<span class="r-in"><span>        verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>      <span class="op">)</span>,</span></span>
+<span class="r-in"><span>      socket <span class="op">=</span> <span class="fu"><a href="pf_simplify.html">pf_simplify</a></span><span class="op">(</span><span class="va">out_pf</span>,</span></span>
+<span class="r-in"><span>        calc_distance <span class="op">=</span> <span class="st">"lcp"</span>,</span></span>
+<span class="r-in"><span>        cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>      <span class="op">)</span>,</span></span>
 <span class="r-in"><span>      replications <span class="op">=</span> <span class="fl">1L</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu">pbapply</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pbapply/man/pboptions.html" class="external-link">pboptions</a></span><span class="op">(</span><span class="va">pb_op</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">}</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf() called (@ 2023-02-19 14:57:11)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf() called (@ 2023-08-29 15:40:33)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Determining the set of possible starting locations (t = 1)... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
@@ -203,7 +205,7 @@ In the future, parallelisation routines in flapper may be improved to reduce mem
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Time = 18... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... ... Selecting candidate starting positions for the current time step... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf() call completed (@ 2023-02-19 14:57:16) after ~0.07 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf() call completed (@ 2023-08-29 15:40:36) after ~0.04 minutes. </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -214,7 +216,7 @@ In the future, parallelisation routines in flapper may be improved to reduce mem
 <span class="r-in"><span><span class="co">#### Note a difference in error handling between socket clusters and forking:</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="co"># Implement pf() with a small number of particles</span></span></span>
-<span class="r-in"><span><span class="va">pf_args</span>   <span class="op">&lt;-</span> <span class="va">dat_dcpf_histories</span><span class="op">$</span><span class="va">args</span></span></span>
+<span class="r-in"><span><span class="va">pf_args</span> <span class="op">&lt;-</span> <span class="va">dat_dcpf_histories</span><span class="op">$</span><span class="va">args</span></span></span>
 <span class="r-in"><span><span class="va">pf_args</span><span class="op">$</span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">10L</span></span></span>
 <span class="r-in"><span><span class="va">pf_args</span><span class="op">$</span><span class="va">calc_distance_euclid_fast</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="va">out_pf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">pf</span>, <span class="va">pf_args</span><span class="op">)</span></span></span>
@@ -223,19 +225,21 @@ In the future, parallelisation routines in flapper may be improved to reduce mem
 <span class="r-in"><span><span class="co"># ... (which is because we have implemented pf() using Euclidean sampling</span></span></span>
 <span class="r-in"><span><span class="co"># ... with only 10 particles).</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="pf_simplify.html">pf_simplify</a></span><span class="op">(</span><span class="va">out_pf</span>,</span></span>
-<span class="r-in"><span>            calc_distance <span class="op">=</span> <span class="st">"lcp"</span>,</span></span>
-<span class="r-in"><span>            cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  calc_distance <span class="op">=</span> <span class="st">"lcp"</span>,</span></span>
+<span class="r-in"><span>  cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># With forking, we get an apparently less helpful error message:</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="pf_simplify.html">pf_simplify</a></span><span class="op">(</span><span class="va">out_pf</span>,</span></span>
-<span class="r-in"><span>            calc_distance <span class="op">=</span> <span class="st">"lcp"</span>,</span></span>
-<span class="r-in"><span>            cl <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  calc_distance <span class="op">=</span> <span class="st">"lcp"</span>,</span></span>
+<span class="r-in"><span>  cl <span class="op">=</span> <span class="fl">2L</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># This results from a difference in error handling</span></span></span>
 <span class="r-in"><span><span class="co"># ... between parLapply() and mclapply(), as shown here:</span></span></span>
-<span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">pbapply</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pbapply/man/pbapply.html" class="external-link">pblapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="kw">if</span><span class="op">(</span><span class="va">i</span><span class="op">==</span> <span class="fl">5L</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"error"</span><span class="op">)</span> <span class="kw">else</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">pbapply</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pbapply/man/pbapply.html" class="external-link">pblapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="fl">5L</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"error"</span><span class="op">)</span> <span class="kw">else</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">pbapply</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pbapply/man/pbapply.html" class="external-link">pblapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, cl <span class="op">=</span> <span class="fl">2L</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="kw">if</span><span class="op">(</span><span class="va">i</span><span class="op">==</span> <span class="fl">5L</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"error"</span><span class="op">)</span> <span class="kw">else</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">pbapply</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pbapply/man/pbapply.html" class="external-link">pblapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, cl <span class="op">=</span> <span class="fl">2L</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="fl">5L</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"error"</span><span class="op">)</span> <span class="kw">else</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># In the example above, connected cells are being identified at each time step</span></span></span>
 <span class="r-in"><span><span class="co"># ... based on previous cells. The function hits a point at which there are no</span></span></span>

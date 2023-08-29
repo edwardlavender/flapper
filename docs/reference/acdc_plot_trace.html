@@ -170,34 +170,39 @@ For each time step, the function plots the probability surface, the receiver(s) 
 <span class="r-in"><span><span class="va">id</span> <span class="op">&lt;-</span> <span class="fl">25</span></span></span>
 <span class="r-in"><span><span class="va">acc</span> <span class="op">&lt;-</span> <span class="va">dat_acoustics</span><span class="op">[</span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">individual_id</span> <span class="op">==</span> <span class="va">id</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span> <span class="op">&lt;-</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/round_date.html" class="external-link">round_date</a></span><span class="op">(</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span>, <span class="st">"2 mins"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">acc</span><span class="op">$</span><span class="va">key</span>       <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span>, <span class="st">"-"</span>, <span class="va">acc</span><span class="op">$</span><span class="va">receiver_id</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">acc</span>           <span class="op">&lt;-</span> <span class="va">acc</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">duplicated</a></span><span class="op">(</span><span class="va">acc</span><span class="op">$</span><span class="va">key</span><span class="op">)</span>, <span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">acc</span><span class="op">$</span><span class="va">key</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">acc</span><span class="op">$</span><span class="va">timestamp</span>, <span class="st">"-"</span>, <span class="va">acc</span><span class="op">$</span><span class="va">receiver_id</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">acc</span> <span class="op">&lt;-</span> <span class="va">acc</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">duplicated</a></span><span class="op">(</span><span class="va">acc</span><span class="op">$</span><span class="va">key</span><span class="op">)</span>, <span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Define receiver locations ('moorings' SPDF) and activity status matrix</span></span></span>
 <span class="r-in"><span><span class="co"># Receiver locations</span></span></span>
 <span class="r-in"><span><span class="va">proj_wgs84</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:4326"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">proj_utm</span>   <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_long"</span>, <span class="st">"receiver_lat"</span><span class="op">)</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                        <span class="va">proj_wgs84</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">proj_utm</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_long"</span>, <span class="st">"receiver_lat"</span><span class="op">)</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  <span class="va">proj_wgs84</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/spTransform.html" class="external-link">spTransform</a></span><span class="op">(</span><span class="va">xy</span>, <span class="va">proj_utm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">moorings</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPointsDataFrame</a></span><span class="op">(</span><span class="va">xy</span>, data <span class="op">=</span> <span class="va">dat_moorings</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Daily activity status matrix</span></span></span>
 <span class="r-in"><span><span class="va">as_POSIXct</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"00:00:00"</span><span class="op">)</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">moorings_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_matrix_receivers.html">make_matrix_receivers</a></span><span class="op">(</span><span class="va">dat_moorings</span>,</span></span>
-<span class="r-in"><span>                                      delta_t <span class="op">=</span> <span class="st">"days"</span>,</span></span>
-<span class="r-in"><span>                                      as_POSIXct <span class="op">=</span> <span class="va">as_POSIXct</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  delta_t <span class="op">=</span> <span class="st">"days"</span>,</span></span>
+<span class="r-in"><span>  as_POSIXct <span class="op">=</span> <span class="va">as_POSIXct</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Prepare grid</span></span></span>
 <span class="r-in"><span><span class="co"># We will use a regular, relatively high resolution grid,</span></span></span>
 <span class="r-in"><span><span class="co"># focused on a small area around the receivers at which the ID was detected</span></span></span>
 <span class="r-in"><span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></span><span class="op">(</span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">dat_gebco</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                       res <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">25</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                       crs <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="va">dat_gebco</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  res <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">25</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  crs <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="va">dat_gebco</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/resample.html" class="external-link">resample</a></span><span class="op">(</span><span class="va">dat_gebco</span>, <span class="va">grid</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ext</span> <span class="op">&lt;-</span></span></span>
 <span class="r-in"><span>  <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="fu">rgeos</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rgeos/man/rgeos-deprecated.html" class="external-link">gBuffer</a></span><span class="op">(</span><span class="va">moorings</span><span class="op">[</span><span class="va">moorings</span><span class="op">$</span><span class="va">receiver_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">acc</span><span class="op">$</span><span class="va">receiver_id</span>, <span class="op">]</span>,</span></span>
-<span class="r-in"><span>                   width <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      width <span class="op">=</span> <span class="fl">10000</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-in"><span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/crop.html" class="external-link">crop</a></span><span class="op">(</span><span class="va">grid</span>, <span class="va">ext</span><span class="op">)</span></span></span>
@@ -208,14 +213,16 @@ For each time step, the function plots the probability surface, the receiver(s) 
 <span class="r-in"><span><span class="co">## Define detection containers/probability kernels</span></span></span>
 <span class="r-in"><span><span class="co"># Define detection containers</span></span></span>
 <span class="r-in"><span><span class="va">moorings</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/crop.html" class="external-link">crop</a></span><span class="op">(</span><span class="va">moorings</span>, <span class="va">grid</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">dat_container</span> <span class="op">&lt;-</span> <span class="fu"><a href="acs_setup_containers.html">acs_setup_containers</a></span><span class="op">(</span>xy <span class="op">=</span> <span class="va">moorings</span>,</span></span>
-<span class="r-in"><span>                                    detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
-<span class="r-in"><span>                                    coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
-<span class="r-in"><span>                                    boundaries <span class="op">=</span> <span class="va">ext</span>,</span></span>
-<span class="r-in"><span>                                    plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                                    resolution <span class="op">=</span> <span class="fl">10</span>,</span></span>
-<span class="r-in"><span>                                    verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_containers() called (@ 2023-02-19 14:51:32)... </span>
+<span class="r-in"><span><span class="va">dat_container</span> <span class="op">&lt;-</span> <span class="fu"><a href="acs_setup_containers.html">acs_setup_containers</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  xy <span class="op">=</span> <span class="va">moorings</span>,</span></span>
+<span class="r-in"><span>  detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
+<span class="r-in"><span>  coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
+<span class="r-in"><span>  boundaries <span class="op">=</span> <span class="va">ext</span>,</span></span>
+<span class="r-in"><span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  resolution <span class="op">=</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_containers() called (@ 2023-08-29 15:34:32)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'rownames(xy@data) overwritten with xy$receiver_id.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting background map of area... </span>
@@ -247,25 +254,29 @@ For each time step, the function plots the probability surface, the receiver(s) 
 <span class="r-plt img"><img src="acdc_plot_trace-2.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting containers on map... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Processing containers... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_containers() call completed (@ 2023-02-19 14:51:33) after ~0.01 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_containers() call completed (@ 2023-08-29 15:34:33) after ~0.01 minutes. </span>
 <span class="r-in"><span><span class="co"># Define detection container overlaps</span></span></span>
-<span class="r-in"><span><span class="va">containers_spdf</span>      <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="fu">raster</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/raster/man/bind.html" class="external-link">bind</a></span>, <span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/compact.html" class="external-link">compact</a></span><span class="op">(</span><span class="va">dat_containers</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">containers_spdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="fu">raster</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/raster/man/bind.html" class="external-link">bind</a></span>, <span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/compact.html" class="external-link">compact</a></span><span class="op">(</span><span class="va">dat_containers</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">containers_spdf</span><span class="op">@</span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">dat_moorings</span></span></span>
 <span class="r-in"><span><span class="va">dat_containers_overlaps</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="get_detection_containers_overlap.html">get_detection_containers_overlap</a></span><span class="op">(</span>containers <span class="op">=</span> <span class="va">containers_spdf</span>,</span></span>
-<span class="r-in"><span>                                  services <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="get_detection_containers_overlap.html">get_detection_containers_overlap</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    containers <span class="op">=</span> <span class="va">containers_spdf</span>,</span></span>
+<span class="r-in"><span>    services <span class="op">=</span> <span class="cn">NULL</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Define detection probability kernels</span></span></span>
 <span class="r-in"><span><span class="va">calc_dpr</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&lt;=</span> <span class="fl">425</span>, <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="fl">2.5</span> <span class="op">+</span> <span class="op">-</span><span class="fl">0.02</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">}</span></span></span>
-<span class="r-in"><span><span class="va">dat_kernels</span> <span class="op">&lt;-</span> <span class="fu"><a href="acs_setup_detection_kernels.html">acs_setup_detection_kernels</a></span><span class="op">(</span>xy <span class="op">=</span> <span class="va">moorings</span>,</span></span>
-<span class="r-in"><span>                                           services <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>                                           containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>                                           overlaps <span class="op">=</span> <span class="va">dat_containers_overlaps</span>,</span></span>
-<span class="r-in"><span>                                           calc_detection_pr <span class="op">=</span> <span class="va">calc_dpr</span>,</span></span>
-<span class="r-in"><span>                                           bathy <span class="op">=</span> <span class="va">grid</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_kernels() called (@ 2023-02-19 14:51:34)... </span>
+<span class="r-in"><span><span class="va">dat_kernels</span> <span class="op">&lt;-</span> <span class="fu"><a href="acs_setup_detection_kernels.html">acs_setup_detection_kernels</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  xy <span class="op">=</span> <span class="va">moorings</span>,</span></span>
+<span class="r-in"><span>  services <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>  containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  overlaps <span class="op">=</span> <span class="va">dat_containers_overlaps</span>,</span></span>
+<span class="r-in"><span>  calc_detection_pr <span class="op">=</span> <span class="va">calc_dpr</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">grid</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_kernels() called (@ 2023-08-29 15:34:33)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting receiver-specific kernels (for detection)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -459,25 +470,26 @@ For each time step, the function plots the probability surface, the receiver(s) 
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... ... ... Extract detection probability kernels for active receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... ... ... Combining detection kernels to calculate the background detection probability surfaces (this is a slow step)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Process detection probability kernels ... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_kernels() call completed (@ 2023-02-19 14:51:45) after ~0.19 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_kernels() call completed (@ 2023-08-29 15:34:41) after ~0.14 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Implement AC algorithm</span></span></span>
-<span class="r-in"><span><span class="va">out_ac</span> <span class="op">&lt;-</span> <span class="fu"><a href="ac.html">ac</a></span><span class="op">(</span>acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
-<span class="r-in"><span>             step <span class="op">=</span> <span class="fl">120</span>,</span></span>
-<span class="r-in"><span>             bathy <span class="op">=</span> <span class="va">grid</span>,</span></span>
-<span class="r-in"><span>             detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>             detection_kernels <span class="op">=</span> <span class="va">dat_kernels</span>,</span></span>
-<span class="r-in"><span>             detection_kernels_overlap <span class="op">=</span> <span class="va">dat_containers_overlaps</span>,</span></span>
-<span class="r-in"><span>             mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
-<span class="r-in"><span>             save_record_spatial <span class="op">=</span> <span class="cn">NULL</span></span></span>
-<span class="r-in"><span>             <span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> flapper::ac() called (@ 2023-02-19 14:51:45)...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs_pl() called (@ 2023-02-19 14:51:45)... </span>
+<span class="r-in"><span><span class="va">out_ac</span> <span class="op">&lt;-</span> <span class="fu"><a href="ac.html">ac</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
+<span class="r-in"><span>  step <span class="op">=</span> <span class="fl">120</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">grid</span>,</span></span>
+<span class="r-in"><span>  detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  detection_kernels <span class="op">=</span> <span class="va">dat_kernels</span>,</span></span>
+<span class="r-in"><span>  detection_kernels_overlap <span class="op">=</span> <span class="va">dat_containers_overlaps</span>,</span></span>
+<span class="r-in"><span>  mobility <span class="op">=</span> <span class="fl">200</span>,</span></span>
+<span class="r-in"><span>  save_record_spatial <span class="op">=</span> <span class="cn">NULL</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> flapper::ac() called (@ 2023-08-29 15:34:41)...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs_pl() called (@ 2023-08-29 15:34:41)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Processing movement time series... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting movement time series (for each chunk)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Calling .acs() to implement ACDC algorithm on one chunk... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-02-19 14:51:45)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-08-29 15:34:41)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%... Initiating algorithm: moving over acoustic and internal ('archival') time steps... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... On acoustic time step ('timestep_detection') 1. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... On internal time step ('timestep_archival') 1. </span>
@@ -572,9 +584,9 @@ For each time step, the function plots the probability surface, the receiver(s) 
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================| 100%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Movement over acoustic and internal ('archival') time steps has been completed. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-02-19 14:51:49) after ~0.07 minutes. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs_pl() call completed (@ 2023-02-19 14:51:49) after ~0.07 minutes. </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> flapper::ac() finished (@ 2023-02-19 14:51:49)...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-08-29 15:34:44) after ~0.05 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs_pl() call completed (@ 2023-08-29 15:34:44) after ~0.05 minutes. </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> flapper::ac() finished (@ 2023-08-29 15:34:44)...</span>
 <span class="r-plt img"><img src="acdc_plot_trace-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Simplify outputs</span></span></span>
@@ -582,33 +594,35 @@ For each time step, the function plots the probability surface, the receiver(s) 
 <span class="r-msg co"><span class="r-pr">#&gt;</span> acdc_simplify() implemented for type = 'acs'.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (1): Implement the function with default arguments</span></span></span>
-<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu">acdc_plot_trace</span><span class="op">(</span><span class="va">record</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="va">moorings</span>, <span class="va">moorings_mat</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2): Customise plot via add_* arguments and ...</span></span></span>
-<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu">acdc_plot_trace</span><span class="op">(</span><span class="va">record</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="va">moorings</span>, <span class="va">moorings_mat</span>,</span></span>
-<span class="r-in"><span>                  add_raster <span class="op">=</span></span></span>
-<span class="r-in"><span>                    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>plot_method <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span>, legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                  add_coastline <span class="op">=</span></span></span>
-<span class="r-in"><span>                    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dat_coast</span>, col <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha</a></span><span class="op">(</span><span class="st">"dimgrey"</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                  xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">699000</span>, <span class="fl">711000</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6250000</span>, <span class="fl">6269500</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    add_raster <span class="op">=</span></span></span>
+<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>plot_method <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span>, legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    add_coastline <span class="op">=</span></span></span>
+<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dat_coast</span>, col <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha</a></span><span class="op">(</span><span class="st">"dimgrey"</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">699000</span>, <span class="fl">711000</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6250000</span>, <span class="fl">6269500</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3): Save plots to file via the png_param argument</span></span></span>
 <span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/acdc_trace/"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.exists</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.exists</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">acdc_plot_trace</span><span class="op">(</span><span class="va">record</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="va">moorings</span>, <span class="va">moorings_mat</span>,</span></span>
-<span class="r-in"><span>                add_raster <span class="op">=</span></span></span>
-<span class="r-in"><span>                  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>plot_method <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span>, legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                add_coastline <span class="op">=</span></span></span>
-<span class="r-in"><span>                  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dat_coast</span>, col <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha</a></span><span class="op">(</span><span class="st">"dimgrey"</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">699000</span>, <span class="fl">711000</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6250000</span>, <span class="fl">6269500</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                png_param <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>filename <span class="op">=</span> <span class="va">con</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                prompt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  add_raster <span class="op">=</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>plot_method <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span>, legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  add_coastline <span class="op">=</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dat_coast</span>, col <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha</a></span><span class="op">(</span><span class="st">"dimgrey"</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">699000</span>, <span class="fl">711000</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6250000</span>, <span class="fl">6269500</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  png_param <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>filename <span class="op">=</span> <span class="va">con</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  prompt <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "1.png"  "10.png" "11.png" "12.png" "13.png" "14.png" "15.png" "16.png"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "17.png" "18.png" "19.png" "2.png"  "20.png" "21.png" "22.png" "23.png"</span>

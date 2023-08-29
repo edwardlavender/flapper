@@ -130,7 +130,7 @@
 <span class="r-in"><span><span class="co">## (1) Define the period over which to calculate COAs</span></span></span>
 <span class="r-in"><span><span class="co"># ... by focusing on the time over which IDs were at liberty.</span></span></span>
 <span class="r-in"><span><span class="va">dat_ids</span><span class="op">$</span><span class="va">tag_start_date</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="va">dat_ids</span><span class="op">$</span><span class="va">tag_start_date</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">dat_ids</span><span class="op">$</span><span class="va">tag_end_date</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2017-06-02"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat_ids</span><span class="op">$</span><span class="va">tag_end_date</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2017-06-02"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## (2) Define the receivers over which to calculate detections</span></span></span>
 <span class="r-in"><span><span class="co"># ... Here we use factors to ensure that the order of receiver coordinates</span></span></span>
@@ -138,7 +138,8 @@
 <span class="r-in"><span><span class="co"># ... matches.</span></span></span>
 <span class="r-in"><span><span class="va">dat_moorings</span><span class="op">$</span><span class="va">receiver_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dat_moorings</span><span class="op">$</span><span class="va">receiver_id</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">receiver_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dat_acoustics</span><span class="op">$</span><span class="va">receiver_id</span>,</span></span>
-<span class="r-in"><span>                                    levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">dat_moorings</span><span class="op">$</span><span class="va">receiver_id</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">dat_moorings</span><span class="op">$</span><span class="va">receiver_id</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## (3) Define the detection matrix</span></span></span>
 <span class="r-in"><span><span class="co"># ... Here we simply create a detection matrix across all IDs and using</span></span></span>
@@ -146,20 +147,23 @@
 <span class="r-in"><span><span class="co"># ... to consider the time series for which to calculate</span></span></span>
 <span class="r-in"><span><span class="co"># ... COAs and the appropriate delta t value(s) more carefully.</span></span></span>
 <span class="r-in"><span><span class="va">detection_matrix_by_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_matrix_detections.html">make_matrix_detections</a></span><span class="op">(</span><span class="va">dat_acoustics</span>,</span></span>
-<span class="r-in"><span>                                                 delta_t <span class="op">=</span> <span class="st">"days"</span>,</span></span>
-<span class="r-in"><span>                                                 start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">dat_ids</span><span class="op">$</span><span class="va">tag_start_date</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                                 end <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">dat_ids</span><span class="op">$</span><span class="va">tag_end_date</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::make_matrix_detections() called (@ 2023-02-19 14:53:02)... </span>
+<span class="r-in"><span>  delta_t <span class="op">=</span> <span class="st">"days"</span>,</span></span>
+<span class="r-in"><span>  start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">dat_ids</span><span class="op">$</span><span class="va">tag_start_date</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  end <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">dat_ids</span><span class="op">$</span><span class="va">tag_end_date</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::make_matrix_detections() called (@ 2023-08-29 15:37:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining time bins given 'delta_t'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Making detection matrix... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::make_matrix_detections() call completed (@ 2023-02-19 14:53:02) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::make_matrix_detections() call completed (@ 2023-08-29 15:37:13) after ~0 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## (4) Define receiver coordinates with UTM projection</span></span></span>
 <span class="r-in"><span><span class="va">proj_wgs84</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:4326"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">proj_utm</span>   <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_long"</span>, <span class="st">"receiver_lat"</span><span class="op">)</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                        <span class="va">proj_wgs84</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">proj_utm</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_long"</span>, <span class="st">"receiver_lat"</span><span class="op">)</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  <span class="va">proj_wgs84</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/spTransform.html" class="external-link">spTransform</a></span><span class="op">(</span><span class="va">xy</span>, <span class="va">proj_utm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">xy</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -183,10 +187,12 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3): Implement the algorithm on a cluster</span></span></span>
 <span class="r-in"><span><span class="co"># This will only be faster for very large detection time series.</span></span></span>
-<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="va">flapper_run_parallel</span><span class="op">)</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">coa_mat</span> <span class="op">&lt;-</span> <span class="fu">coa</span><span class="op">(</span>mat <span class="op">=</span> <span class="va">detection_matrix_by_id</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                 xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
-<span class="r-in"><span>                 cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">flapper_run_parallel</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">coa_mat</span> <span class="op">&lt;-</span> <span class="fu">coa</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    mat <span class="op">=</span> <span class="va">detection_matrix_by_id</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>    xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
+<span class="r-in"><span>    cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

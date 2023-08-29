@@ -1,8 +1,8 @@
-pandoc: 2.19.2
+pandoc: 3.1.1
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   flapper_algorithms_faqs: flapper_algorithms_faqs.html
   flapper_overview: flapper_overview.html
-last_built: 2023-02-19T13:45Z
+last_built: 2023-08-29T13:20Z
 

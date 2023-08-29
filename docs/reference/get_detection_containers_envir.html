@@ -127,19 +127,23 @@
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#### Define receiver locations as a SpatialPoints object with a UTM CRS</span></span></span>
 <span class="r-in"><span><span class="va">proj_wgs84</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:4326"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">proj_utm</span>   <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_long"</span>, <span class="st">"receiver_lat"</span><span class="op">)</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                        <span class="va">proj_wgs84</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">proj_utm</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">dat_moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_long"</span>, <span class="st">"receiver_lat"</span><span class="op">)</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  <span class="va">proj_wgs84</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/spTransform.html" class="external-link">spTransform</a></span><span class="op">(</span><span class="va">xy</span>, <span class="va">proj_utm</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">xy</span><span class="op">@</span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">xy</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (1): Extract all depth values within each receiver's container</span></span></span>
 <span class="r-in"><span><span class="va">depths_by_container</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span>  <span class="fu">get_detection_containers_envir</span><span class="op">(</span>xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
-<span class="r-in"><span>                                detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
-<span class="r-in"><span>                                coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
-<span class="r-in"><span>                                envir <span class="op">=</span> <span class="va">dat_gebco</span></span></span>
-<span class="r-in"><span>                                <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::get_detection_containers_envir() called (@ 2023-02-19 14:59:21)... </span>
+<span class="r-in"><span>  <span class="fu">get_detection_containers_envir</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
+<span class="r-in"><span>    detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
+<span class="r-in"><span>    coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
+<span class="r-in"><span>    envir <span class="op">=</span> <span class="va">dat_gebco</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::get_detection_containers_envir() called (@ 2023-08-29 15:42:06)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing function checks... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining detection container(s)... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
@@ -350,14 +354,16 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:4] 116.5 104.9 85.5 54.9</span>
 <span class="r-in"><span><span class="co"># Collapse the list and compare conditions across receivers</span></span></span>
 <span class="r-in"><span><span class="va">depths_by_container</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">depths_by_container</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">depths_by_container</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="va">d</span> <span class="op">&lt;-</span> <span class="va">depths_by_container</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span></span>
 <span class="r-in"><span>    <span class="va">d</span><span class="op">$</span><span class="va">receiver_id</span> <span class="op">&lt;-</span> <span class="va">dat_moorings</span><span class="op">$</span><span class="va">receiver_id</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span></span>
 <span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">depths_by_container</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">depths_by_container</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">prettyGraphics</span><span class="fu">::</span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_boxplot.html" class="external-link">pretty_boxplot</a></span><span class="op">(</span><span class="va">depths_by_container</span><span class="op">$</span><span class="va">receiver_id</span>,</span></span>
-<span class="r-in"><span>                               <span class="va">depths_by_container</span><span class="op">$</span><span class="va">envir</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">prettyGraphics</span><span class="fu">::</span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_boxplot.html" class="external-link">pretty_boxplot</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">depths_by_container</span><span class="op">$</span><span class="va">receiver_id</span>,</span></span>
+<span class="r-in"><span>  <span class="va">depths_by_container</span><span class="op">$</span><span class="va">envir</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'x' co-erced to a factor.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 3 observation pair(s) in x are NA; these are removed.</span>
 <span class="r-plt img"><img src="get_detection_containers_envir-1.png" alt="" width="700" height="433"></span>
@@ -365,13 +371,14 @@
 <span class="r-in"><span><span class="co">#### Example (2): Extract a random sample of values</span></span></span>
 <span class="r-in"><span><span class="co"># (We'll keep the values small for speed)</span></span></span>
 <span class="r-in"><span><span class="va">depths_by_container</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span>  <span class="fu">get_detection_containers_envir</span><span class="op">(</span>xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
-<span class="r-in"><span>                                detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
-<span class="r-in"><span>                                coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
-<span class="r-in"><span>                                envir <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
-<span class="r-in"><span>                                sample_size <span class="op">=</span> <span class="fl">2</span></span></span>
-<span class="r-in"><span>                                <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::get_detection_containers_envir() called (@ 2023-02-19 14:59:22)... </span>
+<span class="r-in"><span>  <span class="fu">get_detection_containers_envir</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
+<span class="r-in"><span>    detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
+<span class="r-in"><span>    coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
+<span class="r-in"><span>    envir <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
+<span class="r-in"><span>    sample_size <span class="op">=</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::get_detection_containers_envir() called (@ 2023-08-29 15:42:07)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing function checks... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining detection container(s)... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
@@ -459,147 +466,150 @@
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">depths_by_container</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 40</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3004 3076</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 69.9 69.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3078 3004</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 107.1 69.9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 871 870</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 152 167</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 871 869</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 152 175</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 643 644</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 72.1 138.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 645 644</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 141 138</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3002 3001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 29.8 25.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3000 3000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] NA NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 860 863</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 145 180</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 862 861</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 166 157</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 945 945</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 162 162</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 945 871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 162 152</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1069 1068</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.2 48.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1142 1142</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 102 102</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1755 1754</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 32.2 46.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1680 1755</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 43.5 32.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1360 1286</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 19.3 22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1286 1286</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 22 22</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3234 3233</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 85.5 104.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3233 3308</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 104.9 48.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1212 1287</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 28 22.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1287 1213</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 22.9 28.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1683 1682</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 32.5 25.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1682 1683</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.6 32.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3237 3235</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 42.8 61.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3235 3163</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 61.3 47.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3662 3660</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 115 106</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3661 3661</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 108 108</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 832 904</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 108.7 76.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 905 832</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 84.4 108.7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3229 3229</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 68.8 68.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3230 3229</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 79 68.8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3164 3164</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 40.4 40.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3238 3165</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 35 32.8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3154 3153</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 112 119</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3155 3156</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 94 84.7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1605 1531</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.2 43.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1605 1605</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.2 47.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 2866 2867</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 135 123</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 2867 2941</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 123 127</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3450 3375</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 93.9 75.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3449 3450</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 92.5 93.9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1749 1825</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 50.8 73.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1751 1824</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 57.8 64.9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1297 1296</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 102 105</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1298 1224</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 105 133</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 795 794</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 174 179</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 796 794</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 161 179</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1068 1068</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 48.4 48.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1069 1067</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.2 53.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3305 3232</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 89.3 116.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3231 3305</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 107.1 89.3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1018 1018</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 159 159</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1018 1020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 159 83.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3162 3161</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 71.9 104</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3161 3161</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 104 104</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1139 1138</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 22 21.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1139 1211</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 22 20.4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1067 1065</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 53.5 57.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1067 1066</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 53.5 71.6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3080 3080</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 137 137</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3154 3080</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 112 137</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3004 3002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 69.9 29.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3002 3002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 29.8 29.8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1974 1899</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 44.7 80.7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1900 1972</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 64.9 45.3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1969 1969</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 34.5 34.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1896 1896</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 32.5 32.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1139 1137</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 22 22.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1065 1137</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 57.5 22.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 2927 2929</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] NA 31.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 2928 2928</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 14 14</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1210 1286</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 19 22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1286 1285</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 22 14.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3167 3168</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 58.5 29.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3168 3168</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 29.4 29.4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3237 3165</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 42.8 32.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3238 3238</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 35 35</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3307 3234</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 54.9 85.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3234 3234</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 85.5 85.5</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3) Extract a random sample of values with weighted probabilities</span></span></span>
 <span class="r-in"><span><span class="co"># Define detection probability function based only on distance</span></span></span>
 <span class="r-in"><span><span class="va">calc_detection_pr</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span>  <span class="kw">function</span><span class="op">(</span><span class="va">dist</span><span class="op">)</span><span class="op">{</span></span></span>
-<span class="r-in"><span>    <span class="va">dpr</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_detection_pr.html">get_detection_pr</a></span><span class="op">(</span>distance <span class="op">=</span> <span class="va">dist</span>,</span></span>
-<span class="r-in"><span>                            beta_0 <span class="op">=</span> <span class="fl">2.5</span>,</span></span>
-<span class="r-in"><span>                            beta_1 <span class="op">=</span> <span class="op">-</span><span class="fl">0.01</span>,</span></span>
-<span class="r-in"><span>                            inv_link <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span>,</span></span>
-<span class="r-in"><span>                            output <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="kw">function</span><span class="op">(</span><span class="va">dist</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="va">dpr</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_detection_pr.html">get_detection_pr</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      distance <span class="op">=</span> <span class="va">dist</span>,</span></span>
+<span class="r-in"><span>      beta_0 <span class="op">=</span> <span class="fl">2.5</span>,</span></span>
+<span class="r-in"><span>      beta_1 <span class="op">=</span> <span class="op">-</span><span class="fl">0.01</span>,</span></span>
+<span class="r-in"><span>      inv_link <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span>,</span></span>
+<span class="r-in"><span>      output <span class="op">=</span> <span class="fl">2L</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">dpr</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-in"><span><span class="co"># Implement sampling with replacement according to detection probability</span></span></span>
 <span class="r-in"><span><span class="va">depths_by_container</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span>  <span class="fu">get_detection_containers_envir</span><span class="op">(</span>xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
-<span class="r-in"><span>                                detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
-<span class="r-in"><span>                                coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
-<span class="r-in"><span>                                envir <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
-<span class="r-in"><span>                                sample_size <span class="op">=</span> <span class="fl">2</span>,</span></span>
-<span class="r-in"><span>                                sample_probs <span class="op">=</span> <span class="va">calc_detection_pr</span></span></span>
-<span class="r-in"><span>                                <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::get_detection_containers_envir() called (@ 2023-02-19 14:59:23)... </span>
+<span class="r-in"><span>  <span class="fu">get_detection_containers_envir</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
+<span class="r-in"><span>    detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
+<span class="r-in"><span>    coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
+<span class="r-in"><span>    envir <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
+<span class="r-in"><span>    sample_size <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>    sample_probs <span class="op">=</span> <span class="va">calc_detection_pr</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::get_detection_containers_envir() called (@ 2023-08-29 15:42:08)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing function checks... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining detection container(s)... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
@@ -691,217 +701,218 @@
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">depths_by_container</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 40</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3077 3077</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 99.3 99.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 178 178</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.673 0.673</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3077 3078</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 99.3 107.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 178 261</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.673 0.473</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 869 870</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 175 167</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 259.21 4.13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.477 0.921</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 871 869</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 152 175</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 255 259</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.488 0.477</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 643 645</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 72.1 141.4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 307 209</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.361 0.6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3003 3001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 58 25.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 63.6 143.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.866 0.744</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3002 3000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 29.8 NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 122 398</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.782 0.186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 861 862</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 157 166</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 99.8 157.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.818 0.716</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 862 863</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 166 180</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 157 414</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.716 0.162</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 944 945</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 176 162</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 326.1 87.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.318 0.835</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 944 946</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 176 135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 326 203</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.318 0.616</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1069 1068</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.2 48.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 228 56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.554 0.874</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1069 1067</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.2 53.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 228 294</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.554 0.393</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1753 1753</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 55 55</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 173 173</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.684 0.684</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1753 1752</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 55 56.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 173 406</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.684 0.173</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1286 1285</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 22 14.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 65.3 214.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.864 0.587</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1360 1286</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 19.3 22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 420.3 65.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.154 0.864</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3235 3234</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 61.3 85.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 247 58.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.508 0.871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3234 3233</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 85.5 104.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 58.9 45.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.871 0.885</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1214 1214</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 28.8 28.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 214 214</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.588 0.588</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1212 1213</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 28 28.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 195.2 67.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.634 0.861</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1682 1682</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.6 25.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 192 192</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.642 0.642</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1682 1755</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.6 32.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 192 338</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.642 0.293</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3161 3162</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 104 71.9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 206 177</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.609 0.675</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3662 3660</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 115 106</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 235 329</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.538 0.313</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3661 3662</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 108 115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 125 235</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.778 0.538</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 830 830</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 117 117</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 215 215</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.587 0.587</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 832 831</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 109 118</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 411 204</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.167 0.614</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3229 3231</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 68.8 107.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 352.4 65.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.264 0.864</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3230 3229</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 79 68.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 95.5 352.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.824 0.264</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3163 3163</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.5 47.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 144 144</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.742 0.742</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3164 3165</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 40.4 32.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 101 241</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.817 0.522</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3156 3154</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 84.7 112.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 380 148</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.214 0.736</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3155 3154</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 94 112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 131 148</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.767 0.736</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1606 1605</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 36.1 47.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 237 228</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.532 0.555</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1605 1605</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.2 47.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 228 228</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.555 0.555</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 2867 2867</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 123 123</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 173 173</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.683 0.683</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3450 3450</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 93.9 93.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 400 400</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.183 0.183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3449 3376</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 92.5 90.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 281 339</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.423 0.291</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1824 1825</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 64.9 73.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 292 337</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.398 0.294</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1750 1825</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 61.5 73.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 194 337</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.635 0.294</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1222 1222</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 131 131</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 281 281</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.423 0.423</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1298 1223</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 105 132</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 411 204</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.166 0.614</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 795 796</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 174 161</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 82.1 337.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.843 0.294</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 795 795</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 174 174</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 82.1 82.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.843 0.843</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1069 1068</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.2 48.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 228 56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.554 0.874</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1067 1068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 53.5 48.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 294 56</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.393 0.874</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3231 3305</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 107.1 89.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 65.2 407.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.864 0.171</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3230 3231</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 79 107</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 95.5 65.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.824 0.864</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1020 1020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 83.2 83.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 218 218</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.58 0.58</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1019 1093</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 126.8 75.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 141 352</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.749 0.265</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3161 3162</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 104 71.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 206 177</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.609 0.675</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3163 3087</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.5 141.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 144 355</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.742 0.259</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1137 1138</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 22.2 21.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 353 172</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.263 0.685</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1139 1211</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 22 20.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 157 197</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.717 0.63</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1065 1067</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 57.5 53.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 196 294</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.631 0.393</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1066 1065</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 71.6 57.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 61.9 196.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.868 0.631</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3079 3154</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 102 112</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 283 148</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.419 0.736</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3154 3154</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 112 112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 148 148</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.736 0.736</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3003 3002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 58 29.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 63.6 122.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.866 0.782</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3003 3004</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 58 69.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 63.6 319.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.866 0.333</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1899 1972</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 80.7 45.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 186 359</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.654 0.251</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1973 1898</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 55.8 60</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 281 291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.423 0.399</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1896 1897</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 32.5 38.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 231 329</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.547 0.312</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1897 1896</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 38.5 32.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 329 231</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.312 0.547</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1138 1065</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 21.6 57.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 172 196</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.685 0.631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1139 1139</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 22 22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 157 157</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.717 0.717</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3001 2928</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.4 14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 143 246</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.744 0.51</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 2927 3002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] NA 29.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 275 122</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.437 0.782</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1212 1212</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 28 28</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 195 195</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.634 0.634</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1213 1286</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 28.5 22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 67.5 65.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.861 0.864</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3165 3165</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 32.8 32.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 241 241</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.522 0.522</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3168 3167</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 29.4 58.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 378 121</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.218 0.784</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3162 3163</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 71.9 47.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 177 144</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.675 0.742</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3237 3165</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 42.8 32.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 306 241</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.364 0.522</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3233 3234</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 104.9 85.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 45.5 58.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.885 0.871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3234 3232</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 85.5 116.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 58.9 231.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.871 0.547</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (4) Sampling without replacement via sample_replace = FALSE</span></span></span>
 <span class="r-in"><span><span class="va">depths_by_container</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span>  <span class="fu">get_detection_containers_envir</span><span class="op">(</span>xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
-<span class="r-in"><span>                                detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
-<span class="r-in"><span>                                coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
-<span class="r-in"><span>                                envir <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
-<span class="r-in"><span>                                sample_size <span class="op">=</span> <span class="fl">2</span>,</span></span>
-<span class="r-in"><span>                                sample_probs <span class="op">=</span> <span class="va">calc_detection_pr</span>,</span></span>
-<span class="r-in"><span>                                sample_replace <span class="op">=</span> <span class="cn">FALSE</span></span></span>
-<span class="r-in"><span>                                <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::get_detection_containers_envir() called (@ 2023-02-19 14:59:25)... </span>
+<span class="r-in"><span>  <span class="fu">get_detection_containers_envir</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
+<span class="r-in"><span>    detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
+<span class="r-in"><span>    coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
+<span class="r-in"><span>    envir <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
+<span class="r-in"><span>    sample_size <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>    sample_probs <span class="op">=</span> <span class="va">calc_detection_pr</span>,</span></span>
+<span class="r-in"><span>    sample_replace <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::get_detection_containers_envir() called (@ 2023-08-29 15:42:10)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing function checks... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining detection container(s)... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
@@ -989,219 +1000,220 @@
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">depths_by_container</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 40</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3003 3077</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 58 99.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 63.6 177.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.866 0.673</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3077 3078</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 99.3 107.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 178 261</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.673 0.473</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 870 869</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 167 175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 4.13 259.21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.921 0.477</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 869 870</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 175 167</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 259.21 4.13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.477 0.921</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 643 645</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 72.1 141.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 307 209</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.361 0.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3001 3000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.4 NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 143 398</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.744 0.186</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 862 861</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 166 157</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 157.3 99.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.716 0.818</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 945 871</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 162 152</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 87.7 254.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.835 0.488</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1067 1069</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 53.5 25.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 294 228</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.393 0.554</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1754 1755</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 46.9 32.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 163 338</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.705 0.293</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1285 1286</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 14.5 22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 214.8 65.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.587 0.864</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3233 3235</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 104.9 61.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 45.5 247</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.885 0.508</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1213 1214</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 28.5 28.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 67.5 214.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.861 0.588</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1681 1682</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.6 25.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 230 192</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.55 0.642</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3236 3163</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.9 47.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 212 144</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.594 0.742</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3661 3662</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 108 115</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 125 235</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.778 0.538</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 831 830</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 118 117</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 204 215</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.614 0.587</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3232 3230</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 116 79</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 231.2 95.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.547 0.824</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3163 3165</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.5 32.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 144 241</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.742 0.522</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3155 3153</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 94 119</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 131 398</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.767 0.185</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1605 1604</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.2 55.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 228 424</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.555 0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 2940 2866</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 130 135</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 358 248</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.254 0.506</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3376 3375</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 90.4 75.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 339 186</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.291 0.656</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1825 1750</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 73.1 61.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 337 194</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.294 0.635</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1222 1223</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 131 132</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 281 204</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.423 0.614</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 794 795</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 179 174</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 177.6 82.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.674 0.843</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1068 1069</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 48.4 25.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 56 228</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.874 0.554</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3232 3230</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 116 79</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 231.2 95.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.547 0.824</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1020 1019</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 83.2 126.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 218 141</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.58 0.749</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3161 3163</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 104 47.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 206 144</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.609 0.742</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1211 1139</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 20.4 22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 197 157</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.63 0.717</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1066 1065</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 71.6 57.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 61.9 196.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.868 0.631</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3079 3154</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 102 112</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 283 148</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.419 0.736</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 644 645</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 138 141</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 54.8 209.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.876 0.6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3003 3002</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 58 29.8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 63.6 122.4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.866 0.782</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1899 1973</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 80.7 55.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 186 281</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.654 0.423</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 860 863</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 145 180</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 357 414</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.256 0.162</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1896 1969</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 32.5 34.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 231 363</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.547 0.244</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 946 871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 135 152</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 203 255</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.616 0.488</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1138 1065</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 21.6 57.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 172 196</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.685 0.631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1069 1068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.2 48.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 228 56</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.554 0.874</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3001 3002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.4 29.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 143 122</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.744 0.782</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1754 1753</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 46.9 55</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 163 173</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.705 0.684</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1285 1211</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 14.5 20.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 215 197</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.587 0.63</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1285 1286</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 14.5 22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 214.8 65.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.587 0.864</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3234 3235</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 85.5 61.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 58.9 247</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.871 0.508</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1287 1214</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 22.9 28.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 307 214</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.36 0.588</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1682 1755</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.6 32.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 192 338</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.642 0.293</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3236 3237</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.9 42.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 212 306</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.594 0.364</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3661 3588</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 108 113</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 125 406</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.778 0.174</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 831 904</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 118.1 76.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 204 328</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.614 0.314</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3231 3230</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 107 79</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 65.2 95.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.864 0.824</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3163 3164</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.5 40.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 144 101</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.742 0.817</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3155 3154</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 94 112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 131 148</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.767 0.736</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1605 1606</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.2 36.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 228 237</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.555 0.532</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 2867 2866</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 123 135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 173 248</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.683 0.506</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3374 3450</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 72.1 93.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 293 400</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.394 0.183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1750 1824</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 61.5 64.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 194 292</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.635 0.398</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1223 1297</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 132 102</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 204 273</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.614 0.443</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 794 795</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 179 174</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 177.6 82.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.674 0.843</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1069 994</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.2 NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 228 262</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.554 0.471</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3232 3230</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 116 79</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 231.2 95.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.547 0.824</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1018 1020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 159 83.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 352 218</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.264 0.58</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3162 3163</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 71.9 47.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 177 144</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.675 0.742</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1212 1138</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 28 21.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 195 172</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.634 0.685</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1065 1066</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 57.5 71.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 196.4 61.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.631 0.868</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3080 3154</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 137 112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 94.5 147.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.826 0.736</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3003 3004</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 58 69.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 63.6 319.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.866 0.333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1973 1900</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 55.8 64.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 281 342</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.423 0.286</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1897 1896</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 38.5 32.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 329 231</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.312 0.547</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1138 1139</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 21.6 22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 172 157</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.685 0.717</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 2927 3001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] NA 25.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 275 143</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.437 0.744</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1211 1213</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 20.4 28.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 196.6 67.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.63 0.861</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3166 3165</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.7 32.8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 136 241</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.757 0.522</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3164 3238</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 40.4 35</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 101 370</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.817 0.231</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3165 3164</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 32.8 40.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 241 101</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.522 0.817</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3232 3234</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 116.5 85.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 231.2 58.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.547 0.871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3307 3233</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 54.9 104.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 417.6 45.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.158 0.885</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (5) Parallelise the algorithm via cl and varlist arguments</span></span></span>
 <span class="r-in"><span><span class="va">depths_by_container</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span>  <span class="fu">get_detection_containers_envir</span><span class="op">(</span>xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
-<span class="r-in"><span>                                detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
-<span class="r-in"><span>                                coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
-<span class="r-in"><span>                                envir <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
-<span class="r-in"><span>                                sample_size <span class="op">=</span> <span class="fl">2</span>,</span></span>
-<span class="r-in"><span>                                sample_probs <span class="op">=</span> <span class="va">calc_detection_pr</span>,</span></span>
-<span class="r-in"><span>                                sample_replace <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>                                cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                varlist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dat_gebco"</span>,<span class="st">"calc_detection_pr"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                                <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::get_detection_containers_envir() called (@ 2023-02-19 14:59:27)... </span>
+<span class="r-in"><span>  <span class="fu">get_detection_containers_envir</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
+<span class="r-in"><span>    detection_range <span class="op">=</span> <span class="fl">425</span>,</span></span>
+<span class="r-in"><span>    coastline <span class="op">=</span> <span class="va">dat_coast</span>,</span></span>
+<span class="r-in"><span>    envir <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
+<span class="r-in"><span>    sample_size <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>    sample_probs <span class="op">=</span> <span class="va">calc_detection_pr</span>,</span></span>
+<span class="r-in"><span>    sample_replace <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>    cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    varlist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dat_gebco"</span>, <span class="st">"calc_detection_pr"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::get_detection_containers_envir() called (@ 2023-08-29 15:42:12)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing function checks... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining detection container(s)... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
@@ -1290,205 +1302,205 @@
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">depths_by_container</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 40</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3003 3077</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 58 99.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 63.6 177.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.866 0.673</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3077 3078</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 99.3 107.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 178 261</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.673 0.473</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 870 869</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 167 175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 4.13 259.21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.921 0.477</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 869 870</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 175 167</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 259.21 4.13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.477 0.921</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 643 645</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 72.1 141.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 307 209</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.361 0.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3001 3000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.4 NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 143 398</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.744 0.186</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 862 861</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 166 157</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 157.3 99.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.716 0.818</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 945 871</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 162 152</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 87.7 254.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.835 0.488</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1067 1069</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 53.5 25.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 294 228</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.393 0.554</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1754 1755</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 46.9 32.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 163 338</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.705 0.293</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1285 1286</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 14.5 22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 214.8 65.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.587 0.864</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3233 3235</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 104.9 61.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 45.5 247</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.885 0.508</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1213 1214</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 28.5 28.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 67.5 214.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.861 0.588</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1681 1682</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.6 25.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 230 192</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.55 0.642</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3236 3163</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.9 47.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 212 144</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.594 0.742</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3661 3662</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 108 115</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 125 235</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.778 0.538</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 831 830</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 118 117</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 204 215</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.614 0.587</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3232 3230</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 116 79</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 231.2 95.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.547 0.824</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3163 3165</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.5 32.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 144 241</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.742 0.522</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3155 3153</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 94 119</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 131 398</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.767 0.185</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1605 1604</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.2 55.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 228 424</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.555 0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 2940 2866</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 130 135</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 358 248</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.254 0.506</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3376 3375</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 90.4 75.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 339 186</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.291 0.656</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1825 1750</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 73.1 61.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 337 194</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.294 0.635</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1222 1223</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 131 132</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 281 204</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.423 0.614</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 794 795</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 179 174</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 177.6 82.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.674 0.843</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1068 1069</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 48.4 25.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 56 228</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.874 0.554</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3232 3230</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 116 79</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 231.2 95.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.547 0.824</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1020 1019</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 83.2 126.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 218 141</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.58 0.749</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3161 3163</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 104 47.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 206 144</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.609 0.742</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1211 1139</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 20.4 22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 197 157</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.63 0.717</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1066 1065</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 71.6 57.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 61.9 196.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.868 0.631</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3079 3154</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 102 112</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 283 148</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.419 0.736</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 644 645</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 138 141</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 54.8 209.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.876 0.6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3003 3002</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 58 29.8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 63.6 122.4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.866 0.782</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1899 1973</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 80.7 55.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 186 281</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.654 0.423</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 860 863</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 145 180</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 357 414</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.256 0.162</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1896 1969</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 32.5 34.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 231 363</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.547 0.244</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 946 871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 135 152</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 203 255</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.616 0.488</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1138 1065</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 21.6 57.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 172 196</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.685 0.631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1069 1068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.2 48.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 228 56</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.554 0.874</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3001 3002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.4 29.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 143 122</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.744 0.782</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1754 1753</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 46.9 55</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 163 173</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.705 0.684</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1285 1211</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 14.5 20.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 215 197</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.587 0.63</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1285 1286</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 14.5 22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 214.8 65.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.587 0.864</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3234 3235</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 85.5 61.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 58.9 247</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.871 0.508</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1287 1214</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 22.9 28.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 307 214</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.36 0.588</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1682 1755</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.6 32.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 192 338</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.642 0.293</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3236 3237</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.9 42.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 212 306</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.594 0.364</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3661 3588</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 108 113</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 125 406</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.778 0.174</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 831 904</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 118.1 76.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 204 328</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.614 0.314</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3231 3230</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 107 79</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 65.2 95.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.864 0.824</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3163 3164</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.5 40.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 144 101</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.742 0.817</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3155 3154</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 94 112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 131 148</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.767 0.736</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1605 1606</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.2 36.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 228 237</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.555 0.532</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 2867 2866</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 123 135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 173 248</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.683 0.506</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3374 3450</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 72.1 93.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 293 400</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.394 0.183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1750 1824</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 61.5 64.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 194 292</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.635 0.398</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1223 1297</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 132 102</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 204 273</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.614 0.443</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 794 795</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 179 174</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 177.6 82.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.674 0.843</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1069 994</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 25.2 NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 228 262</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.554 0.471</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3232 3230</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 116 79</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 231.2 95.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.547 0.824</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1018 1020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 159 83.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 352 218</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.264 0.58</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3162 3163</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 71.9 47.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 177 144</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.675 0.742</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1212 1138</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 28 21.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 195 172</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.634 0.685</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1065 1066</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 57.5 71.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 196.4 61.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.631 0.868</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3080 3154</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 137 112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 94.5 147.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.826 0.736</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3003 3004</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 58 69.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 63.6 319.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.866 0.333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1973 1900</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 55.8 64.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 281 342</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.423 0.286</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1897 1896</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 38.5 32.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 329 231</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.312 0.547</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1138 1139</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 21.6 22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 172 157</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.685 0.717</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 2927 3001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] NA 25.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 275 143</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.437 0.744</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 1211 1213</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 20.4 28.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 196.6 67.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.63 0.861</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3166 3165</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 47.7 32.8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 136 241</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.757 0.522</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3164 3238</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 40.4 35</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 101 370</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.817 0.231</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3165 3164</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 32.8 40.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 241 101</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.522 0.817</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ :'data.frame':	2 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3232 3234</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 116.5 85.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 231.2 58.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.547 0.871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cell : num [1:2] 3307 3233</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ envir: num [1:2] 54.9 104.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ dist : num [1:2] 417.6 45.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prob : num [1:2] 0.158 0.885</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

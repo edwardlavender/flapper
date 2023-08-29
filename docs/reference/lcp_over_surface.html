@@ -218,14 +218,18 @@
 <span class="r-in"><span><span class="co">#### Simulate a hypothetical landscape</span></span></span>
 <span class="r-in"><span><span class="co"># Define a miniature, blank landscape with appropriate dimensions</span></span></span>
 <span class="r-in"><span><span class="va">proj_utm</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></span><span class="op">(</span>nrows <span class="op">=</span> <span class="fl">3</span>, ncols <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                    crs <span class="op">=</span> <span class="va">proj_utm</span>,</span></span>
-<span class="r-in"><span>                    resolution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                    ext <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">15</span>, <span class="fl">0</span>, <span class="fl">15</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  nrows <span class="op">=</span> <span class="fl">3</span>, ncols <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  crs <span class="op">=</span> <span class="va">proj_utm</span>,</span></span>
+<span class="r-in"><span>  resolution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  ext <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">15</span>, <span class="fl">0</span>, <span class="fl">15</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Define a matrix of hypothetical values for the landscape</span></span></span>
-<span class="r-in"><span><span class="va">mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                <span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">4</span>,</span></span>
-<span class="r-in"><span>                <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">6</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span>, nrow <span class="op">=</span> <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  <span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">4</span>,</span></span>
+<span class="r-in"><span>  <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">6</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span>, nrow <span class="op">=</span> <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">r</span><span class="op">[</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">mat</span></span></span>
 <span class="r-in"><span><span class="co"># Visualise simulated landscape</span></span></span>
 <span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span></span>
@@ -240,10 +244,12 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (1): Find the distance between a single origin and destination</span></span></span>
 <span class="r-in"><span><span class="co"># ... using the "cppRouting" method:</span></span></span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:44)... </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:43:57)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -252,7 +258,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining nodes, edges and costs to make graph... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Constructing graph object... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost distance(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:44) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:43:57) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co"># Extract shortest distance</span></span></span>
 <span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7.071068</span>
@@ -474,9 +480,9 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ makegraph_param        :List of 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ df      :'data.frame':	40 obs. of  3 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ from: int [1:40] 1 2 1 2 1 2 3 4 2 3 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ to  : int [1:40] 2 3 4 4 5 5 5 5 6 6 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ cost: num [1:40] 7.07 8.6 5.83 10.68 8.12 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ from: int [1:40] 2 4 5 1 3 4 5 6 2 5 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ to  : int [1:40] 1 1 1 2 2 2 2 2 3 3 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ cost: num [1:40] 7.07 5.83 8.12 7.07 8.6 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ directed: logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ coords  :'data.frame':	9 obs. of  3 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ node: int [1:9] 1 2 3 4 5 6 7 8 9</span>
@@ -485,16 +491,16 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ get_distance_pair_param:List of 5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ Graph    :List of 5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ data  :'data.frame':	80 obs. of  3 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ from: int [1:80] 0 1 0 1 0 1 2 3 1 2 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ to  : int [1:80] 1 2 3 3 4 4 4 4 5 5 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ dist: num [1:80] 7.07 8.6 5.83 10.68 8.12 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ from: int [1:80] 0 1 2 3 4 1 2 5 0 2 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ to  : int [1:80] 3 3 3 0 0 0 0 0 4 4 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ dist: num [1:80] 7.07 5.83 8.12 7.07 8.6 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ coords:'data.frame':	9 obs. of  3 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ node: chr [1:9] "1" "2" "3" "4" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ X   : num [1:9] 2.5 7.5 12.5 2.5 7.5 12.5 2.5 7.5 12.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ Y   : num [1:9] 12.5 12.5 12.5 7.5 7.5 7.5 2.5 2.5 2.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ node: chr [1:9] "2" "4" "5" "1" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ X   : num [1:9] 7.5 2.5 7.5 2.5 12.5 12.5 2.5 7.5 12.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ Y   : num [1:9] 12.5 7.5 7.5 12.5 12.5 7.5 2.5 2.5 2.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ nbnode: int 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ dict  :'data.frame':	9 obs. of  2 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ ref: chr [1:9] "1" "2" "3" "4" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ ref: chr [1:9] "2" "4" "5" "1" ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ id : int [1:9] 0 1 2 3 4 5 6 7 8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ attrib:List of 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ aux  : NULL</span>
@@ -508,21 +514,22 @@
 <span class="r-in"><span><span class="co"># 'time' records the time of each stage</span></span></span>
 <span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">time</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       event                time   serial_duration</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                     onset 2023-02-19 15:01:44 0.0517330170 secs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2         surface_processed 2023-02-19 15:01:44 0.0172920227 secs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 transition_matrix_defined 2023-02-19 15:01:44 0.0024631023 secs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4             graph_defined 2023-02-19 15:01:44 0.0005919933 secs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5          dist_lcp_defined 2023-02-19 15:01:44 0.0003068447 secs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                    finish 2023-02-19 15:01:44           NA secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                     onset 2023-08-29 15:43:57 0.0471990108 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2         surface_processed 2023-08-29 15:43:57 0.0285661221 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 transition_matrix_defined 2023-08-29 15:43:57 0.0011448860 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4             graph_defined 2023-08-29 15:43:57 0.0004138947 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5          dist_lcp_defined 2023-08-29 15:43:57 0.0002651215 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                    finish 2023-08-29 15:43:57           NA secs</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2): Find the distance between a single origin and destination</span></span></span>
 <span class="r-in"><span><span class="co"># ... using the "gdistance" method</span></span></span>
-<span class="r-in"><span><span class="va">out2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         method <span class="op">=</span> <span class="st">"gdistance"</span></span></span>
-<span class="r-in"><span>                         <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:44)... </span>
+<span class="r-in"><span><span class="va">out2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:43:57)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -531,7 +538,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Using method = 'gdistance'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost distance(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:44) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:43:58) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co"># Extract distance</span></span></span>
 <span class="r-in"><span><span class="va">out2</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7.071068</span>
@@ -541,7 +548,7 @@
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">out2</span><span class="op">$</span><span class="va">gdistance_param</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ costDistance_param:List of 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ x         :Formal class 'TransitionLayer' [package "gdistance"] with 12 slots</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ x         :Formal class 'TransitionLayer' [package "gdistance"] with 13 slots</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..@ title           : chr(0) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..@ extent          :Formal class 'Extent' [package "raster"] with 4 slots</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. .. ..@ xmin: num 0</span>
@@ -555,8 +562,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..@ ncols           : int 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..@ nrows           : int 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..@ crs             :Formal class 'CRS' [package "sp"] with 1 slot</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. .. ..@ projargs: chr "+proj=utm +zone=29 +datum=WGS84 +units=m +no_defs"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. .. ..$ comment: chr "PROJCRS[\"WGS 84 / UTM zone 29N\",\n    BASEGEOGCRS[\"WGS 84\",\n        ENSEMBLE[\"World Geodetic System 1984 "| __truncated__</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. .. ..@ projargs: chr NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..@ srs             : chr "PROJCRS[\"WGS 84 / UTM zone 29N\",\n    BASEGEOGCRS[\"WGS 84\",\n        ENSEMBLE[\"World Geodetic System 1984 "| __truncated__</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..@ history         : list()</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..@ z               : list()</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..@ transitionMatrix:Formal class 'dsCMatrix' [package "Matrix"] with 7 slots</span>
@@ -585,20 +592,24 @@
 <span class="r-in"><span><span class="co">#### Example (3): Find the distances between other origins and destinations</span></span></span>
 <span class="r-in"><span><span class="co">## Implement function to determine shortest distances:</span></span></span>
 <span class="r-in"><span><span class="co"># shortest distance between cell 1 and 6 via gdistance</span></span></span>
-<span class="r-in"><span><span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                 destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                 surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                 method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
-<span class="r-in"><span>                 verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
+<span class="r-in"><span><span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
 <span class="r-plt img"><img src="lcp_over_surface-3.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 13.95499</span>
 <span class="r-in"><span><span class="co"># shortest distance between cell 1 and 6 via cppRouting</span></span></span>
-<span class="r-in"><span><span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                 destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                 surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                 method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
-<span class="r-in"><span>                 verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
+<span class="r-in"><span><span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 13.95499</span>
 <span class="r-in"><span><span class="co">## Compare to manually computed distances</span></span></span>
@@ -616,7 +627,8 @@
 <span class="r-in"><span><span class="co">## Force the 5th cell to be NA</span></span></span>
 <span class="r-in"><span><span class="va">rtmp</span> <span class="op">&lt;-</span> <span class="va">r</span></span></span>
 <span class="r-in"><span><span class="va">rtmp</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span></span>
-<span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">rtmp</span><span class="op">)</span>; <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/text.html" class="external-link">text</a></span><span class="op">(</span><span class="va">rtmp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">rtmp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/text.html" class="external-link">text</a></span><span class="op">(</span><span class="va">rtmp</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="lcp_over_surface-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co">## Compute shortest distances via algorithm:</span></span></span>
 <span class="r-in"><span><span class="co"># Now compute shortest distances, which we can see have increased the distance</span></span></span>
@@ -624,21 +636,26 @@
 <span class="r-in"><span><span class="co"># ... reflects missing data, it may be appropriate to interpolate NAs using</span></span></span>
 <span class="r-in"><span><span class="co"># ... surrounding cells (e.g., see raster::approxNA()) so that movement</span></span></span>
 <span class="r-in"><span><span class="co"># ... is possible through these cells</span></span></span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">rtmp</span>,</span></span>
-<span class="r-in"><span>                         method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
-<span class="r-in"><span>                         verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">rtmp</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
-<span class="r-in"><span><span class="va">out2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">rtmp</span>,</span></span>
-<span class="r-in"><span>                         method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
-<span class="r-in"><span>                         verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">rtmp</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
 <span class="r-plt img"><img src="lcp_over_surface-5.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">dist_lcp</span>; <span class="va">out2</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
+<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 16.34469</span>
+<span class="r-in"><span><span class="va">out2</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 16.34469</span>
 <span class="r-in"><span><span class="co">## Compare to manual calculations of shortest route:</span></span></span>
 <span class="r-in"><span><span class="co"># Route option one: cell 1 to 2, 2 to 6</span></span></span>
@@ -651,20 +668,25 @@
 <span class="r-in"><span><span class="co"># In the same way, we can force the shortest path away from particular areas</span></span></span>
 <span class="r-in"><span><span class="co"># ... by making the height of the landscape in those areas very large or Inf:</span></span></span>
 <span class="r-in"><span><span class="va">rtmp</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1e20</span></span></span>
-<span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">rtmp</span><span class="op">)</span>; <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/text.html" class="external-link">text</a></span><span class="op">(</span><span class="va">rtmp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">rtmp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/text.html" class="external-link">text</a></span><span class="op">(</span><span class="va">rtmp</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="lcp_over_surface-6.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                 destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                 surface <span class="op">=</span> <span class="va">rtmp</span>,</span></span>
-<span class="r-in"><span>                 method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
-<span class="r-in"><span>                 verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
+<span class="r-in"><span><span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">rtmp</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 16.34469</span>
-<span class="r-in"><span><span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                 destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                 surface <span class="op">=</span> <span class="va">rtmp</span>,</span></span>
-<span class="r-in"><span>                 method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
-<span class="r-in"><span>                 verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
+<span class="r-in"><span><span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">rtmp</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
 <span class="r-plt img"><img src="lcp_over_surface-7.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 16.34469</span>
@@ -680,9 +702,11 @@
 <span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">res</a></span><span class="op">(</span><span class="va">dat_gebco_utm</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 257 463</span>
 <span class="r-in"><span><span class="co"># (b) Resample so that the resolution in the x and y directions is identical</span></span></span>
-<span class="r-in"><span><span class="va">dat_gebco_utm_planar</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">proj_utm</span>,</span></span>
-<span class="r-in"><span>                                       ext <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">dat_gebco_utm</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                       resolution <span class="op">=</span> <span class="fl">250</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat_gebco_utm_planar</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  crs <span class="op">=</span> <span class="va">proj_utm</span>,</span></span>
+<span class="r-in"><span>  ext <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">dat_gebco_utm</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  resolution <span class="op">=</span> <span class="fl">250</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dat_gebco_utm_planar</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/resample.html" class="external-link">resample</a></span><span class="op">(</span><span class="va">dat_gebco_utm</span>, <span class="va">dat_gebco_utm_planar</span>, method <span class="op">=</span> <span class="st">"bilinear"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Examine processed raster</span></span></span>
 <span class="r-in"><span><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -693,15 +717,17 @@
 <span class="r-in"><span><span class="co">## Define example origin and destination</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dat_gebco_utm_planar_xy</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">dat_gebco_utm_planar</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">index</span>       <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat_gebco_utm_planar_xy</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">origin</span>      <span class="op">&lt;-</span> <span class="va">dat_gebco_utm_planar_xy</span><span class="op">[</span><span class="va">index</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat_gebco_utm_planar_xy</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">origin</span> <span class="op">&lt;-</span> <span class="va">dat_gebco_utm_planar_xy</span><span class="op">[</span><span class="va">index</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">destination</span> <span class="op">&lt;-</span> <span class="va">dat_gebco_utm_planar_xy</span><span class="op">[</span><span class="va">index</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="co">## Implement function to compute shortest distances</span></span></span>
-<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
-<span class="r-in"><span>                               destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
-<span class="r-in"><span>                               surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
-<span class="r-in"><span>                               method <span class="op">=</span> <span class="st">"gdistance"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:45)... </span>
+<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:43:59)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -710,12 +736,14 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Using method = 'gdistance'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost distance(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:45) after ~0 minutes. </span>
-<span class="r-in"><span><span class="va">out_gebco2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
-<span class="r-in"><span>                               destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
-<span class="r-in"><span>                               surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
-<span class="r-in"><span>                              method <span class="op">=</span> <span class="st">"cppRouting"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:45)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:43:59) after ~0 minutes. </span>
+<span class="r-in"><span><span class="va">out_gebco2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"cppRouting"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:43:59)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -724,25 +752,29 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining nodes, edges and costs to make graph... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Constructing graph object... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost distance(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:45) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:43:59) after ~0.01 minutes. </span>
 <span class="r-in"><span><span class="co"># Compare Euclidean and shortest distances</span></span></span>
-<span class="r-in"><span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_euclid</span>; <span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
+<span class="r-in"><span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_euclid</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8902.247</span>
+<span class="r-in"><span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 9278.626</span>
-<span class="r-in"><span><span class="va">out_gebco2</span><span class="op">$</span><span class="va">dist_euclid</span>; <span class="va">out_gebco2</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
+<span class="r-in"><span><span class="va">out_gebco2</span><span class="op">$</span><span class="va">dist_euclid</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8902.247</span>
+<span class="r-in"><span><span class="va">out_gebco2</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 9278.626</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (5A): Reduce the complexity of the landscape by cropping</span></span></span>
 <span class="r-in"><span><span class="va">ext</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">dat_gebco_utm_planar</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ext</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">6255000</span></span></span>
 <span class="r-in"><span><span class="va">ext</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">6265000</span></span></span>
-<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
-<span class="r-in"><span>                               destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
-<span class="r-in"><span>                               surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
-<span class="r-in"><span>                               method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
-<span class="r-in"><span>                               crop <span class="op">=</span> <span class="va">ext</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:45)... </span>
+<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
+<span class="r-in"><span>  crop <span class="op">=</span> <span class="va">ext</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:43:59)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Cropping raster to inputted extent... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
@@ -752,17 +784,19 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Using method = 'gdistance'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost distance(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:45) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:00) after ~0 minutes. </span>
 <span class="r-in"><span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 9278.626</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (5B): Reduce the complexity of the landscape around a buffer</span></span></span>
-<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
-<span class="r-in"><span>                               destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
-<span class="r-in"><span>                               surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
-<span class="r-in"><span>                               method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
-<span class="r-in"><span>                               buffer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:45)... </span>
+<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
+<span class="r-in"><span>  buffer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:00)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Cropping raster to buffer zone around a Euclidean transect between the origin and destination... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
@@ -773,18 +807,20 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Using method = 'gdistance'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost distance(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:45) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:00) after ~0 minutes. </span>
 <span class="r-in"><span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 9278.626</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (5C): Reduce the complexity of the landscape via aggregation</span></span></span>
-<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
-<span class="r-in"><span>                               destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
-<span class="r-in"><span>                               surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
-<span class="r-in"><span>                               method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
-<span class="r-in"><span>                               buffer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                               aggregate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fact <span class="op">=</span> <span class="fl">5</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:45)... </span>
+<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
+<span class="r-in"><span>  buffer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  aggregate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fact <span class="op">=</span> <span class="fl">5</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:00)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Cropping raster to buffer zone around a Euclidean transect between the origin and destination... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
@@ -796,7 +832,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Using method = 'gdistance'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost distance(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:45) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:00) after ~0 minutes. </span>
 <span class="r-in"><span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10088.96</span>
 <span class="r-in"><span></span></span>
@@ -804,23 +840,24 @@
 <span class="r-in"><span><span class="co"># Define coastline</span></span></span>
 <span class="r-in"><span><span class="va">dat_coast_around_oban</span> <span class="op">&lt;-</span> <span class="fu">prettyGraphics</span><span class="fu">::</span><span class="va"><a href="https://edwardlavender.github.io/prettyGraphics/reference/dat_coast_around_oban.html" class="external-link">dat_coast_around_oban</a></span></span></span>
 <span class="r-in"><span><span class="va">coastline</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/spTransform.html" class="external-link">spTransform</a></span><span class="op">(</span><span class="va">dat_coast_around_oban</span>, <span class="va">proj_utm</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>NULL source CRS comment, falling back to PROJ string</span>
 <span class="r-in"><span><span class="co"># Visualise bathymetry and coastline</span></span></span>
 <span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dat_gebco_utm_planar</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu">lines</span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="lcp_over_surface-14.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># Define example origin and destination within the sea</span></span></span>
-<span class="r-in"><span><span class="va">origin</span>      <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">714000</span>, <span class="fl">6260000</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">origin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">714000</span>, <span class="fl">6260000</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">destination</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">721000</span>, <span class="fl">6265000</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Implement algorithm</span></span></span>
-<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
-<span class="r-in"><span>                               destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
-<span class="r-in"><span>                               surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
-<span class="r-in"><span>                               method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
-<span class="r-in"><span>                               crop <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                               mask <span class="op">=</span> <span class="va">coastline</span>,</span></span>
-<span class="r-in"><span>                               mask_inside <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:45)... </span>
+<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
+<span class="r-in"><span>  crop <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  mask <span class="op">=</span> <span class="va">coastline</span>,</span></span>
+<span class="r-in"><span>  mask_inside <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:00)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Cropping raster to inputted extent... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Masking raster... </span>
@@ -831,15 +868,17 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Using method = 'gdistance'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost distance(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:45) after ~0 minutes. </span>
-<span class="r-in"><span><span class="va">out_gebco2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
-<span class="r-in"><span>                               destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
-<span class="r-in"><span>                               surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
-<span class="r-in"><span>                               method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
-<span class="r-in"><span>                               crop <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                               mask <span class="op">=</span> <span class="va">coastline</span>,</span></span>
-<span class="r-in"><span>                               mask_inside <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:45)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:00) after ~0 minutes. </span>
+<span class="r-in"><span><span class="va">out_gebco2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
+<span class="r-in"><span>  crop <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  mask <span class="op">=</span> <span class="va">coastline</span>,</span></span>
+<span class="r-in"><span>  mask_inside <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:00)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Cropping raster to inputted extent... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Masking raster... </span>
@@ -852,26 +891,30 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining nodes, edges and costs to make graph... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Constructing graph object... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost distance(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:45) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:01) after ~0.01 minutes. </span>
 <span class="r-in"><span><span class="co"># Compare Euclidean and least-cost distances</span></span></span>
-<span class="r-in"><span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_euclid</span>; <span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
+<span class="r-in"><span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_euclid</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8602.325</span>
+<span class="r-in"><span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 9071.48</span>
-<span class="r-in"><span><span class="va">out_gebco2</span><span class="op">$</span><span class="va">dist_euclid</span>; <span class="va">out_gebco2</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
+<span class="r-in"><span><span class="va">out_gebco2</span><span class="op">$</span><span class="va">dist_euclid</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8602.325</span>
+<span class="r-in"><span><span class="va">out_gebco2</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 9071.48</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (7) Implement shortest distance algorithms in parallel:</span></span></span>
 <span class="r-in"><span><span class="co"># With the default method ("cppRouting"), use use_all_cores = TRUE</span></span></span>
-<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
-<span class="r-in"><span>                               destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
-<span class="r-in"><span>                               surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
-<span class="r-in"><span>                               method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
-<span class="r-in"><span>                               crop <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                               mask <span class="op">=</span> <span class="va">coastline</span>,</span></span>
-<span class="r-in"><span>                               mask_inside <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                               use_all_cores <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:45)... </span>
+<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
+<span class="r-in"><span>  crop <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  mask <span class="op">=</span> <span class="va">coastline</span>,</span></span>
+<span class="r-in"><span>  mask_inside <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  use_all_cores <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:01)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Cropping raster to inputted extent... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Masking raster... </span>
@@ -885,17 +928,19 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost distance(s)... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> allcores argument is deprecated since v3.0. </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Please use RcppParallel::setThreadOptions() to set the number of threads</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:46) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:01) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co"># With method = "gdistance" use cl argument</span></span></span>
-<span class="r-in"><span><span class="va">out_gebco2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
-<span class="r-in"><span>                               destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
-<span class="r-in"><span>                               surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
-<span class="r-in"><span>                               method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
-<span class="r-in"><span>                               crop <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                               mask <span class="op">=</span> <span class="va">coastline</span>,</span></span>
-<span class="r-in"><span>                               mask_inside <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                               cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:46)... </span>
+<span class="r-in"><span><span class="va">out_gebco2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
+<span class="r-in"><span>  crop <span class="op">=</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  mask <span class="op">=</span> <span class="va">coastline</span>,</span></span>
+<span class="r-in"><span>  mask_inside <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:01)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'cl' or 'varlist' arguments ignored for method = 'cppRouting': use use_all_cores = TRUE instead.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Cropping raster to inputted extent... </span>
@@ -908,9 +953,10 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining nodes, edges and costs to make graph... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Constructing graph object... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost distance(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:46) after ~0.01 minutes. </span>
-<span class="r-in"><span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_lcp</span>; <span class="va">out_gebco2</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:02) after ~0.01 minutes. </span>
+<span class="r-in"><span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 9071.48</span>
+<span class="r-in"><span><span class="va">out_gebco2</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 9071.48</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
@@ -919,11 +965,13 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (8) Shortest paths (goal = 2) only using default method</span></span></span>
 <span class="r-in"><span><span class="co"># Implement function</span></span></span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:46)... </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:02)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -931,7 +979,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining nodes, edges and costs to make graph... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Constructing graph object... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost paths(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:46) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:02) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co"># The path is stored in path_lcp, This includes:</span></span></span>
 <span class="r-in"><span><span class="co"># ... (a) a dataframe with the cells comprising each path:</span></span></span>
 <span class="r-in"><span><span class="co"># ... (b) a SpatialLines object of the path</span></span></span>
@@ -966,94 +1014,94 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> $Graph</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $Graph$data</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    from to      dist</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     0  1  7.071068</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     1  2  8.602325</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     0  3  5.830952</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     1  3 10.677078</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     0  4  8.124038</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     1  4 10.295630</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7     2  4  7.348469</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8     3  4  5.099020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9     1  5  9.273618</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10    2  5  5.099020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11    4  5  5.830952</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12    3  6  5.830952</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13    4  6  8.124038</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14    3  7  8.124038</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15    4  7  7.071068</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16    5  7  7.348469</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17    6  7  5.099020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18    4  8  8.660254</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19    5  8  5.385165</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20    7  8  5.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21    1  0  7.071068</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22    2  1  8.602325</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23    3  0  5.830952</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24    3  1 10.677078</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25    4  0  8.124038</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26    4  1 10.295630</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27    4  2  7.348469</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28    4  3  5.099020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29    5  1  9.273618</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30    5  2  5.099020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31    5  4  5.830952</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32    6  3  5.830952</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 33    6  4  8.124038</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34    7  3  8.124038</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 35    7  4  7.071068</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 36    7  5  7.348469</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37    7  6  5.099020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38    8  4  8.660254</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 39    8  5  5.385165</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 40    8  7  5.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 41    1  0  7.071068</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 42    2  1  8.602325</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 43    3  0  5.830952</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 44    3  1 10.677078</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 45    4  0  8.124038</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 46    4  1 10.295630</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 47    4  2  7.348469</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 48    4  3  5.099020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 49    5  1  9.273618</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 50    5  2  5.099020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 51    5  4  5.830952</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 52    6  3  5.830952</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 53    6  4  8.124038</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 54    7  3  8.124038</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 55    7  4  7.071068</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 56    7  5  7.348469</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 57    7  6  5.099020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 58    8  4  8.660254</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 59    8  5  5.385165</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60    8  7  5.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 61    0  1  7.071068</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 62    1  2  8.602325</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63    0  3  5.830952</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64    1  3 10.677078</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 65    0  4  8.124038</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 66    1  4 10.295630</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 67    2  4  7.348469</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 68    3  4  5.099020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 69    1  5  9.273618</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70    2  5  5.099020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71    4  5  5.830952</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 72    3  6  5.830952</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 73    4  6  8.124038</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 74    3  7  8.124038</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 75    4  7  7.071068</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 76    5  7  7.348469</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 77    6  7  5.099020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 78    4  8  8.660254</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 79    5  8  5.385165</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 80    7  8  5.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     0  3  7.071068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     1  3  5.830952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     2  3  8.124038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     3  0  7.071068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     4  0  8.602325</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     1  0 10.677078</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7     2  0 10.295630</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     5  0  9.273618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     0  4  8.602325</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10    2  4  7.348469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11    5  4  5.099020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12    3  1  5.830952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13    0  1 10.677078</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14    2  1  5.099020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15    6  1  5.830952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16    7  1  8.124038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17    3  2  8.124038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18    0  2 10.295630</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19    4  2  7.348469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20    1  2  5.099020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21    5  2  5.830952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22    6  2  8.124038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23    7  2  7.071068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24    8  2  8.660254</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25    0  5  9.273618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26    4  5  5.099020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27    2  5  5.830952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28    7  5  7.348469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29    8  5  5.385165</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30    1  6  5.830952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 31    2  6  8.124038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 32    7  6  5.099020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 33    1  7  8.124038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 34    2  7  7.071068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 35    5  7  7.348469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 36    6  7  5.099020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37    8  7  5.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38    2  8  8.660254</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 39    5  8  5.385165</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 40    7  8  5.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 41    3  0  7.071068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 42    3  1  5.830952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 43    3  2  8.124038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 44    0  3  7.071068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 45    0  4  8.602325</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 46    0  1 10.677078</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 47    0  2 10.295630</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 48    0  5  9.273618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 49    4  0  8.602325</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50    4  2  7.348469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 51    4  5  5.099020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 52    1  3  5.830952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 53    1  0 10.677078</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 54    1  2  5.099020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 55    1  6  5.830952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 56    1  7  8.124038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 57    2  3  8.124038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 58    2  0 10.295630</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 59    2  4  7.348469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 60    2  1  5.099020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 61    2  5  5.830952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 62    2  6  8.124038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 63    2  7  7.071068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 64    2  8  8.660254</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 65    5  0  9.273618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 66    5  4  5.099020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 67    5  2  5.830952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 68    5  7  7.348469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 69    5  8  5.385165</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 70    6  1  5.830952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71    6  2  8.124038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 72    6  7  5.099020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 73    7  1  8.124038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 74    7  2  7.071068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 75    7  5  7.348469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 76    7  6  5.099020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 77    7  8  5.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 78    8  2  8.660254</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 79    8  5  5.385165</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 80    8  7  5.000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $Graph$coords</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   node    X    Y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    1  2.5 12.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2    2  7.5 12.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    3 12.5 12.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4    4  2.5  7.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5    5  7.5  7.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    1  2.5 12.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    3 12.5 12.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6    6 12.5  7.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7    7  2.5  2.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8    8  7.5  2.5</span>
@@ -1064,11 +1112,11 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $Graph$dict</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ref id</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   1  0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2  1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3  2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   4  3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   5  4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   2  0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   4  1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   5  2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   1  3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   3  4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6   6  5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7   7  6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8   8  7</span>
@@ -1110,11 +1158,13 @@
 <span class="r-in"><span><span class="co"># Note the path is also added to the plot produced, if plot = TRUE.</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (9) Shortest distances and paths (goal = 3) using default method</span></span></span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:46)... </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">3</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:02)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1125,9 +1175,10 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Constructing graph object... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost distance(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost paths(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:46) after ~0 minutes. </span>
-<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">dist_lcp</span>; <span class="va">out1</span><span class="op">$</span><span class="va">path_lcp</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:02) after ~0 minutes. </span>
+<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 13.95499</span>
+<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">path_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $cells</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   path_id path origin destination cell</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       1  1-6      1           6    6</span>
@@ -1152,12 +1203,14 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (10) Shortest distances and paths (goal = 3) via gdistance</span></span></span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                         method <span class="op">=</span> <span class="st">"gdistance"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:46)... </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:02)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1167,7 +1220,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost distance(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost path(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:46) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:02) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co"># As above, paths are stored in path_lcp and distances in dist_lcp</span></span></span>
 <span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">path_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $cells</span>
@@ -1181,7 +1234,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialLines </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 2.5, 12.5, 7.5, 12.5  (xmin, xmax, ymin, ymax)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $coordinates</span>
@@ -1219,12 +1272,14 @@
 <span class="r-in"><span><span class="co"># ... is only implemented for distance calculations (so not if goal = 2),</span></span></span>
 <span class="r-in"><span><span class="co"># ... while parallelisation is implemented for both distance and shortest</span></span></span>
 <span class="r-in"><span><span class="co"># ... paths for method = "gdistance"</span></span></span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                         use_all_cores <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:46)... </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  use_all_cores <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:02)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1237,14 +1292,16 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Please use RcppParallel::setThreadOptions() to set the number of threads</span>
 <span class="r-plt img"><img src="lcp_over_surface-18.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost paths(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:46) after ~0 minutes. </span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">2</span>,</span></span>
-<span class="r-in"><span>                         method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
-<span class="r-in"><span>                         cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:46)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:02) after ~0 minutes. </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
+<span class="r-in"><span>  cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:02)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1252,14 +1309,16 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Using method = 'gdistance'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost path(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:52) after ~0.1 minutes. </span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                         method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
-<span class="r-in"><span>                         cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:08) after ~0.1 minutes. </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
+<span class="r-in"><span>  cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:08)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1268,7 +1327,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost distance(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost path(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:58) after ~0.1 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:13) after ~0.09 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">############################################################################</span></span></span>
@@ -1276,11 +1335,13 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (12): Shortest distances/paths computed in sequence:</span></span></span>
 <span class="r-in"><span><span class="co"># cppRouting method</span></span></span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:58)... </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">3</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:13)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1291,14 +1352,16 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Constructing graph object... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost distance(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost paths(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:58) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:14) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co"># gdistance method</span></span></span>
-<span class="r-in"><span><span class="va">out2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                         method <span class="op">=</span> <span class="st">"gdistance"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:58)... </span>
+<span class="r-in"><span><span class="va">out2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:14)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1308,9 +1371,10 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost distance(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost path(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:58) after ~0 minutes. </span>
-<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">dist_lcp</span>; <span class="va">out1</span><span class="op">$</span><span class="va">path_lcp</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:14) after ~0 minutes. </span>
+<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8.124038 9.273618</span>
+<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">path_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $cells</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   path_id path origin destination cell</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       1  2-6      2           6    2</span>
@@ -1342,8 +1406,9 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 12.5 7.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="va">out2</span><span class="op">$</span><span class="va">dist_lcp</span>; <span class="va">out2</span><span class="op">$</span><span class="va">path_lcp</span></span></span>
+<span class="r-in"><span><span class="va">out2</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8.124038 9.273618</span>
+<span class="r-in"><span><span class="va">out2</span><span class="op">$</span><span class="va">path_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $cells</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   path_id path origin destination cell</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       1  1-5      1           5    1</span>
@@ -1356,13 +1421,13 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialLines </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 2.5, 7.5, 7.5, 12.5  (xmin, xmax, ymin, ymax)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $SpatialLines$`2`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialLines </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 7.5, 12.5, 7.5, 12.5  (xmin, xmax, ymin, ymax)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $coordinates</span>
@@ -1380,12 +1445,14 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (13): Shortest distances/paths computed in parallel:</span></span></span>
 <span class="r-in"><span><span class="co"># cppRouting method for goal 3</span></span></span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                         use_all_cores <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:58)... </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  use_all_cores <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:14)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1398,15 +1465,17 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Please use RcppParallel::setThreadOptions() to set the number of threads</span>
 <span class="r-plt img"><img src="lcp_over_surface-22.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing bi algorithm to compute least-cost paths(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:01:58) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:14) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co"># gdistance method for goal 2</span></span></span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">2</span>,</span></span>
-<span class="r-in"><span>                         method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
-<span class="r-in"><span>                         cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:01:58)... </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
+<span class="r-in"><span>  cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:14)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1414,15 +1483,17 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Using method = 'gdistance'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost path(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:02:05) after ~0.1 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:22) after ~0.13 minutes. </span>
 <span class="r-in"><span><span class="co"># gdistance method for goal 3</span></span></span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                         method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
-<span class="r-in"><span>                         cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:02:05)... </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
+<span class="r-in"><span>  cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:22)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1431,7 +1502,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost distance(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost path(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:02:11) after ~0.11 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:34) after ~0.2 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">############################################################################</span></span></span>
@@ -1439,13 +1510,15 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (14) Compute all combinations via combination = "matrix"</span></span></span>
 <span class="r-in"><span><span class="co"># cppRouting goal 3</span></span></span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                         cppRouting_algorithm <span class="op">=</span> <span class="st">"phast"</span>,</span></span>
-<span class="r-in"><span>                         combination <span class="op">=</span> <span class="st">"matrix"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:02:11)... </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  cppRouting_algorithm <span class="op">=</span> <span class="st">"phast"</span>,</span></span>
+<span class="r-in"><span>  combination <span class="op">=</span> <span class="st">"matrix"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:34)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1456,14 +1529,16 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Constructing graph object... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing phast algorithm to compute least-cost distance(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... .... Implementing Dijkstra's algorithm recursively to compute least-cost paths(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:02:11) after ~0 minutes. </span>
-<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">dist_euclid</span>; <span class="va">out1</span><span class="op">$</span><span class="va">dist_lcp</span>; <span class="va">out1</span><span class="op">$</span><span class="va">path_lcp</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:34) after ~0 minutes. </span>
+<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">dist_euclid</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          5         6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 7.071068 11.180340</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 5.000000  7.071068</span>
+<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           5         6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1  8.124038 13.954990</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 10.295630  9.273618</span>
+<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">path_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $cells</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   path_id path origin destination cell</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       1  1-6      1           6    5</span>
@@ -1524,14 +1599,16 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># cppRouting goal 3 parallelised</span></span></span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                         combination <span class="op">=</span> <span class="st">"matrix"</span>,</span></span>
-<span class="r-in"><span>                         cppRouting_algorithm <span class="op">=</span> <span class="st">"phast"</span>,</span></span>
-<span class="r-in"><span>                         use_all_cores <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:02:11)... </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  combination <span class="op">=</span> <span class="st">"matrix"</span>,</span></span>
+<span class="r-in"><span>  cppRouting_algorithm <span class="op">=</span> <span class="st">"phast"</span>,</span></span>
+<span class="r-in"><span>  use_all_cores <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:34)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1543,16 +1620,18 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> allcores argument is deprecated since v3.0. </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Please use RcppParallel::setThreadOptions() to set the number of threads</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... .... Implementing Dijkstra's algorithm recursively to compute least-cost paths(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:02:11) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:34) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co"># gdistance goal 3</span></span></span>
-<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                         surface <span class="op">=</span> <span class="va">r</span>,</span></span>
-<span class="r-in"><span>                         goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                         method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
-<span class="r-in"><span>                         combination <span class="op">=</span> <span class="st">"matrix"</span>,</span></span>
-<span class="r-in"><span>                         cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:02:11)... </span>
+<span class="r-in"><span><span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">rxy</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">r</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
+<span class="r-in"><span>  combination <span class="op">=</span> <span class="st">"matrix"</span>,</span></span>
+<span class="r-in"><span>  cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:34)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1562,14 +1641,16 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost distance(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost path(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:02:18) after ~0.1 minutes. </span>
-<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">dist_euclid</span>; <span class="va">out1</span><span class="op">$</span><span class="va">dist_lcp</span>; <span class="va">out1</span><span class="op">$</span><span class="va">path_lcp</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:44) after ~0.16 minutes. </span>
+<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">dist_euclid</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          5         6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 7.071068 11.180340</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 5.000000  7.071068</span>
+<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           5         6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1  8.124038 13.954990</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 10.295630  9.273618</span>
+<span class="r-in"><span><span class="va">out1</span><span class="op">$</span><span class="va">path_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $cells</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   path_id path origin destination cell</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       1  1-5      1           5    1</span>
@@ -1587,25 +1668,25 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialLines </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 2.5, 7.5, 7.5, 12.5  (xmin, xmax, ymin, ymax)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $SpatialLines$`2`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialLines </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 7.5, 7.5, 7.5, 12.5  (xmin, xmax, ymin, ymax)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $SpatialLines$`3`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialLines </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 2.5, 12.5, 7.5, 12.5  (xmin, xmax, ymin, ymax)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $SpatialLines$`4`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> class       : SpatialLines </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> features    : 1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> extent      : 7.5, 12.5, 7.5, 12.5  (xmin, xmax, ymin, ymax)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : +proj=utm +zone=29 +datum=WGS84 +units=m +no_defs </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> crs         : NA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $coordinates</span>
@@ -1641,20 +1722,22 @@
 <span class="r-in"><span><span class="va">dat_gebco_utm_planar_zoom_xy</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">dat_gebco_utm_planar_zoom</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Sample random origins</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2019</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">index</span>       <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat_gebco_utm_planar_zoom_xy</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">origin</span>      <span class="op">&lt;-</span> <span class="va">dat_gebco_utm_planar_zoom_xy</span><span class="op">[</span><span class="va">index</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat_gebco_utm_planar_zoom_xy</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">origin</span> <span class="op">&lt;-</span> <span class="va">dat_gebco_utm_planar_zoom_xy</span><span class="op">[</span><span class="va">index</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="co"># Sample random destinations</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2020</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">index</span>       <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat_gebco_utm_planar_zoom_xy</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat_gebco_utm_planar_zoom_xy</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">destination</span> <span class="op">&lt;-</span> <span class="va">dat_gebco_utm_planar_zoom_xy</span><span class="op">[</span><span class="va">index</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="co"># Implement algorithm</span></span></span>
-<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
-<span class="r-in"><span>                               destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
-<span class="r-in"><span>                               surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
-<span class="r-in"><span>                               method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
-<span class="r-in"><span>                               goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                               combination <span class="op">=</span> <span class="st">"matrix"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:02:18)... </span>
+<span class="r-in"><span><span class="va">out_gebco1</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"gdistance"</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  combination <span class="op">=</span> <span class="st">"matrix"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:44)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1664,15 +1747,17 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Defining 'ease' matrix... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost distance(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Implementing Dijkstra's algorithm to compute least-cost path(s)... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:02:18) after ~0 minutes. </span>
-<span class="r-in"><span><span class="va">out_gebco2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span>origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
-<span class="r-in"><span>                               destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
-<span class="r-in"><span>                               surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
-<span class="r-in"><span>                               method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
-<span class="r-in"><span>                               goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                               combination <span class="op">=</span> <span class="st">"matrix"</span>,</span></span>
-<span class="r-in"><span>                               cppRouting_algorithm <span class="op">=</span> <span class="st">"phast"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-02-19 15:02:18)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:44) after ~0.01 minutes. </span>
+<span class="r-in"><span><span class="va">out_gebco2</span> <span class="op">&lt;-</span> <span class="fu">lcp_over_surface</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  origin <span class="op">=</span> <span class="va">origin</span>,</span></span>
+<span class="r-in"><span>  destination <span class="op">=</span> <span class="va">destination</span>,</span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">dat_gebco_utm_planar</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"cppRouting"</span>,</span></span>
+<span class="r-in"><span>  goal <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  combination <span class="op">=</span> <span class="st">"matrix"</span>,</span></span>
+<span class="r-in"><span>  cppRouting_algorithm <span class="op">=</span> <span class="st">"phast"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_over_surface() called (@ 2023-08-29 15:44:44)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining cost matrix... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
@@ -1684,23 +1769,25 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... .... Implementing Dijkstra's algorithm recursively to compute least-cost paths(s)... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>number of rows of result is not a multiple of vector length (arg 1)</span>
 <span class="r-plt img"><img src="lcp_over_surface-27.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-02-19 15:02:18) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_over_surface() call completed (@ 2023-08-29 15:44:45) after ~0.01 minutes. </span>
 <span class="r-in"><span><span class="co"># The function returns distances between all combinations</span></span></span>
-<span class="r-in"><span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_lcp</span>; <span class="va">out_gebco2</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
+<span class="r-in"><span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          2945     2463      3438</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2610 3375.062 4064.206 6062.3124</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3544 3270.267 5106.123  707.1401</span>
+<span class="r-in"><span><span class="va">out_gebco2</span><span class="op">$</span><span class="va">dist_lcp</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          2945     2463      3438</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2610 3375.062 4064.206 6062.3124</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3544 3270.267 5106.123  707.1401</span>
 <span class="r-in"><span><span class="co"># The two outputs are the same (though the ordering of factor levels differs)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">path_lcp</span><span class="op">$</span><span class="va">cells</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">out_gebco2</span><span class="op">$</span><span class="va">path_lcp</span><span class="op">$</span><span class="va">cells</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">out_gebco1</span><span class="op">$</span><span class="va">path_lcp</span><span class="op">$</span><span class="va">cells</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 'data.frame':	83 obs. of  5 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ path_id    : num  1 1 1 1 1 1 1 1 1 1 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ path       : Factor w/ 6 levels "2610-2945","3544-2945",..: 1 1 1 1 1 1 1 1 1 1 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ origin     : int  2610 2610 2610 2610 2610 2610 2610 2610 2610 2610 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ destination: int  2945 2945 2945 2945 2945 2945 2945 2945 2945 2945 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ cell       : int  2610 2665 2666 2667 2668 2723 2778 2833 2834 2835 ...</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">out_gebco2</span><span class="op">$</span><span class="va">path_lcp</span><span class="op">$</span><span class="va">cells</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 'data.frame':	72 obs. of  5 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ path_id    : num  1 1 1 1 1 1 1 1 1 1 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ path       : Factor w/ 6 levels "2610-2945","2610-2463",..: 2 2 2 2 2 2 2 2 2 2 ...</span>

@@ -137,23 +137,26 @@
 <span class="r-in"><span><span class="co">#### Example (2): Plot customisation options, e.g.:</span></span></span>
 <span class="r-in"><span><span class="co"># Customise bathy via add_bathy()</span></span></span>
 <span class="r-in"><span><span class="fu">pf_plot_history</span><span class="op">(</span><span class="va">dat_dcpf_histories</span>,</span></span>
-<span class="r-in"><span>                time_steps <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>                add_surface <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">grDevices</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">topo.colors</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  time_steps <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  add_surface <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">grDevices</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">topo.colors</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Spatial layers do not have identical CRS strings</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="pf_plot_history-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># Customise particles via add_particles</span></span></span>
 <span class="r-in"><span><span class="fu">pf_plot_history</span><span class="op">(</span><span class="va">dat_dcpf_histories</span>,</span></span>
-<span class="r-in"><span>                time_steps <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>                add_particles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  time_steps <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  add_particles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Spatial layers do not have identical CRS strings</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="pf_plot_history-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># Pass other arguments to prettyGraphics::pretty_map() via ...</span></span></span>
 <span class="r-in"><span><span class="fu">pf_plot_history</span><span class="op">(</span><span class="va">dat_dcpf_histories</span>,</span></span>
-<span class="r-in"><span>                time_steps <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>                add_polys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dat_coast</span>, col <span class="op">=</span> <span class="st">"brown"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                crop_spatial <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  time_steps <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  add_polys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dat_coast</span>, col <span class="op">=</span> <span class="st">"brown"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  crop_spatial <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Spatial layers do not have identical CRS strings</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-plt img"><img src="pf_plot_history-4.png" alt="" width="700" height="433"></span>
@@ -175,16 +178,18 @@
 <span class="r-in"><span><span class="co">#### Example (4): Compare outputs for sampled versus connected particles</span></span></span>
 <span class="r-in"><span><span class="va">dat_dcpf_histories_connected</span> <span class="op">&lt;-</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="pf_simplify.html">pf_simplify</a></span><span class="op">(</span><span class="va">dat_dcpf_histories</span>, return <span class="op">=</span> <span class="st">"archive"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf_simplify() called (@ 2023-02-19 15:03:44)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::pf_simplify() called (@ 2023-08-29 15:45:43)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting pairwise cell movements based on calc_distance = 'euclid'... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Stepping through time steps to join coordinate pairs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Identifying connected cells... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Processing connected cells for return = 'archive'... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf_simplify() call completed (@ 2023-02-19 15:03:45) after ~0.01 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::pf_simplify() call completed (@ 2023-08-29 15:45:43) after ~0 minutes. </span>
 <span class="r-in"><span><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfcol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">pf_plot_history</span><span class="op">(</span><span class="va">dat_dcpf_histories</span>, time_steps <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,</span></span>
-<span class="r-in"><span>                add_particles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pch <span class="op">=</span> <span class="fl">21</span>, bg <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                prompt  <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">pf_plot_history</span><span class="op">(</span><span class="va">dat_dcpf_histories</span>,</span></span>
+<span class="r-in"><span>  time_steps <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,</span></span>
+<span class="r-in"><span>  add_particles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pch <span class="op">=</span> <span class="fl">21</span>, bg <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  prompt <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Spatial layers do not have identical CRS strings</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Spatial layers do not have identical CRS strings</span>
@@ -193,9 +198,11 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Spatial layers do not have identical CRS strings</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
-<span class="r-in"><span><span class="fu">pf_plot_history</span><span class="op">(</span><span class="va">dat_dcpf_histories_connected</span>, time_steps <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,</span></span>
-<span class="r-in"><span>                add_particles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pch <span class="op">=</span> <span class="fl">21</span>, bg <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                prompt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">pf_plot_history</span><span class="op">(</span><span class="va">dat_dcpf_histories_connected</span>,</span></span>
+<span class="r-in"><span>  time_steps <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,</span></span>
+<span class="r-in"><span>  add_particles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pch <span class="op">=</span> <span class="fl">21</span>, bg <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  prompt <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Spatial layers do not have identical CRS strings</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Spatial layers do not have identical CRS strings</span>

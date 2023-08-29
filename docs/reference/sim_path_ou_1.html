@@ -154,11 +154,11 @@
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#### Example (1): Implement simulation with default options</span></span></span>
 <span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">sim_path_ou_1</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up simulation... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Simulating movement path... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting simulated path... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing function checks... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting CRS... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
@@ -169,16 +169,16 @@
 <span class="r-plt img"><img src="sim_path_ou_1-1.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding spatial layer(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding pretty axes... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-08-29 15:46:18) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-08-29 15:46:18) after ~0 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2): Change the number of time steps</span></span></span>
 <span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">sim_path_ou_1</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up simulation... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Simulating movement path... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting simulated path... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing function checks... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting CRS... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
@@ -189,17 +189,17 @@
 <span class="r-plt img"><img src="sim_path_ou_1-2.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding spatial layer(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding pretty axes... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-08-29 15:46:18) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-08-29 15:46:18) after ~0 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3): Change model parameters</span></span></span>
 <span class="r-in"><span><span class="co"># esp parameter</span></span></span>
 <span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">sim_path_ou_1</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10000</span>, eps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up simulation... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Simulating movement path... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting simulated path... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing function checks... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting CRS... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
@@ -210,14 +210,14 @@
 <span class="r-plt img"><img src="sim_path_ou_1-3.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding spatial layer(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding pretty axes... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-08-29 15:46:18) after ~0.01 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-08-29 15:46:18) after ~0.01 minutes. </span>
 <span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">sim_path_ou_1</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10000</span>, eps <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up simulation... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Simulating movement path... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting simulated path... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing function checks... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting CRS... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
@@ -228,15 +228,15 @@
 <span class="r-plt img"><img src="sim_path_ou_1-4.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding spatial layer(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding pretty axes... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-08-29 15:46:18) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-08-29 15:46:18) after ~0 minutes. </span>
 <span class="r-in"><span><span class="co"># central harmonic parameter</span></span></span>
 <span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">sim_path_ou_1</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, eps <span class="op">=</span> <span class="fl">1</span>, k <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up simulation... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Simulating movement path... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting simulated path... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing function checks... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting CRS... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
@@ -247,14 +247,14 @@
 <span class="r-plt img"><img src="sim_path_ou_1-5.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding spatial layer(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding pretty axes... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-08-29 15:46:18) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-08-29 15:46:18) after ~0 minutes. </span>
 <span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">sim_path_ou_1</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, eps <span class="op">=</span> <span class="fl">1</span>, k <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up simulation... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Simulating movement path... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting simulated path... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing function checks... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting CRS... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
@@ -265,14 +265,14 @@
 <span class="r-plt img"><img src="sim_path_ou_1-6.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding spatial layer(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding pretty axes... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-08-29 15:46:18) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-08-29 15:46:18) after ~0 minutes. </span>
 <span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">sim_path_ou_1</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, eps <span class="op">=</span> <span class="fl">1</span>, k <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up simulation... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Simulating movement path... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting simulated path... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing function checks... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting CRS... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
@@ -280,24 +280,26 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining pretty axes... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining area... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting background... </span>
-<span class="r-plt img"><img src="sim_path_ou_1-7.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding spatial layer(s)... </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>zero-length arrow is of indeterminate angle and so skipped</span>
+<span class="r-plt img"><img src="sim_path_ou_1-7.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding pretty axes... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-08-29 15:46:18) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-08-29 15:46:18) after ~0 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (4): Customise the plot via add_paths, add_points and ...</span></span></span>
 <span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span></span>
-<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">sim_path_ou_1</span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span>,</span></span>
-<span class="r-in"><span>                      add_points <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                      add_paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu">viridis</span><span class="fu">::</span><span class="fu"><a href="https://sjmgarnier.github.io/viridisLite/reference/viridis.html" class="external-link">magma</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                      pretty_axis_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                      <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">sim_path_ou_1</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  n <span class="op">=</span> <span class="va">n</span>,</span></span>
+<span class="r-in"><span>  add_points <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  add_paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu">viridis</span><span class="fu">::</span><span class="fu"><a href="https://sjmgarnier.github.io/viridisLite/reference/viridis.html" class="external-link">magma</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  pretty_axis_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::sim_path_ou_1() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up simulation... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Simulating movement path... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting simulated path... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-02-19 15:04:52)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() called (@ 2023-08-29 15:46:18)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing function checks... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting CRS... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> prettyGraphics::pretty_map() CRS taken as: 'NA'.</span>
@@ -309,8 +311,8 @@
 <span class="r-plt img"><img src="sim_path_ou_1-8.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding spatial layer(s)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Adding pretty axes... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-02-19 15:04:52) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... prettyGraphics::pretty_map() call completed (@ 2023-08-29 15:46:19) after ~0 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::sim_path_ou_1() call completed (@ 2023-08-29 15:46:19) after ~0 minutes. </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -120,18 +120,23 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Define some example 'moorings' data</span></span></span>
 <span class="r-in"><span><span class="co"># ... with receiver IDs and deployment times</span></span></span>
-<span class="r-in"><span><span class="va">moorings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>receiver_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                       receiver_start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2016-01-01"</span>,</span></span>
-<span class="r-in"><span>                                                       <span class="st">"2016-01-02"</span>,</span></span>
-<span class="r-in"><span>                                                       <span class="st">"2016-01-03"</span>,</span></span>
-<span class="r-in"><span>                                                       <span class="st">"2016-01-04"</span>,</span></span>
-<span class="r-in"><span>                                                       <span class="st">"2016-01-05"</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                       receiver_end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2016-01-06"</span>,</span></span>
-<span class="r-in"><span>                                                     <span class="st">"2016-01-07"</span>,</span></span>
-<span class="r-in"><span>                                                     <span class="st">"2016-01-08"</span>,</span></span>
-<span class="r-in"><span>                                                     <span class="st">"2016-01-09"</span>,</span></span>
-<span class="r-in"><span>                                                     <span class="st">"2016-01-09"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                       <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">moorings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  receiver_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  receiver_start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-01"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-02"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-03"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-04"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-05"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  receiver_end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-06"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-07"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-08"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-09"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-09"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Define some example 'servicing' data</span></span></span>
 <span class="r-in"><span><span class="co"># ... with receiver IDs and servicing times</span></span></span>
@@ -139,14 +144,19 @@
 <span class="r-in"><span><span class="co"># ... ... from 2016-01-02--3 and 2016-01-04--5</span></span></span>
 <span class="r-in"><span><span class="co"># ... and receiver 5 was serviced</span></span></span>
 <span class="r-in"><span><span class="co"># ... ... on 2016-01-08.</span></span></span>
-<span class="r-in"><span><span class="va">services</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>receiver_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                       service_start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2016-01-02"</span>,</span></span>
-<span class="r-in"><span>                                                      <span class="st">"2016-01-04"</span>,</span></span>
-<span class="r-in"><span>                                                      <span class="st">"2016-01-08"</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                       service_end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2016-01-03"</span>,</span></span>
-<span class="r-in"><span>                                                    <span class="st">"2016-01-05"</span>,</span></span>
-<span class="r-in"><span>                                                    <span class="st">"2016-01-08"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                       <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">services</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  receiver_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  service_start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-02"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-04"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-08"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  service_end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-03"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-05"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"2016-01-08"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Get daily receiver status (0, 1) matrix</span></span></span>
 <span class="r-in"><span><span class="fu">make_matrix_receivers</span><span class="op">(</span><span class="va">moorings</span>, delta_t <span class="op">=</span> <span class="st">"days"</span>, as_POSIXct <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
@@ -183,7 +193,7 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2): Illustration using actual data</span></span></span>
 <span class="r-in"><span><span class="co"># ... for different time windows</span></span></span>
-<span class="r-in"><span><span class="va">mat_days</span>  <span class="op">&lt;-</span> <span class="fu">make_matrix_receivers</span><span class="op">(</span><span class="va">dat_moorings</span>, delta_t <span class="op">=</span> <span class="st">"days"</span>, as_POSIXct <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mat_days</span> <span class="op">&lt;-</span> <span class="fu">make_matrix_receivers</span><span class="op">(</span><span class="va">dat_moorings</span>, delta_t <span class="op">=</span> <span class="st">"days"</span>, as_POSIXct <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">mat_hours</span> <span class="op">&lt;-</span> <span class="fu">make_matrix_receivers</span><span class="op">(</span><span class="va">dat_moorings</span>, delta_t <span class="op">=</span> <span class="st">"hours"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">mat_days</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  num [1:508, 1:40] 1 1 1 1 1 1 1 1 1 1 ...</span>

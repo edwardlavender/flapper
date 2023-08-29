@@ -149,10 +149,12 @@
 <span class="r-in"><span><span class="va">coastline</span> <span class="op">&lt;-</span> <span class="fu">prettyGraphics</span><span class="fu">::</span><span class="va"><a href="https://edwardlavender.github.io/prettyGraphics/reference/dat_coast_around_oban.html" class="external-link">dat_coast_around_oban</a></span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (1) Implement the dcq() algorithm with 25 m bins</span></span></span>
-<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span>archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
-<span class="r-in"><span>              bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
-<span class="r-in"><span>              bin <span class="op">=</span> <span class="fl">25</span>,</span></span>
-<span class="r-in"><span>              plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
+<span class="r-in"><span>  bin <span class="op">=</span> <span class="fl">25</span>,</span></span>
+<span class="r-in"><span>  plot <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dcq() called... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 1: Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 2: Calculating the number of observations within each depth bin for each time unit... </span>
@@ -228,11 +230,13 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2): Implement the algorithm in parallel:</span></span></span>
-<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span>archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
-<span class="r-in"><span>              bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
-<span class="r-in"><span>              bin <span class="op">=</span> <span class="fl">25</span>,</span></span>
-<span class="r-in"><span>              plot <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>              cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
+<span class="r-in"><span>  bin <span class="op">=</span> <span class="fl">25</span>,</span></span>
+<span class="r-in"><span>  plot <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>  cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dcq() called... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 1: Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 2: Calculating the number of observations within each depth bin for each time unit... </span>
@@ -241,11 +245,13 @@
 <span class="r-in"><span><span class="co">#### Example (3): Visualise the function outputs on one page</span></span></span>
 <span class="r-in"><span><span class="co"># ... using standard options.</span></span></span>
 <span class="r-in"><span><span class="co"># Examine results with 25 m bin</span></span></span>
-<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span>archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
-<span class="r-in"><span>              bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
-<span class="r-in"><span>              bin <span class="op">=</span> <span class="fl">25</span>,</span></span>
-<span class="r-in"><span>              plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>              one_page <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
+<span class="r-in"><span>  bin <span class="op">=</span> <span class="fl">25</span>,</span></span>
+<span class="r-in"><span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  one_page <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dcq() called... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 1: Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 2: Calculating the number of observations within each depth bin for each time unit... </span>
@@ -253,11 +259,13 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 4: Mapping the results... </span>
 <span class="r-plt img"><img src="dcq-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># Examine results with a higher resolution bin</span></span></span>
-<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span>archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
-<span class="r-in"><span>              bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
-<span class="r-in"><span>              bin <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>              plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>              one_page <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
+<span class="r-in"><span>  bin <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  one_page <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dcq() called... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 1: Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 2: Calculating the number of observations within each depth bin for each time unit... </span>
@@ -267,12 +275,14 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (4): Plot customisation options</span></span></span>
 <span class="r-in"><span><span class="co"># fix zlim to be constant across all plots to enable comparability</span></span></span>
-<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span>archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
-<span class="r-in"><span>              bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
-<span class="r-in"><span>              bin <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>              plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>              one_page <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>              fix_zlim <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
+<span class="r-in"><span>  bin <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  one_page <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  fix_zlim <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dcq() called... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 1: Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 2: Calculating the number of observations within each depth bin for each time unit... </span>
@@ -280,12 +290,14 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 4: Mapping the results... </span>
 <span class="r-plt img"><img src="dcq-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># fix zlim using custom limits across all plots</span></span></span>
-<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span>archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
-<span class="r-in"><span>              bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
-<span class="r-in"><span>              bin <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>              plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>              one_page <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>              fix_zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5000</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
+<span class="r-in"><span>  bin <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  one_page <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  fix_zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5000</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dcq() called... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 1: Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 2: Calculating the number of observations within each depth bin for each time unit... </span>
@@ -294,12 +306,14 @@
 <span class="r-plt img"><img src="dcq-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># Transform the returned and plotted rasters by supplying a function to the</span></span></span>
 <span class="r-in"><span><span class="co"># ... transform argument</span></span></span>
-<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span>archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
-<span class="r-in"><span>              bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
-<span class="r-in"><span>              bin <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>              plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>              one_page <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>              transform <span class="op">=</span> <span class="va">sqrt</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
+<span class="r-in"><span>  bin <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  one_page <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  transform <span class="op">=</span> <span class="va">sqrt</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dcq() called... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 1: Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 2: Calculating the number of observations within each depth bin for each time unit... </span>
@@ -309,17 +323,19 @@
 <span class="r-in"><span><span class="co"># Customise the plot further via before_plot, after_plot functions</span></span></span>
 <span class="r-in"><span><span class="co"># ... and other arguments passed via ... E.g., note the need to include</span></span></span>
 <span class="r-in"><span><span class="co"># ... add = TRUE because the raster plot is added to the plot of the coastline.</span></span></span>
-<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span>archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
-<span class="r-in"><span>              bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
-<span class="r-in"><span>              bin <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>              plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>              one_page <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>              transform <span class="op">=</span> <span class="va">sqrt</span>,</span></span>
-<span class="r-in"><span>              fix_zlim <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>              before_plot <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>              after_plot <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu">lines</span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>              add <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>              col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">topo.colors</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dcq_maps</span> <span class="op">&lt;-</span> <span class="fu">dcq</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  archival_ls <span class="op">=</span> <span class="va">archival_ls</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">bathy</span>,</span></span>
+<span class="r-in"><span>  bin <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  one_page <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  transform <span class="op">=</span> <span class="va">sqrt</span>,</span></span>
+<span class="r-in"><span>  fix_zlim <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>  before_plot <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  after_plot <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu">lines</span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  add <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">topo.colors</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> flapper::dcq() called... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 1: Checking user inputs... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Step 2: Calculating the number of observations within each depth bin for each time unit... </span>

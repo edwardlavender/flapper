@@ -204,19 +204,28 @@ Under the default options, the approach is implemented step-wise (i.e., step-by-
 <span class="r-in"><span><span class="co">#### Example (1) Implement AC algorithm with default arguments</span></span></span>
 <span class="r-in"><span><span class="co"># This implements the algorithm on a single core, printing messages</span></span></span>
 <span class="r-in"><span><span class="co"># ... to the console to monitor function progress.</span></span></span>
-<span class="r-in"><span><span class="va">out_ac</span> <span class="op">&lt;-</span> <span class="fu">ac</span><span class="op">(</span>acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
-<span class="r-in"><span>             step <span class="op">=</span> <span class="fl">120</span>,</span></span>
-<span class="r-in"><span>             bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
-<span class="r-in"><span>             detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>             mobility <span class="op">=</span> <span class="fl">200</span></span></span>
-<span class="r-in"><span>             <span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> flapper::ac() called (@ 2023-02-19 14:45:22)...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs_pl() called (@ 2023-02-19 14:45:22)... </span>
+<span class="r-in"><span><span class="va">out_ac</span> <span class="op">&lt;-</span> <span class="fu">ac</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  acoustics <span class="op">=</span> <span class="va">acc</span>,</span></span>
+<span class="r-in"><span>  step <span class="op">=</span> <span class="fl">120</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">dat_gebco</span>,</span></span>
+<span class="r-in"><span>  detection_containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  mobility <span class="op">=</span> <span class="fl">200</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> flapper::ac() called (@ 2023-08-29 15:20:42)...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs_pl() called (@ 2023-08-29 15:20:42)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Checking user inputs... </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> which was just loaded, will retire in October 2023.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Please refer to R-spatial evolution reports for details, especially</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> https://r-spatial.org/r/2023/05/15/evolution4.html.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> It may be desirable to make the sf package available;</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> package maintainers should consider adding sf to Suggests:.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The sp package is now running under evolution status 2</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>      (status 2 uses the sf package in place of rgdal)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Processing movement time series... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Plotting movement time series (for each chunk)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Calling .acs() to implement ACDC algorithm on one chunk... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-02-19 14:45:26)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::.acs() called (@ 2023-08-29 15:20:46)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%... Initiating algorithm: moving over acoustic and internal ('archival') time steps... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... On acoustic time step ('timestep_detection') 1. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... On internal time step ('timestep_archival') 1. </span>
@@ -226,6 +235,14 @@ Under the default options, the approach is implemented step-wise (i.e., step-by-
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... On internal time step ('timestep_archival') 1. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... On internal time step ('timestep_archival') 2. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... ... Acoustic container is expanding... </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> rgeos version: 0.6-4, (SVN revision 699)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  GEOS runtime version: 3.11.0-CAPI-1.17.0 </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  Please note that rgeos will be retired during October 2023,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> plan transition to sf or terra functions using GEOS at your earliest convenience.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> See https://r-spatial.org/r/2023/05/15/evolution4.html for details.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  GEOS using OverlayNG</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  Linking to sp version: 2.0-0 </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  Polygon checking: TRUE </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=========                                                             |  12%... On acoustic time step ('timestep_detection') 4. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... On internal time step ('timestep_archival') 1. </span>
@@ -327,9 +344,9 @@ Under the default options, the approach is implemented step-wise (i.e., step-by-
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... On internal time step ('timestep_archival') 1. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================| 100%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Movement over acoustic and internal ('archival') time steps has been completed. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-02-19 14:45:27) after ~0.02 minutes. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs_pl() call completed (@ 2023-02-19 14:45:28) after ~0.09 minutes. </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> flapper::ac() finished (@ 2023-02-19 14:45:28)...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs() call completed (@ 2023-08-29 15:20:49) after ~0.05 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::.acs_pl() call completed (@ 2023-08-29 15:20:50) after ~0.12 minutes. </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> flapper::ac() finished (@ 2023-08-29 15:20:50)...</span>
 <span class="r-plt img"><img src="ac-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Subsequent examples follow the implementation given in acdc().</span></span></span>

@@ -152,15 +152,19 @@ For each unique array design (i.e. set of active receivers, given receiver deplo
 <span class="r-in"><span><span class="va">moorings</span> <span class="op">&lt;-</span> <span class="va">dat_moorings</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="co"># Define receiver locations as a SpatialPoints object with a UTM CRS</span></span></span>
 <span class="r-in"><span><span class="va">proj_wgs84</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:4326"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">proj_utm</span>   <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="va">moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_long"</span>, <span class="st">"receiver_lat"</span><span class="op">)</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                        <span class="va">proj_wgs84</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">proj_utm</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span>SRS_string <span class="op">=</span> <span class="st">"EPSG:32629"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_long"</span>, <span class="st">"receiver_lat"</span><span class="op">)</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  <span class="va">proj_wgs84</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/spTransform.html" class="external-link">spTransform</a></span><span class="op">(</span><span class="va">xy</span>, <span class="va">proj_utm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Link receiver IDs, locations and deployment dates to form a SpatialPointsDataFrame</span></span></span>
 <span class="r-in"><span><span class="co"># ... Note required column names and class types.</span></span></span>
-<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPointsDataFrame</a></span><span class="op">(</span><span class="va">xy</span>, <span class="va">moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"receiver_id"</span>,</span></span>
-<span class="r-in"><span>                                                  <span class="st">"receiver_start_date"</span>,</span></span>
-<span class="r-in"><span>                                                  <span class="st">"receiver_end_date"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPointsDataFrame</a></span><span class="op">(</span><span class="va">xy</span>, <span class="va">moorings</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"receiver_id"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"receiver_start_date"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"receiver_end_date"</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Define bathymetric map of area for which AC* algorithm(s) will be implemented</span></span></span>
 <span class="r-in"><span><span class="co"># ... The resolution must be sufficiently high</span></span></span>
@@ -176,7 +180,7 @@ For each unique array design (i.e. set of active receivers, given receiver deplo
 <span class="r-in"><span><span class="co"># ... (defined in flapper::acs_setup_containers()).</span></span></span>
 <span class="r-in"><span><span class="co"># ... Here, we assume detection_range = 425 m.</span></span></span>
 <span class="r-in"><span><span class="va">calc_dpr</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&lt;=</span> <span class="fl">425</span>, <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="fl">2.5</span> <span class="op">+</span> <span class="op">-</span><span class="fl">0.02</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">1000</span>, <span class="fu">calc_dpr</span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">1000</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"l"</span><span class="op">)</span></span></span>
@@ -193,12 +197,14 @@ For each unique array design (i.e. set of active receivers, given receiver deplo
 <span class="r-plt img"><img src="acs_setup_detection_kernels-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (1): Implement function using default options</span></span></span>
-<span class="r-in"><span><span class="va">kernels</span> <span class="op">&lt;-</span> <span class="fu">acs_setup_detection_kernels</span><span class="op">(</span>xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
-<span class="r-in"><span>                                       containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
-<span class="r-in"><span>                                       overlaps <span class="op">=</span> <span class="va">overlaps</span>,</span></span>
-<span class="r-in"><span>                                       calc_detection_pr <span class="op">=</span> <span class="va">calc_dpr</span>,</span></span>
-<span class="r-in"><span>                                       bathy <span class="op">=</span> <span class="va">surface</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_kernels() called (@ 2023-02-19 14:52:05)... </span>
+<span class="r-in"><span><span class="va">kernels</span> <span class="op">&lt;-</span> <span class="fu">acs_setup_detection_kernels</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  xy <span class="op">=</span> <span class="va">xy</span>,</span></span>
+<span class="r-in"><span>  containers <span class="op">=</span> <span class="va">dat_containers</span>,</span></span>
+<span class="r-in"><span>  overlaps <span class="op">=</span> <span class="va">overlaps</span>,</span></span>
+<span class="r-in"><span>  calc_detection_pr <span class="op">=</span> <span class="va">calc_dpr</span>,</span></span>
+<span class="r-in"><span>  bathy <span class="op">=</span> <span class="va">surface</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::acs_setup_detection_kernels() called (@ 2023-08-29 15:35:21)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Setting up function... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Getting receiver-specific kernels (for detection)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -256,7 +262,7 @@ For each unique array design (i.e. set of active receivers, given receiver deplo
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... ... ... Extract detection probability kernels for active receivers... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... ... ... Combining detection kernels to calculate the background detection probability surfaces (this is a slow step)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Process detection probability kernels ... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_kernels() call completed (@ 2023-02-19 14:52:07) after ~0.03 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::acs_setup_detection_kernels() call completed (@ 2023-08-29 15:35:22) after ~0.02 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Examine list elements</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">kernels</span><span class="op">)</span></span></span>

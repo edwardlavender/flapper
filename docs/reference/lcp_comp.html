@@ -167,11 +167,11 @@
 <span class="r-in"><span><span class="co">#### Define surface for examples</span></span></span>
 <span class="r-in"><span><span class="co"># We will focus on a relatively small area for speed</span></span></span>
 <span class="r-in"><span><span class="co"># The raster resolution should be equal in x and y directions</span></span></span>
-<span class="r-in"><span><span class="va">bathy</span>      <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">::</span><span class="va"><a href="dat_gebco.html">dat_gebco</a></span></span></span>
+<span class="r-in"><span><span class="va">bathy</span> <span class="op">&lt;-</span> <span class="fu">flapper</span><span class="fu">::</span><span class="va"><a href="dat_gebco.html">dat_gebco</a></span></span></span>
 <span class="r-in"><span><span class="va">boundaries</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="fl">700652.2</span>, <span class="fl">708401.2</span>, <span class="fl">6262905</span>, <span class="fl">6270179</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">blank</span>      <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></span><span class="op">(</span><span class="va">boundaries</span>, res <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">bathy</span>      <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/resample.html" class="external-link">resample</a></span><span class="op">(</span><span class="va">bathy</span>, <span class="va">blank</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">bathy</span>      <span class="op">&lt;-</span> <span class="fu"><a href="mask_io.html">mask_io</a></span><span class="op">(</span><span class="va">bathy</span>, <span class="fu">flapper</span><span class="fu">::</span><span class="va"><a href="dat_coast.html">dat_coast</a></span>, mask_inside <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">blank</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></span><span class="op">(</span><span class="va">boundaries</span>, res <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bathy</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/resample.html" class="external-link">resample</a></span><span class="op">(</span><span class="va">bathy</span>, <span class="va">blank</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bathy</span> <span class="op">&lt;-</span> <span class="fu"><a href="mask_io.html">mask_io</a></span><span class="op">(</span><span class="va">bathy</span>, <span class="fu">flapper</span><span class="fu">::</span><span class="va"><a href="dat_coast.html">dat_coast</a></span>, mask_inside <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>GEOS support is provided by the sf and terra packages among others</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>spgeom1 and spgeom2 have different proj4 strings</span>
 <span class="r-in"><span><span class="co"># raster::plot(bathy)</span></span></span>
@@ -182,27 +182,29 @@
 <span class="r-in"><span><span class="va">coastline</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">coastline</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Define graph for shortest-distance calculations</span></span></span>
-<span class="r-in"><span><span class="va">bathy_costs</span> <span class="op">&lt;-</span> <span class="fu"><a href="lcp_costs.html">lcp_costs</a></span><span class="op">(</span><span class="va">bathy</span><span class="op">)</span>                                 <span class="co"># ~0.38 mins</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_costs() called (@ 2023-02-19 15:00:11)... </span>
+<span class="r-in"><span><span class="va">bathy_costs</span> <span class="op">&lt;-</span> <span class="fu"><a href="lcp_costs.html">lcp_costs</a></span><span class="op">(</span><span class="va">bathy</span><span class="op">)</span> <span class="co"># ~0.38 mins</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_costs() called (@ 2023-08-29 15:42:40)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining transition matrices... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transition function gives negative values</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Calculating distance matrices... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Assembling LCP costs... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_costs() call completed (@ 2023-02-19 15:00:38) after ~0.45 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_costs() call completed (@ 2023-08-29 15:42:59) after ~0.31 minutes. </span>
 <span class="r-in"><span><span class="va">bathy_graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="lcp_graph_surface.html">lcp_graph_surface</a></span><span class="op">(</span><span class="va">bathy</span>, <span class="va">bathy_costs</span><span class="op">$</span><span class="va">dist_total</span><span class="op">)</span> <span class="co"># ~0.26 mins</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_graph_surface() called (@ 2023-02-19 15:00:38)... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_graph_surface() called (@ 2023-08-29 15:42:59)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining nodes, edges and costs to make graph... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Constructing graph object... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_graph_surface() call completed (@ 2023-02-19 15:00:52) after ~0.24 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_graph_surface() call completed (@ 2023-08-29 15:43:08) after ~0.16 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (1): Distance-vector-based implementation</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Implement function</span></span></span>
-<span class="r-in"><span><span class="va">out_1</span> <span class="op">&lt;-</span> <span class="fu">lcp_comp</span><span class="op">(</span>surface <span class="op">=</span> <span class="va">bathy</span>,</span></span>
-<span class="r-in"><span>                  distance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">100</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                  graph <span class="op">=</span> <span class="va">bathy_graph</span>,</span></span>
-<span class="r-in"><span>                  barrier <span class="op">=</span> <span class="va">coastline</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_comp() called (@ 2023-02-19 15:00:52)... </span>
+<span class="r-in"><span><span class="va">out_1</span> <span class="op">&lt;-</span> <span class="fu">lcp_comp</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">bathy</span>,</span></span>
+<span class="r-in"><span>  distance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">100</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  graph <span class="op">=</span> <span class="va">bathy_graph</span>,</span></span>
+<span class="r-in"><span>  barrier <span class="op">=</span> <span class="va">coastline</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_comp() called (@ 2023-08-29 15:43:08)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining parameters... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Sampling n location pairs for each distance value... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Sampling for distance = 50... </span>
@@ -216,7 +218,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing shortest-distance calculations... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Calculating shortest-distances via cppRouting::get_distance_pair() for 20 location pair(s) ... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Cleaning results... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_comp() call completed (@ 2023-02-19 15:01:06) after ~0.24 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_comp() call completed (@ 2023-08-29 15:43:16) after ~0.13 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Examine outputs</span></span></span>
 <span class="r-in"><span><span class="co"># The function returns a dataframe</span></span></span>
@@ -224,47 +226,52 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> 'data.frame':	20 obs. of  12 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ index      : int  1 2 3 4 5 6 7 8 9 10 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ id         : int  1 2 3 4 5 6 7 8 9 10 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ cell_x0    : num  701105 702625 701310 706065 704330 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ cell_y0    : num  6265712 6264646 6266462 6267096 6266516 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ cell_x1    : num  701065 702670 701280 706025 704375 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ cell_y1    : num  6265686 6264672 6266502 6267122 6266496 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ cell_id0   : num  1384241 1714695 1151782 955883 1135336 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ cell_id1   : num  1391983 1706954 1139376 948125 1141545 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ cell_x0    : num  701520 701955 705210 707355 703900 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ cell_y0    : num  6265956 6267946 6265682 6266712 6263782 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ cell_x1    : num  701475 701965 705210 707340 703945 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ cell_y1    : num  6265926 6267996 6265632 6266666 6263762 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ cell_id0   : num  1308374 691561 1394362 1075491 1983100 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ cell_id1   : num  1317665 676063 1409862 1089438 1989309 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ dist_sim   : num  50 50 50 50 50 50 50 50 50 50 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ dist_euclid: num  47.2 51.5 50 47.2 49.2 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ dist_lcp   : num  50.4 55.4 52.4 51.1 53.8 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ dist_euclid: num  54.1 51 50 47.4 49.2 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ dist_lcp   : num  57.4 54.2 50 51.2 53.3 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ barrier    : Factor w/ 2 levels "0","1": 1 1 1 1 1 1 1 1 1 1 ...</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Visualise sampled locations on map</span></span></span>
 <span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bathy</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu">lines</span><span class="op">(</span><span class="va">dat_coast</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">out_1</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">out_1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/arrows.html" class="external-link">arrows</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_x0</span>, y0 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_y0</span>,</span></span>
-<span class="r-in"><span>         x1 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_x1</span>, y1 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_y1</span>, length <span class="op">=</span> <span class="fl">0.01</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">out_1</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">out_1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/arrows.html" class="external-link">arrows</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    x0 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_x0</span>, y0 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_y0</span>,</span></span>
+<span class="r-in"><span>    x1 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_x1</span>, y1 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_y1</span>, length <span class="op">=</span> <span class="fl">0.01</span>, lwd <span class="op">=</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="lcp_comp-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Compare simulated, Euclidean and shortest distances</span></span></span>
 <span class="r-in"><span><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_plot.html" class="external-link">pretty_plot</a></span><span class="op">(</span><span class="va">out_1</span><span class="op">$</span><span class="va">dist_sim</span>, <span class="va">out_1</span><span class="op">$</span><span class="va">dist_euclid</span>,</span></span>
-<span class="r-in"><span>            xlab <span class="op">=</span> <span class="st">"Distance (simulated) [m]"</span>,</span></span>
-<span class="r-in"><span>            ylab <span class="op">=</span> <span class="st">"Distance (Euclidean)[m]"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  xlab <span class="op">=</span> <span class="st">"Distance (simulated) [m]"</span>,</span></span>
+<span class="r-in"><span>  ylab <span class="op">=</span> <span class="st">"Distance (Euclidean)[m]"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_plot.html" class="external-link">pretty_plot</a></span><span class="op">(</span><span class="va">out_1</span><span class="op">$</span><span class="va">dist_euclid</span>, <span class="va">out_1</span><span class="op">$</span><span class="va">dist_lcp</span>,</span></span>
-<span class="r-in"><span>            xlab <span class="op">=</span> <span class="st">"Distance (Euclidean) [m]"</span>,</span></span>
-<span class="r-in"><span>            ylab <span class="op">=</span> <span class="st">"Distance (shortest) [m]"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  xlab <span class="op">=</span> <span class="st">"Distance (Euclidean) [m]"</span>,</span></span>
+<span class="r-in"><span>  ylab <span class="op">=</span> <span class="st">"Distance (shortest) [m]"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="lcp_comp-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">pp</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (2): Distance-vector-based implementation in parallel</span></span></span>
-<span class="r-in"><span><span class="va">out_2</span> <span class="op">&lt;-</span> <span class="fu">lcp_comp</span><span class="op">(</span>surface <span class="op">=</span> <span class="va">bathy</span>,</span></span>
-<span class="r-in"><span>                  distance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">100</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                  graph <span class="op">=</span> <span class="va">bathy_graph</span>,</span></span>
-<span class="r-in"><span>                  barrier <span class="op">=</span> <span class="va">coastline</span>,</span></span>
-<span class="r-in"><span>                  cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                  <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_comp() called (@ 2023-02-19 15:01:07)... </span>
+<span class="r-in"><span><span class="va">out_2</span> <span class="op">&lt;-</span> <span class="fu">lcp_comp</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">bathy</span>,</span></span>
+<span class="r-in"><span>  distance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">100</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  graph <span class="op">=</span> <span class="va">bathy_graph</span>,</span></span>
+<span class="r-in"><span>  barrier <span class="op">=</span> <span class="va">coastline</span>,</span></span>
+<span class="r-in"><span>  cl <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_comp() called (@ 2023-08-29 15:43:16)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining parameters... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Sampling n location pairs for each distance value... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Processing samples... </span>
@@ -272,19 +279,20 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing shortest-distance calculations... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Calculating shortest-distances via cppRouting::get_distance_pair() for 20 location pair(s) ... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Cleaning results... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_comp() call completed (@ 2023-02-19 15:01:28) after ~0.36 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_comp() call completed (@ 2023-08-29 15:43:27) after ~0.18 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#### Example (3): Mobility-based implementation</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Implement function for mobility = 500</span></span></span>
 <span class="r-in"><span><span class="va">mob</span> <span class="op">&lt;-</span> <span class="fl">500</span></span></span>
-<span class="r-in"><span><span class="va">out_3</span> <span class="op">&lt;-</span> <span class="fu">lcp_comp</span><span class="op">(</span>surface <span class="op">=</span> <span class="va">bathy</span>,</span></span>
-<span class="r-in"><span>                  mobility <span class="op">=</span> <span class="va">mob</span>,</span></span>
-<span class="r-in"><span>                  n <span class="op">=</span> <span class="fl">1000</span>,</span></span>
-<span class="r-in"><span>                  graph <span class="op">=</span> <span class="va">bathy_graph</span>,</span></span>
-<span class="r-in"><span>                  barrier <span class="op">=</span> <span class="va">coastline</span></span></span>
-<span class="r-in"><span>                  <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_comp() called (@ 2023-02-19 15:01:28)... </span>
+<span class="r-in"><span><span class="va">out_3</span> <span class="op">&lt;-</span> <span class="fu">lcp_comp</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  surface <span class="op">=</span> <span class="va">bathy</span>,</span></span>
+<span class="r-in"><span>  mobility <span class="op">=</span> <span class="va">mob</span>,</span></span>
+<span class="r-in"><span>  n <span class="op">=</span> <span class="fl">1000</span>,</span></span>
+<span class="r-in"><span>  graph <span class="op">=</span> <span class="va">bathy_graph</span>,</span></span>
+<span class="r-in"><span>  barrier <span class="op">=</span> <span class="va">coastline</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flapper::lcp_comp() called (@ 2023-08-29 15:43:27)... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Defining parameters... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Sampling n locations... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Calculating Euclidean distances between sampled locations... </span>
@@ -294,14 +302,16 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Implementing shortest-distance calculations... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... ... Calculating shortest-distances via cppRouting::get_distance_pair() for 1000 location pair(s) ... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ... Cleaning results... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_comp() call completed (@ 2023-02-19 15:01:34) after ~0.09 minutes. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ... flapper::lcp_comp() call completed (@ 2023-08-29 15:43:29) after ~0.03 minutes. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Visualise sampled locations on map</span></span></span>
 <span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bathy</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">raster</span><span class="fu">::</span><span class="fu">lines</span><span class="op">(</span><span class="va">dat_coast</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">out_3</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">out_3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/arrows.html" class="external-link">arrows</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_x0</span>, y0 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_y0</span>,</span></span>
-<span class="r-in"><span>         x1 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_x1</span>, y1 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_y1</span>, length <span class="op">=</span> <span class="fl">0.01</span>, lwd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">out_3</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">out_3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/arrows.html" class="external-link">arrows</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    x0 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_x0</span>, y0 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_y0</span>,</span></span>
+<span class="r-in"><span>    x1 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_x1</span>, y1 <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">cell_y1</span>, length <span class="op">=</span> <span class="fl">0.01</span>, lwd <span class="op">=</span> <span class="fl">0.5</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="lcp_comp-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
@@ -314,27 +324,31 @@
 <span class="r-in"><span><span class="co"># Results for paths that do not cross a barrier</span></span></span>
 <span class="r-in"><span><span class="co"># ... Visualisation</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_plot.html" class="external-link">pretty_plot</a></span><span class="op">(</span><span class="va">out_3_barrier0</span><span class="op">$</span><span class="va">dist_euclid</span>, <span class="va">out_3_barrier0</span><span class="op">$</span><span class="va">dist_lcp</span>,</span></span>
-<span class="r-in"><span>            xlab <span class="op">=</span> <span class="st">"Distance (Euclidean) [m]"</span>,</span></span>
-<span class="r-in"><span>            ylab <span class="op">=</span> <span class="st">"Distance (shortest) [m]"</span>,</span></span>
-<span class="r-in"><span>            pch <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  xlab <span class="op">=</span> <span class="st">"Distance (Euclidean) [m]"</span>,</span></span>
+<span class="r-in"><span>  ylab <span class="op">=</span> <span class="st">"Distance (shortest) [m]"</span>,</span></span>
+<span class="r-in"><span>  pch <span class="op">=</span> <span class="st">"."</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">mob</span>, col <span class="op">=</span> <span class="st">"royalblue"</span>, lty <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># ... Euclidean distance parameter at which mobility is exceeded</span></span></span>
-<span class="r-in"><span><span class="va">limit0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">out_3_barrier0</span><span class="op">$</span><span class="va">dist_euclid</span><span class="op">[</span><span class="va">out_3_barrier0</span><span class="op">$</span><span class="va">dist_lcp</span> <span class="op">&gt;</span> <span class="va">mob</span><span class="op">]</span><span class="op">)</span>; <span class="va">limit0</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 462.8715</span>
+<span class="r-in"><span><span class="va">limit0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">out_3_barrier0</span><span class="op">$</span><span class="va">dist_euclid</span><span class="op">[</span><span class="va">out_3_barrier0</span><span class="op">$</span><span class="va">dist_lcp</span> <span class="op">&gt;</span> <span class="va">mob</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">limit0</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 464.8656</span>
 <span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">limit0</span>, col <span class="op">=</span> <span class="st">"royalblue"</span>, lty <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Results for paths that cross a barrier</span></span></span>
 <span class="r-in"><span><span class="co"># ... Visualisation</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_plot.html" class="external-link">pretty_plot</a></span><span class="op">(</span><span class="va">out_3_barrier1</span><span class="op">$</span><span class="va">dist_euclid</span>, <span class="va">out_3_barrier1</span><span class="op">$</span><span class="va">dist_lcp</span>,</span></span>
-<span class="r-in"><span>           xlab <span class="op">=</span> <span class="st">"Distance (Euclidean) [m]"</span>,</span></span>
-<span class="r-in"><span>           ylab <span class="op">=</span> <span class="st">"Distance (shortest) [m]"</span>,</span></span>
-<span class="r-in"><span>           pch <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  xlab <span class="op">=</span> <span class="st">"Distance (Euclidean) [m]"</span>,</span></span>
+<span class="r-in"><span>  ylab <span class="op">=</span> <span class="st">"Distance (shortest) [m]"</span>,</span></span>
+<span class="r-in"><span>  pch <span class="op">=</span> <span class="st">"."</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">mob</span>, col <span class="op">=</span> <span class="st">"royalblue"</span>, lty <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># ... Euclidean distance parameter at which mobility is exceeded</span></span></span>
 <span class="r-in"><span><span class="va">limit1</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">out_3_barrier1</span><span class="op">$</span><span class="va">dist_euclid</span><span class="op">[</span><span class="va">out_3_barrier1</span><span class="op">$</span><span class="va">dist_lcp</span> <span class="op">&gt;</span> <span class="va">mob</span><span class="op">]</span><span class="op">)</span>; <span class="va">limit1</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 480</span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">out_3_barrier1</span><span class="op">$</span><span class="va">dist_euclid</span><span class="op">[</span><span class="va">out_3_barrier1</span><span class="op">$</span><span class="va">dist_lcp</span> <span class="op">&gt;</span> <span class="va">mob</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">limit1</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 466.1545</span>
 <span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">limit1</span>, col <span class="op">=</span> <span class="st">"royalblue"</span>, lty <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="lcp_comp-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">pp</span><span class="op">)</span></span></span>
@@ -342,15 +356,17 @@
 <span class="r-in"><span><span class="co">## Plot the difference between Euclidean and shortest distances with distance</span></span></span>
 <span class="r-in"><span><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">4</span>, <span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_plot.html" class="external-link">pretty_plot</a></span><span class="op">(</span><span class="va">out_3_barrier0</span><span class="op">$</span><span class="va">dist_euclid</span>,</span></span>
-<span class="r-in"><span>            <span class="va">out_3_barrier0</span><span class="op">$</span><span class="va">dist_lcp</span> <span class="op">-</span> <span class="va">out_3_barrier0</span><span class="op">$</span><span class="va">dist_euclid</span>,</span></span>
-<span class="r-in"><span>            xlab <span class="op">=</span> <span class="st">"Distance (Euclidean) [m]"</span>,</span></span>
-<span class="r-in"><span>            ylab <span class="op">=</span> <span class="st">"Distance (shortest - Euclidean) [m]"</span>,</span></span>
-<span class="r-in"><span>            pch <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">out_3_barrier0</span><span class="op">$</span><span class="va">dist_lcp</span> <span class="op">-</span> <span class="va">out_3_barrier0</span><span class="op">$</span><span class="va">dist_euclid</span>,</span></span>
+<span class="r-in"><span>  xlab <span class="op">=</span> <span class="st">"Distance (Euclidean) [m]"</span>,</span></span>
+<span class="r-in"><span>  ylab <span class="op">=</span> <span class="st">"Distance (shortest - Euclidean) [m]"</span>,</span></span>
+<span class="r-in"><span>  pch <span class="op">=</span> <span class="st">"."</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_plot.html" class="external-link">pretty_plot</a></span><span class="op">(</span><span class="va">out_3_barrier1</span><span class="op">$</span><span class="va">dist_euclid</span>,</span></span>
-<span class="r-in"><span>            <span class="va">out_3_barrier1</span><span class="op">$</span><span class="va">dist_lcp</span> <span class="op">-</span> <span class="va">out_3_barrier1</span><span class="op">$</span><span class="va">dist_euclid</span>,</span></span>
-<span class="r-in"><span>            xlab <span class="op">=</span> <span class="st">"Distance (Euclidean) [m]"</span>,</span></span>
-<span class="r-in"><span>            ylab <span class="op">=</span> <span class="st">"Distance (shortest - Euclidean) [m]"</span>,</span></span>
-<span class="r-in"><span>            pch <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">out_3_barrier1</span><span class="op">$</span><span class="va">dist_lcp</span> <span class="op">-</span> <span class="va">out_3_barrier1</span><span class="op">$</span><span class="va">dist_euclid</span>,</span></span>
+<span class="r-in"><span>  xlab <span class="op">=</span> <span class="st">"Distance (Euclidean) [m]"</span>,</span></span>
+<span class="r-in"><span>  ylab <span class="op">=</span> <span class="st">"Distance (shortest - Euclidean) [m]"</span>,</span></span>
+<span class="r-in"><span>  pch <span class="op">=</span> <span class="st">"."</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="lcp_comp-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">pp</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -362,22 +378,26 @@
 <span class="r-in"><span><span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>barrier <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fl">0</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>, dist_euclid <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ci</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/list_CIs.html" class="external-link">list_CIs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod</span>, <span class="va">nd</span>, se.fit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/pretty_plot.html" class="external-link">pretty_plot</a></span><span class="op">(</span><span class="va">out_3</span><span class="op">$</span><span class="va">dist_euclid</span>, <span class="va">out_3</span><span class="op">$</span><span class="va">dist_lcp</span>,</span></span>
-<span class="r-in"><span>                            col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grey"</span>, <span class="st">"darkred"</span><span class="op">)</span><span class="op">[</span><span class="va">out_3</span><span class="op">$</span><span class="va">barrier</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                            cex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1.5</span><span class="op">)</span><span class="op">[</span><span class="va">out_3</span><span class="op">$</span><span class="va">barrier</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grey"</span>, <span class="st">"darkred"</span><span class="op">)</span><span class="op">[</span><span class="va">out_3</span><span class="op">$</span><span class="va">barrier</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  cex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1.5</span><span class="op">)</span><span class="op">[</span><span class="va">out_3</span><span class="op">$</span><span class="va">barrier</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/add_error_envelope.html" class="external-link">add_error_envelope</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">ci</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">nd</span><span class="op">$</span><span class="va">barrier</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fl">1</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ci</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/list_CIs.html" class="external-link">list_CIs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod</span>, <span class="va">nd</span>, se.fit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://edwardlavender.github.io/prettyGraphics/reference/add_error_envelope.html" class="external-link">add_error_envelope</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">ci</span>,</span></span>
-<span class="r-in"><span>                   add_fit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   add_ci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha</a></span><span class="op">(</span><span class="st">"red"</span>, <span class="fl">0.5</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                 border <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  add_fit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  add_ci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    col <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha</a></span><span class="op">(</span><span class="st">"red"</span>, <span class="fl">0.5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    border <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="lcp_comp-6.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># Define predictive model based on this analysis</span></span></span>
-<span class="r-in"><span><span class="va">lcp_predict</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">m</span>, <span class="va">barrier</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">lcp_predict</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">m</span>, <span class="va">barrier</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op">==</span> <span class="fl">2L</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">barrier</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">m</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">x</span> <span class="op">*</span> <span class="op">(</span><span class="va">barrier</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span> <span class="va">m</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="va">x</span> <span class="op">*</span> <span class="op">(</span><span class="va">barrier</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="op">}</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
