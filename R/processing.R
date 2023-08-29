@@ -141,52 +141,58 @@ process_receiver_id <-
 #' @return The function returns a vector, of the same length as \code{det} with three possible values: NA, which identifies detections which have not been flagged as false detections (i.e., \code{passed_filter = 0}, see \code{\link[glatos]{false_detections}}) and are therefore not passed through the spatial filter; 1, which identifies detections which `passed' the spatial filter (i.e., false detections which are accompanied by detections at nearby receivers within the defined spatial and temporal thresholds); or 0, which defines detections which `failed' the spatial filter (i.e., false detections which are not accompanied by detections at nearby receivers within the defined spatial and temporal thresholds). This vector has one attribute, `details', a dataframe with the same number of rows as \code{det} with the following columns: `passed_filter_sf', `n_wn_sf', `detection_timestamp_utc_sf' and `receiver_sn_sf'. `passed_filter_sf' takes a value of NA, 0 or 1 depending on whether or not the detection was flagged as a false detection (if not, NA) and whether each false detection passed the spatial filter (no, 0; yes, 1). If the detection did pass the spatial filter, `n_wn_sf' provides the number of detections at nearby receivers within \code{tf} and \code{sf}; and `detection_timestamp_utc_sf', `receiver_sn_sf' and `dist_sf' define the timestamp of the detection at the nearest receiver, the receiver at which the detection was made and the distance between the two receivers respectively.
 #'
 #' @examples
-#' #### Add some false detections for demonstration purposes
-#' # Add three rows to dat_acoustics which, below, we'll make 'false detections'
-#' dat_acoustics_with_false_det <-
-#'   rbind(dat_acoustics, dat_acoustics[rep(nrow(dat_acoustics), 3), ])
-#' pos_false <- (nrow(dat_acoustics_with_false_det) - 2):nrow(dat_acoustics_with_false_det)
-#' # Add an isolated detection accompanied by a detection at a nearby receiver
-#' dat_acoustics_with_false_det$timestamp[pos_false[1:2]] <-
-#'   dat_acoustics_with_false_det$timestamp[pos_false[1:2]] + 60 * 60 * 60
-#' dat_acoustics_with_false_det$receiver_id[pos_false[2]] <- 33
-#' # Add an isolated detection not accompanied by a detection at a nearby receiver
-#' dat_acoustics_with_false_det$timestamp[pos_false[3]] <-
-#'   dat_acoustics_with_false_det$timestamp[pos_false[3]] + 60 * 60 * 60 * 2
-#'
 #' #### Define necessary columns to compute false detections using glatos::false_detections()
-#' dat_acoustics_with_false_det$detection_timestamp_utc <-
-#'   dat_acoustics_with_false_det$timestamp
-#' dat_acoustics_with_false_det$transmitter_codespace <-
-#'   substr(dat_acoustics_with_false_det$transmitter_id, 1, 8)
-#' dat_acoustics_with_false_det$transmitter_id <-
-#'   substr(dat_acoustics_with_false_det$transmitter_id, 10, 13)
-#' dat_acoustics_with_false_det$receiver_sn <- dat_acoustics_with_false_det$receiver_id
-#' det <- dat_acoustics_with_false_det[, c(
+#' det <- dat_acoustics[dat_acoustics$individual_id == 25, ]
+#' stopifnot(!is.unsorted(det$timestamp))
+#' det$detection_timestamp_utc <- det$timestamp
+#' det$transmitter_codespace   <- substr(det$transmitter_id, 1, 8)
+#' det$transmitter_id          <- substr(det$transmitter_id, 10, 13)
+#' det$receiver_sn             <- det$receiver_id
+#' det <- det[, c(
 #'   "detection_timestamp_utc",
 #'   "transmitter_codespace",
 #'   "transmitter_id",
 #'   "receiver_sn"
 #' )]
 #'
-#' #### Compute false detections
-#' # 3 false detections returned, as expected:
+#' #### Clean false detections from 'raw' data
 #' det <- glatos::false_detections(det, tf = 3600)
+#' det <- det[det$passed_filter == 1, ]
+#' det$passed_filter <- NULL
+#' det$min_lag <- NULL
+#'
+#' #### Add 'new' false detections for demonstration purposes
+#' # Add three rows to `det` which, below, we'll make 'false detections'
+#' det <- rbind(det, det[rep(nrow(det), 3), ])
+#' pos_false <- (nrow(det) - 2):nrow(det)
+#' # Add an isolated detection accompanied by a detection at a nearby receiver
+#' det$detection_timestamp_utc[pos_false[1:2]] <-
+#'   det$detection_timestamp_utc[pos_false[1:2]] + 60 * 60 * 60
+#' det$receiver_sn[pos_false[2]] <- 52
+#' # Add an isolated detection not accompanied by a detection at a nearby receiver
+#' det$detection_timestamp_utc[pos_false[3]] <-
+#'   det$detection_timestamp_utc[pos_false[3]] + 60 * 60 * 60 * 2
+
+#### Identify false detections
+# 3 false detections returned, as expected:
+#' det <- glatos::false_detections(det, tf = 3600)
+#' stopifnot(length(which(det$passed_filter == 0)) == 3L)
 #' tail(det$passed_filter)
 #'
-#' #### Pass false detections through a spatial filter
-#' # distances between receivers are required
+#' ##### Implement spatial filter
+#' # Calculate distances between receivers
+#' # * For simplicity, here, we ignore differences in deployment timing
 #' dist_btw_receivers_km <-
 #'   dist_btw_receivers(dat_moorings[, c("receiver_id", "receiver_long", "receiver_lat")])
-#' # Implement spatial filter.
 #' # Note the function returns a vector, unlike glatos::false_detections():
-#' det$passed_filter_sf <- process_false_detections_sf(det,
-#'   tf = 3600,
-#'   sf = 0.5,
-#'   dist_btw_receivers = dist_btw_receivers_km
-#' )
+#' det$passed_filter_sf <-
+#'   process_false_detections_sf(det,
+#'                               tf = 3600,
+#'                               sf = 0.5,
+#'                               dist_btw_receivers = dist_btw_receivers_km)
 #' # Only the last observation failed the spatial filter, as expected:
 #' tail(det$passed_filter_sf)
+#' stopifnot(which(det$passed_filter_sf == 0) == nrow(det))
 #' # Additional information is available from the attributes dataframe:
 #' tail(attr(det$passed_filter_sf, "details"))
 #'
