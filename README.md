@@ -534,9 +534,8 @@ Edinburgh 105, 273–284. <https://doi.org/10.1017/S1755691015000146>
 
 ## Citation
 
-Lavender, E. et al. (in prep). A semi-stochastic modelling framework for
-passive acoustic telemetry.
+Lavender, E. et al. (2023). An integrative modelling framework for
+passive acoustic telemetry. Methods in Ecology and Evolution.
+<https://doi.org/10.1111/2041-210X.14193>
 
-Lavender, E. (2021). flapper: Routines for the analysis of passive
-acoustic telemetry data. R package version 0.0.9000.
-<https://github.com/edwardlavender/flapper/>
+------------------------------------------------------------------------
