@@ -482,7 +482,7 @@ acdc_plot_trace <- function(record,
 #' @param add_coastline (optional) A named list of arguments, passed to \code{\link[raster]{plot}}, to add a polygon (i.e., of the coastline), to the plot. If provided, this must contain an `x' element that contains the coastline as a spatial object (e.g., a SpatialPolygonsDataFrame: see \code{\link[flapper]{dat_coast}} for an example).
 #' @param add_receivers (optional) A named list of arguments, passed to \code{\link[graphics]{points}}, to add points (i.e., receivers) to the plot. If provided, this must contain an `x' element that is a SpatialPoints object that specifies receiver locations (in the same coordinate reference system as other spatial data).
 #' @param add_raster (optional) A named list of arguments, passed to \code{\link[fields]{image.plot}}, to plot the RasterLayer of possible locations that is extracted from \code{record}.
-#' @param add_containers (optional) For outputs from the AC* algorithms (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), \code{containers} is a named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic containers to the plot.
+#' @param add_containers (optional) For outputs from the AC* algorithms (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), \code{containers} is a named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic containers to the plot. If specified, the container that defines the boundaries of the individual's possible locations at each time step is drawn (i.e., `container_c` in \code{\link[flapper]{acdc_record-class}} objects).
 #' @param add_additional (optional) A stand-alone function, to be executed after the background plot has been made and any specified spatial layers have been added to this, to customise the result (see Examples).
 #' @param crop_spatial A logical variable that defines whether or not to crop spatial data to lie within the axis limits.
 #' @param xlim,ylim,fix_zlim,pretty_axis_args Axis control arguments. \code{xlim} and \code{ylim} control the axis limits, following the rules of the \code{lim} argument in \code{\link[prettyGraphics]{pretty_axis}}. \code{fix_zlim} is a logical input that defines whether or not to fix z axis limits across all plots (to facilitate comparisons), or a vector of two numbers that define a custom range for the z axis which is fixed across all plots. \code{fix_zlim = FALSE} produces plots in which the z axis is allowed to vary flexibly between time units. Other axis options supported by \code{\link[prettyGraphics]{pretty_axis}} are implemented by passing a named list of arguments to this function via \code{pretty_axis_args}.
@@ -684,9 +684,9 @@ acdc_plot_record <- function(record,
     if (length(acdc_plot) <= 0) stop("No plotting data available for selected plot(s).")
     if (any(length(plot) > length(acdc_plot))) stop("'plot' exceeds the number of available plots.")
     if (!is.null(add_containers)) {
-      if (!rlang::has_name(acdc_plot[[1]], "container")) {
+      if (!rlang::has_name(acdc_plot[[1]], "container_c")) {
         add_containers <- NULL
-        message("add_containers = NULL implemented: 'record' does not contain containers.")
+        message("`add_containers = NULL` implemented: 'record' does not contain containers (`container_c` element).")
       }
     }
   }
@@ -798,7 +798,7 @@ acdc_plot_record <- function(record,
     }
     # Add acoustic container
     if (!is.null(add_containers)) {
-      add_containers$x <- map_info$container
+      add_containers$x <- map_info$container_c
       if (crop_spatial) add_containers$x <- raster::crop(add_containers$x, ext)
       add_containers$add <- TRUE
       do.call(raster::plot, add_containers)

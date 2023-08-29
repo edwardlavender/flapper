@@ -42,7 +42,7 @@ acdc_plot_record(
 
 \item{add_raster}{(optional) A named list of arguments, passed to \code{\link[fields]{image.plot}}, to plot the RasterLayer of possible locations that is extracted from \code{record}.}
 
-\item{add_containers}{(optional) For outputs from the AC* algorithms (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), \code{containers} is a named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic containers to the plot.}
+\item{add_containers}{(optional) For outputs from the AC* algorithms (\code{\link[flapper]{ac}} or \code{\link[flapper]{acdc}}), \code{containers} is a named list of arguments, passed to \code{\link[raster]{plot}}, to add the acoustic containers to the plot. If specified, the container that defines the boundaries of the individual's possible locations at each time step is drawn (i.e., `container_c` in \code{\link[flapper]{acdc_record-class}} objects).}
 
 \item{add_additional}{(optional) A stand-alone function, to be executed after the background plot has been made and any specified spatial layers have been added to this, to customise the result (see Examples).}
 
