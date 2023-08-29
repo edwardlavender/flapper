@@ -24,6 +24,6 @@ dat_archival
 A dataset containing a sample of flapper skate (\emph{Dipturus intermedius}) depth (m) time series. Observations were sampled every 2 minutes using archival tags. Data are arranged by \code{individual_id} and then \code{timestamp}.
 }
 \references{
-Data collection and processing is described in Lavender (in prep). Fine-scale habitat use of the Critically Endangered flapper skate (\emph{Dipturus intermedius}). [Doctoral dissertation, University of St Andrews].
+Data collection and processing are described in Lavender (2022). Modelling the movements of flapper skate (\emph{Dipturus intermedius}) in relation to a Scottish Marine Protected Area. University of St Andrews. https://www.doi.org/10.17630/sta/201
 }
 \keyword{datasets}

@@ -31,6 +31,6 @@ A dataset containing a sample of processed flapper skate (\emph{Dipturus interme
 Time stamps are expressed to the nearest two minutes. `Duplicate' detections (of the same individual at the same receiver in the same time step) are excluded. This supports the implementation of the acoustic-container (AC) and acoustic-container depth-contour (ACDC) algorithms (see \code{\link[flapper]{ac}} and \code{\link[flapper]{acdc}}).
 }
 \references{
-Data collection and processing is described in Lavender (in prep). Fine-scale habitat use of the Critically Endangered flapper skate (\emph{Dipturus intermedius}). [Doctoral dissertation, University of St Andrews].
+Data collection and processing are described in Lavender (2022). Modelling the movements of flapper skate (\emph{Dipturus intermedius}) in relation to a Scottish Marine Protected Area. University of St Andrews. https://www.doi.org/10.17630/sta/201
 }
 \keyword{datasets}
