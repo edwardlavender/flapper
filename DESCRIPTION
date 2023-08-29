@@ -36,7 +36,7 @@ Remotes:
     github::edwardlavender/prettyGraphics, 
     github::edwardlavender/Tools4ETS,
     github::adamlilith/fasterRaster,
-    url::https://gitlab.oceantrack.org/GreatLakes/glatos/-/archive/master/glatos-master.zip
+    github::ocean-tracking-network/glatos
 Depends: R (>= 4.0)
 License: GPL-3
 URL: https://github.com/edwardlavender/flapper/, https://edwardlavender.github.io/flapper/
