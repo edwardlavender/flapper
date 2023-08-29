@@ -1,0 +1,22 @@
+citHeader("To cite package ‘flapper’ in publications, use Lavender et al. (2023). For residency analyses, please also cite Lavender et al. (2021).")
+
+bibentry(
+  bibtype  = "Article",
+  title    = "An integrative modelling framework for passive acoustic telemetry",
+  author   = c("Edward Lavender", "Stanisław Biber", "Janine Illian", "Mark James", "Peter J. Wright", "James Thorburn", "Sophie Smout"),
+  journal  = "Methods in Ecology and Evolution",
+  year     = "2023",
+  doi      = "https://doi.org/10.1111/2041-210X.14193"
+)
+
+bibentry(
+  bibtype  = "Article",
+  title    = "Movement patterns of a Critically Endangered elasmobranch (_Dipturus intermedius_) in a Marine Protected Area",
+  author   = c("Edward Lavender", "Dmitry Aleynik", "Jane Dodd", "Janine Illian", "Mark James", "Peter J. Wright", "Sophie Smout", "James Thorburn"),
+  journal  = "Aquatic Conservation: Marine and Freshwater Ecosystems",
+  year     = "2023",
+  volume   = "32",
+  issue    = "2",
+  pages    = "348–365",
+  doi      = "https://doi.org/10.1002/aqc.3753"
+)
