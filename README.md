@@ -9,8 +9,9 @@ patterns of space use. <https://edwardlavender.github.io/flapper/>**
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/flapper)](https://cran.r-project.org/package=flapper)
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/flapper)](https://CRAN.R-project.org/package=flapper)
 
 [`flapper`](https://edwardlavender.github.io/flapper/) is an `R` package
 which provides tools for passive acoustic telemetry data. The package
