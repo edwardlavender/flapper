@@ -59,7 +59,8 @@ as part of the Movement Ecology of Flapper Skate project by Marine
 Scotland Science and NatureScot. The insert of the flapper skate is also
 courtesy of this project. The bathymetry data are sourced from the
 Ireland, Northern Island and Scotland Hydrographic survey (Howe et al.,
-2014). Plots were produced using the
+2014. Earth Environ. Sci. Trans. R. Soc. Edinburgh 105, 273–284.). Plots
+were produced using the
 [prettyGraphics](https://github.com/edwardlavender/prettyGraphics)
 package.*
 
@@ -79,7 +80,7 @@ detections at receivers, especially:
 - **`lcp_*()`.** These functions facilitate the calculation of shortest
   paths and their distances between and around points using efficient
   `C++` algorithms from the
-  [cppRouting](https://github.com/vlarmet/cppRouting) package. This
+  [`cppRouting`](https://github.com/vlarmet/cppRouting) package. This
   makes it easy to use biologically meaningful distances (that account
   for the bathymetric surface over which a benthic animal must move, if
   applicable, and barriers to movement) in movement models.
@@ -503,6 +504,41 @@ the `cl_*()` function family:
   - `cl_export()` exports objects required by a cluster;
   - `cl_stop()` closes a cluster;
 
+## Resources
+
+**For an overview of the flapper algorithms**, see: Lavender, E., Biber,
+S., Illian, J., James, M., Wright, P. J., Thorburn, J., & Smout, S.
+(2023). An integrative modelling framework for passive acoustic
+telemetry. Methods in Ecology and Evolution, 00, 1–13.
+<https://doi.org/10.1111/2041-210X.14193>
+
+**For further code examples**, see:
+
+- [`flapper_demo`](https://github.com/edwardlavender/flapper_demo) for a
+  demo of the flapper algorithms;
+- [`flapper_sim`](https://github.com/edwardlavender/flapper_sim) for
+  simulation-based explorations of the algorithms;
+- [`flapper_appl`](https://github.com/edwardlavender/flapper_appl) for
+  example real-world applications;
+
+**For further information of the flapper package**, see:
+
+- `?flapper::flapper` for an overview of package functions;
+- `?flapper::ac` for information on specific functions (e.g., `ac()`,
+  which implements the acoustic-container algorithm);
+
+## Disclaimers and troubleshooting
+
+[`flapper`](https://github.com/edwardlavender/flapper) is a new,
+proof-of-concept [R](https://www.r-project.org/) package. It was written
+to support the implementation of a novel, mathematical framework for
+movement modelling in passive acoustic telemetry systems in our study
+system in Scotland. The functions are extensively documented but the
+package is at an early stage of evolution. All routines are
+experimental. Researchers interested in using the package are encouraged
+to get in touch while the methods and package remain at an early stage
+of evolution (<edward.lavender@eawag.ch>).
+
 ## Associated packages
 
 - **[prettyGraphics](https://github.com/edwardlavender/prettyGraphics)**
@@ -527,17 +563,26 @@ the `cl_*()` function family:
   particularly motivated by the West Scotland Coastal Ocean Modelling
   System (WeStCOMS).
 
-## References
-
-Howe, J. A. et al. (2014). The seabed geomorphology and geological
-structure of the Firth of Lorn, western Scotland, UK, as revealed by
-multibeam echo-sounder survey. Earth Environ. Sci. Trans. R. Soc.
-Edinburgh 105, 273–284. <https://doi.org/10.1017/S1755691015000146>
-
 ## Citation
+
+**To cite package [`flapper`](https://edwardlavender.github.io/flapper/)
+in publications, please use Lavender et al. (2023). For residency
+analyses, please also cite Lavender et al. (2021).**
+
+Lavender, E. et al. (2021). Movement patterns of a Critically Endangered
+elasmobranch (*Dipturus intermedius*) in a Marine Protected Area.
+*Aquatic Conservation: Marine and Freshwater Ecosystems*, *32*, 348–365.
+<https://doi.org/10.1002/aqc.3753>
 
 Lavender, E. et al. (2023). An integrative modelling framework for
 passive acoustic telemetry. Methods in Ecology and Evolution.
 <https://doi.org/10.1111/2041-210X.14193>
+
+**For the shortest-path routines, please also consider citing
+[`cppRouting`](https://github.com/vlarmet/cppRouting):**
+
+Larmet V (2022). *cppRouting: Algorithms for Routing and Solving the
+Traffic Assignment Problem*. R package version 3.1.
+<https://CRAN.R-project.org/package=cppRouting>.
 
 ------------------------------------------------------------------------
