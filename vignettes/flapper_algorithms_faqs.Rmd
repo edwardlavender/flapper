@@ -164,7 +164,7 @@ H.	Array design. The flapper algorithms present opportunities to inform tag and 
 
 Aspillaga, E. _et al._ (2019a). Modelling the three-dimensional space use of aquatic animals combining topography and Eulerian telemetry data. Methods in Ecology and Evolution, 10(9), 1551–1557. https://doi.org/10.1111/2041-210X.13232
 
-Aspillaga, E. _et al._ (2019b). fishtrack3d: Analysis of passive acoustic telemetry data in 3D. http://github.com/aspillaga/fishtrack3d
+Aspillaga, E. _et al._ (2019b). fishtrack3d: Analysis of passive acoustic telemetry data in 3D. https://github.com/aspillaga/fishtrack3d
 
 Kessel, S. T. _et al._ (2016). Distinct patterns of Arctic cod (_Boreogadus saida_) presence and absence in a shallow high Arctic embayment, revealed across open-water and ice-covered periods through acoustic telemetry. Polar Biology, 39(6), 1057–1068. https://doi.org/10.1007/s00300-015-1723-y
 
