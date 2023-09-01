@@ -1,6 +1,6 @@
 Package: flapper
 Type: Package
-Title: Routines for the analysis of passive acoustic telemetry data
+Title: Routines for the Analysis of Passive Acoustic Telemetry Data
 Version: 0.1.0.9000
 Author: Edward Lavender
 Maintainer: Edward Lavender <el72@st-andrews.ac.uk>
