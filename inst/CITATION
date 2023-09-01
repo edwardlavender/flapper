@@ -1,4 +1,4 @@
-citHeader("To cite package ‘flapper’ in publications, use Lavender et al. (2023). For residency analyses, please also cite Lavender et al. (2021).")
+citHeader("To cite {flapper} in publications, use Lavender et al. (2023). For residency analyses, please also cite Lavender et al. (2021). The shortest-path routines (`lcp_*()`) are based on {cppRouting}, so please consider also citing that package if you use those explicitly (see `citation('cppRouting')`).")
 
 bibentry(
   bibtype  = "Article",
@@ -14,7 +14,7 @@ bibentry(
   title    = "Movement patterns of a Critically Endangered elasmobranch (_Dipturus intermedius_) in a Marine Protected Area",
   author   = c("Edward Lavender", "Dmitry Aleynik", "Jane Dodd", "Janine Illian", "Mark James", "Peter J. Wright", "Sophie Smout", "James Thorburn"),
   journal  = "Aquatic Conservation: Marine and Freshwater Ecosystems",
-  year     = "2023",
+  year     = "2021",
   volume   = "32",
   issue    = "2",
   pages    = "348–365",
