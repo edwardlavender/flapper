@@ -13,6 +13,13 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 [![CRAN
 status](https://www.r-pkg.org/badges/version/flapper)](https://CRAN.R-project.org/package=flapper)
 
+> **Warning** The [`flapper`](https://edwardlavender.github.io/flapper/)
+> package has been superseeded by
+> [`patter`](https://github.com/edwardlavender/patter), which is
+> simpler, faster and better tested.
+> [`patter`](https://github.com/edwardlavender/patter) will be made
+> available late 2023. Please get in touch to support beta testing.
+
 [`flapper`](https://edwardlavender.github.io/flapper/) is an `R` package
 which provides tools for passive acoustic telemetry data. The package
 has been particularly motivated by the collection of acoustic and
@@ -115,6 +122,13 @@ detections at receivers, especially:
   for the simulation of receiver arrays, movement paths and detections.
 
 ## Installation
+
+> **Warning** The [`flapper`](https://edwardlavender.github.io/flapper/)
+> package has been superseeded by
+> [`patter`](https://github.com/edwardlavender/patter), which is
+> simpler, faster and better tested.
+> [`patter`](https://github.com/edwardlavender/patter) will be made
+> available late 2023. Please get in touch to support beta testing.
 
 This package requires `R` version ≥ 4.0. You can check your current
 version with `R.version.string`. Subsequent installation steps (may)

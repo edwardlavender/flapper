@@ -18,6 +18,9 @@ knitr::opts_chunk$set(
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN status](https://www.r-pkg.org/badges/version/flapper)](https://CRAN.R-project.org/package=flapper)
 
+> **Warning**
+> The [`flapper`](https://edwardlavender.github.io/flapper/) package has been superseeded by [`patter`](https://github.com/edwardlavender/patter), which is simpler, faster and better tested. [`patter`](https://github.com/edwardlavender/patter) will be made available late 2023. Please get in touch to support beta testing. 
+
 [`flapper`](https://edwardlavender.github.io/flapper/) is an `R` package which provides tools for passive acoustic telemetry data. The package has been particularly motivated by the collection of acoustic and archival data from a Critically Endangered elasmobranch, the flapper skate (_Dipturus intermedius_), off the west coast of Scotland where a static passive acoustic telemetry array was established to examine the movements of individuals within a Marine Protected Area. [`flapper`](https://edwardlavender.github.io/flapper/) has been designed to complement existing packages for the analysis of these data (e.g. [VTrack](https://github.com/RossDwyer/VTrack), [glatos](https://github.com/ocean-tracking-network/glatos) and [fishtrack3d](https://github.com/aspillaga/fishtrack3d) and [actel](https://github.com/hugomflavio/actel)), with a particular focus on the provision of movement modelling methods for passive acoustic telemetry systems that permit the reconstruction of fine-scale movement paths and emergent patterns of space use. To this end, [`flapper`](https://edwardlavender.github.io/flapper/) contains functions in the following themes:
 
 * **Data processing tools**, including data assembly (e.g., range-testing datasets), the evaluation of false detections and quality checks;
@@ -45,6 +48,9 @@ The main highlights of the package are the provision of routines for the rapid c
   * **`sim_*()`.** These functions provide flexible, joined-up routines for the simulation of receiver arrays, movement paths and detections. 
 
 ## Installation
+
+> **Warning**
+> The [`flapper`](https://edwardlavender.github.io/flapper/) package has been superseeded by [`patter`](https://github.com/edwardlavender/patter), which is simpler, faster and better tested. [`patter`](https://github.com/edwardlavender/patter) will be made available late 2023. Please get in touch to support beta testing. 
 
 This package requires `R` version ≥ 4.0. You can check your current version with `R.version.string`. Subsequent installation steps (may) require the `devtools` and `pkgbuild` packages, which can be installed with `install.packages(c("devtools", "pkgbuild"))`. On Windows, package building requires `Rtools`. You can check whether `Rtools` is installed with `pkgbuild::has_rtools()`. If `Rtools` is not installed, it is necessary to download and install the appropriate version of `Rtools` before proceeding by following the instructions [here](https://cran.r-project.org/bin/windows/Rtools/). 
 
