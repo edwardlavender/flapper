@@ -8,13 +8,14 @@ Description: Routines for the analysis of passive acoustic telemetry data, inclu
 Imports:
     magrittr, dplyr, rlang, lubridate, purrr, 
     methods, data.table, Matrix, pbapply,
-    raster, rgeos, geosphere, Orcs, cppRouting, gdistance, sp, adehabitatHR,
+    raster, geosphere, Orcs, cppRouting, gdistance, sp, adehabitatHR,
     prettyGraphics, fields,
     Tools4ETS
 Suggests:
     plyr,
     tidyr,
     stringr,
+    rgeos,
     terra,
     fasterRaster,
     sf,
